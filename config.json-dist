@@ -1,0 +1,57 @@
+{
+  "motd": "Welcome to TS1 PServer",
+  "data": {
+    "server": [
+      "account"
+    ]
+  },
+  "server_name": "Development",
+  "data_path": "data",
+  "ports": {
+    "login": 11091,
+    "world": 11092
+  },
+  "interfaces": {
+    "regular": "0.0.0.0",
+    "lan": "0.0.0.0"
+  },
+  "plugins": [ "login.js", "world.js" ],
+  "max_clients": "10",
+  "client_timeout": "120",
+  "web_enabled": "true",
+  "max_login_attempt": "5",
+  "server_status": {
+    "admin_only": "false",
+    "maintenance": "false",
+    "debugging": "false",
+    "online": "true"
+  },
+  "mongodb": {
+    "connectString": "ts1:ts1@localhost:27017/ts1",
+    "collections": [
+      "account",
+      "character",
+      "counters"
+    ]
+  },
+  "SingleClanOnly": false,
+  "Clans": [
+    "Guanyin",
+    "Fujin",
+    "Jinong"
+  ],
+  "zoneTransferLogoutTimer": 300000,
+  "systemAdminPassword": "password",
+  "systemAdminIP": [
+    "127.0.0.1",
+    "PUT YOUR INTERNAL IP HERE"
+  ],
+  "natTranslations": [
+    {
+      "mask": "PUT YOUR NETWORK MASK HERE/24",
+      "ip": "PUT YOUR INTERNAL IP HERE"
+    }
+  ],
+  "externalIP": "PUT YOUR EXTERNAL IP HERE",
+  "viewable_action_distance": 5000
+}
