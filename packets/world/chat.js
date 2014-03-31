@@ -40,7 +40,7 @@ WorldPC.Set(0x13, {
 
 	function: function NormalChatRecv(socket, input) {
 
-		if (input.Message.indexOf('/') == 0) {
+		if (input.Message.indexOf('/') === 0) {
 			GMCommand.Execute(input.Message.substr(1), socket); // Need to remove the / so everything after it.
 			return;
 		}
@@ -50,7 +50,7 @@ WorldPC.Set(0x13, {
 		new buffer(
 		WorldPC.ChatPacketReply.pack({
 			PacketID: 0x2A,
-			Name: input.Name,
+			Name: socket.character.Name,
 			Message: input.Message
 		})), socket.character.Clan);
 	}
