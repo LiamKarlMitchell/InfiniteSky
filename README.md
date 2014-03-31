@@ -81,9 +81,11 @@ By running that script you can easily start the database server for InfiniteSky.
 You will also need to create the ts1 db collection and user.
 To do that run mongo or cd bin then type ./mongo if your on linux.
 Then type in the following commands.
-```use ts1
+```
+use ts1
 db.createCollection("ts1")
-db.addUser({user: "ts1", pwd: "ts1", roles: ["readWrite"]})```
+db.addUser({user: "ts1", pwd: "ts1", roles: ["readWrite"]})
+```
 
 
 ##### Copy game files to data directorys you made
