@@ -1,0 +1,56 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TSX_Launcher", "TSX_Launcher\TSX_Launcher.vcproj", "{CA4D1AB9-B416-4822-BCB9-461A4EEC1874}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TSX_Client", "TSX_Client\TSX_Client.vcproj", "{92B67201-1C65-4D91-84D9-922511BF3001}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "diStorm", "diStorm\make\win32\vs2008\diStorm\diStorm.vcproj", "{7DD8CDF7-4B04-41FD-A074-BE9AA21E3848}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NtHookEngine", "NtHookEngine\NtHookEngine.vcproj", "{152D6838-5593-4C3D-BB00-9A9B434EA7BB}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MergeSpawnInfos", "MergeSpawnInfos\MergeSpawnInfos.vcproj", "{4A249D59-407B-4B8F-809E-B796218966F6}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SpawnInfoManager", "SpawnInfoManager\SpawnInfoManager.vcproj", "{031181BE-9154-4BBF-A598-3CB696E2399A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PrivateServerLauncher", "PrivateServerLauncher\PrivateServerLauncher.vcproj", "{347E6EA1-EEA0-4F5B-906B-4153628E11C0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CA4D1AB9-B416-4822-BCB9-461A4EEC1874}.Debug|Win32.ActiveCfg = Debug|Win32
+		{CA4D1AB9-B416-4822-BCB9-461A4EEC1874}.Debug|Win32.Build.0 = Debug|Win32
+		{CA4D1AB9-B416-4822-BCB9-461A4EEC1874}.Release|Win32.ActiveCfg = Release|Win32
+		{CA4D1AB9-B416-4822-BCB9-461A4EEC1874}.Release|Win32.Build.0 = Release|Win32
+		{92B67201-1C65-4D91-84D9-922511BF3001}.Debug|Win32.ActiveCfg = Debug|Win32
+		{92B67201-1C65-4D91-84D9-922511BF3001}.Debug|Win32.Build.0 = Debug|Win32
+		{92B67201-1C65-4D91-84D9-922511BF3001}.Release|Win32.ActiveCfg = Release|Win32
+		{92B67201-1C65-4D91-84D9-922511BF3001}.Release|Win32.Build.0 = Release|Win32
+		{7DD8CDF7-4B04-41FD-A074-BE9AA21E3848}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7DD8CDF7-4B04-41FD-A074-BE9AA21E3848}.Debug|Win32.Build.0 = Debug|Win32
+		{7DD8CDF7-4B04-41FD-A074-BE9AA21E3848}.Release|Win32.ActiveCfg = Release|Win32
+		{7DD8CDF7-4B04-41FD-A074-BE9AA21E3848}.Release|Win32.Build.0 = Release|Win32
+		{152D6838-5593-4C3D-BB00-9A9B434EA7BB}.Debug|Win32.ActiveCfg = Debug|Win32
+		{152D6838-5593-4C3D-BB00-9A9B434EA7BB}.Debug|Win32.Build.0 = Debug|Win32
+		{152D6838-5593-4C3D-BB00-9A9B434EA7BB}.Release|Win32.ActiveCfg = Release|Win32
+		{152D6838-5593-4C3D-BB00-9A9B434EA7BB}.Release|Win32.Build.0 = Release|Win32
+		{4A249D59-407B-4B8F-809E-B796218966F6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4A249D59-407B-4B8F-809E-B796218966F6}.Debug|Win32.Build.0 = Debug|Win32
+		{4A249D59-407B-4B8F-809E-B796218966F6}.Release|Win32.ActiveCfg = Release|Win32
+		{4A249D59-407B-4B8F-809E-B796218966F6}.Release|Win32.Build.0 = Release|Win32
+		{031181BE-9154-4BBF-A598-3CB696E2399A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{031181BE-9154-4BBF-A598-3CB696E2399A}.Debug|Win32.Build.0 = Debug|Win32
+		{031181BE-9154-4BBF-A598-3CB696E2399A}.Release|Win32.ActiveCfg = Release|Win32
+		{031181BE-9154-4BBF-A598-3CB696E2399A}.Release|Win32.Build.0 = Release|Win32
+		{347E6EA1-EEA0-4F5B-906B-4153628E11C0}.Debug|Win32.ActiveCfg = Debug|Win32
+		{347E6EA1-EEA0-4F5B-906B-4153628E11C0}.Debug|Win32.Build.0 = Debug|Win32
+		{347E6EA1-EEA0-4F5B-906B-4153628E11C0}.Release|Win32.ActiveCfg = Release|Win32
+		{347E6EA1-EEA0-4F5B-906B-4153628E11C0}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
