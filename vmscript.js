@@ -64,7 +64,6 @@ function vmscript(name,directory,scope) {
 
   this.Load = function(file,callback) {
     // this.Unload(file);
-    file = path.normalize(file);
     if (typeof(scripts.__fileTimes[name+'_'+file])==='undefined') {
       scripts.__fileTimes[name+'_'+file] = new Date(0);
       if (!directory && fs.existsSync(file)) {

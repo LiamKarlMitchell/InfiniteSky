@@ -37,6 +37,11 @@ node-debug main
 Installation
 --------------
 
+For a video see here: http://youtu.be/WH32P1i5DrQ
+
+To setup with git check here
+* docs/gitsetup.md
+
 ##### Install Node.js & MongoDB
 *If you have not already*
 Currently using Node.js v0.10.26
@@ -46,6 +51,8 @@ Don't use the one from apt-get on linux, I have had experiences with it being ma
 See the following links:
 * http://nodejs.org
 * http://www.mongodb.org
+
+Some assumptions are that you know how to do basic file management and use the command prompt or terminal. As well as download and install files.
 
 Server is currently untested on linux. I have been running it on Windows 7
 ```sh
@@ -59,6 +66,26 @@ mkdir data/spawninfo
 mkdir data/world
 ```
 
+or maybe ```mkdir -p data/world data/infos data/packets data/spawninfo data/world```
+
+To setup mongodb what I did was create a data directory in the mongo db directory. Then I make a bat script like this
+```title Mongodb
+cls
+bin\mongod.exe --dbpath "data"```
+
+or you could use sh script like this on linux
+```./bin/mongod --dbpath "./data"```
+
+By running that script you can easily start the database server for InfiniteSky.
+
+You will also need to create the ts1 db collection and user.
+To do that run mongo or cd bin then type ./mongo if your on linux.
+Then type in the following commands.
+```use ts1
+db.createCollection("ts1")
+db.addUser({user: "ts1", pwd: "ts1", roles: ["readWrite"]})```
+
+
 ##### Copy game files to data directorys you made
 
 for more information on these directorys look at *docs/directorys.md*
@@ -71,9 +98,9 @@ data/world:
 * G03_GDATA/D07_GWORLD/*.WREGION
 * 
 ##### Configure. Instructions in 
-cp config.json-dist config.json
-and edit it accordingly
+copy the config.json-dist file and rename it to config.json and edit it accordingly
 
+```cp config.json-dist config.json```
 * docs/config.md
 
 Replace the following in the config

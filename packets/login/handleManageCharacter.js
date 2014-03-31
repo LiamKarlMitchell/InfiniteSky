@@ -82,6 +82,8 @@ LoginPC.Set(0x06, {
 
 		// Could get all the vars and pass them in here.
 		var newCharacter = new db.Character();
+
+		console.log('newCharacter.updateInfos: '+typeof(newCharacter.updateInfos));
 		newCharacter.Name = create.Name;
 		// Check create.Name for invalid characters here
 		console.log('TODO: Code in checking name for invalid characters/words');
@@ -137,7 +139,17 @@ LoginPC.Set(0x06, {
 			// Merge the newcharacter template info from json file into newCharacter
 			// TODO: Move new character config setting into Character.js
 			// Then we could do away with extend?
-			newCharacter = extend(newCharacter, util.newcharacterconfig[ClanName]);
+			console.log('newCharacter.updateInfos: '+typeof(newCharacter.updateInfos));
+			//newCharacter = extend(newCharacter, util.newcharacterconfig[ClanName]);
+			var newcharcfg = util.newcharacterconfig[ClanName];
+			for (var thing in newCharacter) {
+				if (newCharacter.hasOwnProperty(thing) && newcharcfg.hasOwnProperty(thing)) {
+					// Check for invalid things that should not be copied over?
+					// Accept characters value first?
+					newCharacter[thing] = newcharcfg[thing];
+				}
+			}
+			console.log('newCharacter.updateInfos: '+typeof(newCharacter.updateInfos));
 
 			// Set values that can not be overwritten here.
 			// Check Hair and Face for each clan

@@ -89,6 +89,8 @@ generic.calculateCharacterStatInfo = function calculateCharacterStatInfo(reloadE
   var level = this.Level;
   if (level>106) level=106;
   if (reloadEXPInfo) this.expinfo = infos.Exp[level];
+  console.log('Level is '+level);
+  console.log(JSON.stringify(infos.Exp[level]));
   // Setup base stats bassed on points, bonuses gear etc.
 
   var statInfo = {}; // Should make this a js object
@@ -213,7 +215,7 @@ generic.calculateCharacterStatInfo = function calculateCharacterStatInfo(reloadE
 
   var cvars = Modifiers[this.Clan];
   var WeaponType = 0;
-  
+
   statInfo.HP += cvars.HP;
   statInfo.Chi += cvars.Chi;
 

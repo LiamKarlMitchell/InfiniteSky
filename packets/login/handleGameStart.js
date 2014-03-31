@@ -14,7 +14,7 @@ int32lu("Port");
 
 LoginPC.Set(0x09, {
 	Restruct: restruct.
-	int32lu("MaID").
+	int32lu("MapID").
 	int8lu("Slot").
 	string("UserID", 8),
 
