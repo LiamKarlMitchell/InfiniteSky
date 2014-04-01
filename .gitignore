@@ -215,6 +215,7 @@ pip-log.txt
 .mr.developer.cfg
 
 /config.json
-/data/
+/data/infos
+/data/world
 /node_modules/
 /npm-cache/

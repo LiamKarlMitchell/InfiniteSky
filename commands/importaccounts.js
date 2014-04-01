@@ -14,7 +14,7 @@ GMCommands.AddCommand(new Command('importaccounts',100,function command_importac
 		// Make an account
 		db.getNextSequence('accountid',function(id) {
 
-			newaccount = new db.mongoose.Account({Username: username, Password: password, Email: email_address, Level: level, _id: id});
+			newaccount = new db.Account({Username: username, Password: password, Email: email_address, Level: level, _id: id});
 			newaccount.save(function (err) {
 				  if (err) {
 				  	//console.log(err);

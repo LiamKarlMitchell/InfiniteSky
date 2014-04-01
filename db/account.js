@@ -2,7 +2,7 @@
 // Copyright (c) InfiniteSky Dev Teams - Licensed under GNU GPL
 // For more information, see LICENCE in the main folder
 
-db.mongoose.accountSchema = mongoose.Schema({
+db.accountSchema = mongoose.Schema({
   _id: { type: Number, unique: true, index: true },
 	Username: { type: String, unique: true, index: true },
 	Password: String,
@@ -16,7 +16,7 @@ db.mongoose.accountSchema = mongoose.Schema({
 });
 
 delete mongoose.models['account_mongoose'];
-db.Account = mongoose.model('account_mongoose', db.mongoose.accountSchema);
+db.Account = mongoose.model('account_mongoose', db.accountSchema);
 
 //Log user out
 db.Account.logoutUser = function (socket) {

@@ -27,7 +27,7 @@ GMCommands.AddCommand(new Command('makeaccount',61,function command_makeaccount(
 		// Make an account
 		db.getNextSequence('accountid',function(id) {
 
-			newaccount = new db.mongoose.Account({Username: Username, Password: Password, Level: Level, _id: id});
+			newaccount = new db.Account({Username: Username, Password: Password, Level: Level, _id: id});
 			newaccount.save(function (err) {
 				  if (err) {
 				  	client.sendInfoMessage('Error making account already exists');

@@ -2,7 +2,7 @@
 // Copyright (c) InfiniteSky Dev Teams - Licensed under GNU GPL
 // For more information, see LICENCE in the main folder
 
-var mongoose = require('mongoose');
+mongoose = require('mongoose');
 var vmscript = require('./vmscript');
 var scope = require('./sandbox');
 

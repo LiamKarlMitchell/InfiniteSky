@@ -3,7 +3,7 @@
 // For more information, see LICENCE in the main folder
 
 // Starting work on an email queue schema
-db.mongoose.emailQueueSchema = mongoose.Schema({
+db.emailQueueSchema = mongoose.Schema({
   Subject: { type: String, index: true },
   To: { type: String, index: true },
   Body: String,
@@ -12,4 +12,4 @@ db.mongoose.emailQueueSchema = mongoose.Schema({
 });
 
 delete mongoose.models['emailqueue'];
-db.EmailQueue = mongoose.model('emailqueue', db.mongoose.emailQueueSchema);
+db.EmailQueue = mongoose.model('emailqueue', db.emailQueueSchema);

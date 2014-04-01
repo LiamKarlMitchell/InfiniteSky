@@ -30,9 +30,12 @@ cli.createaccount = function CLI_CreateAccount(input) {
  	return;
  }
  
+  // TODO: Move create account into db/account.js as a function
+  // TODO: Make a delete account function and maybe ban/suspend?
+  // TODO: Make a reset password for account function.
   db.getNextSequence('accountid',function(id) {
   	info._id = id;
-  	var newaccount = new db.mongoose.Account(info);
+  	var newaccount = new db.Account(info);
   	newaccount.save(function (err) {
   		  if (err) { // Assuming account already exists
   		    util.dumpError('Error making account already exists or there was an error.');

@@ -3,14 +3,15 @@
 // For more information, see LICENCE in the main folder
 
 // Shorthand Types
-//var String = mongoose.Schema.Types.String;
-//var Number = mongoose.Schema.Types.Number;
-var Bool = mongoose.Schema.Types.Boolean;
-var Array = mongoose.Schema.Types.Array;
-var Buffer = mongoose.Schema.Types.Buffer;
-//var Date = mongoose.Schema.Types.Date;
-var ObjectId = mongoose.Schema.Types.ObjectId;
-var Mixed = mongoose.Schema.Types.Mixed;
+//var String = db.mongoose.Schema.Types.String;
+//var Number = db.mongoose.Schema.Types.Number;
+var mongoose = require('mongoose');
+var Bool = db.mongoose.Schema.Types.Boolean;
+//var Array = db.mongoose.Schema.Types.Array;
+var Buffer = db.mongoose.Schema.Types.Buffer;
+//var Date = db.mongoose.Schema.Types.Date;
+var ObjectId = db.mongoose.Schema.Types.ObjectId;
+var Mixed = db.mongoose.Schema.Types.Mixed;
 
 // Actuall definitions here
 var itemEquip = {

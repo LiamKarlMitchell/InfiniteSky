@@ -2,7 +2,7 @@
 // Copyright (c) InfiniteSky Dev Teams - Licensed under GNU GPL
 // For more information, see LICENCE in the main folder
 
-db.mongoose.guildSchema = mongoose.Schema({
+db.guildSchema = mongoose.Schema({
   Name: { type: String, unique: true, index: true },
   Master: String,
   Level: {type: Number, default: 0},
@@ -12,4 +12,4 @@ db.mongoose.guildSchema = mongoose.Schema({
 });
 
 delete mongoose.models['guilds'];
-db.Guild = mongoose.model('guilds', db.mongoose.guildSchema);
+db.Guild = mongoose.model('guilds', db.guildSchema);

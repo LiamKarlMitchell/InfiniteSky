@@ -7,7 +7,7 @@
 // Command to see how many accounts are online
 GMCommands.AddCommand(new Command('online',0,function command_online(string,client){
 	// Ask the database
-	db.mongoose.Account.find({active: 1},function (err,accounts) {
+	db.Account.find({active: 1},function (err,accounts) {
 		if (err) {
 			client.sendInfoMessage('Error talking to database...');	
 			console.log(err);

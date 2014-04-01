@@ -12,7 +12,7 @@ GMCommands.AddCommand(new Command('unlockaccount',80,function command_unlockacco
 		Searcher = {active: 1};
 	}
 	console.log(Searcher);
-	db.mongoose.Account.find(Searcher,function (err,acc) {
+	db.Account.find(Searcher,function (err,acc) {
 		if (err) {
 			client.sendInfoMessage('Error talking to database...');	
 			console.log(err);
