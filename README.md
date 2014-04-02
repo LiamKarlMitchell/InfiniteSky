@@ -37,25 +37,26 @@ node-debug main
 Installation
 --------------
 
-For a video see here: http://youtu.be/WH32P1i5DrQ
+[Video Guide](http://youtu.be/WH32P1i5DrQ)
 
-To setup with git check here
-* docs/gitsetup.md
+To setup with git check see [Git Setup](https://github.com/LiamKarlMitchell/InfiniteSky/blob/master/docs/gitsetup.md)
 
-##### Install Node.js & MongoDB
+## Install Node.js & MongoDB
 *If you have not already*
 Currently using Node.js v0.10.26
 
-Don't use the one from apt-get on linux, I have had experiences with it being majorly out of date.
+Don't use the one from apt-get on linux, I have had experiences with it being quite out of date.
 
 See the following links:
-* http://nodejs.org
-* http://www.mongodb.org
+* [Node.JS](http://nodejs.org)
+* [MongoDB](http://www.mongodb.org)
 
 Some assumptions are that you know how to do basic file management and use the command prompt or terminal. As well as download and install files.
+We suggest setting up your code somewhere such as
 
 Server is currently untested on linux. I have been running it on Windows 7
-```sh
+```
+sh
 git clone [git-repo-url] InfiniteSky
 cd InfiniteSky
 npm install
@@ -69,12 +70,16 @@ mkdir data/world
 or maybe ```mkdir -p data/world data/infos data/packets data/spawninfo data/world```
 
 To setup mongodb what I did was create a data directory in the mongo db directory. Then I make a bat script like this
-```title Mongodb
+```
+title Mongodb
 cls
-bin\mongod.exe --dbpath "data"```
+bin\mongod.exe --dbpath "data"
+```
 
 or you could use sh script like this on linux
-```./bin/mongod --dbpath "./data"```
+```
+./bin/mongod --dbpath "./data"
+```
 
 By running that script you can easily start the database server for InfiniteSky.
 
@@ -87,10 +92,9 @@ db.createCollection("ts1")
 db.addUser({user: "ts1", pwd: "ts1", roles: ["readWrite"]})
 ```
 
+## Copy game files to data directorys you made
 
-##### Copy game files to data directorys you made
-
-for more information on these directorys look at *docs/directorys.md*
+for more information on these see [Directory Documentation](https://github.com/LiamKarlMitchell/InfiniteSky/blob/master/docs/directorys.md)
 
 data/infos:
 * G03_GDATA/D01_GIMAGE2D/005/*.IMG
@@ -98,19 +102,20 @@ data/infos:
 data/world:
 * G03_GDATA/D07_GWORLD/*.WM
 * G03_GDATA/D07_GWORLD/*.WREGION
-* 
-##### Configure. Instructions in 
+*
+## Configure. Instructions in
 copy the config.json-dist file and rename it to config.json and edit it accordingly
 
 ```cp config.json-dist config.json```
-* docs/config.md
+
+For more info see [Config Documentation](https://github.com/LiamKarlMitchell/InfiniteSky/blob/master/docs/config.md)
 
 Replace the following in the config
 "PUT YOUR INTERNAL IP HERE" with your ip address you can find it by doing ipconfig and looking at your interfaces ip.
 "PUT YOUR NETWORK MASK HERE" Your nemask in cider notation. For example "10.1.1.0/24" is 255.255.255.0
 "PUT YOUR EXTERNAL IP HERE" Get your external ip by googling what is my ip and putting the result in here. This is required for other people to connect to your server. Otherwise use your internal IP if running on lan.
 
-##### Configure Plugins. Instructions in following README.md files
+## Configure Plugins. Instructions in following README.md files
 
 * plugins/dropbox/README.md
 * plugins/github/README.md
@@ -120,11 +125,12 @@ Replace the following in the config
 node app
 ```
 
-##### Scripting Documentation
+## Documentation
+Main Documentation in docs/index.html
+[Restruct Documentation](https://github.com/LiamKarlMitchell/InfiniteSky/blob/master/docs/gitsetup.md)
+[Scripting Documentation](https://github.com/LiamKarlMitchell/InfiniteSky/blob/master/docs/scripting.md)
 
-* docs/scripting.md
-
-##### Game Launcher and TSX Client DLL
+## Game Launcher and TSX Client DLL
 
 Compile the launcher and dll and package them together.
 The PrivateServer.ini should look like this
@@ -138,9 +144,16 @@ HookFileLoading = 1
 DevButtons = 1
 ```
 
-##### Notes
+## Notes
 
 The server will take a while to start, be patient.
+
+## Style Guide
+We should style our code like so [Idiomatic.js Style Guide](https://github.com/rwldrn/idiomatic.js),
+there are places where we may not have written code this way in existing code. I recommend you fix these in existing code or in the case of a pull request tell the author to fix it up.
+
+##Recommended sublime plug-ins:
+Coming Soon
 
 
 License
@@ -149,4 +162,3 @@ License
 GNU GPL see LICENSE file
 
 **Enjoy!**
-    
