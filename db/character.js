@@ -57,19 +57,19 @@ var characterSchema = mongoose.Schema({
 	Guild: { type: String, index: true },
 	Title: { type: String },
 
-	IsGM: Number,
-	PlayTime: Number,
+	IsGM: {type: Number, default: 0 },
+	PlayTime: {type: Number, default: 0 },
 	Name: { type: String, unique: true, index: true },
 
-	Clan: {type: Number, min: 0, max: 2},
-	Gender: Number,
-	Hair: Number,
-	Face: Number,
-	Level: Number,
-	Experience: Number,
-	OtherIngame: Number,
-	StatBonus: Number,
-	Honor: Number,
+	Clan: {type: Number, min: 0, max: 2, default: 0 },
+	Gender: {type: Number, default: 0 },
+	Hair: {type: Number, default: 0 },
+	Face: {type: Number, default: 0 },
+	Level: {type: Number, default: 1 },
+	Experience: {type: Number, default: 0 },
+	OtherIngame: {type: Number, default: 0 },
+	StatBonus: {type: Number, default: 0 },
+	Honor: {type: Number, default: 0 },
 	SkillPoints: {type: Number, default: 0 },
 	StatPoints: {type: Number, default: 0 },
 
@@ -79,7 +79,6 @@ var characterSchema = mongoose.Schema({
 
 	Name: { type: String, unique: true, index: true },
 
-	
 	StatStrength: {type: Number, default: 0 },
 	StatChi: {type: Number, default: 0 },
 	StatDexterity: {type: Number, default: 0 },
@@ -115,7 +114,6 @@ var characterSchema = mongoose.Schema({
 	Health: Number,
 	Chi: Number,
 
-
 	StrBonus: { type: Number, default: 0 },
 	DexBonus: { type: Number, default: 0 },
 	LuckBuff: { type: Number, default: 0 },
@@ -136,6 +134,9 @@ var characterSchema = mongoose.Schema({
 	DailyUnknown2: { type: Number, default: 0 }	,
 
 	LastUpdated: { type: Date, default: Date.now },
+
+	Deaths: { type: Number, min: 0, default: 0 },
+	MonstersKilled: {}, // A hash to store monsters killed
 	//DuelWins: Number,
 	//DuelLosses: Number,
 	//TotalEnemyFactionKills: Number

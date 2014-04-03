@@ -1,8 +1,7 @@
 // This file is part of InfiniteSky.
 // Copyright (c) InfiniteSky Dev Teams - Licensed under GNU GPL
 // For more information, see LICENCE in the main folder
-
-util.newcharacterconfig = {
+infos.NewCharacter = {
 	"Guanyin": {
 		"Armor": { "ID": 8, "Enchant": 0, "Combine": 0},
 		"Glove": { "ID": 9, "Enchant": 0, "Combine": 0},

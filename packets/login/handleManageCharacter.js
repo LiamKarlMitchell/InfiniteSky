@@ -134,6 +134,7 @@ LoginPC.Set(0x06, {
 
 			// Get clan name, Because Ryan no likey using 0 1 2 to define the new character things in json :D
 			var ClanName = util.config.Clans[create.Clan];
+			console.log('Clan: '+ClanName);
 
 			//console.log("Wants to create character of clan %s", ClanName);
 			// Merge the newcharacter template info from json file into newCharacter
@@ -141,9 +142,10 @@ LoginPC.Set(0x06, {
 			// Then we could do away with extend?
 			console.log('newCharacter.updateInfos: '+typeof(newCharacter.updateInfos));
 			//newCharacter = extend(newCharacter, util.newcharacterconfig[ClanName]);
-			var newcharcfg = util.newcharacterconfig[ClanName];
-			for (var thing in newCharacter) {
-				if (newCharacter.hasOwnProperty(thing) && newcharcfg.hasOwnProperty(thing)) {
+			
+			var newcharcfg = infos.NewCharacter[ClanName];
+			for (var thing in newcharcfg) {
+				if (newcharcfg.hasOwnProperty(thing)) {
 					// Check for invalid things that should not be copied over?
 					// Accept characters value first?
 					newCharacter[thing] = newcharcfg[thing];

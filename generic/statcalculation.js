@@ -88,9 +88,14 @@ generic.calculateCharacterStatInfo = function calculateCharacterStatInfo(reloadE
 
   var level = this.Level;
   if (level>106) level=106;
-  if (reloadEXPInfo) this.expinfo = infos.Exp[level];
-  console.log('Level is '+level);
-  console.log(JSON.stringify(infos.Exp[level]));
+  if (reloadEXPInfo || this.expinfo === undefined) this.expinfo = infos.Exp[level];
+
+  // Setup base stats bassed on points, bonuses gear etc.
+  if (this.expinfo === undefined) {
+    throw new Error('Level is set to '+level+' for character '+this.Name+' which does not have exp info for it.');
+  }
+
+
   // Setup base stats bassed on points, bonuses gear etc.
 
   var statInfo = {}; // Should make this a js object
