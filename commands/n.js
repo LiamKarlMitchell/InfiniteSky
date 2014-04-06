@@ -6,5 +6,5 @@
 // Command: n
 // Notice command to send to all players in world
 GMCommands.AddCommand(new Command('n',50,function command_n(string,client){
-	GMCommands.World.sendNotice(string);
+	world.sendNotice(string);
 }));

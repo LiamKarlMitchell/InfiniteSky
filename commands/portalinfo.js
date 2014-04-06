@@ -9,7 +9,7 @@ GMCommands.AddCommand(new Command('portalinfo',60,function command_bring(string,
 	var Zone = null;
 	
 	if (string.length) {
-		Zone = World.findZoneByID(string);
+		Zone = zones[string];
 	}
 
 	if (Zone===null) {

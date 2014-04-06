@@ -8,7 +8,7 @@
 GMCommands.AddCommand(new Command('bring',50,function command_bring(string,client){
 		console.log(client.character.Name+' wants to bring '+string+' to their location');
 		var otherName = string; // Need to get name from string
-		other = this.World.findCharacterSocket(otherName);
+		other = world.findCharacterSocket(otherName);
 		if (other==null)
 		{
 			client.sendInfoMessage(otherName+' could not be found');

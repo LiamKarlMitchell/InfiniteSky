@@ -36,23 +36,22 @@ function getNamespace(name) {
 var vmscriptEventEmitter = new events.EventEmitter();
 
 // TODO: Make this sync? so that callback can be done when everythings finished loading. Or figure out how to do that async...
-// vmscript can watch a directory and you can pass a scope to it such as this
-function vmscript(name,directory,scope) {
+// vmscript can watch a directory and you can pass a sandbox to it such as this
+function vmscript(name,directory,sandbox) {
   this.LastAdded = null;
-  if (!scope) {
-    scope = {};
+  if (!sandbox) {
+    sandbox = {};
   }
   this.eventEmitter = vmscriptEventEmitter;
-  var scripts = scope['scripts_'+name] = this;
+  var scripts = sandbox['scripts_'+name] = this;
   this.unload = {};
-  scope.console = console;
-  scope.Buffer = Buffer;
+  sandbox.console = console;
+  sandbox.Buffer = Buffer;
   scripts.__fileTimes = [];
-  var context = vm.createContext(scope);
 
   loadedScriptNamespaces[name] = this;
   // TODO: Fix unloading so it actually works as expected, maybe create a better interface if possible such as commands/scripts registering
-  // functions by name which can be auto removed if required eg delete scope[name][functionname];
+  // functions by name which can be auto removed if required eg delete sandbox[name][functionname];
   this.Unload = function(file) {
     if (scripts.__fileTimes[name+'_'+file]) {
       if (typeof(scripts.unload[name+'_'+file]) === 'function') {
@@ -102,57 +101,58 @@ function vmscript(name,directory,scope) {
         else
         {
           try {
-              scope.__filename = file;
-              scope.__dirname = path.dirname(file);
-              scope.module = {};
-              var result = vm.runInNewContext(data.toString(), scope, path.normalize(file));
-              if (scope.module.exports !== undefined) {
+              sandbox.__filename = file;
+              sandbox.__dirname = path.dirname(file);
+              sandbox.module = {};
+              //var context = vm.createContext(sandbox);
+              var result = vm.runInNewContext(data.toString(), sandbox, path.normalize(file));
+              if (sandbox.module.exports !== undefined) {
                 // TODO: Store exports from a script o.O could do an unload too :)
                 // require.cache[require.resolve(file)]
-                //console.log(scope.module.exports);
-                //console.log(scope.module.exports.prototype);
-                if (scope.module.name) {
+                //console.log(sandbox.module.exports);
+                //console.log(sandbox.module.exports.prototype);
+                if (sandbox.module.name) {
                   console.log('Named module found');
                   var transfer;
-                  if (scope.module.merge) {
-                    if (scope[scope.module.name] !== undefined) {
-                      if (typeof(scope[scope.module.name].transfer) === 'function' ) {
-                        transfer = scope[scope.module.name].transfer();
-                        console.log(scope[scope.module.name].transfer());
-                        console.log(scope[scope.module.name].testa());
+                  if (sandbox.module.merge) {
+                    if (sandbox[sandbox.module.name] !== undefined) {
+                      if (typeof(sandbox[sandbox.module.name].transfer) === 'function' ) {
+                        transfer = sandbox[sandbox.module.name].transfer();
+                        console.log(sandbox[sandbox.module.name].transfer());
+                        console.log(sandbox[sandbox.module.name].testa());
                       }
                       // If prototype is set
-                      scope[scope.module.name].__proto__ = scope.module.exports.prototype;
+                      sandbox[sandbox.module.name].__proto__ = sandbox.module.exports.prototype;
 
-                      if (typeof(scope.module.exports.transfer) === 'function' ) {
+                      if (typeof(sandbox.module.exports.transfer) === 'function' ) {
                         console.log('giving transfer data',transfer);
-                        scope.module.exports.transfer(transfer);
+                        sandbox.module.exports.transfer(transfer);
                       }
 
-                      console.log('module '+scope.module.name+' reloaded');
+                      console.log('module '+sandbox.module.name+' reloaded');
                     } else {
 
-                      scope[scope.module.name] = scope.module.exports;
-                      console.log('module '+scope.module.name+' loaded');
+                      sandbox[sandbox.module.name] = sandbox.module.exports;
+                      console.log('module '+sandbox.module.name+' loaded');
 
                     }
                   }
                   else
                   {
-                    if (scope.module.name === undefined && typeof(scope.module.exports) === 'function' && scope.module.name) {
-                      scope.module.name = scope.module.exports.name;
+                    if (sandbox.module.name === undefined && typeof(sandbox.module.exports) === 'function' && sandbox.module.name) {
+                      sandbox.module.name = sandbox.module.exports.name;
                     }
 
-                    if (typeof(scope[scope.module.name].transfer) === 'function' ) {
-                        transfer = scope[scope.module.name].transfer();
+                    if (typeof(sandbox[sandbox.module.name].transfer) === 'function' ) {
+                        transfer = sandbox[sandbox.module.name].transfer();
                     }
 
-                    scope[scope.module.name] = scope.module.exports;
-                    if (typeof(scope[scope.module.name].transfer) === 'function' ) {
-                        scope[scope.module.name].transfer(transfer);
+                    sandbox[sandbox.module.name] = sandbox.module.exports;
+                    if (typeof(sandbox[sandbox.module.name].transfer) === 'function' ) {
+                        sandbox[sandbox.module.name].transfer(transfer);
                       }
 
-                    console.log('module '+scope.module.name+' loaded');
+                    console.log('module '+sandbox.module.name+' loaded');
 
                   }
                 }
@@ -221,7 +221,7 @@ module.exports = vmscript;
 // function loadModule(moduleInfo) {
 //   // If it can be loaded just fine
 //   vmscriptEventEmitter.emit('loadedModule', moduleInfo);
-//   scope[moduleInfo.name] = moduleInfo.exports;
+//   sandbox[moduleInfo.name] = moduleInfo.exports;
 //   if (typeof (moduleInfo.exports.onModuleLoaded) === 'function') {
 //     moduleInfo.exports.onModuleLoaded();
 //   }

@@ -54,6 +54,7 @@ var util = {
   padLeft: function(string,pad,amount) {
     return (new Array(amount).join(pad)+string).slice(-amount);
   },
+  // TODO: Make Async?
   loadConfig: function(name) {
     if (name !== undefined) util.configFile = name;
     if (util.configFile === undefined) {
@@ -62,7 +63,7 @@ var util = {
     console.log('Attempting to load config file: '+util.configFile);
     try {
       util.config = JSON.parse(fs.readFileSync(util.configFile,{ encoding: 'ascii' }));
-      console.log(util.config.natTranslations);
+      //console.log(util.config.natTranslations);
       scope.main.events.emit('config_loaded');
       return util.config;
     } catch(ex) {

@@ -139,6 +139,13 @@ if (!util.loadConfig('./config.json')) {
   process.exit(1);
 }
 
+// TODO: Config file watching for reload
+fs.watchFile('./config.json', function(curr, perv) {
+  if (!sandbox.util.loadConfig('./config.json')) {
+    console.log('Error loading config file.');
+  }
+})
+
 natTranslations.length = 0;
 util.config.natTranslations.forEach(function(natTranslation,index) {
   natTranslations[index] = new Netmask(natTranslation.mask);

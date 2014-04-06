@@ -17,7 +17,7 @@ GMCommands.AddCommand(new Command('online',0,function command_online(string,clie
 		var onlineaccounts = [];
 
 		for (var i=0;i<accounts.length;i++) {
-			var w = World.findAccountSocket(accounts[i].Username);
+			var w = world.findAccountSocket(accounts[i].Username);
 			if (w && w._handle) {
 				onlineaccounts.push(w);
 			}

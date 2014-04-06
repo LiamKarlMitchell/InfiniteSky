@@ -212,7 +212,7 @@ GMCommands.AddCommand(new Command('set',60,function command_set(string,client){
 				sendCharUpdate = true;
 			break;
 			case 'MapID':
-				if (World.findZoneByID(Value)) {
+				if (zones[Value]) {
 					client.sendInfoMessage('Please relog to load into map if possible.');
 					client.character.MapID = Value;
 					client.character.ToMapID = Value;

@@ -34,6 +34,7 @@ WorldPC.Set(0x01, {
 		// on create character we would set the respawn location to their home zone
 		// Need to know if mongodb always returns characters/things in same order and if it always loops through them in same order in the for each.. hoping it does
 		// on login game start we should store a reference to the selected character in socket.selectedCharacter then we can just grab that.
+		console.log('world\\handshake.js '+socket.Username);
 		var oldsocket = world.getSocketFromTransferQueue(socket.Username);
 		if (oldsocket != null) {
 			console.log('Existing socket found');
@@ -57,7 +58,7 @@ WorldPC.Set(0x01, {
 			// Find Zone info
 			// Can compare to oldsocket.zone to check map id and portal xyz for validity etc.
 			// Check portal endpoints
-			socket.Zone = world.findZoneByID(socket.character.ToMapID);
+			socket.Zone = zones[socket.character.ToMapID];
 			var newlocation = socket.character.state.ToLocation.X;;
 			if (socket.Zone != null) {
 				socket.character.MapID = socket.character.ToMapID;

@@ -96,7 +96,7 @@ LoginPC.Set(0x09, {
 		// Add to WorldServer client transfer.
 		socket.character.state.ToLocation = socket.character.state.Location;
 		socket.character.ToMapID = socket.character.MapID;
-
+		debugger;
 		socket.zoneTransfer = true;
 		world.addSocketToTransferQueue(socket);
 

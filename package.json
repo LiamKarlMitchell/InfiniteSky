@@ -29,6 +29,7 @@
     "mongoose": "^3.8.8",
     "netmask": "^1.0.4",
     "socket.io": "^0.9.16",
-    "xtend": "^2.2.0"
+    "xtend": "^2.2.0",
+    "fast-csv": "^0.2.2"
   }
 }

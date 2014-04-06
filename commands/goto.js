@@ -8,7 +8,7 @@
 GMCommands.AddCommand(new Command('goto',50,function command_goto(string,client){
 		console.log(client.character.Name+' wants to goto '+string+'\'s location');
 		var otherName = string; // Need to get name from string
-		other = this.World.findCharacterSocket(otherName);
+		other = world.findCharacterSocket(otherName);
 		if (other==null)
 		{
 			client.sendInfoMessage(otherName+' could not be found');

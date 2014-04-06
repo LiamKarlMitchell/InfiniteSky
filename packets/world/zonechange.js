@@ -53,7 +53,7 @@ WorldPC.Set(0x08, {
 			}
 		}
 
-		var TransferZone = world.findZoneByID(request.ZoneID);
+		var TransferZone = zones[request.ZoneID];
 		if (TransferZone) {
 			socket.sendInfoMessage('Zone [' + TransferZone.getName() + '] Exists');
 

@@ -26,7 +26,8 @@ db.Account.logoutUser = function (socket) {
 	}
 
 	if(socket.zoneTransfer) {
-		worldserver.getSocketFromTransferQueue(socket.account.name);
+		console.log('db.Account.logoutUser '+socket.account.name)
+		world.getSocketFromTransferQueue(socket.account.name);
 
 		db.Account.update({
 			_id: socket.account._id
@@ -90,7 +91,7 @@ db.Account.loginUser = function (user, socket, callback) {
 			// 	return;				
 			// }			
 			
-			existingLoggedInClient = worldserver.findAccountSocket(account.Username);
+			existingLoggedInClient = world.findAccountSocket(account.Username);
 			if (existingLoggedInClient)
 			{
 				console.log('Already Logged In - WorldServer');

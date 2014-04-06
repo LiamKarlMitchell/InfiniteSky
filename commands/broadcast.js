@@ -11,7 +11,7 @@ GMCommands.AddCommand(new Command('b', 0, function command_giveexp(string, clien
 		return;
 	}
 
-	World.sendToAll(new buffer(
+	world.sendToAll(new buffer(
 		packets.ChatPacketReply.pack({
 			PacketID: 0x2A,
 			Name: client.character.Name,
