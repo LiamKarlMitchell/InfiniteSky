@@ -152,7 +152,7 @@ WorldPC.Set(0x08, {
 					// Get clients ip, check if it is on lan with server,
 					// if so send it servers lan ip and port
 					// otherwise send it real world ip and port
-					theIP = config.externalIP;
+					theIP = util.config.externalIP;
 					if (socket.remoteAddress.indexOf('127') == 0) {
 						theIP = '127.0.0.1'
 					}
@@ -166,14 +166,14 @@ WorldPC.Set(0x08, {
 						}
 					}
 					//socket.sendInfoMessage('IP for client to connect too: ' + theIP);
-					thePort = config.ports.world;
+					thePort = util.config.ports.world;
 
 					//////////////////////////////// NEED CODE RAWR
 					// Need to know how to get the client endpoint ip here.
 					// socket.address.endpoint orsomething will need to google around.
-					// Will do basic in config, if we can get our endpoint ip
+					// Will do basic in util.config, if we can get our endpoint ip
 					// Then we can say use that. For external users we will want to point them to the wan ip.
-					// If we can get socket dynamically it would be best, but if not we will have to code it into the config, im cool with that.
+					// If we can get socket dynamically it would be best, but if not we will have to code it into the util.config, im cool with that.
 					// Status: 
 					// 0 - Good to go
 					// 1 - No game server you can connect to

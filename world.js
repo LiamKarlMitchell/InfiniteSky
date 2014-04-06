@@ -44,6 +44,8 @@ world.connection = function(socket) {
 socket.Destroying = false;
 socket.clientID = clientID;
 clientID++;
+// TODO: World server should assume the previous socket's id after a successfull handshake/login.
+// This allows us to have a session object using that id :)
 socket.authenticated = false;
 socket.character = {};
 socket.zoneTransfer = false;
@@ -617,19 +619,6 @@ function removeDisconnectedCharacter() {
     world.removeClient(this);
 }
 
-CachedBuffer.call(socket, world.packets);
-
-//Let client know how many people are playing on server
-try {
-    world.packets.onConnected(socket);
-} catch (e) {
-
-}
-
-//Say hi to client
-//socket.write('hi\n');
-world.addClient(socket);
-
 socket.sendActionStateToArea = function() {
 
     this.Zone.sendToAllArea(this, true, packets.makeCompressedPacket(
@@ -712,8 +701,9 @@ socket.sendInfoMessage = function(message) {
          util.dumpError(e);
      }
 
-     clients.push(socket);
-     world[socket.ID] = socket;
+
+    world.addClient(socket);
+    world[socket.ID] = socket;
 };
 
 world.findAccountSocket = function(name) {

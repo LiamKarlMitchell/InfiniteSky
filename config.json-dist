@@ -15,7 +15,7 @@
     "regular": "0.0.0.0",
     "lan": "0.0.0.0"
   },
-  "plugins": [ "login.js", "world.js" ],
+  "plugins": [ "generic/packets.js", "login.js", "zone.js", "world.js", "sendmail.js" ],
   "max_clients": "10",
   "client_timeout": "120",
   "web_enabled": "true",
@@ -116,5 +116,6 @@
   "140": { "Name": "Z140", "Load": true, "DisplayName": "" },
   "141": { "Name": "Z141", "Load": true, "DisplayName": "" },
   "142": { "Name": "Z142", "Load": true, "DisplayName": "" },
-  "143 
+  "143": { "Name": "Z143", "Load": true, "DisplayName": "" }
+  }
 }

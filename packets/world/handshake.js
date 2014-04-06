@@ -9,6 +9,8 @@ WorldPC.Set(0x01, {
 	int32lu('MapID'),
 
 	function: function Handshake(socket, info) {
+		debugger;
+		console.log(socket.id);
 		if (socket.authenticated) return;
 		console.log(info);
 		console.log('Handshake packet for account %s slot %d', info.Name, info.Slot);
@@ -27,6 +29,7 @@ WorldPC.Set(0x01, {
 
 		// if MapID is 0 then get the clan map id
 		//////////////////////////// NEED TO CODE MORE! BLAH
+		// TODO: Improve game start and zone changing.
 		// Can get account and characters here!
 		// At this stage the login server/previouszoneserver should still have a connection with the client.
 		// We can read the information from that to double check legitness.
