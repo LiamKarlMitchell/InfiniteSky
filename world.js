@@ -916,7 +916,7 @@ var loadedInfos = {
     '005_00003.IMG': infos.Skill !== undefined && infos.Skill.Loaded,
     '005_00004.IMG': infos.Monster !== undefined && infos.Monster.Loaded,
     //'005_00005.IMG':
-    //'005_00006.IMG': infos.Npc !== undefined && infos.Npc.Loaded,
+    '005_00006.IMG': infos.Npc !== undefined && infos.Npc.Loaded,
     //'005_00007.IMG': infos.Quest !== undefined && infos.Quest.Loaded,
     'Zone': typeof(Zone) !== undefined
 };

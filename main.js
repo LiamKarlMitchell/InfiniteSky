@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /*  Copyright (c) InfiniteSky Dev Teams - Licensed under GNU GPL  
  *
  *    InfiniteSky is free software: you can redistribute it and/or modify

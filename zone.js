@@ -1,9 +1,77 @@
 if(typeof(Zone) === 'undefined') {
-    Zone: function Zone(ID) {
+    Zone = function Zone(ID) {
         this.ID = ID;
         this.Init();
     };
 }
+
+
+// NPC Definition
+packets.NPCObject = restruct.
+    //int8lu('Status').
+    int32lu('UniqueID').
+    int32lu('ID').
+    int32lu('NPCID').
+    int32lu('Life').
+    int32lu('Stance').
+    int32lu('Skill').
+    float32l('Frame').
+    struct('Location',structs.CVec3).
+    int32lu('Unknown3',3).
+    float32l('Direction').
+    float32l('TargetDirection').
+    int32ls('TargetObjectIndex').
+    int32lu('Unknown3',4).
+    struct('LocationTo',structs.CVec3).
+    float32l('FacingDirection').
+    int32lu('HP');
+
+// TODO: Convert NPC Definition to a better layout for vmscript
+var NPC = function(ID) {
+	//AIModule.AIObject.call(this);
+	AIObject.call(this);
+	//var Attackers = new AIModule.AttackerCollection();
+	var Attackers = new AttackerCollection();
+	this.UniqueID = 0;
+	this._ID = 0; // Faction ID?
+	this.NPCID = ID;
+
+	this.Life = 1;
+	this.Stance = 0;
+	this.Skill = 0;
+	this.Frame = 0;
+	Location = new CVec3();
+	LocationTo = new CVec3();
+	this.Direction = 0;
+	this.TargetDirection = 0;
+	this.TargetObjectIndex = -1;
+	//'Unknown3',7
+	this.FacingDirection = 0;
+	this.HP = 1;
+
+
+	// Get info from NPCInfo
+	//this.info = NPCInfo.getByID(this.NPCID);
+	// Set up health and stats etc	
+	this.getPacket = function() {
+		var packet = packets.makeCompressedPacket(0x19, new Buffer(packets.NPCObject.pack(this)));
+		return packet;
+	}
+
+	this.onDelete = function() {
+		// Remove timers and intervals to free up references
+		clearInterval(this.updateInterval);
+		//clearTimeout(this.monsterDeathTimer);
+	}
+
+	this.setLocationRandomOffset = function(Location, Radius) {
+		// Set the location to random spot in a circle? :D
+	}
+}
+
+// END OF NPC Definition
+
+
 Zone.prototype = {
     Init: function() {
         this.Loaded = false;
@@ -15,6 +83,11 @@ Zone.prototype = {
         this.Clients = [];
 
         this.zone_script = {};
+
+        MonsterAICollection = new AICollection();
+	    NpcAICollection     = new AICollection();
+		ZoneAICollection    = new AICollection();
+
     },
     addSocket: function(socket) {
         // Should check to make sure it dosnt exist already etc.
@@ -121,6 +194,112 @@ Zone.prototype = {
         }
         return portal;
     },
+
+// NPC Functions
+// NPC
+createNPC: function(spawninfo) {
+	//console.log('creating monster with spawninfo: ',spawninfo);
+	var npc = new NPC(spawninfo.ID);
+
+	npc.spawninfo = spawninfo;
+	//npc.UniqueID = spawninfo.UniqueID;
+	npc.UniqueID = 3;
+
+	npc.ID = this.NPCNextID;
+
+	this.NPCNextID++;
+
+	if (this.NPCNextID > this.NPCsMaxLength) {
+		this.NPCNextID = 0; // Could find next free slot and if none free overwrite older items?
+		// Quick sort ftw.
+	}
+
+	npc.Location = spawninfo.Location;
+	npc.FacingDirection = spawninfo.Direction;
+
+	this.NPCs[npc.ID] = npc;
+
+	//if (npc.NPCID == 50) console.log(npc.ID, npc.UniqueID, npc.NPCID);
+	return npc;
+},
+
+addNPC: function(npc) {
+	npc.updateInterval = setInterval(function() {
+		//console.log('Updating information of monster.');
+		// Send the packet to everyone
+		// Send monster to all area
+		// send the packet to all in area. monster.getPacket()
+		zone.sendToAllAreaLocation(npc.Location, npc.getPacket(), config.viewable_action_distance)
+	}, 4000);
+	// monster.monsterDeathTimer = setTimeout(function() {
+	//   console.log('Destroying monster.');
+	//   zone.removeMonster(monster.UniqueID);
+	//   // Send the packet to everyone
+	//   // Send item to all area
+	//   // send the packet to all in area. item.getPacket()
+	//   // zone.SendToAllAreaLocation( item.Location,item.getPacket(),config.viewable_action_distance )
+	// },180000); // 3 min
+	this.NPCs[npc.UniqueID] = npc;
+
+	// Send it to clients
+	this.sendToAllAreaLocation(npc.Location, npc.getPacket(), config.viewable_action_distance);
+	npc.JustSpawned = 0;
+	npc.Skill = 0;
+},
+// Expects itemjson to have Row, Column, ID
+// Basicaly storageItemSchema is what we are retriving in character.js
+getNPC: function(index) {
+	var npc = null;
+	console.log('Get npc ' + index);
+	if (this.NPCs[index]) {
+		console.log('npc Found');
+		npc = this.NPCs[index]; // Check for valid shit later eg distance.
+	}
+	return npc;
+},
+
+getNPCWhereID: function(id) {
+	var npcs = [];
+
+	// Could also just iterate forward.
+	for (var index = 0; index != this.NPCs.length; index++) {
+		if (this.NPCs[index] && this.NPCs[index].NPCID == id) npcs.push(this.NPCs[index]);
+	}
+
+	return npcs;
+},
+
+removeNPC: function(index) {
+	console.log('! CODE removeNPC');
+	if (this.NPCs[index]) {
+		// Send packet to all saying it got picked up / destroyed
+		console.log('Removing npc ' + index);
+		var npc = this.NPCs[index];
+		npc.onDelete();
+
+		npc.JustSpawned = 3;
+		npc.unknown1 = 1;
+		npc.unknown2 = 1;
+		npc.Rotation[0] = 1;
+		npc.Rotation[1] = 1;
+
+		this.sendToAllAreaLocation(npc.Location, npc.getPacket(), config.viewable_action_distance);
+		///delete this.NPCs[index];
+		this.NPCs.splice(index, 1);
+	}
+},
+
+clearNPC: function() {
+	var zone = this;
+	this.NPCs.forEach(function(npc, index) {
+		if (npc) {
+			zone.removeNPC(npc.UniqueID); // Could use index
+		}
+	});
+},
+// End of NPC Functions
+
+
     Load: function(callback) {
         if(this.Loaded) {
             callback('Already Loaded');
@@ -265,4 +444,10 @@ Zone.prototype = {
         callback(null, true);
     }
 };
+// TODO: Figure out a way to get prototypal inheritance working with node vm...
+if (typeof(zones) !== 'undefined') {
+	for (var zone in zones) {
+		zone.__proto__ = Zone.prototype;
+	}
+}
 main.events.emit('gameinfo_loaded', 'Zone');

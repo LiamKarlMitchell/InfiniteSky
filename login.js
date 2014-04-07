@@ -98,11 +98,7 @@ login.findAccountSocket = function(name) {
 var loadedInfos = {
     '005_00001.IMG': infos.Exp !== undefined && infos.Exp.Loaded,
     '005_00002.IMG': infos.Item !== undefined && infos.Item.Loaded,
-    '005_00003.IMG': infos.Skill !== undefined && infos.Skill.Loaded,
-    '005_00004.IMG': infos.Monster !== undefined && infos.Monster.Loaded
-    //'005_00005.IMG':
-    //'005_00006.IMG': infos.Npc !== undefined && infos.Npc.Loaded,
-    //'005_00007.IMG': infos.Quest !== undefined && infos.Quest.Loaded,
+    '005_00003.IMG': infos.Skill !== undefined && infos.Skill.Loaded 
 };
 
 var AreAllInfosLoaded = function() {
@@ -149,10 +145,6 @@ if (login.start) {
                 case '005_00001.IMG': loadedInfos['005_00001.IMG'] =  infos.Exp !== undefined && infos.Exp.Loaded; break;
                 case '005_00002.IMG': loadedInfos['005_00002.IMG'] =  infos.Item !== undefined && infos.Item.Loaded; break;
                 case '005_00003.IMG': loadedInfos['005_00003.IMG'] = infos.Skill !== undefined && infos.Skill.Loaded; break;
-                case '005_00004.IMG': loadedInfos['005_00004.IMG'] =  infos.Monster !== undefined && infos.Monster.Loaded; break;
-                //case '005_00005.IMG': loadedInfos['005_00005.IMG'] = break;
-                case '005_00006.IMG': loadedInfos['005_00006.IMG'] =  infos.Npc !== undefined && infos.Npc.Loaded; break;
-                case '005_00007.IMG': loadedInfos['005_00007.IMG'] =  infos.Quest !== undefined && infos.Quest.Loaded; break;
             }
 
             if (AreAllInfosLoaded()) {
