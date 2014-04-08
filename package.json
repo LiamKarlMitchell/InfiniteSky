@@ -21,7 +21,7 @@
   "bugs": {
     "url": "https://github.com/LiamKarlMitchell/InfiniteSky/issues"
   },
-  "homepage": "https://github.com/LiamKarlMitchell/InfiniteSky",
+  "homepage": "http://liamkarlmitchell.github.io/InfiniteSky/",
   "dependencies": {
     "async": "^0.2.10",
     "jshint": "^2.4.4",
