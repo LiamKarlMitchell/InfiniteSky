@@ -20,13 +20,23 @@ infos.NewCharacter = {
 
 		"Silver": 20000,
 
+		"SkillBar": [
+			{ "ID": 1, "Level": 1 },
+			{ "ID": 2, "Level": 1 }
+		],
+		
 		"SkillList": [
-			{ "ID": 1, "level": 1 }
+			{ "ID": 1, "Level": 1 },
+			{ "ID": 2, "Level": 1 }
+		],
+
+		"QuickUseItems": [		
+			{ "Column": 1, "ID": 2, "Amount": 99 }
 		],
 		
 		"Inventory": [
-			{ "Column": 0, "Row": 0, "ID": 2, "Amount": 99 },
-			{ "Column": 1, "Row": 1, "ID": 2, "Amount": 99 }
+			{ "Column": 0, "Row": 0, "ID": 150, "Amount": 12},		
+			{ "Column": 1, "Row": 0, "ID": 2, "Amount": 99 }
 		],
 		
 		"Level": 1,
@@ -49,12 +59,23 @@ infos.NewCharacter = {
 		
 		"Silver": 20000,
 		
+		"SkillBar": [
+			{ "ID": 20, "Level": 1 },
+			{ "ID": 21, "Level": 1 }
+		],		
+		
 		"SkillList": [
-			{ "ID": 1, "Level": 1 }
+			{ "ID": 20, "Level": 1 },
+			{ "ID": 21, "Level": 1 }
+		],
+
+		"QuickUseItems": [		
+			{ "Column": 1, "ID": 2, "Amount": 99 }
 		],
 		
 		"Inventory": [
-			{ "Column": 0, "Row": 0, "ID": 2, "Amount": 99 }
+			{ "Column": 0, "Row": 0, "ID": 150, "Amount": 12},		
+			{ "Column": 1, "Row": 0, "ID": 2, "Amount": 99 }
 		],
 		
 		"Level": 1,
@@ -77,12 +98,23 @@ infos.NewCharacter = {
 		
 		"Silver": 20000,
 		
+		"SkillBar": [
+			{ "ID": 39, "Level": 1 },
+			{ "ID": 40, "Level": 1 }
+		],
+		
 		"SkillList": [
-			{ "ID": 1, "Level": 1 }
+			{ "ID": 39, "Level": 1 },
+			{ "ID": 40, "Level": 1 }
+		],
+
+		"QuickUseItems": [		
+			{ "Column": 1, "ID": 2, "Amount": 99 }
 		],
 		
 		"Inventory": [
-			{ "Column": 0, "Row": 0, "ID": 2, "Amount": 99 }
+			{ "Column": 0, "Row": 0, "ID": 150, "Amount": 12},
+			{ "Column": 1, "Row": 0, "ID": 2, "Amount": 99 }
 		],
 		
 		"Level": 1,
