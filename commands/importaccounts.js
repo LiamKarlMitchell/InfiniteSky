@@ -26,7 +26,7 @@ GMCommands.AddCommand(new Command('importaccounts',100,function command_importac
 
 				  // Send email here
 				  var mail = {
-				    from: config.smtpTransport.auth.name+" <"+config.smtpTransport.auth.user+">", // sender address
+				    from: util.config.smtpTransport.auth.name+" <"+util.config.smtpTransport.auth.user+">", // sender address
 				    to: email_address, // list of receivers
 				    subject: "Welcome to TSX Private Server", // Subject line
 				    text: "Hello "+username+', you have been chosen to access the TSX Server.\n\nPlease follow the instructions here: http://inifintiesky.blogspot.co.nz/2013/10/tsx-oct-25th-pserver-cb-launch.html\n\nYou can login with the following:\n\tUsername: '+username+'\n\tPassword: '+password+'\n\nHave a good day.' // plaintext body

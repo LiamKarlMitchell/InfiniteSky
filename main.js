@@ -36,7 +36,7 @@ vmscript = require('./vmscript');
 util = require('./util');
 zlib = require('zlib');
 extend = require("xtend");
-
+GMCommands = require("./GMCommand");
 // TODO: See if we can replace CLI's inspect with eyes.inspect as its nicer and can be formatted nicely
 // TODO: Rewrite restruct to use buffer when in node.js enviroment
 restruct = require('./restruct');
@@ -183,7 +183,9 @@ function clearLoggedInAccounts() {
   db.Account.logoutAll();
 }
 main.events.once('db_accounts_schema_loaded', clearLoggedInAccounts);
-
+main.events.once('world_started', function() {
+  GMCommands.Start();
+});
 var db = new (require('./db'))(util.config.mongodb.connectString);
 
 // Start up Command Line Interface

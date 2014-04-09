@@ -6,22 +6,23 @@
 // Command: commands
 // Used to tell the user all of the commands they can execute
 GMCommands.AddCommand(new Command('commands',0,function command_commands(string,client){
+
 		client.sendInfoMessage('Avaliable Commands for Level: '+client.account.Level);
 		var tmpoutput='';
-		for(var i = 0; i < Commands.length; i++) {
-			if (client.account.Level>=Commands[i].Level){
+		for(var i = 0; i < GMCommands.Commands.length; i++) {
+			if (client.account.Level>=GMCommands.Commands[i].Level){
 	        	//console.log(Commands[i].Name);
-				if (tmpoutput.length+Commands[i].Name.length+1<50)
+				if (tmpoutput.length+GMCommands.Commands[i].Name.length+1<50)
 				{
-					tmpoutput+=Commands[i].Name+' ';
+					tmpoutput+=GMCommands.Commands[i].Name+' ';
 				}
 				else
 				{
 					client.sendInfoMessage(tmpoutput);	
-					tmpoutput=Commands[i].Name+' ';
+					tmpoutput=GMCommands.Commands[i].Name+' ';
 				}
 				// client.sendInfoMessage(Commands[i].Name);
-				if (i==Commands.length-1) client.sendInfoMessage(tmpoutput);
+				if (i==GMCommands.Commands.length-1) client.sendInfoMessage(tmpoutput);
 			}
 		}
 }));

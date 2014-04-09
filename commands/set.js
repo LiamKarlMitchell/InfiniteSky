@@ -254,7 +254,7 @@ GMCommands.AddCommand(new Command('set',60,function command_set(string,client){
 							client.character.state
 							)
 						)
-				),config.viewable_action_distance
+				),util.config.viewable_action_distance
 			);
 		}
 		//client.send2FUpdate();

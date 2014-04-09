@@ -41,7 +41,7 @@ WorldPC.Set(0x13, {
 	function: function NormalChatRecv(socket, input) {
 
 		if (input.Message.indexOf('/') === 0) {
-			GMCommand.Execute(input.Message.substr(1), socket); // Need to remove the / so everything after it.
+			GMCommands.Execute(input.Message.substr(1), socket); // Need to remove the / so everything after it.
 			return;
 		}
 		console.log("[Normal] " + socket.character.Name + ": " + input.Message);

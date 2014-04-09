@@ -11,7 +11,7 @@ if (typeof(world) === 'undefined') {
             this.server.listen(util.config.ports.world);
 
             this.loadAllZones();
-
+            main.events.emit('world_started');
             main.events.on('step', function(delta) {world.GameStep(delta)});
         },
         running: true
