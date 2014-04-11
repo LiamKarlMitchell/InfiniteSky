@@ -217,8 +217,8 @@ DWORD TSX_Client::Run()
 		//if (ScreenID!=PreviousScreenID) ScreenChanged();
 
 		// If Zone Changed
-		ZoneID = *ZoneAddress;
-		if (ZoneID!=PreviousZoneID) ZoneChanged();
+		//ZoneID = *ZoneAddress;
+		//if (ZoneID!=PreviousZoneID) ZoneChanged();
 
 		if (DevButtons) {
 
@@ -367,23 +367,19 @@ void TSX_Client::Init()
 	if (VersionString)
 	{
 		Log.Write("Game Version: %s Found at %08X",VersionString,VersionString);
-		Log.Write("A0");
-		oldProtection = SetProtection(VersionString,50);
-		sprintf(VersionString, "%s TSX",VersionString);
-		SetProtection(VersionString,50,oldProtection);
-		Log.Write("A0.1");
+		//oldProtection = SetProtection(VersionString,50);
+		//sprintf(VersionString, "%s TSX",VersionString); // Actually overwrites camera default zoom or something.
+		//SetProtection(VersionString,50,oldProtection);
 	}
 	else
 	{
 		Log.Write("Game Version Not Found");
 	}
 
-	Log.Write("A1");
 	char* GGFile = "GameGuard.des";
 	char* GGFileBackup = "GameGuard.des.bak";
 	if (ini->GetInt("BypassGameGuard",1))
 	{
-		Log.Write("A2");
 		Log.Write("Attempting to bypass GameGuard");
 		rename(GGFile,GGFileBackup);
 
@@ -462,7 +458,6 @@ void TSX_Client::Init()
 		{
 			Log.Write("GGBypass1 Not Found");
 		}
-		Log.Write("A3");
 
 		// STEP TWO:
 		// Bypassing GameGuard Error MessageBox's
@@ -489,7 +484,6 @@ void TSX_Client::Init()
 		//00401ABA  |.  81C4 E8030000 ADD ESP,0x3E8
 		//00401AC0  \.  C3            RETN
 		// Would be more awesome if we could detour this and log the messages to our log.
-Log.Write("A4");
 		byte* GGBypass2 = (byte*)sig->search("81ECE8030000E8????????3D55070000",6);
 		if (GGBypass2)
 		{
