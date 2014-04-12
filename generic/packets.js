@@ -558,10 +558,25 @@ packets.ItemActionReplyPacket = restruct.
     int32lu('RowPickup'). // Seems to be InventoryIndexTo
     int32lu('ColumnMove').
     int32lu('RowMove').
-    int32lu('Enchant');
+    int32lu('Enchant'); // Set Failed to 1 to say the action failed or to 0 to say it succeed. 0 is default if not put in structure.
 
-
-
+packets.ItemActionReplyPacket2 = restruct.
+		int8lu('PacketID').
+		int32lu('ActionType').
+		int32lu('ItemUniqueID').
+		int32lu('ItemUniqueID2').
+		int32lu('ItemID').
+		int32lu('Unknown3').
+		int32lu('Unknown4').
+		int32lu('Unknown5').
+		int32lu('Amount').
+		int32lu('InventoryIndex'). // Seems to be InventoryIndexFrom
+		int32lu('RowDrop').
+		int32lu('ColumnPickup').
+		int32lu('RowPickup'). // Seems to be InventoryIndexTo
+		int32lu('ColumnMove').
+		int32lu('RowMove').
+		int32lu('Failed'); // Set Failed to 1 to say the action failed or to 0 to say it succeed. 0 is default if not put in structure.
 
 packets.ItemActionPacket = restruct.
     int8lu('PacketID').

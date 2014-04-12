@@ -219,3 +219,5 @@ pip-log.txt
 /data/world
 /node_modules/
 /npm-cache/
+/TSX_Client/lib/NtHookEngine_d.lib
+/TSX_Client/lib/diStorm_x86_d.lib

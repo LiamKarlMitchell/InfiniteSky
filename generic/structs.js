@@ -2,10 +2,7 @@
 // Copyright (c) InfiniteSky Dev Teams - Licensed under GNU GPL
 // For more information, see LICENCE in the main folder
 
-//Open up our structs to main.js
-structs = {};
-
-//qBEGIN: Actual game structs
+structs = {}; // Global Variable of main.js range
 
 structs.CVec3= restruct.
 	float32l('X').
@@ -14,21 +11,22 @@ structs.CVec3= restruct.
 
 structs.Equipt= restruct.
 	int32lu('ID').
-	int32lu('Enchant').
-	int32lu('Combine');
+	int32lu('RequiredHonor').
+	int8lu('Enchant'). // 1 = 3%
+	int8lu('Combine').
+	int16lu('Unknown');
 
 structs.SmallStorageItem = restruct.
 	int32lu('ID').
 	int32lu('Amount').
 	int32lu('Enchant');
 
-
-// To test you can use "Pet": { "ID": 99001, "Activity": 0, "Growth": 0}, in new character json
-structs.Pet= restruct.//for Vanity Gear; i dont think thats in ts1 ._.
+structs.Pet= restruct.
 	int32lu("ID").
-	int32lu("Activity").
-	int32lu("Growth");
-	
+	int16lu('Unknown').
+	int16lu('Activity').
+	int32lu('Growth'); // 1250 = 0.001
+
 structs.StorageItem= restruct.
 	int32lu("ID").
 	int32lu("Column").
@@ -436,13 +434,11 @@ structs.Character= restruct.
  //int32lu('DailyPvMKill'); // 4380
  int8lu('',3);
 
-
 structs.SpawnInfo = restruct.
 	int32lu('UniqueID').
 	int32lu('ID').
 	struct('Location',structs.CVec3).
 	float32l('Direction');
-
 
 structs.WREGION = restruct.
 	int32ls('Unknown1').
@@ -453,6 +449,5 @@ structs.WREGION = restruct.
 	int32ls('Y').
 	int32ls('Z').
 	int32ls('Radius');
-//END:   Actual game structs
 
 module.exports = structs;

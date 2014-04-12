@@ -22,42 +22,34 @@ ItemInfo.prototype = {
 		}
 		return false;
 	},
-  getSlotCount = function() {
-    var t = this.ItemType;
-    if (t==0 || t==2 || t==1 || t==6 || t==10)
-    {
-      return 1;
-    }
-    else
-    {
-      return 4;
-    }
-  },
 	getItemType: function() {
 		var ItemType;
 		switch (this.ItemType)
 		{
-			case 0: ItemType = 'Silver Coins';
-			case 1: ItemType = 'Pill';
-			case 2: ItemType = 'Assist';
-			case 3: ItemType = 'Mission';
-			case 4: ItemType = 'Secret Martial Art Book';
-			case 5: ItemType = 'Necklace';
-			case 6: ItemType = 'Calabash_Bottle';
-			case 7: ItemType = 'Ring';
+			case 1: ItemType = 'Silver Coins'; // SilverCoins
+			case 2: ItemType = 'Assist'; // Assist
+			case 3: ItemType = 'Assist 2'; // Assist seems like its grouped to 2, It contains a different kind of pills,
+				// couple books and enchanting mats of different quality
+			case 4: ItemType = 'Mission';
+			case 5: ItemType = 'Skill books / Art Book';
+			case 6: ItemType = 'Calabash_Bottle'; //testing
+			case 7: ItemType = 'Necklace';
 			case 8: ItemType = 'Cape';
 			case 9: ItemType = 'Armor';
 			case 10: ItemType = 'Gloves';
-			case 11: ItemType = 'Shoes';
+			case 11: ItemType = 'Ring';
+			case 12: ItemType = 'Boots';
 			case 13: ItemType = 'Sword';
 			case 14: ItemType = 'Blade';
 			case 15: ItemType = 'Marble';
 			case 16: ItemType = 'Katana';
-			case 17: ItemType = 'Double Blade';
+			case 17: ItemType = 'Double Blade'; // test
 			case 18: ItemType = 'Lute';
 			case 19: ItemType = 'Light Blade';
 			case 20: ItemType = 'Long Spear';
 			case 21: ItemType = 'Scepter';
+			case 22: ItemType = 'Pet';
+			case 23: ItemType = 'Assist 3'; // Seems like crafting materials at herb master
 			default: ItemType = 'Common'; break;
 		};
 		return ItemType;
@@ -67,9 +59,10 @@ ItemInfo.prototype = {
 		switch (this.Rareness)
 		{
 			case 0: Rareness = 'Common'; break;
-			case 1: Rareness = 'Unique'; break;
-			case 2: Rareness = 'Rare'; break;
-			case 3: Rareness = 'Elite'; break;
+			case 1: Rareness = 'Uncommon'; break;
+			case 2: Rareness = 'Unique'; break;
+			case 3: Rareness = 'Rare'; break;
+			case 4: Rareness = 'Elite'; break;
 		}
 		return Rareness;
 	},
@@ -86,9 +79,20 @@ ItemInfo.prototype = {
 				return this.ID+' - '+this.Name+' ('+this.getRareness()+')'+' '+this.getItemType()+' B:'+this.PurchasePrice+' S:'+this.SalePrice+' Lv:'+this.LevelRequirement;
 			break;
 		}
+	},
+	getSlotCount: function() {
+		var t = this.ItemType;
+		if (t==0 || t==2 || t==1 || t==6 || t==10)
+		{
+			return 1;
+		}
+		else
+		{
+			return 4;
+		}
 	}
-
 };
+
 
 LoadItemInfo = function() {
 	// Could wrap in try catch and remove infos.Item if failed load for some error in structure etc/
@@ -160,7 +164,6 @@ restruct.
   string('Description1',25).
   string('Description2',25).
   string('Description3',26),
-
   function onRecordLoad(record) {
   	if (record.ID) {
   		// Change the prototype so that we have access to methods we want.
@@ -168,7 +171,7 @@ restruct.
   	}
   	return record;
   });
-}
+};
 
 // If we have not loaded the item info yet then load it
 if (infos.Item === undefined) LoadItemInfo();

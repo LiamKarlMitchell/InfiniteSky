@@ -78,6 +78,7 @@ LoginPC.Set(0x03, {
 				}
 
 				for (var i = 0; i < charactersLength; i++) {
+
 					socket.characters[i] = characters[i];
 					socket.write(new buffer(LoginPC.CharacterInfoPacket.pack({
 						packetID: 0x05,

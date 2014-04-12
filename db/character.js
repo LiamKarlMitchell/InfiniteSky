@@ -84,15 +84,15 @@ var characterSchema = mongoose.Schema({
 	StatDexterity: {type: Number, default: 0 },
 	StatVitality: {type: Number, default: 0 },
 
-	Ring: itemEquip,
-	Cape: itemEquip,
-	Armor: itemEquip,
-	Glove: itemEquip,
-	Amulet: itemEquip,
-	Boot: itemEquip,
-	CalbashBottle: itemEquip,
-	Weapon: itemEquip,
-	Pet: petEquip,
+	Ring: itemEquip, // 0
+	Cape: itemEquip, // 1
+	Armor: itemEquip, // 2
+	Glove: itemEquip, // 3
+	Amulet: itemEquip, // 4
+	Boot: itemEquip, // 5
+	CalbashBottle: itemEquip, // 6
+	Weapon: itemEquip, // 7
+	Pet: petEquip, // 8
 
 	StorageUse: { type: Number, default: 0 },
 	Silver: { type: Number, default: 0 },
