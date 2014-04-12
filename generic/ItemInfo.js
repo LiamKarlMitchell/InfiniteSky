@@ -22,6 +22,17 @@ ItemInfo.prototype = {
 		}
 		return false;
 	},
+  getSlotCount = function() {
+    var t = this.ItemType;
+    if (t==0 || t==2 || t==1 || t==6 || t==10)
+    {
+      return 1;
+    }
+    else
+    {
+      return 4;
+    }
+  },
 	getItemType: function() {
 		var ItemType;
 		switch (this.ItemType)
