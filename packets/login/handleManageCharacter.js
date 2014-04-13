@@ -60,7 +60,7 @@ LoginPC.Set(0x06, {
 			//console.log(createdcharacter);
 
 			socket.write(
-			new buffer(LoginPC.CharacterCreateReplyPacket.pack({
+			new Buffer(LoginPC.CharacterCreateReplyPacket.pack({
 				packetID: 0x07,
 				Status: status,
 				Character: createdcharacter
@@ -89,10 +89,10 @@ LoginPC.Set(0x06, {
 		console.log('TODO: Code in checking name for invalid characters/words');
 		newCharacter._id = 0;
 		newCharacter.AccountID = socket.account._id;
-		newCharacter.ServerName = util.config.server_name;
+		newCharacter.ServerName = config.server_name;
 
 		// Checking if able to create character of this clan
-		if (util.config.SingleClanOnly && socket.account.Level < 80) {
+		if (config.SingleClanOnly && socket.account.Level < 80) {
 			for (var i = 0; i < socket.characters.length; ++i) {
 				if (socket.characters[i].Clan != create.Clan) {
 					status = 3;
@@ -106,7 +106,7 @@ LoginPC.Set(0x06, {
 		// If name already exists
 		db.Character.findOne({
 			Name: create.Name,
-			ServerName: util.config.server_name
+			ServerName: config.server_name
 		}, function(err, character) {
 			if (err) {
 				console.log(err);
@@ -133,7 +133,7 @@ LoginPC.Set(0x06, {
 			newCharacter.Clan = create.Clan;
 
 			// Get clan name, Because Ryan no likey using 0 1 2 to define the new character things in json :D
-			var ClanName = util.config.Clans[create.Clan];
+			var ClanName = config.Clans[create.Clan];
 			console.log('Clan: '+ClanName);
 
 			//console.log("Wants to create character of clan %s", ClanName);
@@ -265,7 +265,7 @@ LoginPC.Set(0x07, {
 
 				//Reply to client saying character deleted
 				socket.write(
-				new buffer(LoginPC.CharacterDeletePacketReply.pack({
+				new Buffer(LoginPC.CharacterDeletePacketReply.pack({
 					packetID: 0x08,
 					Status: status
 				})));

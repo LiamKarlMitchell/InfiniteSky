@@ -27,7 +27,7 @@ LoginPC.Set(0x09, {
 		// Get clients ip, check if it is on lan with server,
 		// if so send it servers lan ip and port
 		// otherwise send it real world ip and port
-		var theIP = util.config.externalIP;
+		var theIP = config.externalIP;
 		if (socket.remoteAddress.indexOf('127') == 0) {
 			theIP = '127.0.0.1'
 		}
@@ -41,7 +41,7 @@ LoginPC.Set(0x09, {
 			}
 		}
 		//console.log('IP for client to connect too: ' + theIP);
-		var thePort = util.config.ports.world;
+		var thePort = config.ports.world;
 
 		//////////////////////////////// NEED CODE RAWR
 		// Need to know how to get the client endpoint ip here.
@@ -101,7 +101,7 @@ LoginPC.Set(0x09, {
 		world.addSocketToTransferQueue(socket);
 
 		socket.write(
-		new buffer(
+		new Buffer(
 		LoginPC.MapLoadReply.pack({
 			packetID: 0x0A,
 			Status: status,

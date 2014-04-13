@@ -30,7 +30,7 @@ LoginPC.Set(0x0B, {
 	// 0 = Can use
 	// 1 = It cant be used right now
 	// 2 = No items to be paid
-	socket.write(new buffer(LoginPC.GiftPacketReply.pack({packetID: 0x0C, code: 0, items: Items})));
+	socket.write(new Buffer(LoginPC.GiftPacketReply.pack({packetID: 0x0C, code: 0, items: Items})));
 	}
 });
 
@@ -47,6 +47,6 @@ LoginPC.Set(0x0C, {
 	// 0 = The new item has been paid to anterior // Items are removed from list and put elsewhere?
 	// 1 = It cant be used right now
 	// 2 = No items to be paid
-	socket.write(new buffer(LoginPC.Value.pack({PacketID: 0x0D, Value: 1})));
+	socket.write(new Buffer(LoginPC.Value.pack({PacketID: 0x0D, Value: 1})));
 	}
 });

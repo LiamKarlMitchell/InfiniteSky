@@ -5,33 +5,31 @@
 // Shorthand Types
 //var String = db.mongoose.Schema.Types.String;
 //var Number = db.mongoose.Schema.Types.Number;
-var mongoose = require('mongoose');
 var Bool = db.mongoose.Schema.Types.Boolean;
 //var Array = db.mongoose.Schema.Types.Array;
-var Buffer = db.mongoose.Schema.Types.Buffer;
 //var Date = db.mongoose.Schema.Types.Date;
 var ObjectId = db.mongoose.Schema.Types.ObjectId;
 var Mixed = db.mongoose.Schema.Types.Mixed;
 
 // Actuall definitions here
 var itemEquip = {
-	ID: Number,
-	Enchant: Number,
-	Combine: Number
+	ID: {type: Number, default: 0 },
+	Enchant: {type: Number, default: 0 },
+	Combine: {type: Number, default: 0 },
 };
 
 var petEquip = {
-	ID: Number,
-	Activity: Number,
-	Growth: Number
+	ID: {type: Number, default: 0 },
+	Activity: {type: Number, default: 0 },
+	Growth: {type: Number, default: 0 },
 };
 
 var storageItemSchema = mongoose.Schema({
-	ID: Number,
-	Column: Number,
-	Row: Number,
-	Amount: Number,
-	Enchant: Number
+	ID: {type: Number, default: 0 },
+	Column: {type: Number, default: 0 },
+	Row: {type: Number, default: 0 },
+	Amount: {type: Number, default: 0 },
+	Enchant: {type: Number, default: 0 },
 });
 
 storageItemSchema.methods.toString = function()
@@ -40,13 +38,13 @@ storageItemSchema.methods.toString = function()
 }
 
 var quickUseItemSchema = mongoose.Schema({
-	ID: Number,
-	Ammount: Number
+	ID: {type: Number, default: 0 },
+	Ammount: {type: Number, default: 0 },
 });
 
 var skillItemSchema = mongoose.Schema({
-	ID: Number,
-	Level: Number
+	ID: {type: Number, default: 0 },
+	Level: {type: Number, default: 0 },
 });
 
 var characterSchema = mongoose.Schema({
@@ -297,7 +295,8 @@ delete mongoose.models['character_mongoose'];
 var Character = db.mongoose.model('character_mongoose', characterSchema);
 
 db.Character = Character;
-module.exports = Character;
+//module.exports = Character;
 
 // NEEDS TO BE LAST THING IN FILE!!!
+
 main.events.emit('db_character_schema_loaded');

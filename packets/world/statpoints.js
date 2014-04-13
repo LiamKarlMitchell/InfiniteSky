@@ -89,7 +89,7 @@ WorldPC.Set(0x16, {
 		socket.character.StatPoints -= pac.Value;
 		socket.sendInfoMessage('StatPoints is now: '+socket.character.StatPoints);
 
-		socket.write(new buffer(WorldPC.KeyValueUnsigned.pack({
+		socket.write(new Buffer(WorldPC.KeyValueUnsigned.pack({
 			PacketID: 0x84,
 			Key: 0x37,
 			// Hur?? koreans.

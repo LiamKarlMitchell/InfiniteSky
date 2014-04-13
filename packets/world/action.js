@@ -214,9 +214,9 @@ function handleActionPacket(socket, action, update) {
                             console.log("Client attacking monster " + other.character.state.HP + "::" + AttackPacket.TotalDamage);
                             //socket.giveEXP(AttackPacket.TotalDamage); // Give HP relative to the damage we have done
                             
-                            socket.Zone.sendToAllAreaLocation( socket.character.state.Location,packets.makeCompressedPacket(0x2C,new buffer(WorldPC.AttackPacketReply.pack(AttackPacket))),util.config.viewable_action_distance );
-                            // socket.write(packets.makeCompressedPacket(0x2C, new buffer(WorldPC.AttackPacketReply.pack(AttackPacket))));
-                            // other.write(packets.makeCompressedPacket(0x2C, new buffer(WorldPC.AttackPacketReply.pack(AttackPacket))));
+                            socket.Zone.sendToAllAreaLocation( socket.character.state.Location,packets.makeCompressedPacket(0x2C,new Buffer(WorldPC.AttackPacketReply.pack(AttackPacket))),config.viewable_action_distance );
+                            // socket.write(packets.makeCompressedPacket(0x2C, new Buffer(WorldPC.AttackPacketReply.pack(AttackPacket))));
+                            // other.write(packets.makeCompressedPacket(0x2C, new Buffer(WorldPC.AttackPacketReply.pack(AttackPacket))));
                             
                     }
                     break;
@@ -247,7 +247,7 @@ function handleActionPacket(socket, action, update) {
                             // Do battle caculation 
                             //Monster.damage(socket,Damage);
                             // socket.giveEXP(Damage)
-                            //socket.Zone.sendToAllAreaLocation(monster.Location,monster.getPacket(),util.config.viewable_action_distance);
+                            //socket.Zone.sendToAllAreaLocation(monster.Location,monster.getPacket(),config.viewable_action_distance);
                             ///
                             AttackPacket = {
                                 Action: 0,
@@ -270,7 +270,7 @@ function handleActionPacket(socket, action, update) {
                             monster.HP -= AttackPacket.TotalDamage;
                             console.log("Client attacking monster " + monster.HP + "::" + AttackPacket.TotalDamage);
                             socket.giveEXP(AttackPacket.TotalDamage); // Give HP relative to the damage we have done
-                            socket.write(packets.makeCompressedPacket(0x2C, new buffer(WorldPC.AttackPacketReply.pack(AttackPacket))));
+                            socket.write(packets.makeCompressedPacket(0x2C, new Buffer(WorldPC.AttackPacketReply.pack(AttackPacket))));
                             
                             // var DefenderPacket = AttackPacket;
                             //  DefenderPacket.Action = action.Skill;
@@ -278,7 +278,7 @@ function handleActionPacket(socket, action, update) {
                             //  DefenderPacket.AttackerIndex = monster.UniqueID;
                             //  DefenderPacket.DefenderID = socket.character.state.CharacterID;
                             //  DefenderPacket.DefenderIndex = socket.character.state.Index;
-                            // socket.Zone.sendToAllAreaLocation( socket.character.state.Location,packets.makeCompressedPacket(0x2C,new buffer(WorldPC.AttackPacketReply.pack(DefenderPacket))),util.config.viewable_action_distance );
+                            // socket.Zone.sendToAllAreaLocation( socket.character.state.Location,packets.makeCompressedPacket(0x2C,new Buffer(WorldPC.AttackPacketReply.pack(DefenderPacket))),config.viewable_action_distance );
                         }
                     }
                     break;
@@ -345,7 +345,7 @@ function handleActionPacket(socket, action, update) {
 
     if (socket.character.state.hidden) {
         socket.write(packets.makeCompressedPacket(
-        0x18, new buffer(
+        0x18, new Buffer(
         WorldPC.ActionReplyPacket.pack(
         socket.character.state))));
         return;
@@ -353,9 +353,9 @@ function handleActionPacket(socket, action, update) {
 
     if (socket.character.state.Skill!=1) {
         socket.Zone.sendToAllArea(socket, true, packets.makeCompressedPacket(
-        0x18, new buffer(
+        0x18, new Buffer(
         WorldPC.ActionReplyPacket.pack(
-        socket.character.state))), util.config.viewable_action_distance);
+        socket.character.state))), config.viewable_action_distance);
     }
 }
 

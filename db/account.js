@@ -143,4 +143,5 @@ db.Account.logoutAll = function () {
 
 
 // NEEDS TO BE LAST THING IN FILE!!!
+
 main.events.emit('db_accounts_schema_loaded');

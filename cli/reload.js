@@ -8,7 +8,7 @@
 // Should be an object with keys as the reloadable thing
 // Each reloadable thing should consist of a description and a function. Lets store these in an array.
 var reloadables = {
-  'config': [ 'Reloads your config file: '+util.configFile, Reload_Config ]
+  'config': [ 'Reloads your config file: '+configFile, Reload_Config ]
 };
 
 function Reload_Config() {

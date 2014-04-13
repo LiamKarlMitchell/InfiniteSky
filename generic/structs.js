@@ -1,8 +1,10 @@
 // This file is part of InfiniteSky.
 // Copyright (c) InfiniteSky Dev Teams - Licensed under GNU GPL
 // For more information, see LICENCE in the main folder
-
-structs = {}; // Global Variable of main.js range
+vms.depends({ name: 'structs' }, function(){
+if (typeof(structs)==='undefined') {
+    structs = {}; // Global Variable of main.js range
+}
 
 structs.CVec3= restruct.
 	float32l('X').
@@ -450,4 +452,4 @@ structs.WREGION = restruct.
 	int32ls('Z').
 	int32ls('Radius');
 
-module.exports = structs;
+});

@@ -8,6 +8,6 @@ WorldPC.Set(0x75, {
 	// get the packet
 	console.log("Character opened AP Shop");
 	// Send the reply currency back.
-	socket.write(new buffer(packets.Value.pack({ PacketID: 0x9E, Value: socket.account.AP })));
+	socket.write(new Buffer(packets.Value.pack({ PacketID: 0x9E, Value: socket.account.AP })));
 	}
 });

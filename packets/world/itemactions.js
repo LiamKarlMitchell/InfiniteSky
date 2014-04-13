@@ -150,7 +150,7 @@
 var ItemActions = [];
 ItemActions[0] = function PickupItem(socket, input) {
     // Pick up an item from the ground and put it into inventory
-    socket.write(new buffer(
+    socket.write(new Buffer(
     packets.ItemActionReplyPacket.pack({
         PacketID: 0x2B,
         ActionType: input.ActionType,
@@ -170,7 +170,7 @@ ItemActions[0] = function PickupItem(socket, input) {
 
 function ItemActionReplyStatus(socket, actionType, failed){ // Maybe change the name to : OnItemActionReplyStatus
 	if(failed === undefined) failed = 1;
-	socket.write(new buffer(
+	socket.write(new Buffer(
 		packets.ItemActionReplyPacket2.pack({
 				PacketID: 0x2B,
 				ActionType: actionType,
@@ -241,7 +241,7 @@ ItemActions[1] = function DropItem(socket, input) {
     socket.character.save();
     //Update client
     socket.write(
-    new buffer(
+    new Buffer(
         packets.ItemActionReplyPacket.pack({
         PacketID: 0x2B,
         ActionType: input.ActionType,
@@ -279,7 +279,7 @@ ItemActions[2] = function InventoryToPillBar (socket, input) {
                                     console.log("PASS:"+status);
                                     if(status == 15)
                                         {
-                                            socket.write(new buffer(
+                                            socket.write(new Buffer(
                             packets.ItemActionReplyPacket.pack({
                                 PacketID: 0x2B,
                                 ActionType: input.ActionType,
@@ -314,7 +314,7 @@ ItemActions[2] = function InventoryToPillBar (socket, input) {
                                     console.log("PASS");
                                     if(status == 15)
                                         {
-                                            socket.write(new buffer(
+                                            socket.write(new Buffer(
                             packets.ItemActionReplyPacket.pack({
                                 PacketID: 0x2B,
                                 ActionType: input.ActionType,
@@ -518,7 +518,7 @@ ItemActions[3] = function EquipItem(socket, input) {
 	                        socket.character.updateInfos();
 	                        socket.character.state.setFromCharacter(socket.character);
 
-	                        socket.write(new buffer(
+	                        socket.write(new Buffer(
 	                            packets.ItemActionReplyPacket.pack({
 	                                PacketID: 0x2B,
 	                                ActionType: input.ActionType,
@@ -664,7 +664,7 @@ ItemActions[14] = function ItemUnequip (socket, input){
 	socket.character.state.setFromCharacter(socket.character);
 
 	// Send reply
-	socket.write(new buffer(
+	socket.write(new Buffer(
 	    packets.ItemActionReplyPacket.pack({
 	        PacketID: 0x2B,
 	        ActionType: input.ActionType,
@@ -754,7 +754,7 @@ ItemActions[6] = function StoreItem (socket, input){
 
 
 
-	socket.write(new buffer(
+	socket.write(new Buffer(
 	    packets.ItemActionReplyPacket.pack({
 	        PacketID: 0x2B,
 	        ActionType: input.ActionType,
@@ -833,7 +833,7 @@ ItemActions[7] = function ItemSell (socket, input) {
                         socket.character.save();
 
 
-                        socket.write(new buffer(
+                        socket.write(new Buffer(
                             packets.ItemActionReplyPacket.pack({
                                 PacketID: 0x2B,
                                 ActionType: input.ActionType,
@@ -885,7 +885,7 @@ ItemActions[8] = function CoinsToGold(socket, input) {
 	}
 
 	// Send reply to client
-	socket.write(new buffer(
+	socket.write(new Buffer(
 			packets.ItemActionReplyPacket.pack({
 				PacketID: 0x2B,
 				ActionType: input.ActionType
@@ -907,7 +907,7 @@ ItemActions[9] = function GoldToCoins(socket, input) {
 	}
 
     // Send reply to client
-    socket.write(new buffer(
+    socket.write(new Buffer(
     packets.ItemActionReplyPacket.pack({
         PacketID: 0x2B,
         ActionType: input.ActionType
@@ -938,7 +938,7 @@ ItemActions[11] = function PillBarToInventory (socket, input) {
                                     console.log("PASS");
                                     if(status == 15)
                                         {
-                                            socket.write(new buffer(
+                                            socket.write(new Buffer(
                             packets.ItemActionReplyPacket.pack({
                                 PacketID: 0x2B,
                                 ActionType: input.ActionType,
@@ -973,7 +973,7 @@ ItemActions[11] = function PillBarToInventory (socket, input) {
                                     console.log("PASS");
                                     if(status == 15)
                                         {
-                                            socket.write(new buffer(
+                                            socket.write(new Buffer(
                             packets.ItemActionReplyPacket.pack({
                                 PacketID: 0x2B,
                                 ActionType: input.ActionType,
@@ -1024,7 +1024,7 @@ ItemActions[12] = function PillBarUse (socket, input) {
                                     console.log("PASS");
                                     if(status === true)
                                         {
-                                            socket.write(new buffer(
+                                            socket.write(new Buffer(
                             packets.ItemActionReplyPacket.pack({
                                 PacketID: 0x2B,
                                 ActionType: input.ActionType,
@@ -1061,7 +1061,7 @@ ItemActions[12] = function PillBarUse (socket, input) {
                                     console.log("PASS");
                                     if(status == 15)
                                         {
-                                            socket.write(new buffer(
+                                            socket.write(new Buffer(
                             packets.ItemActionReplyPacket.pack({
                                 PacketID: 0x2B,
                                 ActionType: input.ActionType,
@@ -1156,7 +1156,7 @@ else
 }
 
 
-                        socket.write(new buffer(
+                        socket.write(new Buffer(
                             packets.ItemActionReplyPacket.pack({
                                 PacketID: 0x2B,
                                 ActionType: input.ActionType,
@@ -1250,7 +1250,7 @@ ItemActions[17] = function BuyItem (socket, input){
 
                             socket.character.Silver-=ii.PurchasePrice*input.Amount;
 
-                            socket.write(new buffer(
+                            socket.write(new Buffer(
                                 packets.ItemActionReplyPacket.pack({
                                     PacketID: 0x2B,
                                     ActionType: input.ActionType,
@@ -1303,7 +1303,7 @@ ItemActions[20] = function InventoryMoveItem(socket, input) {
         socket.character.markModified('Inventory');
         socket.character.save();
         //
-        socket.write(new buffer(
+        socket.write(new Buffer(
         packets.ItemActionReplyPacket.pack({
         PacketID: 0x2B,
         ActionType: input.ActionType,
@@ -1378,7 +1378,7 @@ ItemActions[20] = function InventoryMoveItem(socket, input) {
 		socket.character.markModified('Inventory');
 		socket.character.save();
 
-		socket.write(new buffer(
+		socket.write(new Buffer(
 			packets.ItemActionReplyPacket.pack({
 			PacketID: 0x2B,
 			ActionType: input.ActionType,
@@ -1514,7 +1514,7 @@ ItemActions[21] = function StoreSilver (socket, input){
                                 }
 
 
-                                socket.write(new buffer(
+                                socket.write(new Buffer(
                                     packets.ItemActionReplyPacket.pack({
                                         PacketID: 0x2B,
                                         ActionType: input.ActionType,
@@ -1543,7 +1543,7 @@ ItemActions[22] = function GateMasterBankSIlver (socket, input){
                                     socket.character.BankSilver+=input.Amount;
                                     socket.character.Silver-=input.Amount+CommissionCost;
 
-                                    socket.write(new buffer(
+                                    socket.write(new Buffer(
                                         packets.ItemActionReplyPacket.pack({
                                             PacketID: 0x2B,
                                             ActionType: input.ActionType,
@@ -1582,7 +1582,7 @@ ItemActions[27] = function SkillToBar (socket, input){
                                     console.log("PASS");
                                     if(status == 15)
                                         {
-                                            socket.write(new buffer(
+                                            socket.write(new Buffer(
                             packets.ItemActionReplyPacket.pack({
                                 PacketID: 0x2B,
                                 ActionType: input.ActionType,
@@ -1640,7 +1640,7 @@ ItemActions[31] = function LearnSkills (socket, input){
                             return;
                         }
 
-                        socket.write(new buffer(
+                        socket.write(new Buffer(
                                 packets.ItemActionReplyPacket.pack({
                                     PacketID: 0x2B,
                                     ActionType: input.ActionType,
@@ -1696,7 +1696,7 @@ WorldPC.Set(0x14, {
             console.log('Unhandled Item Action: ' + input.ActionType);
             socket.sendInfoMessage('The inventory action '+input.ActionType+' has not been coded into the server. Please report this to a developer and tell them what you were doing at the time.');
 
-                            socket.write(new buffer(
+                            socket.write(new Buffer(
                                 packets.ItemActionReplyPacket.pack({
                                     PacketID: 0x2B,
                                     ActionType: input.ActionType,

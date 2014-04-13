@@ -1,7 +1,7 @@
 // This file is part of InfiniteSky.
 // Copyright (c) InfiniteSky Dev Teams - Licensed under GNU GPL
 // For more information, see LICENCE in the main folder
-
+vms.depends({ name: 'packets', depends: 'structs' }, function(){
 if (typeof(packets)==='undefined') {
     packets = {};
 }
@@ -158,8 +158,8 @@ packets.ItemActionType = {
 
 //Hairer
 // Maybe we do
-//if (util.config.useCompressedPackets) method instead
-var useCompressedPackets = util.config.useCompressedPackets = (typeof(util.config.useCompressedPackets) != "undefined") ? util.config.useCompressedPackets : false;
+//if (config.useCompressedPackets) method instead
+var useCompressedPackets = config.useCompressedPackets = (typeof(config.useCompressedPackets) != "undefined") ? config.useCompressedPackets : false;
 if (useCompressedPackets)
 {
     console.log('Not coded.');
@@ -1177,3 +1177,5 @@ packets.LevelUpPacket = restruct.
 // 00000050: 0000 ffff ffff 0100 0000 0000 0000 0000  ..????..........
 // 00000060: 0000 0000 0000 0000 0000 0000 0000 0000  ................
 // 00000070: 0000 0300 3842 0000 0000 0000 0000       ....8B........
+
+});

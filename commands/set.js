@@ -41,7 +41,7 @@ GMCommands.AddCommand(new Command('set',60,function command_set(string,client){
 				//var silverDifference = (client.character.Silver+Value) - client.character.Silver;
 
 				client.write(
-					new buffer(
+					new Buffer(
 						packets.KeyValue.pack({
 							'PacketID': 142,
 							'Key': 1,
@@ -60,7 +60,7 @@ GMCommands.AddCommand(new Command('set',60,function command_set(string,client){
 				//var silverDifference = (client.character.SilverBig+Value) - client.character.SilverBig;
 
 				// client.write(
-				// 	new buffer(
+				// 	new Buffer(
 				// 		packets.KeyValue.pack({
 				// 			'PacketID': 142,
 				// 			'Key': 1,
@@ -238,7 +238,7 @@ GMCommands.AddCommand(new Command('set',60,function command_set(string,client){
 			client.character.do2FPacket = 1;
 			// client.write(packets.makeCompressedPacket(
 			// 		0x18,
-			// 		new buffer(
+			// 		new Buffer(
 			// 				packets.ActionReplyPacket.pack(
 			// 					client.character.state
 			// 					)
@@ -249,12 +249,12 @@ GMCommands.AddCommand(new Command('set',60,function command_set(string,client){
 
 			client.Zone.sendToAllArea(client,true,packets.makeCompressedPacket(		
 				0x18,
-				new buffer(
+				new Buffer(
 						packets.ActionReplyPacket.pack(
 							client.character.state
 							)
 						)
-				),util.config.viewable_action_distance
+				),config.viewable_action_distance
 			);
 		}
 		//client.send2FUpdate();

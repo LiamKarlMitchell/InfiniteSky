@@ -38,9 +38,9 @@ WorldPC.Set(0x7B, {
 		socket.character.updateInfos();
 
 		socket.Zone.sendToAllArea(socket, true, packets.makeCompressedPacket(
-		0x18, new buffer(
+		0x18, new Buffer(
 		packets.ActionReplyPacket.pack(
-		socket.character.state))), util.config.viewable_action_distance);
+		socket.character.state))), config.viewable_action_distance);
 	}
 });
 

@@ -1,0 +1,29 @@
+{
+  "name": "VMScript",
+  "version": "1.0.0",
+  "description": "VMScript is a way to have reloadable code. When you save changes the code is updated.",
+  "main": "vmscript.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LiamKarlMitchell/VMScript.git"
+  },
+  "keywords": [
+    "Reloadable",
+    "Runtime",
+    "Code",
+    "Hotcode"
+  ],
+  "author": "LiamKarlMitchell",
+  "license": "GNU GPL",
+  "bugs": {
+    "url": "https://github.com/LiamKarlMitchell/VMScript/issues"
+  },
+  "homepage": "http://liamkarlmitchell.github.io/VMScript/",
+  "dependencies": {
+    "chokidar": "^0.8.2",
+    "jshint": "^2.5.0"
+  }
+}

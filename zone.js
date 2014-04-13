@@ -1,3 +1,13 @@
+
+vms.depends({name: 'Zone.js', depends: [
+    'infos.Npc',
+    'infos.Item',
+    'infos.Skill',
+    'db.Character',
+    'packets'
+]
+}, function(){
+
 if(typeof(Zone) === 'undefined') {
     Zone = function Zone(ID) {
         this.ID = ID;
@@ -56,18 +66,18 @@ var NPC = function(ID) {
 	this.getPacket = function() {
 		var packet = packets.makeCompressedPacket(0x19, new Buffer(packets.NPCObject.pack(this)));
 		return packet;
-	}
+	};
 
 	this.onDelete = function() {
 		// Remove timers and intervals to free up references
 		clearInterval(this.updateInterval);
 		//clearTimeout(this.monsterDeathTimer);
-	}
+	};
 
 	this.setLocationRandomOffset = function(Location, Radius) {
 		// Set the location to random spot in a circle? :D
-	}
-}
+	};
+};
 
 // END OF NPC Definition
 
@@ -100,7 +110,7 @@ Zone.prototype = {
         this.sendToAllAreaLocation(socket.character.state.Location, packets.makeCompressedPacket(
         0x18, new Buffer(
         packets.ActionReplyPacket.pack(
-        socket.character.state))), util.config.viewable_action_distance);
+        socket.character.state))), config.viewable_action_distance);
     },
     findCharacterSocket: function(Name) {
         var socket = null;
@@ -176,7 +186,7 @@ Zone.prototype = {
         var portal = null
         for(var i = 0; i < this.MoveRegions.length; ++i) {
             console.log(i, this.MoveRegions[i].ZoneID, i % 2);
-            if(i % 2 == 0 && this.MoveRegions[i].ZoneID == ZoneID) {
+            if(i % 2 == 0 && this.MoveRegions[i].ZoneID === ZoneID) {
                 portal = this.MoveRegions[i];
                 break;
             }
@@ -187,7 +197,7 @@ Zone.prototype = {
         console.log('getPortalEndPoint ' + ZoneID);
         var portal = null;
         for(var i = 0; i < this.MoveRegions.length; ++i) {
-            if(i % 2 == 1 && this.MoveRegions[i].ZoneID == ZoneID) {
+            if(i % 2 == 1 && this.MoveRegions[i].ZoneID === ZoneID) {
                 portal = this.MoveRegions[i];
                 break;
             }
@@ -450,4 +460,5 @@ if (typeof(zones) !== 'undefined') {
 		zone.__proto__ = Zone.prototype;
 	}
 }
-main.events.emit('gameinfo_loaded', 'Zone');
+
+});

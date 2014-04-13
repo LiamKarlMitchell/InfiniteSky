@@ -1,0 +1,45 @@
+First off just let me say, Node.js is Amazing. It solves basically all of the design
+problems that I was having with its single thread for code and async for io.
+
+I first got into Node.js to develop an MMORPG server.
+Yeah... giant task for a beginner, Im Crazy or something.
+
+I had heard Node.js is great for handling events, I thought well a request from an mmo client is an event.
+
+There was still something missing, and I knew what it was.
+I require('vmscript') for reloading code at runtime.
+
+There were two real reasons for this:
+1) A Server takes a while to start up, because of the vast amount of information it must load.
+2) Not disconnecting users whilst developing. (Including my self)
+
+As an aditional note, I also hated waiting for compile times in C++ and Java so Node.js worked out well for me here too.
+
+So VMScript is a module that makes use of Node.js VM to run scripts at runtime.
+It also watches directorys and files for changes and can reload them.
+
+
+We have successfully used this at runtime to develop MMO features and patch bugs that users had found whilst testing.
+Testing sessions with users enabled them to message us in game about some feature that they had found a bug in or something they wanted implemented.
+And we were able to implement features or patch bugs rapidly using VMScript.
+The test users responded really well to this, they were excited that we could make changes without them being disconnected, downloading a big patch or waiting for months on end.
+
+After discussing with other developers I soon realised a niche that VMScript could fill. So I decided to make my first npm module.
+
+Examples of where I could see this being used:
+* When creating a backend restful api
+    Although the wait is not as long for this its still fun
+* When writing or executing tests
+    Each time you save a script the test(s) can be run.
+    You could see the result on your 2nd monitor and continue developing.
+* Adding new commands to your system at runtime for example chat or cli commands /slap Username
+* In a learn to code enviroment, users could write their code and see informative responses in near real time.
+* In a collaborative work space where multiple users alter files.
+    Coupled with a debug api, changes could be executed and run against sample code or real data.
+    Then in the ide you could see the data flow and code paths used at runtime for each iteration.
+    Clicking a log statement could show you the log messages per iteration.
+    And you could skip between them and replay with subtle changes to the code.
+    Developers could easily peer programe and see each others code and executions.
+    Hopefully enabling even more rapid development with Node.js.
+    (I will probably work on this as a future project, if anyone is interested to join me)
+

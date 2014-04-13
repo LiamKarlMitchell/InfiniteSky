@@ -55,7 +55,7 @@ function handleDuelInvitePacket(socket, data) {
 		socket.sendInfoMessage(socket.character.Name + ' trying to duel but its not coded yet.');
 		other.sendInfoMessage(socket.character.Name + ' trying to duel you but its not coded yet.');
 		// other.write(
-		// new buffer(
+		// new Buffer(
 		// WorldPC.DuelAccept.pack({
 
 		// 	PacketID: 0x36,
@@ -81,7 +81,7 @@ function handleDuelAcceptDeny(socket, data) {
 	if (other) {
 		other.sendInfoMessage('Duel Accept/Deny from ' + socket.character.Name);
 		other.write(
-		new buffer(WorldPC.DuelAcceptDeny.pack({
+		new Buffer(WorldPC.DuelAcceptDeny.pack({
 			PacketID: 0x38,
 			Name: other.character.Name,
 			Denied: data.Denied // 1 denied else accepted
@@ -125,7 +125,7 @@ WorldPC.Set(0x22, { // Duel accept/deny
 // 		}
 // 		console.log("[Normal] " + socket.character.Name + ": " + input.Message);
 // 		socket.Zone.sendToAllClan(
-// 		new buffer(
+// 		new Buffer(
 // 		WorldPC.ChatPacketReply.pack({
 // 			PacketID: 0x2A,
 // 			Name: input.Name,
@@ -142,7 +142,7 @@ WorldPC.Set(0x22, { // Duel accept/deny
 // 		}
 // 		console.log("[Faction] " + socket.character.Name + ": " + input.Message);
 // 		socket.Zone.sendToAllClan(
-// 		new buffer(
+// 		new Buffer(
 // 		WorldPC.ChatPacketReply.pack({
 // 			PacketID: 0x2A,
 // 			Name: input.Name,

@@ -15,7 +15,7 @@
     "regular": "0.0.0.0",
     "lan": "0.0.0.0"
   },
-  "plugins": [ "generic/packets.js", "generic/AI.js", "login.js", "zone.js", "world.js" ],
+  "plugins": [],
   "max_clients": "10",
   "client_timeout": "120",
   "web_enabled": "true",

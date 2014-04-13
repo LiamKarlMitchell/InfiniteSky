@@ -1,5 +1,4 @@
 //Constructor
-var sandbox = require('./sandbox');
 var Command = function(Name, Level, Execute) {
         this.Name = Name;
         this.Level = Level;
@@ -12,6 +11,7 @@ var Command = function(Name, Level, Execute) {
     // Command.prototype = {
     // }
 var GMCommands = function() {
+        // TODO: Use object for storing commands in rather than array.
         // Add the Command Object refrence to this object so other modules can use it if needed
         this.Command = Command;
         this.Commands = [];
@@ -25,19 +25,13 @@ var GMCommands = function() {
             this.Commands.push(command);
         }
         // this.RemoveCommand = function(name)
-        // {
-        // 	// Find the command by name
-        // 	// Remove it from the Commands by using splice trick.
+        //  {
+        //  	// Find the command by name
+        //  	// Remove it from the Commands by using splice trick.
         // }
-        this.SetWorld = function(world) {
-            this.World = world;
-            scope.World = world;
-        }
         this.Start = function() {
-            sandbox.Command = Command;
-            sandbox.GMCommands = this;
-            gmscripts = new vmscript('commands', 'commands', sandbox);
-            sandbox.main.events.emit('GMCommands_Started');
+            gmscripts = new vmscript('commands', 'commands');
+            main.events.emit('GMCommands_Started');
         }
         this.GetCommandInfo = function() {
             // Get the command info from db for setting levels of commands dynamically?

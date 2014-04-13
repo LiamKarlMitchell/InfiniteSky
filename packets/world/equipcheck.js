@@ -55,7 +55,7 @@ WorldPC.Set(0x17, {
 
 		// we do not know reply yet?
 //		socket.send(
-//		new buffer(
+//		new Buffer(
 //		WorldPC.ChatPacketReply.pack({
 //			PacketID: 0x2A,
 //			Name: socket.character.Name,

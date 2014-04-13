@@ -63,11 +63,11 @@ LoginPC.Set(0x03, {
 
 			db.Character.find({
 				AccountID: socket.account._id,
-				ServerName: util.config.server_name
+				ServerName: config.server_name
 			}, function(error, characters) {
 				if (error) {
 					// Handle error here
-					util.dumpError(error);
+					dumpError(error);
 					return;
 				}
 
@@ -80,7 +80,7 @@ LoginPC.Set(0x03, {
 				for (var i = 0; i < charactersLength; i++) {
 
 					socket.characters[i] = characters[i];
-					socket.write(new buffer(LoginPC.CharacterInfoPacket.pack({
+					socket.write(new Buffer(LoginPC.CharacterInfoPacket.pack({
 						packetID: 0x05,
 						Slot: i,
 						Exists: 1,
@@ -89,7 +89,7 @@ LoginPC.Set(0x03, {
 				}
 
 				for (var i = charactersLength; i < 3; i++) {
-					socket.write(new buffer(LoginPC.CharacterInfoPacket.pack({
+					socket.write(new Buffer(LoginPC.CharacterInfoPacket.pack({
 						packetID: 0x05,
 						Slot: i,
 						Exists: 0
@@ -102,7 +102,7 @@ LoginPC.Set(0x03, {
 		function sendLoginReply(loginSuccess) {
 			console.log('Writing login reply: '+loginSuccess);
 
-			var LoginReply = new buffer(41); // Need to use restruct.
+			var LoginReply = new Buffer(41); // Need to use restruct.
 			LoginReply.fill(0);
 			LoginReply.writeUInt8(0x03, 0);
 			LoginReply.writeUInt8(loginSuccess, 1);
@@ -129,8 +129,8 @@ LoginPC.Set(0x03, {
 		//Check whether user exists in db
 		// Can do active: 0 to not allow multiple logins :P
 		socket.isServerAdmin = false;
-		for (var i = 0; i < util.config.systemAdminIP.length; i++) {
-			if (util.config.systemAdminIP[i] == socket.remoteAddress) {
+		for (var i = 0; i < config.systemAdminIP.length; i++) {
+			if (config.systemAdminIP[i] == socket.remoteAddress) {
 				socket.isServerAdmin = true;
 				break;
 			}

@@ -32,12 +32,13 @@
 console.time('init-server');
 
 // Require anything that should be global here.
-vmscript = require('./vmscript');
+vmscript = require('./vmscript/vmscript');
 csv = require('fast-csv');
-util = require('./util');
+_util = require('./util');
 zlib = require('zlib');
 extend = require("xtend");
 GMCommands = require("./GMCommand");
+Command = GMCommands.Command;
 // TODO: See if we can replace CLI's inspect with eyes.inspect as its nicer and can be formatted nicely
 // TODO: Rewrite restruct to use buffer when in node.js enviroment
 restruct = require('./restruct');
@@ -69,7 +70,6 @@ safeguard_cli = {
 
 infos = {};
 infos.__proto__ = safeguard_cli;
-structs = require('./generic/structs');
 
 Netmask = require('netmask').Netmask;
 net = net = require('net');
@@ -81,16 +81,6 @@ GameInfoLoader = require('./GameInfoLoader');
 
 // Constants/vars for multi purpose
 var temp;
-
-/**
- * Our sandbox object.
- * This is used for vmscript code to run with.
- * Anything in here can be accessed by the vmscripts
- * Also there is a trick below which will take anything
- * in our global scope and put it into the sandbox object.
- * @dict
- */
-var sandbox = require('./sandbox');
 
 // Methods to call when shutting down server can be put into this array.
 var shutdownMethods = [];
@@ -109,13 +99,12 @@ main = {
       try {
         shutdownMethods[i]();
       } catch (ex) {
-        util.dumpError(ex);
+        dumpError(ex);
       }
     }
     process.exit(0);
   }
 };
-sandbox.main = main;
 natTranslations = [];
 
 /** A function that is triggered when config.json is reloaded */
@@ -125,72 +114,73 @@ main.events.on('config_loaded', function Config_Reloaded() {
   // will not change the ports its listening on.
 });
 
-// Get main to require some module and put it in sandbox. only valid in next load of script
-// main_require = function(name,path) {
-//   sandbox[name] = require(path);
-//   console.log(sandbox);
-// };
-
 // Setup our uncaught exception handler and output our header text message.
-util.setupUncaughtExceptionHandler();
-util.outputHeaderText();
+_util.setupUncaughtExceptionHandler();
+_util.outputHeaderText();
 
 // Load Config
-if (!util.loadConfig('./config.json')) {
+if (!_util.loadConfig('./config.json')) {
   console.log('Error loading config file.');
   process.exit(1);
 }
 
 // TODO: Config file watching for reload
 fs.watchFile('./config.json', function(curr, perv) {
-  if (!sandbox.util.loadConfig('./config.json')) {
+  if (!_util.loadConfig('./config.json')) { // TODO: Get config from arg but default to this
     console.log('Error loading config file.');
   }
 })
 
 natTranslations.length = 0;
-util.config.natTranslations.forEach(function(natTranslation,index) {
+config.natTranslations.forEach(function(natTranslation,index) {
   natTranslations[index] = new Netmask(natTranslation.mask);
   natTranslations[index].ip = natTranslation.ip;
 });
 
 // Get external ip address from external source and warn if config external ip is incorrect
 try {
-  generic = new vmscript('generic','generic',sandbox);
-  plugins = new vmscript('plugins',null,sandbox);
+  generic = new vmscript('generic','generic');
+  plugins = new vmscript('plugins',null);
+  generic.on('dependent_loaded',function(info) { plugins.emit('dependent_loaded',info); });
+  plugins.Load('login.js');
+  plugins.Load('zone.js');
+  plugins.Load('world.js');
 
-  console.log(util.config.plugins);  
-  for (var i=0;i<util.config.plugins.length;i++) {
-    plugins.Load(util.config.plugins[i]);
+  // TEMP SOLUTION TO GET VMSCRIPT TRIGGER LOADING...
+  setInterval(function(){
+    plugins.emit('dependent_loaded');
+  },5000);
+
+  console.log(config.plugins);
+  for (var i=0;i<config.plugins.length;i++) {
+    plugins.Load(config.plugins[i]);
   }
 }
 catch (ex) {
   console.error('Problem loading up basic scripts');
-  util.dumpError(ex);
+  dumpError(ex);
 }
-
-// Populate sandbox with any global things
-for (temp in global) {
-  if (global.hasOwnProperty(temp)) {
-    sandbox[temp] = global[temp];
-  }
-}
-// Assign things we may need to use in sandbox
-sandbox.require = require;
-sandbox.buffer = Buffer; // lower cased because something keeps turning my Buffer object into a SchemaBuffer. // TODO: Fix sandbox.Buffer to work.
 
 function clearLoggedInAccounts() {
   console.log('Clearing all accounts that are logged in.');
   db.Account.logoutAll();
+
+  db.scripts.on('dependent_loaded',function(info){ plugins.emit('dependent_loaded',info); });
+  plugins.emit('dependent_loaded','db.js');
 }
+
 main.events.once('db_accounts_schema_loaded', clearLoggedInAccounts);
 main.events.once('world_started', function() {
   GMCommands.Start();
 });
-var db = new (require('./db'))(util.config.mongodb.connectString);
+main.events.on('gameinfo_loaded',function(info){
+  console.log('GameInfo LOADED: '+info);
+  plugins.emit('dependent_loaded',info);
+});
+var db = new (require('./db'))(config.mongodb.connectString);
 
 // Start up Command Line Interface
-var cli = new (require('./cli'))(sandbox);
+var cli = new (require('./cli'));
 
 console.timeEnd('init-server');
 
@@ -201,7 +191,7 @@ var gs = new GameStep(function(delta){
 
 gs.start();
 
-// TODO: Handle exiting server gracefully and pass a function through to sandbox
+// TODO: Handle exiting server gracefully when signal received to close
 process.on('SIGINT', function() {
     console.log('Received Signal');
     setTimeout(function() {

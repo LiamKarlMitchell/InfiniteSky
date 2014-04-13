@@ -112,7 +112,7 @@ WorldPC.Set(0x62,{
 	}
 	socket.sendInfoMessage('Silver is now '+socket.character.Silver);
 
-	socket.write(new buffer(GamblerDiceGameReply.pack({
+	socket.write(new Buffer(GamblerDiceGameReply.pack({
 		PacketID: 0x81,
 		Status: Status,
 		Dice1: Dice1,

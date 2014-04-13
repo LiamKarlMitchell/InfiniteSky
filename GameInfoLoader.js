@@ -11,7 +11,6 @@
 // TODO: Rewrite to use buffer rather than restuct as native code will be faster.
 
 var path = require('path');
-var sandbox = require('./sandbox');
 
 function GameInfoLoader(filename, structure, onRecordFunction) {
 	this.Load(filename,structure,onRecordFunction);
@@ -39,7 +38,7 @@ GameInfoLoader.prototype.Load = function(filename, structure, onRecordFunction) 
 	this.InfoStruct  = structure;
 	
 
-	var filepath = path.join(sandbox.util.config.data_dir || 'data','infos',filename);
+	var filepath = path.join(config.data_dir || 'data','infos',filename);
 
 	console.log('Loading Game Info: '+filepath);
 	fs.readFile(filepath,function(err,data) {
@@ -91,7 +90,7 @@ GameInfoLoader.prototype.Load = function(filename, structure, onRecordFunction) 
 
 			self.infos = infos.info;
 			self.Loaded = true;
-			sandbox.main.events.emit('gameinfo_loaded',filename);
+			main.events.emit('gameinfo_loaded',filename);
 		} else {
 			throw new Error("Not enouth bytes in "+filepath+' to read InfoStructure');
 		}

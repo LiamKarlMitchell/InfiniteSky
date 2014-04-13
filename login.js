@@ -2,27 +2,39 @@
 // Copyright (c) InfiniteSky Dev Teams - Licensed under GNU GPL
 // For more information, see LICENCE in the main folder
 
+vms.depends({name: 'Login Server', depends: [
+    'infos.Exp',
+    'infos.Item',
+    'infos.Skill',
+    'db.Account',
+    'db.Character',
+    'world',
+    'packets'
+]
+}, function(){
 if (typeof(login) === 'undefined') {
+    console.log('Login Server code loaded.');
     login = {
-        packets: new PacketCollection('./packets/login','LoginPC',require('./sandbox')),
+        packets: new PacketCollection('./packets/login','LoginPC'),
         start: function () {
             this.server = net.createServer(function (socket) { login.connection(socket); });
-            console.log('Login server starting listen on port: '+util.config.ports.login);
-            this.server.listen(util.config.ports.login);
+            console.log('Login server starting listen on port: '+config.ports.login);
+            this.server.listen(config.ports.login);
         },
+        clients: [],
+        clientID: 0,
         running: true
     };
-    // Need to move to login.js
-    var clients = [];
-    var clientID = 0;
+} else {
+    console.log('Login Server code reloaded.');
 }
 
 // TODO: Detect client/server version if possible.
 login.connection = function(socket) {
-    console.log("Client #" + clientID + " connected from IP "+socket.remoteAddress);
+    console.log("Client #" + this.clientID + " connected from IP "+socket.remoteAddress);
 
-     socket.clientID = clientID;
-     clientID++;
+     socket.clientID = this.clientID;
+     this.clientID++;
      socket.authenticated = false;
 
      socket.characters = [];
@@ -30,7 +42,7 @@ login.connection = function(socket) {
      //Handle socket disconnection
      socket.on('end', function() {
          console.log('Client #' + socket.clientID + ' ended connection');
-         clients.splice(clients.indexOf(socket), 1);
+         login.clients.splice(login.clients.indexOf(socket), 1);
          delete login[socket.ID];
          db.Account.logoutUser(socket);
      });
@@ -47,27 +59,27 @@ login.connection = function(socket) {
      socket.on('close', function() {
          console.log('Client #' + socket.clientID + ' closed connection');
 
-         clients.splice(clients.indexOf(socket), 1);
+         login.clients.splice(login.clients.indexOf(socket), 1);
          delete login[socket.ID];
-         //var i = allClients.indexOf(socket);
-         //delete allClients[i];
+         //var i = alllogin.Clients.indexOf(socket);
+         //delete alllogin.Clients[i];
          db.Account.logoutUser(socket);
      });
 
      socket.on('disconnect', function() {
          console.log('Client #' + socket.clientID + ' disconnected');
 
-         clients.splice(clients.indexOf(socket), 1);
+         login.clients.splice(login.clients.indexOf(socket), 1);
          delete login[socket.ID];
-         //var i = allClients.indexOf(socket);
-         //delete allClients[i];
+         //var i = alllogin.Clients.indexOf(socket);
+         //delete alllogin.Clients[i];
          // Remove from zone transfer list if its there
          db.Account.logoutUser(socket);
 
          try {
              login.packets.onDisconnected(socket);
          } catch (e) {
-             util.dumpError(e);
+             dumpError(e);
          }
      });
 
@@ -77,18 +89,18 @@ login.connection = function(socket) {
      try {
          login.packets.onConnected(socket);
      } catch (e) {
-         util.dumpError(e);
+         dumpError(e);
      }
 
-     clients.push(socket);
+     login.clients.push(socket);
      login[socket.ID] = socket;
 };
 
 login.findAccountSocket = function(name) {
-    for (var i=0;i<clients.length;i++) {
-        if (clients[i].authenticated) {
-            if (clients[i].ai.username === name) {
-                return clients[i];
+    for (var i=0;i<login.clients.length;i++) {
+        if (login.clients[i].authenticated) {
+            if (login.clients[i].ai.username === name) {
+                return login.clients[i];
             }
         }
     }
@@ -122,45 +134,50 @@ var AreAllInfosLoaded = function() {
 };
 
 login.findAccountSocket = function(name) {
-    for (var i=0;i<clients.length;i++) {
-        if (clients[i].authenticated) {
-            if (clients[i].ai.username === name) {
-                return clients[i];
+    for (var i=0;i<login.clients.length;i++) {
+        if (login.clients[i].authenticated) {
+            if (login.clients[i].ai.username === name) {
+                return login.clients[i];
             }
         }
     }
     return null;
 };
-
 if (login.start) {
-    if (AreAllInfosLoaded()) {
-        // Accept connections?
-        login.start();
-        delete login.start;
-    } else if (login.waiting_on_game_info === undefined) {
-        login.waiting_on_game_info = 1;
-
-        var infoWaitEvent = function (what) {
-            switch (what) {
-                case '005_00001.IMG': loadedInfos['005_00001.IMG'] =  infos.Exp !== undefined && infos.Exp.Loaded; break;
-                case '005_00002.IMG': loadedInfos['005_00002.IMG'] =  infos.Item !== undefined && infos.Item.Loaded; break;
-                case '005_00003.IMG': loadedInfos['005_00003.IMG'] = infos.Skill !== undefined && infos.Skill.Loaded; break;
-            }
-
-            if (AreAllInfosLoaded()) {
-                console.log('All info the Login Server needs is loaded.');
-                // Accept connections?
-                if (login.start) {
-                    login.start();
-                    delete login.start;
-                }
-                main.events.removeListener('gameinfo_loaded',infoWaitEvent);
-            }
-        };
-
-        main.events.once('db_accounts_schema_loaded', infoWaitEvent);
-        main.events.once('db_character_schema_loaded', infoWaitEvent);
-
-        main.events.on('gameinfo_loaded', infoWaitEvent);
-    }
+    login.start();
+    delete login.start;
 }
+// if (login.start) {
+//     if (AreAllInfosLoaded()) {
+//         // Accept connections?
+//         login.start();
+//         delete login.start;
+//     } else if (login.waiting_on_game_info === undefined) {
+//         login.waiting_on_game_info = 1;
+
+//         var infoWaitEvent = function (what) {
+//             switch (what) {
+//                 case '005_00001.IMG': loadedInfos['005_00001.IMG'] =  infos.Exp !== undefined && infos.Exp.Loaded; break;
+//                 case '005_00002.IMG': loadedInfos['005_00002.IMG'] =  infos.Item !== undefined && infos.Item.Loaded; break;
+//                 case '005_00003.IMG': loadedInfos['005_00003.IMG'] = infos.Skill !== undefined && infos.Skill.Loaded; break;
+//             }
+
+//             if (AreAllInfosLoaded()) {
+//                 console.log('All info the Login Server needs is loaded.');
+//                 // Accept connections?
+//                 if (login.start) {
+//                     login.start();
+//                     delete login.start;
+//                 }
+//                 main.events.removeListener('gameinfo_loaded',infoWaitEvent);
+//             }
+//         };
+
+//         main.events.once('db_accounts_schema_loaded', infoWaitEvent);
+//         main.events.once('db_character_schema_loaded', infoWaitEvent);
+
+//         main.events.on('gameinfo_loaded', infoWaitEvent);
+//     }
+// }
+
+});

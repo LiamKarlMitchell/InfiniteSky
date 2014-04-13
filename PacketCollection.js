@@ -45,18 +45,14 @@ function defaultPacketFunction(data) {
 // p.Set(0x03,{Size: 50});
 
 // PacketCollection can watch a directory and you can pass a scope to it such as this
-function PacketCollection(directory,PacketCollectionName,scope) {
+function PacketCollection(directory,PacketCollectionName) {
 	this.LastAdded = null;
-	if (!scope) {
-		scope = {};
-	}
-	scope[PacketCollectionName] = this;
-	scope.console = console;
-	scope.Buffer = Buffer;
 
-	var Packets = {};
+	global[PacketCollectionName] = this;
+	
+	this.Packets = {};
 	this.Get = function(ID) {
-		return Packets[ID] || null;
+		return this.Packets[ID] || null;
 	}
 
 	// This is for use with restruct, for using with regular buffer functions replace Restruct with a function to decode the packet data into object you can use.
@@ -71,16 +67,16 @@ function PacketCollection(directory,PacketCollectionName,scope) {
 			if (options.SizeFunction) p.SizeFunction = options.SizeFunction;
 		}
 
-		Packets[ID] = p;
+		this.Packets[ID] = p;
 
 		this.LastAdded = ID;
 	}
 
 	this.Remove = function(ID) {
-		delete Packets[ID];
+		delete this.Packets[ID];
 	}
 
-	var scripts = new vmscript(PacketCollectionName,directory,scope);
+	this.scripts = new vmscript(PacketCollectionName,directory);
 
 };
 

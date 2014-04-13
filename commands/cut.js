@@ -25,6 +25,6 @@ GMCommands.AddCommand(new Command('cut',20,function command_cut(string,client){
 	};
 
 	
-	client.Zone.sendToAllAreaLocation( client.character.state.Location,packets.makeCompressedPacket(0x2C,new buffer(packets.AttackPacketReply.pack(CutPacket))),util.config.viewable_action_distance );
+	client.Zone.sendToAllAreaLocation( client.character.state.Location,packets.makeCompressedPacket(0x2C,new Buffer(packets.AttackPacketReply.pack(CutPacket))),config.viewable_action_distance );
 	client.sendInfoMessage(client.character.Name + ' has cut you for '+Damage);
 }));

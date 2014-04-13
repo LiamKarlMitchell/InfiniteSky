@@ -47,7 +47,7 @@ WorldPC.Set(0x13, {
 		console.log("[Normal] " + socket.character.Name + ": " + input.Message);
 
 		socket.Zone.sendToAllClan(
-		new buffer(
+		new Buffer(
 		WorldPC.ChatPacketReply.pack({
 			PacketID: 0x2A,
 			Name: socket.character.Name,
@@ -68,7 +68,7 @@ WorldPC.Set(0x3E, {
 		console.log("[Faction] " + socket.character.Name + ": " + input.Message);
 
 		socket.Zone.sendToAllClan(
-		new buffer(
+		new Buffer(
 		WorldPC.ChatPacketReply.pack({
 			PacketID: 0x2A,
 			Name: input.Name,
@@ -90,7 +90,7 @@ WorldPC.Set(0x09, {
 
 		var Other = world.findCharacterSocket(input.NameTo);
 		if (Other) {
-			Other.write(new buffer(
+			Other.write(new Buffer(
 			WorldPC.ChatPacketReply.pack({
 				PacketID: 0x2A,
 				Name: input.Name,
@@ -104,7 +104,7 @@ WorldPC.Set(0x09, {
 
 // Send guild chat to all in guild
 // socket.Zone.sendToAllClan(
-// 		new buffer(
+// 		new Buffer(
 // 		WorldPC.GuildChatPacketReply.pack({
 // 			PacketID: 0x22,
 // 			Name: input.Name,

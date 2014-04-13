@@ -40,7 +40,7 @@ function SendCharacterOnlineStatus(socket, Name) {
 		}
 	}
 
-	socket.write(new buffer(WorldPC.FriendOnlineReply.pack({
+	socket.write(new Buffer(WorldPC.FriendOnlineReply.pack({
 		PacketID: 0x1D,
 		Name: Name,
 		IsOffline: Friend ? 0 : 1,

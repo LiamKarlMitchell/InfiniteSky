@@ -4,7 +4,6 @@
 
 var pjson = require('./package.json');
 var node_util = require('util');
-var scope = require('./sandbox');
 var fs = require('fs');
 
 var util = {
@@ -47,7 +46,7 @@ var util = {
 
   setupUncaughtExceptionHandler: function () {
     process.on('uncaughtException',function(exception) {
-      util.dumpError(exception);
+      dumpError(exception);
     });
   },
 
@@ -56,18 +55,18 @@ var util = {
   },
   // TODO: Make Async?
   loadConfig: function(name) {
-    if (name !== undefined) util.configFile = name;
-    if (util.configFile === undefined) {
-      return util.dumpError("loadConfig requires a config file name to be passed as an argument.");
+    if (name !== undefined) configFile = name;
+    if (configFile === undefined) {
+      return dumpError("loadConfig requires a config file name to be passed as an argument.");
     }
-    console.log('Attempting to load config file: '+util.configFile);
+    console.log('Attempting to load config file: '+configFile);
     try {
-      util.config = JSON.parse(fs.readFileSync(util.configFile,{ encoding: 'ascii' }));
-      //console.log(util.config.natTranslations);
-      scope.main.events.emit('config_loaded');
-      return util.config;
+      config = JSON.parse(fs.readFileSync(configFile,{ encoding: 'ascii' }));
+      //console.log(config.natTranslations);
+      main.events.emit('config_loaded');
+      return config;
     } catch(ex) {
-      util.dumpError(ex);
+      dumpError(ex);
       return null;
     }
   },
@@ -107,5 +106,8 @@ var util = {
     return o;
   }
 }
+
+global.dumpError = util.dumpError;
+global.logHex = util.logHex;
 
 module.exports = util;

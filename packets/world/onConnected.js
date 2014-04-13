@@ -8,7 +8,7 @@ WorldServerInfoPacket = restruct.
 
 WorldPC.onConnected = function (socket) {
 	// Send server info to client here... we don't really seem to have actuall data usage for this
-	socket.write(new buffer(WorldServerInfoPacket.pack({
+	socket.write(new Buffer(WorldServerInfoPacket.pack({
 		packetID: 0x00
 	})));
 
