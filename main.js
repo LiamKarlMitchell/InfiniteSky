@@ -33,6 +33,7 @@ console.time('init-server');
 
 // Require anything that should be global here.
 vmscript = require('./vmscript');
+csv = require('fast-csv');
 util = require('./util');
 zlib = require('zlib');
 extend = require("xtend");
