@@ -49,3 +49,16 @@ GMCommands.AddCommand(new Command('rstat', 80, function(string, client) {
 	console.log(statInfo);
 	client.sendInfoMessage('damage is '+Math.floor((cvars.Damage[statInfo.WeaponType] * statInfo.StatStrength))+' weapon type: '+statInfo.WeaponType+' str: '+statInfo.StatStrength);
 }));
+
+GMCommands.AddCommand(new Command('info', 80, function(string, client) {
+	var item = infos.Item[string];
+	if(item === undefined){
+
+	}else{
+		for(var key in item){
+			if(item.hasOwnProperty(key)){
+				console.log(key+": "+item[key]);
+			}
+		}
+	}
+}));

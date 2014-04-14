@@ -144,7 +144,7 @@ var AIObject = function(ID) {
 	catch(err) {
 		//throw new AIException('The AI ['+this.AI.Name+'] had an error\n'+err);
 		console.log('\x1B[31m' + 'The AI ['+this.AI.Name+'] had an error' + '\x1B[0m');
-		util.dumpError(err);
+		dumpError(err);
 		this.AI = null;
 	}
 }

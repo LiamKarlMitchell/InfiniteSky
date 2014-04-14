@@ -133,7 +133,7 @@ db.Account.logoutAll = function () {
     multi: true
   }, function(err) {
     if(err) {
-      util.dumpError("Error logging out all users. Is the DB running?\n" + err);
+      dumpError("Error logging out all users. Is the DB running?\n" + err);
       main.shutdown();
     } else {
       console.log("All users logged out"); // TODO: we should code this to log them out for this game & server only!

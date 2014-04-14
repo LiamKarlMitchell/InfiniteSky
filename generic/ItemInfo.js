@@ -90,6 +90,11 @@ ItemInfo.prototype = {
 		{
 			return 4;
 		}
+	},
+	isAllowedByClan: function(characterClanID){
+		//TODO: Check up on actuall clan restriction value from Item Info
+		if(this.Clan === 1 || this.Clan === (characterClanID +2)) return true;
+		return false;
 	}
 };
 
@@ -104,8 +109,8 @@ restruct.
   int32lu("ItemType").
   int32lu("DisplayItem2D").
   int32lu("_1").
-  int32lu("_2").
-  int32lu("_3").
+  int32lu("Level"). // Double as LevelRequirement?
+  int32lu("Clan").
   int32lu("_4").
   int32lu("_5").
   int32lu("_6").

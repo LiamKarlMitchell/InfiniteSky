@@ -38,7 +38,7 @@ cli.createaccount = function CLI_CreateAccount(input) {
   	var newaccount = new db.Account(info);
   	newaccount.save(function (err) {
   		  if (err) { // Assuming account already exists
-  		    util.dumpError('Error making account already exists or there was an error.');
+  		    dumpError('Error making account already exists or there was an error.');
   		  	return;
   		  }
   		  console.log('Account '+info.Username+' has been created.');

@@ -107,7 +107,7 @@ var util = {
   }
 }
 
-global.dumpError = util.dumpError;
+global.dumpError = dumpError;
 global.logHex = util.logHex;
 
 module.exports = util;

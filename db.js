@@ -28,7 +28,7 @@ function DB(connectString) {
 
 	// If the connection throws an error
 	mongoose.connection.on('error',function (err) {
-	  util.dumpError('Mongoose default connection error: ' + err);
+	  dumpError('Mongoose default connection error: ' + err);
 	});
 	
 	// When the connection is disconnected
@@ -46,7 +46,7 @@ function DB(connectString) {
 	  if (this[name]===undefined) { console.error('No db object defined as '+name); return; }
 	  this[name].find(searchfilter,feilds,function(err,docs) {
 	    if (err) {
-	      util.dumpError(err);
+	      dumpError(err);
 	      return;
 	    }
 	    console.log(docs);

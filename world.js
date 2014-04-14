@@ -6,6 +6,7 @@ vms.depends({
     depends: ['infos.Exp', 'infos.Item', 'infos.Npc', 'infos.Skill', 'db.Account', 'db.Character', 'Zone', 'packets']
 }, function() {
     if(typeof(world) === 'undefined') {
+        console.log('World server code loaded');
         world = {
             packets: new PacketCollection('./packets/world', 'WorldPC', require('./sandbox')),
             start: function() {
@@ -26,11 +27,13 @@ vms.depends({
         var clients = [];
         var clientID = 0;
         var socket_transfers = [];
+    } else {
+        console.log('World server code reloaded');
     }
     // zones is an object which will contain references to each zone object by its id.
     if(typeof(zones) === 'undefined') {
         zones = {};
-    }
+    }    
     world.GameStep = function(delta) {
         // Do something with delta
         // console.log('Delta: '+delta);
@@ -576,7 +579,7 @@ vms.depends({
             try {
                 world.packets.onDisconnected(socket);
             } catch(e) {
-                util.dumpError(e);
+                dumpError(e);
             }
         });
         CachedBuffer.call(socket, world.packets);
@@ -584,7 +587,7 @@ vms.depends({
         try {
             world.packets.onConnected(socket);
         } catch(e) {
-            util.dumpError(e);
+            dumpError(e);
         }
         world.addClient(socket);
         world[socket.ID] = socket;

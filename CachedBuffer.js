@@ -86,7 +86,7 @@ var CachedBuffer = function(packet_collection, options) {
                                 } catch(ex) {
                                     // For testing only...
                                     this.bufferLength = 0;
-                                    util.dumpError(ex)
+                                    dumpError(ex)
                                 }
                                 this.badCount = 0;
                             } else if(packet.Size && this.bufferLength - position >= packet.Size) { // Check for a packet with Size
@@ -99,7 +99,7 @@ var CachedBuffer = function(packet_collection, options) {
                                 } catch(ex) {
                                     // For testing only...
                                     this.bufferLength = 0;
-                                    util.dumpError(ex)
+                                    dumpError(ex)
                                 }
                                 position += packet.Size;
                                 this.badCount = 0;
@@ -117,7 +117,7 @@ var CachedBuffer = function(packet_collection, options) {
                             } catch(ex) {
                                 // For testing only...
                                 this.bufferLength = 0;
-                                util.dumpError(ex)
+                                dumpError(ex)
                             }
                             position += packet.Restruct.size;
                             this.badCount = 0;

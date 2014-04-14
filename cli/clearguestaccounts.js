@@ -16,7 +16,7 @@ cli.clearguestaccounts = function CLI_ClearGuestAccounts(input) {
 
   db.Account.find({Username: {$regex: 'Guest' } },'_id',function(err,docs){
     if (err) {
-      util.dumpError(err);
+      dumpError(err);
       return;
     }
     
