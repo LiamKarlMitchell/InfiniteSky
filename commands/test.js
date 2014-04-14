@@ -55,6 +55,7 @@ GMCommands.AddCommand(new Command('info', 80, function(string, client) {
 	if(item === undefined){
 
 	}else{
+		console.log("#############################################");
 		for(var key in item){
 			if(item.hasOwnProperty(key)){
 				console.log(key+": "+item[key]);

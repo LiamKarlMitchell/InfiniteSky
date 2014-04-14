@@ -1,3 +1,8 @@
+// ###############
+//TODO: On item move, check their type and save the values in DB if needed, like Pet Growth or Activity! And switch on their types and types of storage
+// ###############
+
+
 var NotImplemented = function(client, name, input) {
     var msg = 'Item Action: ' + name + ' is not implemented.';
     console.log(msg);
@@ -43,7 +48,28 @@ function clientWriteItemActionFailed(client, input){
     })));
 }
 
+function clientWriteItemActionSuccess(client, input){
+    client.write(new Buffer(packets.ItemActionReplyPacket2.pack({
+        PacketID: 0x2B,
+        ActionType: input.ActionType,
+        ItemUniqueID: input.ItemUniqueID,
+        ItemUniqueID2: input.ItemUniqueID2,
+        ItemID: input.ItemID,
+        Unknown3: input.Unknown3,
+        Unknown4: input.Unknown4,
+        Unknown5: input.Unknown5,
+        Amount: input.Amount,
+        InventoryIndex: input.InventoryIndex,
+        RowDrop: input.RowDrop,
+        ColumnPickup: input.ColumnPickup,
+        RowPickup: input.RowPickup,
+        ColumnMove: input.ColumnMove,
+        RowMove: input.RowMove,
+        Failed: 0
+    })));
+}
 
+//TODO: Move it to ItemInfo Prototype
 function getSlotCount(itemType) {
     if (itemType === 0 || itemType === 2 || itemType === 1 || itemType === 6 || itemType === 10) {
         return 1;
@@ -52,6 +78,7 @@ function getSlotCount(itemType) {
     }
 }
 
+//TODO: Move it to db/character.js, and use this.inventory to pass inventory argument
 function checkInventoryItemCollision(inventory, page, x1, y1, s1) {
     if(x1 < 0 || y1 < 0) return false;
 
@@ -95,6 +122,29 @@ function checkInventoryItemCollision(inventory, page, x1, y1, s1) {
     return {index: freeInventoryIndex, x: x1, y: y1, page: page};
 }
 
+//TODO: Similliar to the ItemCollision check function
+function getStackingIventoryItemIndex(inventory, page, x1, y1, itemID){
+    var stackedIndex;
+    for (var i = 0; i < 32+(page*32); i++) {
+        var index = i + (page * 32);
+        var object = inventory[index];
+        if (object !== undefined && object !== null) {
+            var itemInfo = infos.Item[object.ID];
+            if (itemInfo !== undefined) {
+                var posX = object.Column;
+                var posY = object.Row;
+
+                if(stackedIndex === undefined && itemID === object.ID && posX === x1 && posY === y1){
+                    stackedIndex = index;
+                    break;
+                }
+            }
+        }
+    }
+
+    return (stackedIndex === undefined ? false : stackedIndex);
+}
+
 
 ItemActions = [];
 ItemActions[0x00] = function Recv_PickupItem(client, input) {
@@ -103,7 +153,7 @@ ItemActions[0x00] = function Recv_PickupItem(client, input) {
 ItemActions[0x01] = function Recv_DropItem(client, input) {
     NotImplemented(client, 'Recv_DropItem', input);
 };
-ItemActions[0x02] = function Recv_MoveToPillBar(client, input) {
+ItemActions[0x02] = function Recv_MoveToPillBar(client, input) { // COMPLETED
     //NotImplemented(client, 'Recv_MoveToPillBar', input);
     var InventoryItem = client.character.Inventory[input.InventoryIndex];
     var Slot = input.RowPickup;
@@ -167,7 +217,7 @@ ItemActions[0x02] = function Recv_MoveToPillBar(client, input) {
 };
 
 
-ItemActions[0x03] = function Recv_EquipItem(client, input) {
+ItemActions[0x03] = function Recv_EquipItem(client, input) { // COMPLETED
 
     var ItemInfo = infos.Item[input.ItemID];
     var itemType = ItemInfo.ItemType;
@@ -393,7 +443,7 @@ ItemActions[0x06] = function Recv_StoreItem(client, input) {
 ItemActions[0x07] = function Recv_SellItem(client, input) {
     NotImplemented(client, 'Recv_SellItem', input);
 };
-ItemActions[0x08] = function Recv_CoinsToGold(client, input) {
+ItemActions[0x08] = function Recv_CoinsToGold(client, input) { // COMPLETED
     if(client.character.Silver >= 1000000000){
         client.character.Silver -= 1000000000;
         client.character.SilverBig++;
@@ -421,7 +471,7 @@ ItemActions[0x08] = function Recv_CoinsToGold(client, input) {
         clientWriteItemActionFailed(client, input);
     }
 };
-ItemActions[0x09] = function Recv_GoldToCoins(client, input) {
+ItemActions[0x09] = function Recv_GoldToCoins(client, input) { // COMPLETED
     var MAX_SILVER = 2147483647; //TODO: Move this into a main definition file somewhere..
 
     if(client.character.SilverBig >= 1){
@@ -460,7 +510,7 @@ ItemActions[0x09] = function Recv_GoldToCoins(client, input) {
 ItemActions[0xA] = function Recv_Discard_Item(client, input) { // 10
     NotImplemented(client, 'Recv_Discard_Item', input);
 };
-ItemActions[0xB] = function Recv_MoveFromPillBar(client, input) {
+ItemActions[0xB] = function Recv_MoveFromPillBar(client, input) { // COMPLETED
     var QuickItem = client.character.QuickUseItems[input.InventoryIndex];
     var ItemSlot = checkInventoryItemCollision(client.character.Inventory, 0, input.ColumnMove, input.RowMove, 1);
 
@@ -522,14 +572,32 @@ ItemActions[0xB] = function Recv_MoveFromPillBar(client, input) {
         Failed: 0
     })));
 };
-ItemActions[0x0C] = function Recv_Use_item(client, input) {
-    NotImplemented(client, 'Recv_Use_item', input);
+ItemActions[0x0C] = function Recv_Use_item(client, input) { // TODO: Heal method on pills and etc. actuall usage of them and update of characters state.
+    var UsedItem = client.character.QuickUseItems[input.InventoryIndex];
+    if(UsedItem === null || UsedItem === undefined){
+        clientWriteItemActionFailed(client, input);
+        return true;
+    }else{
+        if(UsedItem.ID === undefined || UsedItem.ID !== input.ItemID){
+            clientWriteItemActionFailed(client, input);
+            return true;
+        }else{
+            var Reminder = UsedItem.Amount-1;
+            if(Reminder === 0)
+                client.character.QuickUseItems[input.InventoryIndex] = null;
+            else client.character.QuickUseItems[input.InventoryIndex].Amount = Reminder;
+
+            client.character.markModified('QuickUseItems');
+            client.character.save();
+            clientWriteItemActionSuccess(client, input);
+        }
+    }
 };
 ItemActions[0x0D] = function Recv_Discard_Uniform_Items(client, input) {
     NotImplemented(client, 'Recv_Discard_Uniform_Items', input);
 };
 
-ItemActions[0x0E] = function Recv_UnequipItem(client, input) { // 14, Testing
+ItemActions[0x0E] = function Recv_UnequipItem(client, input) { // COMPLETED
     // NotImplemented(client, 'Recv_UnequipItem', input);
     // ColumnMove = X Axis of incoming item de equipment
     // RowMove = Y Axis of incoming item de equipment
@@ -692,12 +760,89 @@ ItemActions[0x11] = function Recv_BuyItem(client, input) {
 ItemActions[0x12] = function nullsub_4(client, input) {
     NotImplemented(client, 'nullsub_4', input);
 };
-ItemActions[0x13] = function sub_462450(client, input) {
-    NotImplemented(client, 'sub_462450', input);
-};
-ItemActions[0x14] = function Recv_MoveItem(client, input) {
-    //NotImplemented(client, 'Recv_MoveItem', input);
+
+ItemActions[0x13] = function Recv_MoveOnPillbar(client, input) { // COMPLETED?
     console.log(input);
+
+    if(input.InventoryIndex > 3 || input.RowPickup > 3 || input.InventoryIndex < 0 || input.RowPickup < 0 ){
+        clientWriteItemActionFailed(client, input);
+        return true;
+    }
+
+    var PickedItem = client.character.QuickUseItems[input.InventoryIndex];
+    var DropOnItem = client.character.QuickUseItems[input.RowPickup];
+
+    if(PickedItem === undefined || input.Amount <= 0 || input.Amount > 99){
+        clientWriteItemActionFailed(client, input);
+        return true;
+    }else{
+        console.log(DropOnItem);
+        if(DropOnItem === null){
+            var Reminder = PickedItem.Amount - input.Amount;
+            console.log(Reminder);
+            if(Reminder === 0){
+                client.character.QuickUseItems[input.InventoryIndex] = null;
+                client.character.QuickUseItems[input.RowPickup] = PickedItem;
+            }else{
+                PickedItem.Amount -= input.Amount;
+
+                client.character.QuickUseItems[input.RowPickup] = structs.QuickUseItem.objectify();
+                client.character.QuickUseItems[input.RowPickup].ID = PickedItem.ID;
+                client.character.QuickUseItems[input.RowPickup].Amount = input.Amount;
+            }
+        }else{
+            if(DropOnItem.ID === undefined || PickedItem.ID === undefined){
+                clientWriteItemActionFailed(client, input);
+                return true;
+            }else if(DropOnItem.ID === PickedItem.ID){
+                if(infos.Item[PickedItem.ID].Stackable === 0 || input.Amount > PickedItem.Amount){
+                    console.log("Is not able to stack up");
+                    clientWriteItemActionFailed(client, input);
+                    return true;
+                }else{
+                    console.log("Stacking up");
+                    switch(infos.Item[PickedItem.ID].Stackable){
+                        case 0: // Not allowed to be stacked
+                            clientWriteItemActionFailed(client, input);
+                            return true;
+                        break;
+                        case 1: // Stack up to 99
+                            var StackLimit = 99;
+                            if( (input.Amount + DropOnItem.Amount) > StackLimit || (input.Amount + DropOnItem.Amount) <= 0 ){
+                                clientWriteItemActionFailed(client, input);
+                                return true;
+                            }else{
+                                console.log("Stacking 99");
+                                var Reminder = PickedItem.Amount - input.Amount;
+                                console.log(Reminder);
+                                if(Reminder === 0)
+                                client.character.QuickUseItems[input.InventoryIndex] = null;
+                                else client.character.QuickUseItems[input.InventoryIndex].Amount = Reminder;
+                                client.character.QuickUseItems[input.RowPickup].Amount += input.Amount;
+
+                                console.log(client.character.QuickUseItems[input.InventoryIndex]);
+                            }
+                        break;
+
+                        default:
+                            console.log("Is that item should be stacked? ID: " + PickedItem.ID);
+                            clientWriteItemActionFailed(client, input);
+                            client.sendInfoMessage("If you think that is the right item to be stacked, plase tell developers the Maximum stack size and this ID: " + PickedItem.ID);
+                            return true;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    console.log("PASS");
+    client.character.markModified('QuickUseItems');
+    client.character.save();
+    clientWriteItemActionSuccess(client, input);
+};
+ItemActions[0x14] = function Recv_MoveItem(client, input) { // COMPLETED
+    //NotImplemented(client, 'Recv_MoveItem', input);
+    //console.log(input);
     var InventoryItem = client.character.Inventory[input.InventoryIndex];
     if (
         InventoryItem === undefined
@@ -711,10 +856,54 @@ ItemActions[0x14] = function Recv_MoveItem(client, input) {
     } else {
         var InventoryItemCollision = checkInventoryItemCollision(client.character.Inventory, 0, input.ColumnMove, input.RowMove, getSlotCount(infos.Item[InventoryItem.ID].ItemType));
         if(!InventoryItemCollision){
-            console.log("There is no place for a Item?");
-            if(InventoryItem.Amount > 1){
-                console.log("Stackable item?");
-                
+            if(InventoryItem.Amount >= 1){
+                if(infos.Item[InventoryItem.ID].Stackable === 0 || input.Amount <= 0 || input.Amount > InventoryItem.Amount){
+                    clientWriteItemActionFailed(client, input);
+                    return true;
+                }else{
+                    var stackingIndex = getStackingIventoryItemIndex(client.character.Inventory, 0, input.ColumnMove, input.RowMove, InventoryItem.ID);
+                    var stackingItem = client.character.Inventory[stackingIndex];
+                    switch(infos.Item[InventoryItem.ID].Stackable){
+                        case 0: // Not allowed to be stacked
+                            clientWriteItemActionFailed(client, input);
+                            return true;
+                        break;
+                        case 1: // Stack up to 99
+                            var StackLimit = 99;
+                            if( (input.Amount + stackingItem.Amount) > StackLimit || (input.Amount + stackingItem.Amount) <= 0 ){
+                                clientWriteItemActionFailed(client, input);
+                                return true;
+                            }else{
+                                if(stackingIndex === false){
+                                    clientWriteItemActionFailed(client, input);
+                                    return true;
+                                }else{
+                                    if( (client.character.Inventory[stackingIndex]+input.Amount) > StackLimit ){
+                                        clientWriteItemActionFailed(client, input);
+                                        return true;
+                                    }else{
+                                        var Reminder = InventoryItem.Amount - input.Amount;
+                                        if(Reminder === 0)
+                                        client.character.Inventory[input.InventoryIndex] = null;
+                                        else client.character.Inventory[input.InventoryIndex].Amount = Reminder;
+                                        client.character.Inventory[stackingIndex].Amount = client.character.Inventory[stackingIndex].Amount + input.Amount;
+                                    }
+                                }
+                            }
+                        break;
+
+                        default:
+                            console.log("Is that item should be stacked? ID: " + InventoryItem.ID);
+                            clientWriteItemActionFailed(client, input);
+                            client.sendInfoMessage("If you think that is the right item to be stacked, plase tell developers the Maximum stack size and this ID: " + InventoryItem.ID);
+                            return true;
+                        break;
+                    }
+                }
+
+                client.character.markModified('Inventory');
+                client.character.save();
+
                 client.write(new Buffer(packets.ItemActionReplyPacket2.pack({
                     PacketID: 0x2B,
                     ActionType: input.ActionType,
@@ -752,7 +941,6 @@ ItemActions[0x14] = function Recv_MoveItem(client, input) {
                     client.character.Inventory[InventoryItemCollision.index].Row = input.RowMove;
                     client.character.Inventory[InventoryItemCollision.index].Column = input.ColumnMove;
                 }else{
-                    client.sendInfoMessage('Sorry! Stacking and Unstacking of items are not Implemented!');
                     var Reminder = PickedItemInventory.Amount - input.Amount;
                     client.character.Inventory[input.InventoryIndex].Amount = Reminder;
                     client.character.Inventory[InventoryItemCollision.index] = structs.StorageItem.unpack(structs.StorageItem.pack({
@@ -810,14 +998,64 @@ ItemActions[0x19] = function sub_4628A0(client, input) {
 ItemActions[0x1A] = function nullsub_4(client, input) {
     NotImplemented(client, 'nullsub_4', input);
 };
-ItemActions[0x1B] = function Recv_SkillToBar(client, input) {
-    NotImplemented(client, 'Recv_SkillToBar', input);
+ItemActions[0x1B] = function Recv_SkillToBar(client, input) { // COMPLETED
+    var SelectedSkill = client.character.SkillList[input.InventoryIndex];
+
+    if(SelectedSkill === undefined || SelectedSkill === null){
+        clientWriteItemActionFailed(client, input);
+        return true;
+    }else{
+        if(SelectedSkill.ID === undefined || SelectedSkill.Level === undefined ){
+            clientWriteItemActionFailed(client, input);
+            return true;
+        }else{
+            if(input.Amount <= SelectedSkill.Level && input.Amount > 0 && client.character.SkillBar[input.RowPickup] === null){
+                client.character.SkillBar[input.RowPickup] = structs.QuickUseSkill.objectify();
+                client.character.SkillBar[input.RowPickup].ID = SelectedSkill.ID;
+                client.character.SkillBar[input.RowPickup].Level = input.Amount;
+
+                client.character.markModified('SkillBar');
+                client.character.save();
+                clientWriteItemActionSuccess(client, input);
+            }else{
+                clientWriteItemActionFailed(client, input);
+            }
+        }
+    }
 };
-ItemActions[0x1C] = function sub_462970(client, input) {
-    NotImplemented(client, 'sub_462970', input);
+ItemActions[0x1C] = function Recv_RemoveSkillFromBar(client, input) { // COMPLETED
+    if(client.character.SkillBar[input.InventoryIndex] !== null && client.character.SkillBar[input.InventoryIndex].ID !== undefined && client.character.SkillBar[input.InventoryIndex].Level !== undefined){
+        client.character.SkillBar[input.InventoryIndex] = null;
+        client.character.markModified('SkillBar');
+        client.character.save();
+        clientWriteItemActionSuccess(client, input);
+    }else{
+        clientWriteItemActionFailed(client, input);
+    }
 };
-ItemActions[0x1D] = function sub_4629F0(client, input) {
-    NotImplemented(client, 'sub_4629F0', input);
+ItemActions[0x1D] = function Recv_SkillUp(client, input) { // COMPLETED
+    var SelectedSkill = client.character.SkillList[input.InventoryIndex];
+    if(SelectedSkill === undefined || SelectedSkill === null){
+        clientWriteItemActionFailed(client, input);
+        return true;
+    }else{
+        if(client.character.SkillPoints === undefined || client.character.Level === undefined){
+            clientWriteItemActionFailed(client, input);
+            return true;
+        }else{
+            if(client.character.SkillPoints >= 1 && SelectedSkill.Level < 20 && SelectedSkill.Level >= 1){
+                client.character.SkillPoints -= 1;
+                client.character.SkillList[input.InventoryIndex].Level += 1;
+                client.character.markModified('SkillList');
+                client.character.save();
+                clientWriteItemActionSuccess(client, input);
+                return true;
+            }else{
+                clientWriteItemActionFailed(client, input);
+                return true;
+            }
+        }
+    }
 };
 ItemActions[0x1E] = function sub_462A60(client, input) {
     NotImplemented(client, 'sub_462A60', input);
