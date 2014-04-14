@@ -1576,7 +1576,52 @@
             }
 
             return struct;
-        },		
+        },
+
+        // Create js Object with undef keys.
+        objectify: function() {
+            if(typeof offset === 'undefined') offset = 0;
+            if(typeof array === 'undefined') array = [this.length];
+            
+            function objectify_formats(formats){ 
+                for(var i = 0; i < formats.length; ++i) {
+                    var struct = {};
+                    if (typeof(formats[i].type) === 'string') {
+                        var objcheck = formats[i].type.indexOf('[object Object]');
+                        if (objcheck===0){
+                            formats[i].type = formats[i].type.substr(15);
+                            objcheck=1;
+                        }
+
+                        var lb = formats[i].type.indexOf('[');
+                        var rb = formats[i].type.indexOf(']');
+                        
+                        if (lb>-1 && rb>-1) {
+                            lb++;
+                            rb--;
+
+                            if (objcheck) {
+                                struct[formats[i].name] = new Array(Number(formats[i].type.substr(lb,rb-lb)));
+                                throw new Error('Array of struct not yet supported in objectify.');
+                            }
+                            else {
+                                struct[formats[i].name] = new Array(Number(formats[i].type.substr(lb,rb-lb)));
+                            }
+                        } else {
+                            struct[formats[i].name] = undefined;
+                        }
+                    } else if (typeof(formats[i].type) === 'object') {
+                        struct[formats[i].name] = objectify_formats(formats[i].type.formats);
+                    };
+                }
+
+                return struct;
+            }
+            var struct = objectify_formats(this.formats);
+
+
+            return struct;
+        },      
 
         // Pack an array to a struct.
         pack: function(struct, array, offset) {

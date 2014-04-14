@@ -302,7 +302,7 @@ function Dependent(opts, code) {
   this.file = global.__filename;
   this.dir = global.__dirname;
   this.code = code;
-
+  this.executed = false;
   var _this = this;
   this._onDependentLoaded = function(info) { _this.tryExecute(); };
   vms.emit('dependent_init', { name: this.name, file: this.file, dir: this.dir });
@@ -339,6 +339,8 @@ Dependent.prototype = {
     }
   },
   executeCode: function() {
+    if (this.executed) return;
+
     var success = false;
     try {
       this.code();
@@ -353,6 +355,7 @@ Dependent.prototype = {
     if (success) {
       this.vms.emit('dependent_loaded', { name: this.name, file: this.file, dir: this.dir });
     }
+    this.executed = true;
     delete this._onDependentLoaded;
     delete this.code;
     delete this.vms;
