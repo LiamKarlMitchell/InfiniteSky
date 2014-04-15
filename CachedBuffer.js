@@ -73,7 +73,7 @@ var CachedBuffer = function(packet_collection, options) {
                         if(packetID === packet_collection.LastAdded) {
                             console.log('\x1b[31;5m---------------- Last Added Packet ----------------\x1b[0m');
                         }
-                        console.log('PacketID: ' + packetID + ' ' + packetID.toString(16).toUpperCase() + ' bufsize: ' + (this.bufferLength - position) + ' ' + packet.
+                        console.log('PacketID: 0x' + _util.padLeft(packetID.toString(16).toUpperCase(),'0',2) + ' bufsize: ' + (this.bufferLength - position) + ' ' + packet.
                         function.name);
                         }
                         //console.log('PacketFunction: '+packet.function.name);
@@ -127,7 +127,7 @@ var CachedBuffer = function(packet_collection, options) {
                     } else {
                         // unreconized packet id
                         if(this.onUnrecognizedPacket) this.onUnrecognizedPacket(packetID);
-                        console.log('Unreconized PacketID: ' + packetID + ' ' + packetID.toString(16).toUpperCase() + ' Size: ' + (this.bufferLength - position));
+                        console.log('Unreconized PacketID: 0x' + _util.padLeft(packetID.toString(16).toUpperCase(),'0',2) + ' Size: ' + (this.bufferLength - position));
                         //logHex(this.data.slice(position,this.bufferLength));
                         console.log(hexy(this.data.slice(position, this.bufferLength)));
                         // For testing only this will reset buffer to empty.

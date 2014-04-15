@@ -180,7 +180,7 @@ main.events.on('gameinfo_loaded',function(info){
 var db = new (require('./db'))(config.mongodb.connectString);
 
 // Start up Command Line Interface
-var cli = new (require('./cli'));
+cli = new (require('./cli'));
 
 console.timeEnd('init-server');
 

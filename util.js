@@ -1,19 +1,12 @@
 // This file is part of InfiniteSky.
 // Copyright (c) InfiniteSky Dev Teams - Licensed under GNU GPL
 // For more information, see LICENCE in the main folder
-
-var pjson = require('./package.json');
-var node_util = require('util');
 var fs = require('fs');
 
-var util = {
-  package: pjson,
-  util: node_util,
-
-  dumpError: function dumpError(err) {
+function dumpError(err) {
     if (typeof err === 'object') {
       if (err.message) {
-        console.error('\n\x1b[31;1mException: ' + err.message+'\x1b[0m')
+        console.error('\n\x1b[31;1m'+ (err.name || 'Error') +': ' + err.message+'\x1b[0m')
       }
         console.log(new Date());
       if (err.stack) {
@@ -23,7 +16,12 @@ var util = {
       console.error('\x1b[31;1m' + err+'\x1b[0m');
     }
     // Push to redis if required for logging etc
-  },
+}
+
+var util = {
+  package: require('./package.json'),
+
+  dumpError: dumpError,
 
   logHex: function(data) {
     console.log("\n");

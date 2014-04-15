@@ -12,7 +12,7 @@ GMCommands.AddCommand(new Command('monsterinfo',0,function command_monsterinfo(s
 	if (ID)
 	{
 		client.sendInfoMessage("Finding monster where ID is "+ID);
-		var monster = MonsterInfo.getByID(ID);
+		var monster = infos.Monster[ID];
 		if (monster)
 		{
 			//client.sendInfoMessage(monster.ID + " " + monster.Name+" ");
@@ -25,7 +25,7 @@ GMCommands.AddCommand(new Command('monsterinfo',0,function command_monsterinfo(s
 		return;
 	}
 
-	var monsters = MonsterInfo.getByNameLike(string);
+	var monsters = infos.Monster.getByNameLike(string);
 	client.sendInfoMessage("Finding monsters where name is like "+string);
 	for(var i=0;i<monsters.length;i++)
 	{

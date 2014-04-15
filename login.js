@@ -3,9 +3,9 @@
 // For more information, see LICENCE in the main folder
 
 vms.depends({name: 'Login Server', depends: [
-    'infos.Exp',
-    'infos.Item',
-    'infos.Skill',
+    'infos.Exp.Loaded',
+    'infos.Item.Loaded',
+    'infos.Skill.Loaded',
     'db.Account',
     'db.Character',
     'world',

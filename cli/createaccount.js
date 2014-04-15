@@ -10,7 +10,7 @@ cli.createaccount = function CLI_CreateAccount(input) {
  	return console.log(cli.createaccount.help(1));
  }
 
- var info = util.sep(['Username','Password','Level'], input.split(' '));
+ var info = _util.sep(['Username','Password','Level'], input.split(' '));
  if (info.Username === undefined || info.Password === undefined) {
  	console.log('Username and Password required');
  	return;

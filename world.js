@@ -3,7 +3,7 @@
 // For more information, see LICENCE in the main folder
 vms.depends({
     name: 'World Server',
-    depends: ['infos.Exp', 'infos.Item', 'infos.Npc', 'infos.Skill', 'db.Account', 'db.Character', 'Zone', 'packets']
+    depends: ['infos.Exp.Loaded', 'infos.Item.Loaded', 'infos.Npc.Loaded', 'infos.Skill.Loaded', 'db.Account', 'db.Character', 'Zone', 'packets']
 }, function() {
     if(typeof(world) === 'undefined') {
         console.log('World server code loaded');
@@ -24,9 +24,9 @@ vms.depends({
             running: true
         };
         // Need to move to world.js
-        var clients = [];
-        var clientID = 0;
-        var socket_transfers = [];
+        world.clients = [];
+        world.clientID = 0;
+        world.socket_transfers = [];
     } else {
         console.log('World server code reloaded');
     }
@@ -39,14 +39,14 @@ vms.depends({
         // console.log('Delta: '+delta);
     };
     world.connection = function(socket) {
-        console.log("Client #" + clientID + " connected from IP " + socket.remoteAddress);
-        socket.clientID = clientID;
-        clientID++;
+        console.log("Client #" + world.clientID + " connected from IP " + socket.remoteAddress);
+        socket.clientID = world.clientID;
+        world.clientID++;
         socket.authenticated = false;
         // Start of Socket Functions
         socket.Destroying = false;
-        socket.clientID = clientID;
-        clientID++;
+        socket.clientID = world.clientID;
+        world.clientID++;
         // TODO: World server should assume the previous socket's id after a successfull handshake/login.
         // This allows us to have a session object using that id :)
         socket.authenticated = false;
@@ -57,7 +57,7 @@ vms.depends({
         socket.character.do2FPacket = 0;
         // Character related commands
         socket.toString = function(Format) {
-            return this.clientID + ' - ' + this.account.Username + ' Char: ' + this.character.Name + ' Map: ' + this.character.MapID + ' CharacterID: ' + this.character._id;
+            return this.world.clientID + ' - ' + this.account.Username + ' Char: ' + this.character.Name + ' Map: ' + this.character.MapID + ' CharacterID: ' + this.character._id;
             //CharacterTypeIdentifier
         };
         // Gives the character exp and handles sending out the level up packets
@@ -375,7 +375,7 @@ vms.depends({
                 worldserver.addSocketToTransferQueue(this);
                 console.log('Tell client which map server to connect too');
                 //socket.characters[gamestart.Slot].MapID << get the map id of character :P
-                // Get this.clients ip, check if it is on lan with server,
+                // Get world.clients ip, check if it is on lan with server,
                 // if so send it servers lan ip and port
                 // otherwise send it real world ip and port
                 theIP = config.externalIP;
@@ -548,7 +548,7 @@ vms.depends({
         //Handle socket disconnection
         socket.on('end', function() {
             console.log('Client #' + socket.clientID + ' ended connection');
-            clients.splice(clients.indexOf(socket), 1);
+            world.clients.splice(world.clients.indexOf(socket), 1);
             delete world[socket.clientID];
             db.Account.logoutUser(socket);
         });
@@ -562,18 +562,18 @@ vms.depends({
         // Should maybe look at using room or list rather than array of socket object.
         socket.on('close', function() {
             console.log('Client #' + socket.clientID + ' closed connection');
-            clients.splice(clients.indexOf(socket), 1);
+            world.clients.splice(world.clients.indexOf(socket), 1);
             delete world[socket.clientID];
-            //var i = allClients.indexOf(socket);
-            //delete allClients[i];
+            //var i = allworld.clients.indexOf(socket);
+            //delete allworld.clients[i];
             db.Account.logoutUser(socket);
         });
         socket.on('disconnect', function() {
             console.log('Client #' + socket.clientID + ' disconnected');
-            clients.splice(clients.indexOf(socket), 1);
+            world.clients.splice(world.clients.indexOf(socket), 1);
             delete world[socket.clientID];
-            //var i = allClients.indexOf(socket);
-            //delete allClients[i];
+            //var i = allworld.clients.indexOf(socket);
+            //delete allworld.clients[i];
             // Remove from zone transfer list if its there
             db.Account.logoutUser(socket);
             try {
@@ -593,50 +593,47 @@ vms.depends({
         world[socket.ID] = socket;
     };
     world.findAccountSocket = function(name) {
-        for(var i = 0; i < clients.length; i++) {
-            if(clients[i].authenticated) {
-                if(clients[i].ai.username === name) {
-                    return clients[i];
+        for(var i = 0; i < world.clients.length; i++) {
+            if(world.clients[i].authenticated) {
+                if(world.clients[i].ai.username === name) {
+                    return world.clients[i];
                 }
             }
         }
         return null;
     };
     world.findSocketByCharacterID = function(CharacterID) {
-        // Search connected clients
-        for(var i = 0; i < clients.length; ++i) {
-            if(clients[i].character._id == CharacterID && clients[i]._handle) {
-                return clients[i];
+        // Search connected world.clients
+        for(var i = 0; i < world.clients.length; ++i) {
+            if(world.clients[i].character._id == CharacterID && world.clients[i]._handle) {
+                return world.clients[i];
             }
         }
         return null;
     }
     world.findCharacterSocket = function(Name) {
-        // Search connected clients
-        for(var i = 0; i < clients.length; ++i) {
-            if(clients[i].character.Name == Name && clients[i]._handle) {
-                socket = clients[i];
-                break;
+        // Search connected world.clients
+        for(var i = 0; i < world.clients.length; ++i) {
+            if(world.clients[i].character.Name == Name && world.clients[i]._handle) {
+                return world.clients[i];
             }
         }
         return null;
     };
     world.addSocketToTransferQueue = function(socket) {
-        debugger;
         if(socket.authenticated == false) return;
         // set a timeout on the object for logging out the account if it is not removed from world list
         socket.zoneTransferLogout = socket.setTimeout(socket.LogoutUser, config.zoneTransferLogoutTimer || 60000);
-        socket_transfers.push(socket);
+        world.socket_transfers.push(socket);
     }
     world.getSocketFromTransferQueue = function(Username) {
-        debugger;
         var socket = null;
-        for(var i = 0; i < socket_transfers.length; ++i) {
-            var t = socket_transfers[i];
+        for(var i = 0; i < world.socket_transfers.length; ++i) {
+            var t = world.socket_transfers[i];
             if(t.authenticated == true && t.zoneTransfer == true && t.account.Username == Username) {
                 socket = t;
                 clearTimeout(socket.zoneTransferLogout);
-                socket_transfers.splice(socket_transfers.indexOf(socket), 1);
+                world.socket_transfers.splice(world.socket_transfers.indexOf(socket), 1);
                 break;
             }
         }
@@ -644,8 +641,8 @@ vms.depends({
     }
     world.findSocketInTransferQueue = function(Username) {
         var socket = null;
-        for(var i = 0; i < socket_transfers.length; ++i) {
-            var t = socket_transfers[i];
+        for(var i = 0; i < world.socket_transfers.length; ++i) {
+            var t = world.socket_transfers[i];
             if(t.authenticated == true && t.zoneTransfer == true && t.account.Username == Username) {
                 socket = t;
                 break;
@@ -655,24 +652,24 @@ vms.depends({
     }
     // sendToAll
     world.sendToAll = function(buffer) {
-        for(var i = 0; i < clients.length; ++i) {
-            var socket = clients[i];
+        for(var i = 0; i < world.clients.length; ++i) {
+            var socket = world.clients[i];
             if(socket.authenticated) {
                 socket.write(buffer);
             }
         }
     }
     world.sendInfoMessageToAll = function(string) {
-        for(var i = 0; i < clients.length; ++i) {
-            var socket = clients[i];
+        for(var i = 0; i < world.clients.length; ++i) {
+            var socket = world.clients[i];
             if(socket.authenticated) {
                 socket.sendInfoMessage(buffer);
             }
         }
     }
     world.sendToClan = function(clan, buffer) {
-        for(var i = 0; i < clients.length; ++i) {
-            var socket = clients[i];
+        for(var i = 0; i < world.clients.length; ++i) {
+            var socket = world.clients[i];
             if(socket.authenticated) {
                 if(socket.character.Clan == clan) {
                     socket.write(buffer);
@@ -703,11 +700,11 @@ vms.depends({
         // Can attach things here if we need to
         // Call Attach Hooks 
         // setupClient(socket);
-        clients.push(socket);
+        world.clients.push(socket);
     }
     world.removeClient = function(socket) {
         // Call Remove Hooks
-        clients.splice(clients.indexOf(socket), 1);
+        world.clients.splice(world.clients.indexOf(socket), 1);
     }
     world.zoneLoaded = function(err, id) {
         if(err) {
@@ -765,36 +762,7 @@ vms.depends({
             console.log('Zone Not Loaded');
         }
     }
-    var loadedInfos = {
-        '005_00001.IMG': infos.Exp !== undefined && infos.Exp.Loaded,
-        '005_00002.IMG': infos.Item !== undefined && infos.Item.Loaded,
-        '005_00003.IMG': infos.Skill !== undefined && infos.Skill.Loaded,
-        '005_00004.IMG': infos.Monster !== undefined && infos.Monster.Loaded,
-        //'005_00005.IMG':
-        '005_00006.IMG': infos.Npc !== undefined && infos.Npc.Loaded,
-        //'005_00007.IMG': infos.Quest !== undefined && infos.Quest.Loaded,
-        'Zone': typeof(Zone) !== undefined
-    };
-    // Loading check
-    var AreAllInfosLoaded = function() {
-            for(var info in loadedInfos) {
-                if(loadedInfos.hasOwnProperty(info)) {
-                    //console.log(info+' '+ ( loadedInfos[info] ? "Loaded" : "Not Loaded" ));
-                    if(!loadedInfos[info]) {
-                        return false;
-                    }
-                }
-            }
-            if(typeof(db) === "undefined" || db.Account === undefined) {
-                console.log("db.Account is not loaded");
-                return false;
-            }
-            if(typeof(db) === "undefined" || db.Character === undefined) {
-                console.log("db.Character is not loaded");
-                return false;
-            }
-            return true;
-        }
+
     if(world.start) {
         world.start();
         delete world.start;

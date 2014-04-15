@@ -118,12 +118,12 @@ int32ls('DamageHP');
 
 function handleActionPacket(socket, action, update) {
 
-    if (socket.debug) {
-        console.log('Action: '+ action.Skill);
-        console.log('Location: ' + JSON.stringify(action.Location));
-        console.log('LocationTo: ' + JSON.stringify(action.LocationTo));
-        console.log('LocationNew: ' + JSON.stringify(action.LocationNew));
-    }
+    //if (socket.debug) {
+        //console.log('Action: '+ action.Skill);
+        //console.log('Location: ' + JSON.stringify(action.Location));
+        //console.log('LocationTo: ' + JSON.stringify(action.LocationTo));
+        //console.log('LocationNew: ' + JSON.stringify(action.LocationNew));
+    //}
 
     if (socket.character.state.CurrentHP > 0) {
 
@@ -141,13 +141,13 @@ function handleActionPacket(socket, action, update) {
             //console.log("Walking");
             break;
         case 5:
-            console.log('Attack 5');
+            //console.log('Attack 5');
             break;
         case 6:
-            console.log('Attack 6');
+            //console.log('Attack 6');
             break;
         case 7:
-            console.log('Attack 7');
+            //console.log('Attack 7');
             break;
         case 33: 
             //console.log('Fly');
@@ -161,7 +161,7 @@ function handleActionPacket(socket, action, update) {
 
         default: 
             socket.sendInfoMessage("Skill:("+action.Skill+") is not registered");
-
+            break;
         }
 
         var AttackPacket;
@@ -351,12 +351,12 @@ function handleActionPacket(socket, action, update) {
         return;
     }
 
-    if (socket.character.state.Skill!=1) {
+    //if (socket.character.state.Skill!=1) {
         socket.Zone.sendToAllArea(socket, true, packets.makeCompressedPacket(
         0x18, new Buffer(
         WorldPC.ActionReplyPacket.pack(
         socket.character.state))), config.viewable_action_distance);
-    }
+    //}
 }
 
 WorldPC.Set(0x03, {

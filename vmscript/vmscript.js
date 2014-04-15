@@ -320,7 +320,11 @@ Dependent.prototype = {
 
       if (deppath.length>1) {
           for (var j=1;j<deppath.length;j++) {
-            obj = obj[deppath[j]];
+            if (deppath[j].indexOf('()') === deppath[j].length-2) {
+              obj = obj[deppath[j].substr(0,deppath[j].length-2)]();
+            } else {
+              obj = obj[deppath[j]];
+            }
             if (obj === undefined) return false;
           }
       }

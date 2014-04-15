@@ -1,6 +1,6 @@
 {
   "name": "InfiniteSky",
-  "version": "1.0.0",
+  "version": "1.0.05",
   "version_name": "Tomato Soup",
   "description": "InfiniteSky is an open-source project, emulating a Twelve Sky Server. It is written in Node.JS",
   "main": "main.js",
@@ -23,13 +23,13 @@
   },
   "homepage": "http://liamkarlmitchell.github.io/InfiniteSky/",
   "dependencies": {
-    "async": "^0.2.10",
-    "jshint": "^2.4.4",
-    "hexy": "^0.2.5",
-    "mongoose": "^3.8.8",
-    "netmask": "^1.0.4",
-    "socket.io": "^0.9.16",
-    "xtend": "^2.2.0",
-    "fast-csv": "^0.2.2"
+    "async": "^0.7.0",
+    "jshint": "^2.5.0",
+    "hexy": ">=0.2.5",
+    "mongoose": ">=3.8.8",
+    "netmask": ">=1.0.4",
+    "socket.io": "^1.0.0-pre",
+    "xtend": "^3.0.0",
+    "fast-csv": "^0.2.3"
   }
 }

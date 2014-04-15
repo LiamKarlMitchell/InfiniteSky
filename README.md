@@ -3,14 +3,15 @@ InfiniteSky
 
 InfiniteSky is an open-source project, emulating a Twelve Sky Server. It is written in Node.JS
 
-  - Currently the world server part is being re-intergrated into the code base
-  - So you cant login to world just yet but I am working on it :).
-  - Code will under go cleaning and documentation.
+  - We have reloadable code. This means less need to reset the server when developing.
+  - Currently the world server part is being re-intergrated into the code base.
+  - Zone features are being implemented.
+  - Code will under go cleaning and documentation..
 
 Version
 ----
 
-1.0.00 - Tomato Soup
+1.0.05 - Tomato Soup
 
 Tech
 -----------
@@ -19,7 +20,6 @@ InfiniteSky uses a number of open source projects to work properly:
 
 * [hexy] - hexdump, binary pretty-printing
 * [async] - Higher-order functions and common patterns for asynchronous code
-* [xtend] - extend like a boss
 * [jshint] - Static analysis tool for JavaScript
 * [socket] - Socket is a connect clone for simple socket based applications
 * [netmask] - Parse and lookup IP network blocks
@@ -38,6 +38,7 @@ Installation
 --------------
 
 [Video Guide](http://youtu.be/WH32P1i5DrQ)
+I will make another video when I can as this one has poor quality.
 
 To setup with git check see [Git Setup](https://github.com/LiamKarlMitchell/InfiniteSky/blob/master/docs/gitsetup.md)
 
@@ -52,7 +53,7 @@ See the following links:
 * [MongoDB](http://www.mongodb.org)
 
 Some assumptions are that you know how to do basic file management and use the command prompt or terminal. As well as download and install files.
-We suggest setting up your code somewhere such as
+We suggest setting up your code somewhere like c:\node\projects and check out Infinite Sky using a GIT client.
 
 Server is currently untested on linux. I have been running it on Windows 7
 ```

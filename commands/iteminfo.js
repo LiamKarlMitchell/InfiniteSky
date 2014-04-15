@@ -23,7 +23,7 @@ GMCommands.AddCommand(new Command('iteminfo',0,function command_iteminfo(string,
 		return;
 	}
 
-	var items = ItemInfo.getByNameLike(string);
+	var items = infos.Item.getByNameLike(string);
 	client.sendInfoMessage("Finding items where name is like "+string);
 	for(var i=0;i<items.length;i++)
 	{

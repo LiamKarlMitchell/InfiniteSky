@@ -14,6 +14,10 @@ var path = require('path');
 
 function GameInfoLoader(filename, structure, onRecordFunction) {
 	this.Load(filename,structure,onRecordFunction);
+	var self = this;
+	this.Reload = function() {
+		self.Load(filename,structure,onRecordFunction);
+	}
 }
 
 GameInfoLoader.prototype.inspect = safeguard_cli.inspect;
@@ -55,47 +59,69 @@ GameInfoLoader.prototype.Load = function(filename, structure, onRecordFunction) 
 		}
 		
 		if (data.length-4>=self.InfoStruct.size * RecordCount) {
-			// TODO: Make this able to execute async? it takes a lot of time and blocks server....
 			// TODO: Use normal buffer rather than restruct? Or code restruct to use buffer implementation.
-			var infos = restruct.struct('info',self.InfoStruct,RecordCount).unpack(data.slice(4));
-			delete data;
+			var tasks = [];
 
-			var length = infos.info.length, element = null;
-			for (var i = 0; i < length; i++) {
+			var pos = 4;
+			for (var i=0;i<RecordCount;i++) {
+				tasks.push({ index: i, data: data.slice(pos,pos+self.InfoStruct.size) });
+				pos+=self.InfoStruct.size;
+			}
+			//delete data;
+
+			async.each(tasks,function (task, callback) {
+				var info = self.InfoStruct.unpack(task.data);
 				// Put the element into our function which could transform it.
 				// We expect to be able to get back ID either from the value in record or some sort of getter.
-				element = onRecordFunction(infos.info[i]);
-				if (element !== undefined) {
-					infos.info[i] = element;
+				info = onRecordFunction(info);
+				if (info !== undefined && info.ID) {
+					// Assign to self as a key on ID for quick reference.
+					// Example infos.Item[1] would be Silver
+					// But we only care if ID is not 0 and that the info was actually valid		
+					self.infos[info.ID] = info; // Put in array too
+					self[info.ID] = info; // Store in hash
 				}
-				// Assign to self as a key on ID for quick reference.
-				// Example infos.Item[1] would be Silver
-				// But we only care if ID is not 0.
-				if (infos.info[i].ID !== 0) {
-					self[infos.info[i].ID] = infos.info[i];
-				} else {
-					// Unload empty data because why waste the ram
-					delete infos.info[i];
+				async.setImmediate(callback());
+			},function(err){
+				if (err) {
+					dumpError(err);
+					return;
 				}
-			}
+				console.log('All '+filename+' records have been processed.');
+				self.Loaded = true;
+				main.events.emit('gameinfo_loaded',filename);
+			});
 
-			// Loop through infos array and remove anything undefined
-			// Maybe this could be written better such as any record with ID 0?
-			i=length;
-			while (i--) {
-				if (infos.info[i] === undefined) {
-					infos.info.splice(i,1);
-				}
-			}
-
-			self.infos = infos.info;
-			self.Loaded = true;
-			main.events.emit('gameinfo_loaded',filename);
 		} else {
 			throw new Error("Not enouth bytes in "+filepath+' to read InfoStructure');
 		}
 
 	});
+}
+
+GameInfoLoader.prototype.getByName = function(name, limit) {
+	var found = [];
+	for (var i=0;i<this.infos.length;i++) {
+		if (this.infos[i] === undefined) continue;
+		if (this.infos[i].Name === name) {
+			found.push(this.infos[i]);
+			if (limit && found.length === limit) break;
+		}
+	}
+	return found;
+}
+
+GameInfoLoader.prototype.getByNameLike = function(name, limit) {
+	var found = [];
+	name = name.toLowerCase().replace(/ /g,'');
+	for (var i=0;i<this.infos.length;i++) {
+		if (this.infos[i] === undefined) continue;
+		if (this.infos[i].Name.toLowerCase().replace(/ /g,'').indexOf(name)>-1) {
+			found.push(this.infos[i]);
+			if (limit && found.length === limit) break;
+		}
+	}
+	return found;
 }
 
 module.exports = GameInfoLoader;

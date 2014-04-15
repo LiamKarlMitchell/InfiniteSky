@@ -12,7 +12,7 @@ GMCommands.AddCommand(new Command('expinfo',0,function command_expinfo(string,cl
 	if (Level)
 	{
 		client.sendInfoMessage("Finding EXP where Level is "+Level);
-		var exp = infos.Exp.getByLevel(Level);
+		var exp = infos.Exp[Level];
 		if (exp)
 		{
 			//client.sendInfoMessage(exp.toString());

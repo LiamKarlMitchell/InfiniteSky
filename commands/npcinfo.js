@@ -12,7 +12,7 @@ GMCommands.AddCommand(new Command('npcinfo',0,function command_npcinfo(string,cl
 	if (ID)
 	{
 		client.sendInfoMessage("Finding NPC where ID is "+ID);
-		var npc = NPCInfo.getByID(ID);
+		var npc = infos.Npc[ID];
 		if (npc)
 		{
 			client.sendInfoMessage(npc.toString());
@@ -24,7 +24,7 @@ GMCommands.AddCommand(new Command('npcinfo',0,function command_npcinfo(string,cl
 		return;
 	}
 
-	var npcs = NPCInfo.getByNameLike(string);
+	var npcs = infos.Npc.getByNameLike(string);
 	client.sendInfoMessage("Finding npcs where name is like "+string);
 	for(var i=0;i<npcs.length;i++)
 	{
