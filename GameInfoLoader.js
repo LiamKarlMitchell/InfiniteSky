@@ -62,14 +62,7 @@ GameInfoLoader.prototype.Load = function(filename, structure, onRecordFunction) 
 			// TODO: Use normal buffer rather than restruct? Or code restruct to use buffer implementation.
 			var tasks = [];
 
-			var pos = 4;
-			for (var i=0;i<RecordCount;i++) {
-				tasks.push({ index: i, data: data.slice(pos,pos+self.InfoStruct.size) });
-				pos+=self.InfoStruct.size;
-			}
-			//delete data;
-
-			async.each(tasks,function (task, callback) {
+			var queue = async.queue(function (task, callback) {
 				var info = self.InfoStruct.unpack(task.data);
 				// Put the element into our function which could transform it.
 				// We expect to be able to get back ID either from the value in record or some sort of getter.
@@ -81,8 +74,19 @@ GameInfoLoader.prototype.Load = function(filename, structure, onRecordFunction) 
 					self.infos[info.ID] = info; // Put in array too
 					self[info.ID] = info; // Store in hash
 				}
-				async.setImmediate(callback());
-			},function(err){
+				async.setImmediate(callback);
+			},10);
+
+			var pos = 4;
+			for (var i=0;i<RecordCount;i++) {
+				queue.push({ index: i, data: data.slice(pos,pos+self.InfoStruct.size) });
+				pos+=self.InfoStruct.size;
+			}
+			delete data;
+
+			queue.pause();
+
+			queue.drain = function(err){
 				if (err) {
 					dumpError(err);
 					return;
@@ -90,7 +94,9 @@ GameInfoLoader.prototype.Load = function(filename, structure, onRecordFunction) 
 				console.log('All '+filename+' records have been processed.');
 				self.Loaded = true;
 				main.events.emit('gameinfo_loaded',filename);
-			});
+			};
+
+			queue.resume();
 
 		} else {
 			throw new Error("Not enouth bytes in "+filepath+' to read InfoStructure');
