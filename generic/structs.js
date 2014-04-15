@@ -101,7 +101,7 @@ structs.Equip = function()
 }
 
 // Need to find skill and statpoints
-structs.Character= restruct.
+structs.Character = restruct.
 	int32lu('isGM').
 	int32lu('Unused1',6).//Will add later
 	int32lu('PlayTime').
@@ -417,7 +417,7 @@ structs.Character= restruct.
  int32lu(''). // 4304
  int32lu(''). // 4308
  int32lu(''). // 4312
- int32lu(''). // 4316
+ int32lu('SilverBig'). // 4316
  int32lu('ElementalDamage'). // 4320
  int32lu('ElementalDefense'). // 4324
  int32lu('DarkDamage'). // 4328
@@ -427,7 +427,7 @@ structs.Character= restruct.
  int32lu('DamageBonus'). // 4344
  int32lu('SomeRandomKoreanBuff1'). // 4348
  int32lu(''). // 4352
- int32lu('SilverBig'). // 4356
+ int32lu(''). // 4356 Wrong spot
  int32lu(''). // 4360
  int32lu('Daily1'). // 4364
  int32lu('DailyPvPKill'). // 4368
