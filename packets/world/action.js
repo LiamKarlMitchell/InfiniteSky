@@ -18,56 +18,284 @@ float32l('Health').
 int32lu('Unknown10');
 
 WorldPC.ActionReplyPacket = restruct.
-int32lu('CharacterID').
-int32lu('CharacterTypeIdentifier').
-string('Name', packets.CharName_Length + 1).
-string('Demostrater', packets.CharName_Length + 1).
-string('Child', packets.CharName_Length + 1).
-int8lu('UnknownI1').
-int32lu('FactionCapeThing').
-int32lu('UnknownI2').
-int32lu('TraitorFlag').
-int32lu('UnknownI3').
-int32lu('UnknownI4').
-int32lu('GlowItems').
-int32lu('UnknownI5', 2).
-int32lu('Clan').
-int32lu('Gender').
-int32lu('Hair').
-int32lu('Face').
-int32lu('Level').
-int32lu('Honor').
-struct('Necklace', structs.Equipt).
-struct('Cape', structs.Equipt).
-struct('Armor', structs.Equipt).
-struct('Glove', structs.Equipt).
-struct('Ring', structs.Equipt).
-struct('Boot', structs.Equipt).
-struct('CalbashBottle', structs.Equipt).
-struct('Weapon', structs.Equipt).
-struct('Pet', structs.Pet).
-int32lu('Unknown5').
-string('GuildName', packets.GuildName_Length + 1).
-int8lu('Unknown6', 10).
-int16lu('TagExist').
-string('ClanTag', packets.GuildTag_Length + 1).
-string('Unknown7', 14).
-int32lu('Stance').
-int32lu('Skill').
-float32l('Frame').
-struct('Location', structs.CVec3).
-struct('LocationTo', structs.CVec3).
-float32l('Direction').
-int32lu('TargetObjectIndex').
-int32lu('TargetObjectUniqueNumber').
-float32l('UNKnowni6', 4).
-struct('LocationNew', structs.CVec3).
-float32l('FacingDirection').
-int32lu('MaxHP').
-int32lu('CurrentHP').
-int32lu('MaxChi').
-int32lu('CurrentChi').
-int32lu('otherthings', 171);
+// int32lu('CharacterID').
+// int32lu('CharacterTypeIdentifier').
+// string('Name', packets.CharName_Length + 1).
+// string('Demostrater', packets.CharName_Length + 1).
+// string('Child', packets.CharName_Length + 1).
+// int8lu('UnknownI1').
+// int32lu('FactionCapeThing').
+// int32lu('UnknownI2').
+// int32lu('TraitorFlag').
+// int32lu('UnknownI3').
+// int32lu('UnknownI4').
+// int32lu('GlowItems').
+// int32lu('UnknownI5', 2).
+// int32lu('Clan').
+// int32lu('Gender').
+// int32lu('Hair').
+// int32lu('Face').
+// int32lu('Level').
+// int32lu('Honor').
+// struct('Necklace', structs.Equipt).
+// struct('Cape', structs.Equipt).
+// struct('Armor', structs.Equipt).
+// struct('Glove', structs.Equipt).
+// struct('Ring', structs.Equipt).
+// struct('Boot', structs.Equipt).
+// struct('CalbashBottle', structs.Equipt).
+// struct('Weapon', structs.Equipt).
+// struct('Pet', structs.Pet).
+// int32lu('Unknown5').
+// string('GuildName', packets.GuildName_Length + 1).
+// int8lu('Unknown6', 10).
+// int16lu('TagExist').
+// string('ClanTag', packets.GuildTag_Length + 1).
+// string('Unknown7', 14).
+// int32lu('Stance').
+// int32lu('Skill').
+// float32l('Frame').
+// struct('Location', structs.CVec3).
+// struct('LocationTo', structs.CVec3).
+// float32l('Direction').
+// int32lu('TargetObjectIndex').
+// int32lu('TargetObjectUniqueNumber').
+// float32l('UNKnowni6', 4).
+// struct('LocationNew', structs.CVec3).
+// float32l('FacingDirection').
+// int32lu('MaxHP').
+// int32lu('CurrentHP').
+// int32lu('MaxChi').
+// int32lu('CurrentChi').
+// int32lu('otherthings', 171);
+    int32lu('CharacterID').
+    int32lu('CharacterTypeIdentifier').
+    string('Name',packets.CharName_Length+1).
+    string('Demostrater',packets.CharName_Length+1).
+    string('Child',packets.CharName_Length+1).
+    int8lu('UnknownI1').
+    int32lu('FactionCapeThing').
+    int32lu('UnknownI2').
+    int32lu('TraitorFlag').
+    int32lu('UnknownI3').
+    int32lu('UnknownI4').
+    int32lu('GlowItems').
+    int32lu('UnknownI5',2).
+    int32lu('Clan').
+    int32lu('Gender').
+    int32lu('Hair').
+    int32lu('Face').
+    int32lu('Level').
+    int32lu('Honor').
+    struct('Necklace', structs.Equipt).
+    struct('Cape', structs.Equipt).
+    struct('Armor', structs.Equipt).
+    struct('Glove', structs.Equipt).
+    struct('Ring', structs.Equipt).
+    struct('Boot', structs.Equipt).
+    struct('CalbashBottle', structs.Equipt).
+    struct('Weapon', structs.Equipt).
+    struct('Pet', structs.Pet).
+    int32lu('Unknown5').
+    string('GuildName',packets.GuildName_Length+1).
+    int8lu('Unknown6',10).
+    int16lu('TagExist').
+    string('ClanTag',packets.GuildTag_Length+1).
+    string('Unknown7',14).
+    int32lu('Stance').
+    int32lu('Skill').
+    float32l('Frame').
+    struct('Location',structs.CVec3).
+    struct('LocationTo',structs.CVec3).
+    float32l('Direction').
+    int32lu('TargetObjectIndex').
+    int32lu('TargetObjectUniqueNumber').
+    float32l('UNKnowni6',4).
+    struct('LocationNew',structs.CVec3).
+    float32l('FacingDirection').
+    int32lu('MaxHP').
+    int32lu('CurrentHP').
+    int32lu('MaxChi').
+    int32lu('CurrentChi').
+
+int32lu('_Unknown1').
+int32lu('_Unknown2').
+int32lu('_Unknown3').
+int32lu('_Unknown4').
+int32lu('_Unknown5').
+int32lu('_Unknown6').
+int32lu('_Unknown7').
+int32lu('_Unknown8').
+int32lu('_Unknown9').
+int32lu('_Unknown10').
+int32lu('_Unknown11').
+int32lu('_Unknown12').
+int32lu('_Unknown13').
+int32lu('_Unknown14').
+int32lu('_Unknown15').
+int32lu('_Unknown16').
+int32lu('_Unknown17').
+int32lu('_Unknown18').
+int32lu('_Unknown19').
+int32lu('_Unknown20').
+int32lu('_Unknown21').
+int32lu('_Unknown22').
+
+int32lu('MonsterDisguise'). // The ID of a monster to disguise as
+
+int32lu('_Unknown23').
+int32lu('_Unknown24').
+int8lu('dueling').
+int8lu('duel_challenger'). // 0 blue 1 gold
+int8lu('_Unknown25').
+int8lu('Store'). // 0 none 1 open 2 open but empty
+
+
+int32lu('_oUnknown1').
+int32lu('_oUnknown2').
+int32lu('_oUnknown3').
+int32lu('_oUnknown4').
+int32lu('_oUnknown5').
+int32lu('_oUnknown6').
+int32lu('_oUnknown7').
+int32lu('_oUnknown8').
+int32lu('_oUnknown9').
+int32lu('_oUnknown10').
+int32lu('_oUnknown11').
+int32lu('_oUnknown12').
+int32lu('_oUnknown13').
+int32lu('_oUnknown14').
+int32lu('_oUnknown15').
+int32lu('_oUnknown16').
+int32lu('_oUnknown17').
+int32lu('_oUnknown18').
+int32lu('_oUnknown19').
+int32lu('_oUnknown20').
+int32lu('_oUnknown21').
+int32lu('_oUnknown22').
+int32lu('_oUnknown23').
+int32lu('_oUnknown24').
+int32lu('_oUnknown25').
+int32lu('_oUnknown26').
+int32lu('_oUnknown27').
+int32lu('_oUnknown28').
+int32lu('_oUnknown29').
+int32lu('_oUnknown30').
+int32lu('_oUnknown31').
+int32lu('_oUnknown32').
+int32lu('_oUnknown33').
+int32lu('_oUnknown34').
+int32lu('_oUnknown35').
+int32lu('_oUnknown36').
+int32lu('_oUnknown37').
+int32lu('_oUnknown38').
+int32lu('_oUnknown39').
+int32lu('_oUnknown40').
+int32lu('_oUnknown41').
+int32lu('_oUnknown42').
+int32lu('_oUnknown43').
+int32lu('_oUnknown44').
+int32lu('_oUnknown45').
+int32lu('_oUnknown46').
+int32lu('_oUnknown47').
+int32lu('_oUnknown48').
+int32lu('_oUnknown49').
+int32lu('_oUnknown50').
+int32lu('_oUnknown51').
+int32lu('_oUnknown52').
+int32lu('_oUnknown53').
+int32lu('_oUnknown54').
+int32lu('_oUnknown55').
+int32lu('_oUnknown56').
+int32lu('_oUnknown57').
+int32lu('_oUnknown58').
+int32lu('_oUnknown59').
+int32lu('_oUnknown60').
+int32lu('_oUnknown61').
+int32lu('_oUnknown62').
+int32lu('_oUnknown63').
+int32lu('_oUnknown64').
+int32lu('_oUnknown65').
+int32lu('_oUnknown66').
+int32lu('_oUnknown67').
+int32lu('_oUnknown68').
+int32lu('_oUnknown69').
+int32lu('_oUnknown70').
+int32lu('_oUnknown71').
+int32lu('_oUnknown72').
+int32lu('_oUnknown73').
+int32lu('_oUnknown74').
+int32lu('_oUnknown75').
+int32lu('_oUnknown76').
+int32lu('_oUnknown77').
+int32lu('_oUnknown78').
+int32lu('_oUnknown79').
+int32lu('_oUnknown80').
+int32lu('_oUnknown81').
+int32lu('_oUnknown82').
+int32lu('_oUnknown83').
+int32lu('_oUnknown84').
+int32lu('_oUnknown85').
+int32lu('_oUnknown86').
+int32lu('_oUnknown87').
+int32lu('_oUnknown88').
+int32lu('_oUnknown89').
+int32lu('_oUnknown90').
+int32lu('_oUnknown91').
+int32lu('_oUnknown92').
+int32lu('_oUnknown93').
+int32lu('_oUnknown94').
+int32lu('_oUnknown95').
+int32lu('_oUnknown96').
+int32lu('_oUnknown97').
+int32lu('_oUnknown98').
+int32lu('_oUnknown99').
+int32lu('_oUnknown100').
+int32lu('_oUnknown101').
+int32lu('_oUnknown102').
+int32lu('_oUnknown103').
+int32lu('_oUnknown104').
+int32lu('_oUnknown105').
+int32lu('_oUnknown106').
+int32lu('_oUnknown107').
+int32lu('_oUnknown108').
+int32lu('_oUnknown109').
+int32lu('_oUnknown110').
+int32lu('_oUnknown111').
+int32lu('_oUnknown112').
+int32lu('_oUnknown113').
+int32lu('_oUnknown114').
+int32lu('_oUnknown115').
+int32lu('_oUnknown116').
+int32lu('_oUnknown117').
+int32lu('_oUnknown118').
+int32lu('_oUnknown119').
+int32lu('_oUnknown120').
+int32lu('_oUnknown121').
+int32lu('_oUnknown122').
+int32lu('_oUnknown123').
+int32lu('_oUnknown124').
+int32lu('_oUnknown125').
+int32lu('_oUnknown126').
+int32lu('_oUnknown127').
+int32lu('_oUnknown128').
+int32lu('_oUnknown129').
+int32lu('_oUnknown130').
+int32lu('_oUnknown131').
+int32lu('_oUnknown132').
+int32lu('_oUnknown133').
+int32lu('_oUnknown134').
+int32lu('_oUnknown135').
+int32lu('_oUnknown136').
+int32lu('_oUnknown137').
+int32lu('_oUnknown138').
+int32lu('_oUnknown139').
+int32lu('_oUnknown140').
+int32lu('_oUnknown141').
+int32lu('_oUnknown142').
+int32lu('_oUnknown143').
+int32lu('_oUnknown144').
+int32lu('_oUnknown145');
 
 WorldPC.AttackPacket = restruct.
 int8lu('PacketID').
