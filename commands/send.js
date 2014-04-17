@@ -12,6 +12,13 @@ GMCommands.AddCommand(new Command('send',60,function command_send(string,client)
 		if (err)
 		{
 			//client.sendInfoMessage(err.message);
+			if (string.length === 2) {
+				var packetID = parseInt(string,16);
+				if (!isNaN(packetID)) {
+					client.write(new Buffer(1).writeUInt8(packetID,0));
+					return;
+				}
+			}
 			client.sendInfoMessage('Unable to send '+string+'.pac');
 			return;
 		}

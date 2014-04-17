@@ -78,7 +78,7 @@ function CharacterState() {
 	this.Boot = new EquipItem();
 	this.CalbashBottle = new EquipItem();
 	this.Weapon = new EquipItem();
-	this.Animal = new EquipItem();
+	this.Pet = new EquipItem();
 
 	this.GuildName = '';
 
