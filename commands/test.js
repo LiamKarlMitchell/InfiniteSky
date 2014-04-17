@@ -64,7 +64,6 @@ GMCommands.AddCommand(new Command('info', 80, function(string, client) {
 	}
 }));
 
-<<<<<<< HEAD
 GMCommands.AddCommand(new Command('npcs', 80, function(string, client) {
 	for(var i = 1; i <= 153; i++){
 		console.log(i + " : " + infos.Npc[i].Name);
@@ -77,7 +76,7 @@ GMCommands.AddCommand(new Command('skills', 80, function(string, client) {
 	}
 }));
 
-=======
+
 GMCommands.AddCommand(new Command('bling', 80, function(string, client) {
 	client.character.state._oUnknown1 = 1;
 	client.character.state._oUnknown2 = 1;
@@ -225,4 +224,3 @@ GMCommands.AddCommand(new Command('bling', 80, function(string, client) {
 	client.character.state._oUnknown144 = 1;
 	client.character.state._oUnknown145 = 1;
 }));
->>>>>>> 7f45d97e6dc1ef2126f00f94907510642540f5d1
