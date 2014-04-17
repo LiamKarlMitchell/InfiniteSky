@@ -29,7 +29,7 @@ structs.Pet= restruct.
 	int16lu('Activity').
 	int32lu('Growth'); // 1250 = 0.001
 
-structs.StorageItem= restruct.
+structs.StorageItem = restruct.
 	int32lu("ID").
 	int32lu("Column").
 	int32lu("Row").

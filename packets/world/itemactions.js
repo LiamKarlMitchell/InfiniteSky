@@ -223,8 +223,6 @@ ItemActions[0x03] = function Recv_EquipItem(client, input) { // COMPLETED
     var itemType = ItemInfo.ItemType;
     var inventoryItem = client.character.Inventory[input.InventoryIndex];
 
-    console.log("Inventory indexes: " + client.character.Inventory.length);
-
     if(inventoryItem === undefined && ItemInfo !== undefined){
         console.log("Item that index does not exists!");
         clientWriteItemActionFailed(client, input);
@@ -440,8 +438,42 @@ ItemActions[0x05] = function Recv_UnequipItem(client, input) {
 ItemActions[0x06] = function Recv_StoreItem(client, input) {
     NotImplemented(client, 'Recv_StoreItem', input);
 };
-ItemActions[0x07] = function Recv_SellItem(client, input) {
-    NotImplemented(client, 'Recv_SellItem', input);
+ItemActions[0x07] = function Recv_SellItem(client, input) { // COMPLETED TODO: Making sure the player is standing in range of NPC and NPC is visible
+    var MAX_SILVER = 2147483647;
+
+    var sellingItem = client.character.Inventory[input.InventoryIndex];
+    if(sellingItem === undefined || sellingItem === null){
+        clientWriteItemActionFailed(client, input);
+        return; 
+    }else{
+        if(sellingItem.ID !== input.ItemID){
+            clientWriteItemActionFailed(client, input);
+            return;
+        }else{
+            var sellPrice = input.Amount <= 99 && input.Amount > 0 ? infos.Item[input.ItemID].SalePrice * input.Amount : infos.Item[input.ItemID].SalePrice;
+
+            if((client.character.Silver + sellPrice) > MAX_SILVER){
+                clientWriteItemActionFailed(client, input);
+                return;
+            }
+
+            var Reminder = sellingItem.Amount - input.Amount;
+
+            if(Reminder === 0){
+                client.character.Inventory[input.InventoryIndex] = null;
+            }else if(Reminder > 0 && Reminder < 99){
+                client.character.Inventory[input.InventoryIndex].Amount = Reminder;
+            }else{
+                clientWriteItemActionFailed(client, input);
+                return;
+            }
+
+            client.character.Silver += sellPrice;
+            client.character.markModified("Inventory");
+            client.character.save();
+            clientWriteItemActionSuccess(client, input);
+        }
+    }
 };
 ItemActions[0x08] = function Recv_CoinsToGold(client, input) { // COMPLETED
     if(client.character.Silver >= 1000000000){
@@ -754,8 +786,42 @@ ItemActions[0x0F] = function Recv_MoveItemFromStorage(client, input) {
 ItemActions[0x10] = function sub_462140(client, input) {
     NotImplemented(client, 'sub_462140', input);
 };
-ItemActions[0x11] = function Recv_BuyItem(client, input) {
-    NotImplemented(client, 'Recv_BuyItem', input);
+ItemActions[0x11] = function Recv_BuyItem(client, input) { // COMPLETED
+    if(infos.Item[input.ItemID] === infos.Item[input.ItemID]){ // TODO: Check if the Npc has the item in their store
+        if( infos.Item[input.ItemID] === undefined || infos.Item[input.ItemID] === null || input.Amount > 99 || input.Amount < 0){
+            clientWriteItemActionFailed(client, input);
+            return;
+        }else{
+            if( (client.character.Silver - (infos.Item[input.ItemID].PurchasePrice*input.Amount)) >= 0){
+                if(infos.Item[input.ItemID].Stackable === 0 && input.Amount > 0){
+                    clientWriteItemActionFailed(client, input);
+                    return;
+                }else if(infos.Item[input.ItemID].Stackable > 0 && (input.Amount === 0 || input.Amount > 99 || input.Amount < 0)){
+                    clientWriteItemActionFailed(client, input);
+                    return;
+                }
+
+                var InventoryItem = checkInventoryItemCollision(client.character.Inventory, 0, input.ColumnMove, input.RowMove, infos.Item[input.ItemID].getSlotCount());
+                if(InventoryItem){
+                    client.character.Silver -= infos.Item[input.ItemID].PurchasePrice*input.Amount;
+                    client.character.Inventory[InventoryItem.index] = structs.StorageItem.objectify();
+                    client.character.Inventory[InventoryItem.index].Column = InventoryItem.x;
+                    client.character.Inventory[InventoryItem.index].Row = InventoryItem.y;
+                    client.character.Inventory[InventoryItem.index].Amount = input.Amount;
+                    client.character.Inventory[InventoryItem.index].ID = input.ItemID;
+                    client.character.markModified("Inventory");
+                    client.character.save();
+                    clientWriteItemActionSuccess(client, input);
+                }else{
+                    clientWriteItemActionFailed(client, input);
+                    return;
+                }
+            }
+        }
+    }else{
+        clientWriteItemActionFailed(client, input);
+        return;
+    }
 };
 ItemActions[0x12] = function nullsub_4(client, input) {
     NotImplemented(client, 'nullsub_4', input);
@@ -843,6 +909,7 @@ ItemActions[0x13] = function Recv_MoveOnPillbar(client, input) { // COMPLETED?
 ItemActions[0x14] = function Recv_MoveItem(client, input) { // COMPLETED
     //NotImplemented(client, 'Recv_MoveItem', input);
     //console.log(input);
+
     var InventoryItem = client.character.Inventory[input.InventoryIndex];
     if (
         InventoryItem === undefined
@@ -1043,7 +1110,7 @@ ItemActions[0x1D] = function Recv_SkillUp(client, input) { // COMPLETED
             clientWriteItemActionFailed(client, input);
             return true;
         }else{
-            if(client.character.SkillPoints >= 1 && SelectedSkill.Level < 20 && SelectedSkill.Level >= 1){
+            if(client.character.SkillPoints >= 1 && SelectedSkill.Level <= infos.Skill[input.ItemID].MaxSkillLevel && SelectedSkill.Level >= 1){
                 client.character.SkillPoints -= 1;
                 client.character.SkillList[input.InventoryIndex].Level += 1;
                 client.character.markModified('SkillList');
@@ -1060,8 +1127,46 @@ ItemActions[0x1D] = function Recv_SkillUp(client, input) { // COMPLETED
 ItemActions[0x1E] = function sub_462A60(client, input) {
     NotImplemented(client, 'sub_462A60', input);
 };
-ItemActions[0x1F] = function Recv_LearnSkill(client, input) {
-    NotImplemented(client, 'Recv_LearnSkill', input);
+ItemActions[0x1F] = function Recv_LearnSkill(client, input) { // Completed
+    if(client.character.SkillList.length === 30){
+        var alreadyLearned = false;
+        var freeIndex;
+        for(var i = 0; i < client.character.SkillList.length; i++){
+            if(client.character.SkillList[i] !== null && client.character.SkillList[i].ID === input.ItemID){
+                alreadyLearned = true;
+                break;
+            }
+
+            if(freeIndex === undefined && client.character.SkillList[i] === null){
+                freeIndex = i;
+            }
+        }
+
+        if(alreadyLearned){
+            clientWriteItemActionFailed(client, input);
+            return;
+        }
+
+        if((infos.Skill[input.ItemID].Clan !== 1 && infos.Skill[input.ItemID].Clan) !== (client.character.Clan+2) || infos.Skill[input.ItemID].PointsToLearn > client.character.SkillPoints){
+            clientWriteItemActionFailed(client, input);
+            return;
+        }
+
+        client.character.SkillPoints -= infos.Skill[input.ItemID].PointsToLearn;
+
+        client.character.SkillList[freeIndex] = structs.QuickUseSkill.objectify();
+        client.character.SkillList[freeIndex].ID = input.ItemID;
+        client.character.SkillList[freeIndex].Level = infos.Skill[input.ItemID].PointsToLearn;
+
+        client.character.markModified('SkillList');
+        client.character.save();
+
+        clientWriteItemActionSuccess(client, input);
+        return;
+    }else{
+        clientWriteItemActionFailed(client, input);
+        return;
+    }
 };
 ItemActions[0x20] = function sub_462C20(client, input) {
     NotImplemented(client, 'sub_462C20', input);
@@ -1114,6 +1219,7 @@ int32lu('RowMove').
 int32lu('Enchant').
 int32lu('Unknown10').
 int32lu('Unknown11');
+
 WorldPC.Set(0x14, {
     Restruct: WorldPC.ItemActionPacket,
     function: function handleItemActionPacket(client, input) {

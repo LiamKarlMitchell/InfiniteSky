@@ -84,7 +84,7 @@ GameInfoLoader.prototype.Load = function(filename, structure, onRecordFunction) 
 			}
 			delete data;
 
-			queue.pause();
+			//queue.pause();
 
 			queue.drain = function(err){
 				if (err) {
@@ -96,7 +96,7 @@ GameInfoLoader.prototype.Load = function(filename, structure, onRecordFunction) 
 				main.events.emit('gameinfo_loaded',filename);
 			};
 
-			queue.resume();
+			//queue.resume();
 
 		} else {
 			throw new Error("Not enouth bytes in "+filepath+' to read InfoStructure');

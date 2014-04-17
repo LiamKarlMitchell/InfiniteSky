@@ -63,3 +63,16 @@ GMCommands.AddCommand(new Command('info', 80, function(string, client) {
 		}
 	}
 }));
+
+GMCommands.AddCommand(new Command('npcs', 80, function(string, client) {
+	for(var i = 1; i <= 153; i++){
+		console.log(i + " : " + infos.Npc[i].Name);
+	}
+}));
+
+GMCommands.AddCommand(new Command('skills', 80, function(string, client) {
+	for(var i = 1; i <= 120; i++){
+		console.log(i + " : " + infos.Skill[i].Name + " @ " + infos.Skill[i].Clan);
+	}
+}));
+

@@ -243,7 +243,6 @@ generic.calculateCharacterStatInfo = function calculateCharacterStatInfo(reloadE
     }
   statInfo.WeaponType = WeaponType;
 
-  console.log('Weapon Type: '+WeaponType);
   statInfo.Damage += ((cvars.Damage[WeaponType] * statInfo.StatStrength)+statInfo.DamageBonus) || 0;
 
   statInfo.HitRate += cvars.HitRate*statInfo.StatDexterity;

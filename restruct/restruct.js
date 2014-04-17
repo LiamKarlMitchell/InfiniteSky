@@ -462,7 +462,8 @@
                     },
 
                     pack: function(struct, binary) {
-						if (typeof struct[k] === "undefined") struct[k]={};
+                        if (struct==null) { pack8(0,binary); return; }
+						//if (typeof struct[k] === "undefined") struct[k]={};
                         pack8(struct[k], binary);
                     }
                 });
@@ -622,8 +623,10 @@
                     },
 
                     pack: function(struct, binary) {
-						if (typeof struct[k] === "undefined") struct[k]={};
+                        if (struct==null) { pack16l(0,binary); return; }
                         pack16l(struct[k], binary);
+						// if (typeof struct[k] === "undefined") struct[k]={};
+      //                   pack16l(struct[k], binary);
                     }
                 });
             }
@@ -645,7 +648,7 @@
                 pack: function(struct, binary) {
 					if (typeof struct[k] === "undefined") struct[k]={};
                     for(var i = n - 1; i >= 0; --i) {
-						if (typeof struct[k][i] === "undefined") struct[k][i]={};
+                        if (struct==null) { pack16l(0,binary); return; }
                         pack16l(struct[k][i] || 0, binary);
                     }
                 }
