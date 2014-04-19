@@ -21,7 +21,14 @@ structs.Equipt= restruct.
 structs.SmallStorageItem = restruct.
 	int32lu('ID').
 	int32lu('Amount').
-	int32lu('Enchant');
+	int8lu('Enchant').
+	int8lu('Combine').
+	int16lu('Unk');
+
+structs.SmallStorageItemPet = restruct.
+	int32lu('ID').
+	int32lu('Activity').
+	int32lu('Growth');
 
 structs.Pet= restruct.
 	int32lu("ID").
@@ -34,7 +41,16 @@ structs.StorageItem = restruct.
 	int32lu("Column").
 	int32lu("Row").
 	int32lu("Amount").
-	int32lu("Enchant");
+	int8lu("Enchant").
+	int8lu("Combine").
+	int16lu("Unknown");
+
+structs.StorageItemPet = restruct.
+	int32lu("ID").
+	int32lu("Column").
+	int32lu("Row").
+	int32lu("Activity").
+	int32lu("Growth");
 
 structs.GiftItem = restruct.
 	int32lu("ID").
@@ -102,46 +118,42 @@ structs.Equip = function()
 
 // Need to find skill and statpoints
 structs.Character = restruct.
-	int32lu('isGM').
-	int32lu('Unused1',6).//Will add later
-	int32lu('PlayTime').
-	string('Name',13).
-	string('StuffLikeLocation',119).
-	int32lu('Clan').
-	int32lu('Gender').
-	int32lu('Hair').
-	int32lu('Face').
-	int32lu('Level').
-	int32lu('Experience').
-	int32lu('OtherIngame',2).//Will add later
-	int32lu('SkillPoints').
-	int32lu('Honor').
-	int32lu('StatPoints').
-	int32lu('StatVitality').
-	int32lu('StatStrength').
-	int32lu('StatChi').
-	int32lu('StatDexterity').
-	int32lu('GameStuff1').
-	int32lu('GameStuff2'). //Will add later
+	int32lu('isGM'). // 4
+	int32lu('Unused1',6).//Will add later // 8
+	int32lu('PlayTime'). // 12
+	string('Name',13). // 25
+	string('StuffLikeLocation',119). // 144
+	int32lu('Clan'). // 148
+	int32lu('Gender'). // 152
+	int32lu('Hair'). // 156
+	int32lu('Face'). // 160
+	int32lu('Level'). // 164
+	int32lu('Experience'). // 168
+	int32lu('OtherIngame',2).//Will add later // 172
+	int32lu('SkillPoints'). // 176
+	int32lu('Honor'). // 180
+	int32lu('StatPoints'). // 184
+	int32lu('StatVitality'). // 188
+	int32lu('StatStrength'). // 192
+	int32lu('StatChi'). // 196
+	int32lu('StatDexterity'). // 200
+	int32lu('GameStuff1'). // 204
+	int32lu('GameStuff2'). //Will add later // 208
 	//Equipt structs needed here, try find restruct's struct-in-struct example, or ask for one
-	struct('Amulet',structs.Equipt).
-	struct('Cape',structs.Equipt).
-	struct('Armor',structs.Equipt).
-	struct('Glove',structs.Equipt).
-	struct('Ring',structs.Equipt).
-	struct('Boot',structs.Equipt).
-	struct('CalbashBottle',structs.Equipt). //Unknown Equip
-	struct('Weapon',structs.Equipt).
-	struct('Pet',structs.Pet).
-	int32lu('storageUse').
-	int32lu('Silver').
+	struct('Amulet',structs.Equipt). // 220
+	struct('Cape',structs.Equipt). // 232
+	struct('Armor',structs.Equipt). // 244
+	struct('Glove',structs.Equipt). // 256
+	struct('Ring',structs.Equipt). // 268
+	struct('Boot',structs.Equipt). // 280
+	struct('CalbashBottle',structs.Equipt). //Unknown Equip // 292
+	struct('Weapon',structs.Equipt). // 304
+	struct('Pet',structs.Pet). // 316
+	int32lu('storageUse'). // 320
+	int32lu('Silver'). // here! // 324
 	struct('Inventory',structs.StorageItem,64).
 	struct('QuickUseItems',structs.QuickUseItem,4).
-	//int8lu('UnknownStuff1',1012).
-	int32lu('StorageSilver').
-	struct('Storage',structs.SmallStorageItem,28).
-
-	int8lu('UnknownStuff1',672).
+	int8lu('UnknownStuff1',1012).
  
 	struct('SkillList',structs.QuickUseSkill,30).
 	struct('SkillBar',structs.QuickUseSkill,24).
@@ -174,7 +186,7 @@ structs.Character = restruct.
  int32lu('RealZ'). // 3332
  int32lu('Health'). // 3336
  int32lu('Chi'). // 3340
- int32lu(''). // 3344
+ int32lu('StorageSilver'). // 3344
  int32lu(''). // 3348
  int32lu(''). // 3352
  int32lu(''). // 3356
@@ -347,7 +359,7 @@ structs.Character = restruct.
  int32lu(''). // 4024
  int32lu(''). // 4028
  int32lu(''). // 4032
- int32lu(''). // 4036
+ int32lu(''). // 40363344
  int32lu('StrBonus'). // 4040
  int32lu('DexBonus'). // 4044
  int32lu(''). // 4048
@@ -453,3 +465,84 @@ structs.WREGION = restruct.
 	int32ls('Radius');
 
 });
+
+structs.setInventoryStorageOnOffsets = function setInventoryOnOffset(buffer, offset, inventory, storage_offset, storage){
+    var InventoryBufferSize = structs.StorageItem.size * inventory.length;
+    var InventoryBuffer = new Buffer(InventoryBufferSize);
+
+    var InventoryOffset = 0;
+    for(var i = 0; i < inventory.length; i++){
+        var object = inventory[i];
+        var workingBuffer;
+        if(object == undefined){
+            workingBuffer = new Buffer(structs.StorageItem.pack());
+            workingBuffer.copy(InventoryBuffer, InventoryOffset);
+        }else{
+            var item = infos.Item[object.ID];
+
+            if(item == undefined){
+                workingBuffer = new Buffer(structs.StorageItem.pack(
+                    object
+                ));
+            }else{
+                if(item.ItemType === 22){
+                    workingBuffer = new Buffer(structs.StorageItemPet.pack(
+                        object
+                    ));
+                }else{
+                    workingBuffer = new Buffer(structs.StorageItem.pack(
+                        object
+                    ));
+                }
+            }
+
+            if(workingBuffer !== undefined){
+                workingBuffer.copy(InventoryBuffer, InventoryOffset, 0, workingBuffer.length);
+            }
+        }
+        InventoryOffset += structs.StorageItem.size;
+    }
+
+    InventoryBuffer.copy(buffer, offset, 0, InventoryBuffer.length);
+
+    var StorageBufferSize = structs.SmallStorageItem.size * storage.length;
+    var StorageBuffer = new Buffer(StorageBufferSize);
+
+    var StorageOffset = 0;
+
+    for(var sI = 0; sI < storage.length; sI++){
+        var object = storage[sI];
+        var workingBuffer;
+        if(object === null){
+            workingBuffer = new Buffer(structs.SmallStorageItem.pack());
+            workingBuffer.copy(StorageBuffer, StorageOffset);
+        }else{
+            var item = infos.Item[object.ID];
+
+            if(item == undefined){
+                workingBuffer = new Buffer(structs.SmallStorageItem.pack(
+                    object
+                ));
+            }else{
+
+                if(item.ItemType === 22){
+                    workingBuffer = new Buffer(structs.SmallStorageItemPet.pack(
+                        object
+                    ));
+                }else{
+                    workingBuffer = new Buffer(structs.SmallStorageItem.pack(
+                        object
+                    ));
+                }
+            }
+
+            workingBuffer.copy(StorageBuffer, StorageOffset);
+        }
+
+        StorageOffset += structs.SmallStorageItem.size;
+    }
+
+    StorageBuffer.copy(buffer, storage_offset, 0, StorageBuffer.length);
+
+    return buffer;
+}

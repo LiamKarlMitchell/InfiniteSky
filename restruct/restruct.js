@@ -1501,6 +1501,11 @@
                 }
             });
         },
+
+        test: function(k, s, n){
+            console.log(binary.offset);
+            console.log(binary.array);
+        },
 		
 		// Floats
         // 32-bit signed little-endian float.

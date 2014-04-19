@@ -82,14 +82,11 @@ ItemInfo.prototype = {
 	},
 	getSlotCount: function() {
 		var t = this.ItemType;
-		if (t==0 || t==2 || t==1 || t==6 || t==10)
-		{
-			return 1;
-		}
-		else
-		{
-			return 4;
-		}
+	    if (t === 2 || t === 7 || t === 11) {
+	        return 1;
+	    } else {
+	        return 4;
+	    }
 	},
 	isAllowedByClan: function(characterClanID){
 		//TODO: Check up on actuall clan restriction value from Item Info

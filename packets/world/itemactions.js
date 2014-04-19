@@ -1,5 +1,5 @@
 // ###############
-//TODO: On item move, check their type and save the values in DB if needed, like Pet Growth or Activity! And switch on their types and types of storage
+
 // ###############
 
 
@@ -69,60 +69,14 @@ function clientWriteItemActionSuccess(client, input){
     })));
 }
 
-//TODO: Move it to ItemInfo Prototype
 function getSlotCount(itemType) {
-    if (itemType === 0 || itemType === 2 || itemType === 1 || itemType === 6 || itemType === 10) {
+    if (itemType === 2 || itemType === 7 || itemType === 11) {
         return 1;
     } else {
         return 4;
     }
 }
 
-//TODO: Move it to db/character.js, and use this.inventory to pass inventory argument
-function checkInventoryItemCollision(inventory, page, x1, y1, s1) {
-    if(x1 < 0 || y1 < 0) return false;
-
-    var reservedSlots = [];
-
-    var pageSize = 8;
-    for(var initArraySize8 = 0; initArraySize8 < pageSize; initArraySize8++){
-        reservedSlots[initArraySize8] = [];
-        for(var initArraySize8Row = 0; initArraySize8Row < pageSize; initArraySize8Row++){
-            reservedSlots[initArraySize8][initArraySize8Row] = false;
-        }
-    }
-    var freeInventoryIndex;
-    for (var i = 0; i < 32+(page*32); i++) {
-        var object = inventory[i + (page * 32)];
-        if (object !== undefined && object !== null) {
-            var itemInfo = infos.Item[object.ID];
-            if (itemInfo !== undefined) {
-                var size = itemInfo.getSlotCount();
-                var posX = object.Column;
-                var posY = object.Row;
-
-                reservedSlots[posX][posY] = true;
-                if(size===4){
-                    reservedSlots[posX][posY+1] = true;
-                    reservedSlots[posX+1][posY] = true;
-                    reservedSlots[posX+1][posY+1] = true;
-                }
-            }
-
-        }else if(freeInventoryIndex === undefined && object === null){
-            freeInventoryIndex = i;
-        }
-    }
-
-    if(s1 === 1 && reservedSlots[x1][y1]) return false;
-    if(s1 === 4 && (reservedSlots[x1][y1] === undefined || reservedSlots[x1+1][y1] === undefined || reservedSlots[x1][y1+1] === undefined || reservedSlots[x1+1][y1+1] === undefined)) return false;
-    if(s1 === 4 && (reservedSlots[x1][y1] || reservedSlots[x1+1][y1] || reservedSlots[x1][y1+1] || reservedSlots[x1+1][y1+1])) return false;
-
-
-    return {index: freeInventoryIndex, x: x1, y: y1, page: page};
-}
-
-//TODO: Similliar to the ItemCollision check function
 function getStackingIventoryItemIndex(inventory, page, x1, y1, itemID){
     var stackedIndex;
     for (var i = 0; i < 32+(page*32); i++) {
@@ -145,7 +99,6 @@ function getStackingIventoryItemIndex(inventory, page, x1, y1, itemID){
     return (stackedIndex === undefined ? false : stackedIndex);
 }
 
-
 ItemActions = [];
 ItemActions[0x00] = function Recv_PickupItem(client, input) {
     NotImplemented(client, 'Recv_PickupItem', input);
@@ -154,37 +107,37 @@ ItemActions[0x01] = function Recv_DropItem(client, input) {
     NotImplemented(client, 'Recv_DropItem', input);
 };
 ItemActions[0x02] = function Recv_MoveToPillBar(client, input) { // COMPLETED
-    //NotImplemented(client, 'Recv_MoveToPillBar', input);
     var InventoryItem = client.character.Inventory[input.InventoryIndex];
     var Slot = input.RowPickup;
     var QuickItems = client.character.QuickUseItems;
 
     if(client.character.Inventory.length === 64 && QuickItems.length === 4){
-        if(InventoryItem === undefined){
-
+        if(InventoryItem == undefined){
+            clientWriteItemActionFailed(client, input);
+            return;
         }else{
             var ItemID = input.ItemID;
             var ItemAmount = input.Amount;
 
             if(ItemID !== InventoryItem.ID || QuickItems[Slot] !== null){
                 clientWriteItemActionFailed(client, input);
-                return true;
+                return;
             }else if(QuickItems[Slot] === null){
                 if(ItemAmount > InventoryItem.Amount || ItemAmount < 0){
                     clientWriteItemActionFailed(client, input);
-                    return true;
+                    return;
                 }else if(ItemAmount === InventoryItem.Amount){
-                    client.character.QuickUseItems[Slot] = structs.QuickUseItem.unpack(structs.QuickUseItem.pack({
-                        "ID": InventoryItem.ID,
-                        "Amount": InventoryItem.Amount
-                    }));
+                    client.character.QuickUseItems[Slot] = structs.QuickUseItem.objectify();
+                    client.character.QuickUseItems[Slot].ID = InventoryItem.ID;
+                    client.character.QuickUseItems[Slot].Amount = InventoryItem.Amount;
+
                     client.character.Inventory[input.InventoryIndex] = null;
                 }else{
                     var Reminder = InventoryItem.Amount - input.Amount;
-                    client.character.QuickUseItems[Slot] = structs.QuickUseItem.unpack(structs.QuickUseItem.pack({
-                        "ID": InventoryItem.ID,
-                        "Amount": input.Amount
-                    }));
+                    client.character.QuickUseItems[Slot] = structs.QuickUseItem.objectify();
+                    client.character.QuickUseItems[Slot].ID = InventoryItem.ID;
+                    client.character.QuickUseItems[Slot].Amount = InventoryItem.Amount;
+
                     client.character.Inventory[input.InventoryIndex].Amount = Reminder;
                 }
             }
@@ -196,163 +149,162 @@ ItemActions[0x02] = function Recv_MoveToPillBar(client, input) { // COMPLETED
     client.character.markModified('Inventory');
     client.character.save();
 
-    client.write(new Buffer(packets.ItemActionReplyPacket2.pack({
-        PacketID: 0x2B,
-        ActionType: input.ActionType,
-        ItemUniqueID: input.ItemUniqueID,
-        ItemUniqueID2: input.ItemUniqueID2,
-        ItemID: input.ItemID,
-        Unknown3: input.Unknown3,
-        Unknown4: input.Unknown4,
-        Unknown5: input.Unknown5,
-        Amount: input.Amount,
-        InventoryIndex: input.InventoryIndex,
-        RowDrop: input.RowDrop,
-        ColumnPickup: input.ColumnPickup,
-        RowPickup: input.RowPickup,
-        ColumnMove: input.ColumnMove,
-        RowMove: input.RowMove,
-        Failed: 0
-    })));
+    clientWriteItemActionSuccess(client, input);
 };
 
 
 ItemActions[0x03] = function Recv_EquipItem(client, input) { // COMPLETED
-
     var ItemInfo = infos.Item[input.ItemID];
     var itemType = ItemInfo.ItemType;
     var inventoryItem = client.character.Inventory[input.InventoryIndex];
 
-    if(inventoryItem === undefined && ItemInfo !== undefined){
+    if(inventoryItem === undefined || inventoryItem === null || ItemInfo === undefined){
         console.log("Item that index does not exists!");
         clientWriteItemActionFailed(client, input);
-        return true;
+        return;
     }
 
     switch(itemType){
         case 7: // Neck
-            if(client.character.Amulet.ID === 0
-                && ItemInfo.isAllowedByClan(client.character.Clan)
+            if( ItemInfo.isAllowedByClan(client.character.Clan)
                 && client.character.Level >= ItemInfo.LevelRequirement
                 ){
-                client.character.Amulet = structs.Equipt.unpack(structs.Equipt.pack({
-                    "ID": inventoryItem["ID"],
-                    "Enchant": inventoryItem["Enchant"],
-                    "Combine": inventoryItem["Combine"]
-                }));
-                client.character.Inventory[input.InventoryIndex] = null;
+                if(client.character.Amulet === null || client.character.Amulet === false || client.character.Amulet === undefined || client.character.Amulet.ID === 0){
+                    client.character.Amulet = structs.Equipt.objectify();
+                    client.character.Amulet.ID = inventoryItem.ID;
+
+                    client.character.Inventory[input.InventoryIndex] = null;
+                }else{
+                    console.log("There is already an equiped item!");
+                    clientWriteItemActionFailed(client, input);
+                    return;
+                }
             }else{
-                console.log(itemType + "HackAttemp! Item is not as required to be worn!");
+                console.log("HackAttemp! Item is not as required to be worn!");
                 clientWriteItemActionFailed(client, input);
-                return true;  
+                return;  
             }
         break;
 
         case 8: // Cape
-            if(client.character.Cape.ID === 0
-                && ItemInfo.isAllowedByClan(client.character.Clan)
+            if( ItemInfo.isAllowedByClan(client.character.Clan)
                 && client.character.Level >= ItemInfo.LevelRequirement
                 ){
-                client.character.Cape = structs.Equipt.unpack(structs.Equipt.pack({
-                    "ID": inventoryItem["ID"],
-                    "Enchant": inventoryItem["Enchant"],
-                    "Combine": inventoryItem["Combine"]
-                }));
-                client.character.Inventory[input.InventoryIndex] = null;
+                if(client.character.Cape === null || client.character.Cape === false || client.character.Cape === undefined || client.character.Cape.ID === 0){
+                    client.character.Cape = structs.Equipt.objectify();
+                    client.character.Cape.ID = inventoryItem.ID;
+
+                    client.character.Inventory[input.InventoryIndex] = null;
+                }else{
+                    console.log("There is already an equiped item!");
+                }
             }else{
                 console.log(itemType + "HackAttemp! Item is not as required to be worn!");
                 clientWriteItemActionFailed(client, input);
-                return true;  
+                return;  
             }
         break;
 
         case 9: // Armor
-            if(client.character.Armor.ID === 0
-                && ItemInfo.isAllowedByClan(client.character.Clan)
+            if( ItemInfo.isAllowedByClan(client.character.Clan)
                 && client.character.Level >= ItemInfo.LevelRequirement
                 ){
-                client.character.Armor = structs.Equipt.unpack(structs.Equipt.pack({
-                    "ID": inventoryItem["ID"],
-                    "Enchant": inventoryItem["Enchant"],
-                    "Combine": inventoryItem["Combine"]
-                }));
-                client.character.Inventory[input.InventoryIndex] = null;
+                if(client.character.Armor === null || client.character.Armor === false || client.character.Armor === undefined || client.character.Armor.ID === 0){
+                    client.character.Armor = structs.Equipt.objectify();
+                    client.character.Armor.ID = inventoryItem.ID;
+                    client.character.Armor.Enchant = inventoryItem.Enchant;
+                    client.character.Armor.Combine = inventoryItem.Combine;
+
+                    client.character.Inventory[input.InventoryIndex] = null;
+                }else{
+                    console.log("There is already an equiped item!");
+                }
             }else{
                 console.log(itemType + "HackAttemp! Item is not as required to be worn!");
                 clientWriteItemActionFailed(client, input);
-                return true; 
+                return; 
             }
         break;
 
         case 10: // Gloves
-            if(client.character.Glove.ID === 0
-                && ItemInfo.isAllowedByClan(client.character.Clan)
-                && client.character.Level >= ItemInfo.LevelRequirement
-                ){
-                client.character.Glove = structs.Equipt.unpack(structs.Equipt.pack({
-                    "ID": inventoryItem["ID"],
-                    "Enchant": inventoryItem["Enchant"],
-                    "Combine": inventoryItem["Combine"]
-                }));
-                client.character.Inventory[input.InventoryIndex] = null;
+            if( ItemInfo.isAllowedByClan(client.character.Clan) && client.character.Level >= ItemInfo.LevelRequirement){
+                if(client.character.Glove === null || client.character.Glove === false || client.character.Glove === undefined || client.character.Glove.ID === 0){
+                    client.character.Glove = structs.Equipt.objectify();
+                    client.character.Glove.ID = inventoryItem.ID;
+                    client.character.Glove.Enchant = inventoryItem.Enchant;
+                    client.character.Glove.Combine = inventoryItem.Combine;
+
+                    client.character.Inventory[input.InventoryIndex] = null;
+                }else{
+                    console.log("There is already an equiped item!");
+                    clientWriteItemActionFailed(client, input);
+                    return; 
+                }
             }else{
                 console.log(itemType + "HackAttemp! Item is not as required to be worn!");
                 clientWriteItemActionFailed(client, input);
-                return true;  
+                return;  
             }
         break;
 
         case 11: // Ring
-            if(lient.character.Ring.ID === 0
-                && ItemInfo.isAllowedByClan(client.character.Clan)
+            if( ItemInfo.isAllowedByClan(client.character.Clan)
                 && client.character.Level >= ItemInfo.LevelRequirement
                 ){
-                client.character.Ring = structs.Equipt.unpack(structs.Equipt.pack({
-                    "ID": inventoryItem["ID"],
-                    "Enchant": inventoryItem["Enchant"],
-                    "Combine": inventoryItem["Combine"]
-                }));
-                client.character.Inventory[input.InventoryIndex] = null;
+                if(client.character.Ring === null || client.character.Ring === false || client.character.Ring === undefined || client.character.Ring.ID === 0){
+                    client.character.Ring = structs.Equipt.objectify();
+                    client.character.Ring.ID = inventoryItem.ID;
+
+                    client.character.Inventory[input.InventoryIndex] = null;
+                }else{
+                    console.log("There is already an equiped item!");
+                    clientWriteItemActionFailed(client, input);
+                    return; 
+                }
             }else{
                 console.log(itemType + "HackAttemp! Item is not as required to be worn!");
                 clientWriteItemActionFailed(client, input);
-                return true;   
+                return;   
             }
         break;
 
         case 12: // Boots
-            if(client.character.Boot.ID === 0
-                && ItemInfo.isAllowedByClan(client.character.Clan)
+            if( ItemInfo.isAllowedByClan(client.character.Clan)
                 && client.character.Level >= ItemInfo.LevelRequirement
                 ){
-                client.character.Boot = structs.Equipt.unpack(structs.Equipt.pack({
-                    "ID": inventoryItem["ID"],
-                    "Enchant": inventoryItem["Enchant"],
-                    "Combine": inventoryItem["Combine"]
-                }));
-                client.character.Inventory[input.InventoryIndex] = null;
+                if(client.character.Boot === null || client.character.Boot === false || client.character.Boot === undefined || client.character.Boot.ID === 0){
+                    client.character.Boot = structs.Equipt.objectify();
+                    client.character.Boot.ID = inventoryItem.ID;
+                    client.character.Boot.Enchant = inventoryItem.Enchant;
+                    client.character.Boot.Combine = inventoryItem.Combine;
+
+                    client.character.Inventory[input.InventoryIndex] = null;
+                }else{
+                    console.log("There is already an equiped item!");
+                }
             }else{
                 console.log(itemType + "HackAttemp! Item is not as required to be worn!");
                 clientWriteItemActionFailed(client, input);
-                return true;  
+                return;  
             }
         break;
 
         case 6: // Bootle
-            if(client.character.CalbashBottle.ID === 0
-                && ItemInfo.isAllowedByClan(client.character.Clan)
+            if( ItemInfo.isAllowedByClan(client.character.Clan)
                 && client.character.Level >= ItemInfo.LevelRequirement
                 ){
-                client.character.CalbashBottle = structs.Equipt.unpack(structs.Equipt.pack({
-                    "ID": inventoryItem["ID"],
-                    "Enchant": inventoryItem["Enchant"],
-                    "Combine": inventoryItem["Combine"]
-                }));
-                client.character.Inventory[input.InventoryIndex] = null;
+                if(client.character.CalbashBottle === null || client.character.CalbashBottle === false || client.character.CalbashBottle === undefined || client.character.CalbashBottle.ID === 0){
+                    client.character.CalbashBottle = structs.Equipt.objectify();
+                    client.character.CalbashBottle.ID = inventoryItem.ID;
+
+                    client.character.Inventory[input.InventoryIndex] = null;
+                }else{
+                    console.log("There is already an equiped item!");
+                }
             }else{
                 console.log(itemType + "HackAttemp! Item is not as required to be worn!");
                 clientWriteItemActionFailed(client, input);
-                return true;  
+                return;  
             }
         break;
 
@@ -365,69 +317,58 @@ ItemActions[0x03] = function Recv_EquipItem(client, input) { // COMPLETED
         case 19: //Light Blade
         case 20: //Long Spear
         case 21: //Scepter
-            if(client.character.Weapon.ID === 0
-                && ItemInfo.isAllowedByClan(client.character.Clan)
+            if( ItemInfo.isAllowedByClan(client.character.Clan)
                 && client.character.Level >= ItemInfo.LevelRequirement
                 ){
-                client.character.Weapon = structs.Equipt.unpack(structs.Equipt.pack({
-                    "ID": inventoryItem["ID"],
-                    "Enchant": inventoryItem["Enchant"],
-                    "Combine": inventoryItem["Combine"]
-                }));
-                client.character.Inventory[input.InventoryIndex] = null;
+                if(client.character.Weapon === null || client.character.Weapon === false || client.character.Weapon === undefined || client.character.Weapon.ID === 0){
+                    client.character.Weapon = structs.Equipt.objectify();
+                    client.character.Weapon.ID = inventoryItem.ID;
+                    client.character.Weapon.Enchant = inventoryItem.Enchant;
+                    client.character.Weapon.Combine = inventoryItem.Combine;
+
+                    client.character.Inventory[input.InventoryIndex] = null;
+                }else{
+                    console.log("There is already an equiped item!");
+                }
             }else{
                 console.log(itemType + "HackAttemp! Item is not as required to be worn!");
                 clientWriteItemActionFailed(client, input);
-                return true; 
+                return; 
             }
         break;
 
         case 22: // Pet
-            if(client.character.Pet.ID === 0
-                && ItemInfo.isAllowedByClan(client.character.Clan)
+            if( ItemInfo.isAllowedByClan(client.character.Clan)
                 && client.character.Level >= ItemInfo.LevelRequirement
                 ){
-                client.character.Pet = structs.Equipt.unpack(structs.Equipt.pack({
-                    "ID": inventoryItem["ID"],
-                    "Enchant": inventoryItem["Enchant"],
-                    "Combine": inventoryItem["Combine"]
-                }));
-                client.character.Inventory[input.InventoryIndex] = null;
+                if(client.character.Pet === null || client.character.Pet === false || client.character.Pet === undefined || client.character.Pet.ID === 0){
+                    client.character.Pet = structs.Pet.objectify();
+                    client.character.Pet.ID = inventoryItem.ID;
+                    client.character.Pet.Activity = inventoryItem.Activity;
+                    client.character.Pet.Growth = inventoryItem.Growth;
+
+                    client.character.Inventory[input.InventoryIndex] = null;
+                }else{
+                    console.log("There is already an equiped item!");
+                }
             }else{
                 console.log(itemType + "HackAttemp! Item is not as required to be worn!");
                 clientWriteItemActionFailed(client, input);
-                return true;   
+                return;   
             }
         break;
 
         default:
             console.log(itemType + " is not defined to Equip a item!");
             clientWriteItemActionFailed(client, input);
-            return true; 
+            return; 
         break;
     }
 
     client.character.markModified('Inventory');
     client.character.save();
 
-    client.write(new Buffer(packets.ItemActionReplyPacket2.pack({
-		PacketID: 0x2B,
-		ActionType: input.ActionType,
-		ItemUniqueID: input.ItemUniqueID,
-		ItemUniqueID2: input.ItemUniqueID2,
-		ItemID: input.ItemID,
-		Unknown3: input.Unknown3,
-		Unknown4: input.Unknown4,
-		Unknown5: input.Unknown5,
-		Amount: input.Amount,
-		InventoryIndex: input.InventoryIndex,
-		RowDrop: input.RowDrop,
-		ColumnPickup: input.ColumnPickup,
-		RowPickup: input.RowPickup,
-		ColumnMove: input.ColumnMove,
-		RowMove: input.RowMove,
-		Failed: 0
-    })));
+    clientWriteItemActionSuccess(client, input);
 };
 ItemActions[0x04] = function Recv_Move_Item(client, input) {
     NotImplemented(client, 'Recv_Move_Item', input);
@@ -435,11 +376,59 @@ ItemActions[0x04] = function Recv_Move_Item(client, input) {
 ItemActions[0x05] = function Recv_UnequipItem(client, input) {
     NotImplemented(client, 'Recv_UnequipItem', input);
 };
-ItemActions[0x06] = function Recv_StoreItem(client, input) {
-    NotImplemented(client, 'Recv_StoreItem', input);
+ItemActions[0x06] = function Recv_StoreItemInGateMaster(client, input) { // COMPLETED
+    var InventoryItem = client.character.Inventory[input.InventoryIndex];
+    var ExistingItem = client.character.Storage[input.RowPickup];
+
+    if(ExistingItem != undefined || InventoryItem === null || InventoryItem === undefined){
+        clientWriteItemActionFailed(client, input);
+        return;
+    }else{
+        var item = infos.Item[InventoryItem.ID];
+        if(item.ItemType !== 22 && input.Amount > 0 && InventoryItem.Amount !== input.Amount){
+            clientWriteItemActionFailed(client, input);
+            return;
+        }else if(item.ItemType !== 22 && input.Amount === 0 && InventoryItem.Amount !== input.Amount){
+            clientWriteItemActionFailed(client, input);
+            return;
+        }else if(item.ItemType === 22 && input.Amount !== InventoryItem.Activity){
+            clientWriteItemActionFailed(client, input);
+            return;
+        }
+
+
+        if(item.ItemType === 22){
+            client.character.Storage[input.RowPickup] = structs.SmallStorageItemPet.objectify();
+            client.character.Storage[input.RowPickup].ID = InventoryItem.ID;
+            client.character.Storage[input.RowPickup].Growth = InventoryItem.Growth;
+            client.character.Storage[input.RowPickup].Activity = InventoryItem.Activity;
+        }else{
+            client.character.Storage[input.RowPickup] = structs.SmallStorageItem.objectify();
+            client.character.Storage[input.RowPickup].ID = InventoryItem.ID;
+            client.character.Storage[input.RowPickup].Amount = InventoryItem.Amount;
+            client.character.Storage[input.RowPickup].Enchant = InventoryItem.Enchant;
+            client.character.Storage[input.RowPickup].Combine = InventoryItem.Combine;
+        }
+
+
+        var storage = client.character.Storage;
+        for(var i = 0; i < 56; i++){
+            if(storage[i] == undefined)
+                client.character.Storage[i] = null;
+        }
+
+        client.character.Inventory[input.InventoryIndex] = null;
+
+        client.character.markModified('Storage');
+        client.character.markModified('Inventory');
+        client.character.save();
+
+        clientWriteItemActionSuccess(client, input);
+    }
+
 };
 ItemActions[0x07] = function Recv_SellItem(client, input) { // COMPLETED TODO: Making sure the player is standing in range of NPC and NPC is visible
-    var MAX_SILVER = 2147483647;
+    var MAX_SILVER = packets.MAX_SILVER;
 
     var sellingItem = client.character.Inventory[input.InventoryIndex];
     if(sellingItem === undefined || sellingItem === null){
@@ -481,30 +470,13 @@ ItemActions[0x08] = function Recv_CoinsToGold(client, input) { // COMPLETED
         client.character.SilverBig++;
         client.character.save();
 
-        client.write(new Buffer(packets.ItemActionReplyPacket2.pack({
-            PacketID: 0x2B,
-            ActionType: input.ActionType,
-            ItemUniqueID: input.ItemUniqueID,
-            ItemUniqueID2: input.ItemUniqueID2,
-            ItemID: input.ItemID,
-            Unknown3: input.Unknown3,
-            Unknown4: input.Unknown4,
-            Unknown5: input.Unknown5,
-            Amount: input.Amount,
-            InventoryIndex: input.InventoryIndex,
-            RowDrop: input.RowDrop,
-            ColumnPickup: input.ColumnPickup,
-            RowPickup: input.RowPickup,
-            ColumnMove: input.ColumnMove,
-            RowMove: input.RowMove,
-            Failed: 0
-        })));
+        clientWriteItemActionSuccess(client, input);
     }else{
         clientWriteItemActionFailed(client, input);
     }
 };
 ItemActions[0x09] = function Recv_GoldToCoins(client, input) { // COMPLETED
-    var MAX_SILVER = 2147483647; //TODO: Move this into a main definition file somewhere..
+    var MAX_SILVER = packets.MAX_SILVER;
 
     if(client.character.SilverBig >= 1){
         if( (client.character.Silver+1000000000) <= MAX_SILVER  ) {
@@ -512,70 +484,53 @@ ItemActions[0x09] = function Recv_GoldToCoins(client, input) { // COMPLETED
             client.character.SilverBig--;
         }else{
             clientWriteItemActionFailed(client, input);
-            return true;
+            return;
         }
     }else{
         clientWriteItemActionFailed(client, input);
-        return true;
+        return;
     }
 
     client.character.save();
-    client.write(new Buffer(packets.ItemActionReplyPacket2.pack({
-        PacketID: 0x2B,
-        ActionType: input.ActionType,
-        ItemUniqueID: input.ItemUniqueID,
-        ItemUniqueID2: input.ItemUniqueID2,
-        ItemID: input.ItemID,
-        Unknown3: input.Unknown3,
-        Unknown4: input.Unknown4,
-        Unknown5: input.Unknown5,
-        Amount: input.Amount,
-        InventoryIndex: input.InventoryIndex,
-        RowDrop: input.RowDrop,
-        ColumnPickup: input.ColumnPickup,
-        RowPickup: input.RowPickup,
-        ColumnMove: input.ColumnMove,
-        RowMove: input.RowMove,
-        Failed: 0
-    })));
+    clientWriteItemActionSuccess(client, input);
 };
 ItemActions[0xA] = function Recv_Discard_Item(client, input) { // 10
     NotImplemented(client, 'Recv_Discard_Item', input);
 };
 ItemActions[0xB] = function Recv_MoveFromPillBar(client, input) { // COMPLETED
     var QuickItem = client.character.QuickUseItems[input.InventoryIndex];
-    var ItemSlot = checkInventoryItemCollision(client.character.Inventory, 0, input.ColumnMove, input.RowMove, 1);
+    var ItemSlot = client.character.checkInventoryItemCollision(0, input.ColumnMove, input.RowMove, 1);
 
     if (!ItemSlot) {
         clientWriteItemActionFailed(client, input);
         console.log("No slot!");
-        return true;
+        return;
     }else{
         if(QuickItem === undefined || QuickItem === null || QuickItem.ID === undefined){
             clientWriteItemActionFailed(client, input);
             console.log("Quick item undefined?!");
-            return true;
+            return;
         }else{
             if(input.Amount > QuickItem.Amount || input.Amount < 0){
                 clientWriteItemActionFailed(client, input);
                 console.log("Input amount exceeds the needs!");
-                return true;
+                return;
             }else if(QuickItem.Amount === input.Amount){
-                client.character.Inventory[ItemSlot.index] = structs.StorageItem.unpack(structs.StorageItem.pack({
-                    "ID": QuickItem.ID,
-                    "Row": ItemSlot.y,
-                    "Column": ItemSlot.x,
-                    "Amount": input.Amount
-                }));
+                client.character.Inventory[ItemSlot.index] = structs.StorageItem.objectify();
+                client.character.Inventory[ItemSlot.index].ID = QuickItem.ID;
+                client.character.Inventory[ItemSlot.index].Row = ItemSlot.y;
+                client.character.Inventory[ItemSlot.index].Column = ItemSlot.x;
+                client.character.Inventory[ItemSlot.index].Amount = input.Amount;
+
                 client.character.QuickUseItems[input.InventoryIndex] = null;
             }else{
                 var Reminder = QuickItem.Amount - input.Amount;
-                client.character.Inventory[ItemSlot.index] = structs.StorageItem.unpack(structs.StorageItem.pack({
-                    "ID": QuickItem.ID,
-                    "Row": ItemSlot.y,
-                    "Column": ItemSlot.x,
-                    "Amount": input.Amount
-                }));
+                client.character.Inventory[ItemSlot.index] = structs.StorageItem.objectify();
+                client.character.Inventory[ItemSlot.index].ID = QuickItem.ID;
+                client.character.Inventory[ItemSlot.index].Row = ItemSlot.y;
+                client.character.Inventory[ItemSlot.index].Column = ItemSlot.x;
+                client.character.Inventory[ItemSlot.index].Amount = input.Amount;
+
                 client.character.QuickUseItems[input.InventoryIndex].Amount = Reminder;
             }
         }
@@ -585,34 +540,17 @@ ItemActions[0xB] = function Recv_MoveFromPillBar(client, input) { // COMPLETED
     client.character.markModified('Inventory');
     client.character.save();
 
-    client.write(new Buffer(packets.ItemActionReplyPacket2.pack({
-        PacketID: 0x2B,
-        ActionType: input.ActionType,
-        ItemUniqueID: input.ItemUniqueID,
-        ItemUniqueID2: input.ItemUniqueID2,
-        ItemID: input.ItemID,
-        Unknown3: input.Unknown3,
-        Unknown4: input.Unknown4,
-        Unknown5: input.Unknown5,
-        Amount: input.Amount,
-        InventoryIndex: input.InventoryIndex,
-        RowDrop: input.RowDrop,
-        ColumnPickup: input.ColumnPickup,
-        RowPickup: input.RowPickup,
-        ColumnMove: input.ColumnMove,
-        RowMove: input.RowMove,
-        Failed: 0
-    })));
+    clientWriteItemActionSuccess(client, input);
 };
 ItemActions[0x0C] = function Recv_Use_item(client, input) { // TODO: Heal method on pills and etc. actuall usage of them and update of characters state.
     var UsedItem = client.character.QuickUseItems[input.InventoryIndex];
     if(UsedItem === null || UsedItem === undefined){
         clientWriteItemActionFailed(client, input);
-        return true;
+        return;
     }else{
         if(UsedItem.ID === undefined || UsedItem.ID !== input.ItemID){
             clientWriteItemActionFailed(client, input);
-            return true;
+            return;
         }else{
             var Reminder = UsedItem.Amount-1;
             if(Reminder === 0)
@@ -634,118 +572,110 @@ ItemActions[0x0E] = function Recv_UnequipItem(client, input) { // COMPLETED
     // ColumnMove = X Axis of incoming item de equipment
     // RowMove = Y Axis of incoming item de equipment
 
-    var ItemSlot = checkInventoryItemCollision(client.character.Inventory, 0, input.ColumnMove, input.RowMove, getSlotCount(input.InventoryIndex));
+    var ItemSlot = client.character.checkInventoryItemCollision(0, input.ColumnMove, input.RowMove, getSlotCount(input.InventoryIndex));
     if (!ItemSlot) {
         clientWriteItemActionFailed(client, input);
-        return true;
+        return;
     } else {
     	switch(input.InventoryIndex){
 			case 0: // Neck
                 var wearedItem = client.character.Amulet;
-                client.character.Inventory[ItemSlot.index] = structs.StorageItem.unpack(structs.StorageItem.pack({
-                    "ID": wearedItem["ID"],
-                    "Column": ItemSlot.x,
-                    "Row": ItemSlot.y,
-                    "Amount" : 1,
-                    "Enchant" : wearedItem["Enchant"]
-                }));
-                client.character.Amulet = structs.Equipt.unpack(structs.Equipt.pack({"ID": 0}));
+                client.character.Inventory[ItemSlot.index] = structs.StorageItem.objectify();
+                client.character.Inventory[ItemSlot.index].ID = wearedItem.ID;
+                client.character.Inventory[ItemSlot.index].Row = ItemSlot.y;
+                client.character.Inventory[ItemSlot.index].Column = ItemSlot.x;
+                client.character.Amulet = null;
 			break;
 
     		case 1: // Cape
                 var wearedItem = client.character.Cape;
-                client.character.Inventory[ItemSlot.index] = structs.StorageItem.unpack(structs.StorageItem.pack({
-                    "ID": wearedItem["ID"],
-                    "Column": ItemSlot.x,
-                    "Row": ItemSlot.y,
-                    "Amount" : 1,
-                    "Enchant" : wearedItem["Enchant"]
-                }));
+
+                client.character.Inventory[ItemSlot.index] = structs.StorageItem.objectify();
+                client.character.Inventory[ItemSlot.index].ID = wearedItem.ID;
+                client.character.Inventory[ItemSlot.index].Row = ItemSlot.y;
+                client.character.Inventory[ItemSlot.index].Column = ItemSlot.x;
+
                 client.character.Cape = structs.Equipt.unpack(structs.Equipt.pack({"ID": 0}));
     		break;
 
     		case 2: // Armor
                 var wearedItem = client.character.Armor;
-                client.character.Inventory[ItemSlot.index] = structs.StorageItem.unpack(structs.StorageItem.pack({
-                    "ID": wearedItem["ID"],
-                    "Column": ItemSlot.x,
-                    "Row": ItemSlot.y,
-                    "Amount" : 1,
-                    "Enchant" : wearedItem["Enchant"]
-                }));
-                client.character.Armor = structs.Equipt.unpack(structs.Equipt.pack({"ID": 0}));
+                client.character.Inventory[ItemSlot.index] = structs.StorageItem.objectify();
+                client.character.Inventory[ItemSlot.index].ID = wearedItem.ID;
+                client.character.Inventory[ItemSlot.index].Row = ItemSlot.y;
+                client.character.Inventory[ItemSlot.index].Column = ItemSlot.x;
+                client.character.Inventory[ItemSlot.index].Enchant = wearedItem.Enchant;
+                client.character.Inventory[ItemSlot.index].Combine = wearedItem.Combine;
+
+                client.character.Armor = null;
     		break;
 
     		case 3: // Gloves
 				var wearedItem = client.character.Glove;
-    			client.character.Inventory[ItemSlot.index] = structs.StorageItem.unpack(structs.StorageItem.pack({
-                    "ID": wearedItem["ID"],
-                    "Column": ItemSlot.x,
-                    "Row": ItemSlot.y,
-                    "Amount" : 1,
-                    "Enchant" : wearedItem["Enchant"]
-                }));
-    			client.character.Glove = structs.Equipt.unpack(structs.Equipt.pack({"ID": 0}));
+                client.character.Inventory[ItemSlot.index] = structs.StorageItem.objectify();
+                client.character.Inventory[ItemSlot.index].ID = wearedItem.ID;
+                client.character.Inventory[ItemSlot.index].Row = ItemSlot.y;
+                client.character.Inventory[ItemSlot.index].Column = ItemSlot.x;
+                client.character.Inventory[ItemSlot.index].Enchant = wearedItem.Enchant;
+                client.character.Inventory[ItemSlot.index].Combine = wearedItem.Combine;
+
+    			client.character.Glove = null;
     		break;
 
     		case 4: // Ring
                 var wearedItem = client.character.Ring;
-                client.character.Inventory[ItemSlot.index] = structs.StorageItem.unpack(structs.StorageItem.pack({
-                    "ID": wearedItem["ID"],
-                    "Column": ItemSlot.x,
-                    "Row": ItemSlot.y,
-                    "Amount" : 1,
-                    "Enchant" : wearedItem["Enchant"]
-                }));
-                client.character.Ring = structs.Equipt.unpack(structs.Equipt.pack({"ID": 0}));
+                client.character.Inventory[ItemSlot.index] = structs.StorageItem.objectify();
+                client.character.Inventory[ItemSlot.index].ID = wearedItem.ID;
+                client.character.Inventory[ItemSlot.index].Row = ItemSlot.y;
+                client.character.Inventory[ItemSlot.index].Column = ItemSlot.x;
+
+                client.character.Ring = null;
     		break;
 
     		case 5: // Boots
                 var wearedItem = client.character.Boot;
-                client.character.Inventory[ItemSlot.index] = structs.StorageItem.unpack(structs.StorageItem.pack({
-                    "ID": wearedItem["ID"],
-                    "Column": ItemSlot.x,
-                    "Row": ItemSlot.y,
-                    "Amount" : 1,
-                    "Enchant" : wearedItem["Enchant"]
-                }));
-                client.character.Boot = structs.Equipt.unpack(structs.Equipt.pack({"ID": 0}));
+                client.character.Inventory[ItemSlot.index] = structs.StorageItem.objectify();
+                client.character.Inventory[ItemSlot.index].ID = wearedItem.ID;
+                client.character.Inventory[ItemSlot.index].Row = ItemSlot.y;
+                client.character.Inventory[ItemSlot.index].Column = ItemSlot.x;
+                client.character.Inventory[ItemSlot.index].Enchant = wearedItem.Enchant;
+                client.character.Inventory[ItemSlot.index].Combine = wearedItem.Combine;
+
+                client.character.Boot = null;
     		break;
 
     		case 6: // Bootle
                 var wearedItem = client.character.CalbashBottle;
-                client.character.Inventory[ItemSlot.index] = structs.StorageItem.unpack(structs.StorageItem.pack({
-                    "ID": wearedItem["ID"],
-                    "Column": ItemSlot.x,
-                    "Row": ItemSlot.y,
-                    "Amount" : 1,
-                    "Enchant" : wearedItem["Enchant"]
-                }));
-                client.character.CalbashBottle = structs.Equipt.unpack(structs.Equipt.pack({"ID": 0}));
+                client.character.Inventory[ItemSlot.index] = structs.StorageItem.objectify();
+                client.character.Inventory[ItemSlot.index].ID = wearedItem.ID;
+                client.character.Inventory[ItemSlot.index].Row = ItemSlot.y;
+                client.character.Inventory[ItemSlot.index].Column = ItemSlot.x;
+
+                client.character.CalbashBottle = null;
     		break;
 
     		case 7: // Weapon
                 var wearedItem = client.character.Weapon;
-                client.character.Inventory[ItemSlot.index] = structs.StorageItem.unpack(structs.StorageItem.pack({
-                    "ID": wearedItem["ID"],
-                    "Column": ItemSlot.x,
-                    "Row": ItemSlot.y,
-                    "Amount" : 1,
-                    "Enchant" : wearedItem["Enchant"]
-                }));
-                client.character.Weapon = structs.Equipt.unpack(structs.Equipt.pack({"ID": 0}));
+                client.character.Inventory[ItemSlot.index] = structs.StorageItem.objectify();
+                client.character.Inventory[ItemSlot.index].ID = wearedItem.ID;
+                client.character.Inventory[ItemSlot.index].Row = ItemSlot.y;
+                client.character.Inventory[ItemSlot.index].Column = ItemSlot.x;
+                client.character.Inventory[ItemSlot.index].Enchant = wearedItem.Enchant;
+                client.character.Inventory[ItemSlot.index].Combine = wearedItem.Combine;
+
+                client.character.Weapon = null;
     		break;
 
     		case 8: // Pet
                 var wearedItem = client.character.Pet;
-                client.character.Inventory[ItemSlot.index] = structs.StorageItem.unpack(structs.StorageItem.pack({
-                    "ID": wearedItem["ID"],
-                    "Column": ItemSlot.x,
-                    "Row": ItemSlot.y,
-                    "Amount" : 1,
-                    "Enchant" : wearedItem["Enchant"]
-                }));
-                client.character.Pet = structs.Equipt.unpack(structs.Equipt.pack({"ID": 0}));
+                client.character.Inventory[ItemSlot.index] = structs.StorageItemPet.objectify();
+                client.character.Inventory[ItemSlot.index].ID = wearedItem.ID;
+                client.character.Inventory[ItemSlot.index].Row = ItemSlot.y;
+                client.character.Inventory[ItemSlot.index].Column = ItemSlot.x;
+                client.character.Inventory[ItemSlot.index].Growth = wearedItem.Growth;
+                client.character.Inventory[ItemSlot.index].Activity = wearedItem.Activity;
+
+                client.character.Pet = null;
     		break;
 
     		default:
@@ -758,33 +688,52 @@ ItemActions[0x0E] = function Recv_UnequipItem(client, input) { // COMPLETED
         client.character.markModified('Inventory');
         client.character.save();
 
-        // Handle item placement and save it to inventory
-	    client.write(new Buffer(packets.ItemActionReplyPacket2.pack({
-			PacketID: 0x2B,
-			ActionType: input.ActionType,
-			ItemUniqueID: input.ItemUniqueID,
-			ItemUniqueID2: input.ItemUniqueID2,
-			ItemID: input.ItemID,
-			Unknown3: input.Unknown3,
-			Unknown4: input.Unknown4,
-			Unknown5: input.Unknown5,
-			Amount: input.Amount,
-			InventoryIndex: input.InventoryIndex,
-			RowDrop: input.RowDrop,
-			ColumnPickup: input.ColumnPickup,
-			RowPickup: input.RowPickup,
-			ColumnMove: input.ColumnMove,
-			RowMove: input.RowMove,
-			Failed: 0
-	    })));
-
+        clientWriteItemActionSuccess(client, input);
     }
 };
 ItemActions[0x0F] = function Recv_MoveItemFromStorage(client, input) {
     NotImplemented(client, 'Recv_MoveItemFromStorage', input);
 };
-ItemActions[0x10] = function sub_462140(client, input) {
-    NotImplemented(client, 'sub_462140', input);
+ItemActions[0x10] = function Recv_GetItemFromGateMasterStorage(client, input) { // COMPLETED
+    var existingItem = client.character.Storage[input.InventoryIndex];
+
+    if(existingItem == undefined || input.ItemID !== existingItem.ID){
+        clientWriteItemActionFailed(client, input);
+        return;
+    }else{
+        var itemInfo = infos.Item[input.ItemID];
+        var getInventoryCollision = client.character.checkInventoryItemCollision(0, input.ColumnMove, input.RowMove, itemInfo.getSlotCount());
+    
+        if(!getInventoryCollision){
+            clientWriteItemActionFailed(client, input);
+            return;
+        }else{
+            client.character.Storage[input.InventoryIndex] = null;
+            if(itemInfo.ItemType === 22){
+                client.character.Inventory[getInventoryCollision.index] = structs.StorageItemPet.objectify();
+                client.character.Inventory[getInventoryCollision.index].Growth = existingItem.Growth;
+                client.character.Inventory[getInventoryCollision.index].Activity = existingItem.Activity;
+            }else{
+                client.character.Inventory[getInventoryCollision.index] = structs.StorageItem.objectify();
+
+                if(existingItem.Amount > 0 && existingItem.Amount === input.Amount)
+                client.character.Inventory[getInventoryCollision.index].Amount = existingItem.Amount;
+                else client.character.Inventory[getInventoryCollision.index].Amount = 0;
+
+                client.character.Inventory[getInventoryCollision.index].Enchant = existingItem.Enchant;
+                client.character.Inventory[getInventoryCollision.index].Combine = existingItem.Combine;
+            }
+
+
+            client.character.Inventory[getInventoryCollision.index].Column = getInventoryCollision.x;
+            client.character.Inventory[getInventoryCollision.index].Row = getInventoryCollision.y;
+            client.character.Inventory[getInventoryCollision.index].ID = input.ItemID;
+            client.character.markModified("Inventory");
+            client.character.markModified("Storage");
+            client.character.save();
+            clientWriteItemActionSuccess(client, input);
+        }
+    }
 };
 ItemActions[0x11] = function Recv_BuyItem(client, input) { // COMPLETED
     if(infos.Item[input.ItemID] === infos.Item[input.ItemID]){ // TODO: Check if the Npc has the item in their store
@@ -801,7 +750,7 @@ ItemActions[0x11] = function Recv_BuyItem(client, input) { // COMPLETED
                     return;
                 }
 
-                var InventoryItem = checkInventoryItemCollision(client.character.Inventory, 0, input.ColumnMove, input.RowMove, infos.Item[input.ItemID].getSlotCount());
+                var InventoryItem = client.character.checkInventoryItemCollision(0, input.ColumnMove, input.RowMove, infos.Item[input.ItemID].getSlotCount());
                 if(InventoryItem){
                     client.character.Silver -= infos.Item[input.ItemID].PurchasePrice*input.Amount;
                     client.character.Inventory[InventoryItem.index] = structs.StorageItem.objectify();
@@ -827,12 +776,10 @@ ItemActions[0x12] = function nullsub_4(client, input) {
     NotImplemented(client, 'nullsub_4', input);
 };
 
-ItemActions[0x13] = function Recv_MoveOnPillbar(client, input) { // COMPLETED?
-    console.log(input);
-
+ItemActions[0x13] = function Recv_MoveOnPillbar(client, input) { // COMPLETED
     if(input.InventoryIndex > 3 || input.RowPickup > 3 || input.InventoryIndex < 0 || input.RowPickup < 0 ){
         clientWriteItemActionFailed(client, input);
-        return true;
+        return;
     }
 
     var PickedItem = client.character.QuickUseItems[input.InventoryIndex];
@@ -840,12 +787,10 @@ ItemActions[0x13] = function Recv_MoveOnPillbar(client, input) { // COMPLETED?
 
     if(PickedItem === undefined || input.Amount <= 0 || input.Amount > 99){
         clientWriteItemActionFailed(client, input);
-        return true;
+        return;
     }else{
-        console.log(DropOnItem);
         if(DropOnItem === null){
             var Reminder = PickedItem.Amount - input.Amount;
-            console.log(Reminder);
             if(Reminder === 0){
                 client.character.QuickUseItems[input.InventoryIndex] = null;
                 client.character.QuickUseItems[input.RowPickup] = PickedItem;
@@ -859,34 +804,28 @@ ItemActions[0x13] = function Recv_MoveOnPillbar(client, input) { // COMPLETED?
         }else{
             if(DropOnItem.ID === undefined || PickedItem.ID === undefined){
                 clientWriteItemActionFailed(client, input);
-                return true;
+                return;
             }else if(DropOnItem.ID === PickedItem.ID){
                 if(infos.Item[PickedItem.ID].Stackable === 0 || input.Amount > PickedItem.Amount){
-                    console.log("Is not able to stack up");
                     clientWriteItemActionFailed(client, input);
-                    return true;
+                    return;
                 }else{
-                    console.log("Stacking up");
                     switch(infos.Item[PickedItem.ID].Stackable){
                         case 0: // Not allowed to be stacked
                             clientWriteItemActionFailed(client, input);
-                            return true;
+                            return;
                         break;
                         case 1: // Stack up to 99
                             var StackLimit = 99;
                             if( (input.Amount + DropOnItem.Amount) > StackLimit || (input.Amount + DropOnItem.Amount) <= 0 ){
                                 clientWriteItemActionFailed(client, input);
-                                return true;
+                                return;
                             }else{
-                                console.log("Stacking 99");
                                 var Reminder = PickedItem.Amount - input.Amount;
-                                console.log(Reminder);
                                 if(Reminder === 0)
                                 client.character.QuickUseItems[input.InventoryIndex] = null;
                                 else client.character.QuickUseItems[input.InventoryIndex].Amount = Reminder;
                                 client.character.QuickUseItems[input.RowPickup].Amount += input.Amount;
-
-                                console.log(client.character.QuickUseItems[input.InventoryIndex]);
                             }
                         break;
 
@@ -894,14 +833,14 @@ ItemActions[0x13] = function Recv_MoveOnPillbar(client, input) { // COMPLETED?
                             console.log("Is that item should be stacked? ID: " + PickedItem.ID);
                             clientWriteItemActionFailed(client, input);
                             client.sendInfoMessage("If you think that is the right item to be stacked, plase tell developers the Maximum stack size and this ID: " + PickedItem.ID);
-                            return true;
+                            return;
                         break;
                     }
                 }
             }
         }
     }
-    console.log("PASS");
+
     client.character.markModified('QuickUseItems');
     client.character.save();
     clientWriteItemActionSuccess(client, input);
@@ -919,35 +858,36 @@ ItemActions[0x14] = function Recv_MoveItem(client, input) { // COMPLETED
         ) {
         console.log("Something went wrong! InventoryIndex: " + input.InventoryIndex);
         clientWriteItemActionFailed(client, input);
-        return true;
+        return;
     } else {
-        var InventoryItemCollision = checkInventoryItemCollision(client.character.Inventory, 0, input.ColumnMove, input.RowMove, getSlotCount(infos.Item[InventoryItem.ID].ItemType));
+        var InventoryItemCollision = client.character.checkInventoryItemCollision(0, input.ColumnMove, input.RowMove, getSlotCount(infos.Item[InventoryItem.ID].ItemType));
+
         if(!InventoryItemCollision){
             if(InventoryItem.Amount >= 1){
                 if(infos.Item[InventoryItem.ID].Stackable === 0 || input.Amount <= 0 || input.Amount > InventoryItem.Amount){
                     clientWriteItemActionFailed(client, input);
-                    return true;
+                    return;
                 }else{
                     var stackingIndex = getStackingIventoryItemIndex(client.character.Inventory, 0, input.ColumnMove, input.RowMove, InventoryItem.ID);
                     var stackingItem = client.character.Inventory[stackingIndex];
                     switch(infos.Item[InventoryItem.ID].Stackable){
                         case 0: // Not allowed to be stacked
                             clientWriteItemActionFailed(client, input);
-                            return true;
+                            return;
                         break;
                         case 1: // Stack up to 99
                             var StackLimit = 99;
                             if( (input.Amount + stackingItem.Amount) > StackLimit || (input.Amount + stackingItem.Amount) <= 0 ){
                                 clientWriteItemActionFailed(client, input);
-                                return true;
+                                return;
                             }else{
                                 if(stackingIndex === false){
                                     clientWriteItemActionFailed(client, input);
-                                    return true;
+                                    return;
                                 }else{
                                     if( (client.character.Inventory[stackingIndex]+input.Amount) > StackLimit ){
                                         clientWriteItemActionFailed(client, input);
-                                        return true;
+                                        return;
                                     }else{
                                         var Reminder = InventoryItem.Amount - input.Amount;
                                         if(Reminder === 0)
@@ -963,7 +903,7 @@ ItemActions[0x14] = function Recv_MoveItem(client, input) { // COMPLETED
                             console.log("Is that item should be stacked? ID: " + InventoryItem.ID);
                             clientWriteItemActionFailed(client, input);
                             client.sendInfoMessage("If you think that is the right item to be stacked, plase tell developers the Maximum stack size and this ID: " + InventoryItem.ID);
-                            return true;
+                            return;
                         break;
                     }
                 }
@@ -971,37 +911,19 @@ ItemActions[0x14] = function Recv_MoveItem(client, input) { // COMPLETED
                 client.character.markModified('Inventory');
                 client.character.save();
 
-                client.write(new Buffer(packets.ItemActionReplyPacket2.pack({
-                    PacketID: 0x2B,
-                    ActionType: input.ActionType,
-                    ItemUniqueID: input.ItemUniqueID,
-                    ItemUniqueID2: input.ItemUniqueID2,
-                    ItemID: input.ItemID,
-                    Unknown3: input.Unknown3,
-                    Unknown4: input.Unknown4,
-                    Unknown5: input.Unknown5,
-                    Amount: input.Amount,
-                    InventoryIndex: input.InventoryIndex,
-                    RowDrop: input.RowDrop,
-                    ColumnPickup: input.ColumnPickup,
-                    RowPickup: input.RowPickup,
-                    ColumnMove: input.ColumnMove,
-                    RowMove: input.RowMove,
-                    Failed: 0
-                })));
+                clientWriteItemActionSuccess(client, input);
             }else{
                 clientWriteItemActionFailed(client, input);
-                return true;
+                return;
             }
         }else{
-            //console.log(input);
             var PickedItemInventory = client.character.Inventory[input.InventoryIndex];
-            //TODO: Stacking and unstacking items
+
             if(input.Amount > 0){
                 if(input.Amount > PickedItemInventory.Amount || input.Amount <= 0){
                     console.log("Hack attempt! User defined amount of moving item which is Equal to 0 or more than stored amount!");
                     clientWriteItemActionFailed(client, input);
-                    return true;  
+                    return;  
                 }else if(input.Amount === PickedItemInventory.Amount){
                     client.character.Inventory[InventoryItemCollision.index] = PickedItemInventory;
                     client.character.Inventory[input.InventoryIndex] = null;
@@ -1010,12 +932,11 @@ ItemActions[0x14] = function Recv_MoveItem(client, input) { // COMPLETED
                 }else{
                     var Reminder = PickedItemInventory.Amount - input.Amount;
                     client.character.Inventory[input.InventoryIndex].Amount = Reminder;
-                    client.character.Inventory[InventoryItemCollision.index] = structs.StorageItem.unpack(structs.StorageItem.pack({
-                        "ID": PickedItemInventory.ID,
-                        "Column": InventoryItemCollision.x,
-                        "Row": InventoryItemCollision.y,
-                        "Amount": input.Amount
-                    }));
+                    client.character.Inventory[InventoryItemCollision.index] = structs.StorageItem.objectify();
+                    client.character.Inventory[InventoryItemCollision.index].ID = PickedItemInventory.ID;
+                    client.character.Inventory[InventoryItemCollision.index].Column = InventoryItemCollision.x;
+                    client.character.Inventory[InventoryItemCollision.index].Row = InventoryItemCollision.y;
+                    client.character.Inventory[InventoryItemCollision.index].Amount = PickedItemInventory.Amount;
                 }
             }else{
                 client.character.Inventory[InventoryItemCollision.index] = PickedItemInventory;
@@ -1026,32 +947,28 @@ ItemActions[0x14] = function Recv_MoveItem(client, input) { // COMPLETED
 
             client.character.markModified('Inventory');
             client.character.save();
-    	    client.write(new Buffer(packets.ItemActionReplyPacket2.pack({
-    			PacketID: 0x2B,
-    			ActionType: input.ActionType,
-    			ItemUniqueID: input.ItemUniqueID,
-    			ItemUniqueID2: input.ItemUniqueID2,
-    			ItemID: input.ItemID,
-    			Unknown3: input.Unknown3,
-    			Unknown4: input.Unknown4,
-    			Unknown5: input.Unknown5,
-    			Amount: input.Amount,
-    			InventoryIndex: input.InventoryIndex,
-    			RowDrop: input.RowDrop,
-    			ColumnPickup: input.ColumnPickup,
-    			RowPickup: input.RowPickup,
-    			ColumnMove: input.ColumnMove,
-    			RowMove: input.RowMove,
-    			Failed: 0
-    	    })));
+            clientWriteItemActionSuccess(client, input);
         }
     }
 };
 ItemActions[0x15] = function sub_462750(client, input) {
     NotImplemented(client, 'sub_462750', input);
 };
-ItemActions[0x16] = function Recv_GateMasterBankSilver(client, input) {
-    NotImplemented(client, 'Recv_GateMasterBankSilver', input);
+ItemActions[0x16] = function Recv_GateMasterBankSilver(client, input) { // COMPLETED
+    var clientSilver = client.character.Silver;
+    var MAX_SILVER = packets.MAX_SILVER;
+
+    if(input.Amount > MAX_SILVER || input.Amount <= 0 || (clientSilver-input.Amount) < 0 || (client.character.StorageSilver+input.Amount) > MAX_SILVER){
+        clientWriteItemActionFailed(client, input);
+        return;
+    }else{
+        client.character.Silver -= input.Amount;
+        client.character.StorageSilver += input.Amount;
+        client.character.save();
+
+        clientWriteItemActionSuccess(client, input);
+        return;
+    }
 };
 ItemActions[0x17] = function nullsub_4(client, input) {
     NotImplemented(client, 'nullsub_4', input);
@@ -1059,8 +976,21 @@ ItemActions[0x17] = function nullsub_4(client, input) {
 ItemActions[0x18] = function sub_462840(client, input) {
     NotImplemented(client, 'sub_462840', input);
 };
-ItemActions[0x19] = function sub_4628A0(client, input) {
-    NotImplemented(client, 'sub_4628A0', input);
+ItemActions[0x19] = function Recv_GateMasterBankGetSilver(client, input) { // COMPLETED
+    var clientSilver = client.character.Silver;
+    var MAX_SILVER = packets.MAX_SILVER;
+
+    if(input.Amount > MAX_SILVER || input.Amount <= 0 || (clientSilver+input.Amount) > MAX_SILVER || (client.character.StorageSilver-input.Amount) < 0){
+        clientWriteItemActionFailed(client, input);
+        return;
+    }else{
+        client.character.Silver += input.Amount;
+        client.character.StorageSilver -= input.Amount;
+        client.character.save();
+
+        clientWriteItemActionSuccess(client, input);
+        return;
+    }
 };
 ItemActions[0x1A] = function nullsub_4(client, input) {
     NotImplemented(client, 'nullsub_4', input);
@@ -1070,11 +1000,11 @@ ItemActions[0x1B] = function Recv_SkillToBar(client, input) { // COMPLETED
 
     if(SelectedSkill === undefined || SelectedSkill === null){
         clientWriteItemActionFailed(client, input);
-        return true;
+        return;
     }else{
         if(SelectedSkill.ID === undefined || SelectedSkill.Level === undefined ){
             clientWriteItemActionFailed(client, input);
-            return true;
+            return;
         }else{
             if(input.Amount <= SelectedSkill.Level && input.Amount > 0 && client.character.SkillBar[input.RowPickup] === null){
                 client.character.SkillBar[input.RowPickup] = structs.QuickUseSkill.objectify();
@@ -1102,24 +1032,25 @@ ItemActions[0x1C] = function Recv_RemoveSkillFromBar(client, input) { // COMPLET
 };
 ItemActions[0x1D] = function Recv_SkillUp(client, input) { // COMPLETED
     var SelectedSkill = client.character.SkillList[input.InventoryIndex];
+
     if(SelectedSkill === undefined || SelectedSkill === null){
         clientWriteItemActionFailed(client, input);
-        return true;
+        return;
     }else{
         if(client.character.SkillPoints === undefined || client.character.Level === undefined){
             clientWriteItemActionFailed(client, input);
-            return true;
+            return;
         }else{
-            if(client.character.SkillPoints >= 1 && SelectedSkill.Level <= infos.Skill[input.ItemID].MaxSkillLevel && SelectedSkill.Level >= 1){
+            if(client.character.SkillPoints >= 1 && SelectedSkill.Level < infos.Skill[SelectedSkill.ID].MaxSkillLevel && SelectedSkill.Level >= 1){
                 client.character.SkillPoints -= 1;
                 client.character.SkillList[input.InventoryIndex].Level += 1;
                 client.character.markModified('SkillList');
                 client.character.save();
                 clientWriteItemActionSuccess(client, input);
-                return true;
+                return;
             }else{
                 clientWriteItemActionFailed(client, input);
-                return true;
+                return;
             }
         }
     }

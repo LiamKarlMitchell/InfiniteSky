@@ -82,15 +82,15 @@ var characterSchema = mongoose.Schema({
 	StatDexterity: {type: Number, default: 0 },
 	StatVitality: {type: Number, default: 0 },
 
-	Ring: itemEquip, // 0
-	Cape: itemEquip, // 1
-	Armor: itemEquip, // 2
-	Glove: itemEquip, // 3
-	Amulet: itemEquip, // 4
-	Boot: itemEquip, // 5
-	CalbashBottle: itemEquip, // 6
-	Weapon: itemEquip, // 7
-	Pet: petEquip, // 8
+	Ring: {type: itemEquip, default: null}, // 0
+	Cape: {type: itemEquip, default: null}, // 1
+	Armor: {type: itemEquip, default: null}, // 2
+	Glove: {type: itemEquip, default: null}, // 3
+	Amulet: {type: itemEquip, default: null}, // 4
+	Boot: {type: itemEquip, default: null}, // 5
+	CalbashBottle: {type: itemEquip, default: null}, // 6
+	Weapon: {type: itemEquip, default: null}, // 7
+	Pet: {type: petEquip, default :null}, // 8
 
 	StorageUse: { type: Number, default: 0 },
 	Silver: { type: Number, default: 0 },
@@ -288,6 +288,50 @@ characterSchema.methods.checkItemSlotFree = function(Column,Row,SlotSize,ItemID)
 		}
 	}
 	return true;
+}
+
+characterSchema.methods.checkInventoryItemCollision = function checkInventoryItemCollision(page, x1, y1, s1) {
+    if(x1 < 0 || y1 < 0) return false;
+    var inventory = this.Inventory;
+
+    var reservedSlots = [];
+
+    var pageSize = 8;
+    for(var initArraySize8 = 0; initArraySize8 < pageSize; initArraySize8++){
+        reservedSlots[initArraySize8] = [];
+        for(var initArraySize8Row = 0; initArraySize8Row < pageSize; initArraySize8Row++){
+            reservedSlots[initArraySize8][initArraySize8Row] = false;
+        }
+    }
+    var freeInventoryIndex;
+    for (var i = 0; i < 32+(page*32); i++) {
+        var object = inventory[i + (page * 32)];
+        if (object !== undefined && object !== null) {
+            var itemInfo = infos.Item[object.ID];
+            if (itemInfo !== undefined) {
+                var size = itemInfo.getSlotCount();
+                var posX = object.Column;
+                var posY = object.Row;
+
+                reservedSlots[posX][posY] = true;
+                if(size===4){
+                    reservedSlots[posX][posY+1] = true;
+                    reservedSlots[posX+1][posY] = true;
+                    reservedSlots[posX+1][posY+1] = true;
+                }
+            }
+
+        }else if(freeInventoryIndex === undefined && object === null){
+            freeInventoryIndex = i;
+        }
+    }
+
+    if(s1 === 1 && reservedSlots[x1][y1]) return false;
+    if(s1 === 4 && (reservedSlots[x1][y1] === undefined || reservedSlots[x1+1][y1] === undefined || reservedSlots[x1][y1+1] === undefined || reservedSlots[x1+1][y1+1] === undefined)) return false;
+    if(s1 === 4 && (reservedSlots[x1][y1] || reservedSlots[x1+1][y1] || reservedSlots[x1][y1+1] || reservedSlots[x1+1][y1+1])) return false;
+
+
+    return {index: freeInventoryIndex, x: x1, y: y1, page: page};
 }
 
 //Constructor

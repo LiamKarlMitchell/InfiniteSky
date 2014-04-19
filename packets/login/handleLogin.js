@@ -50,8 +50,6 @@ var LoginPacket = restruct.
 	string('Username', LoginPC.UsernameLength + 1).
 	string('Password', LoginPC.PasswordLength + 1).
 	pad(63);
-//console.log(LoginPacket.size);
-// Login Packet
 
 LoginPC.Set(0x03, {
 	Restruct: LoginPacket,
@@ -79,12 +77,20 @@ LoginPC.Set(0x03, {
 
 				for (var i = 0; i < charactersLength; i++) {
 					socket.characters[i] = characters[i];
-					socket.write(new Buffer(LoginPC.CharacterInfoPacket.pack({
-						packetID: 0x05,
-						Slot: i,
-						Exists: 1,
-						Character: characters[i]
-					})));
+					socket.write(
+						structs.setInventoryStorageOnOffsets(
+							new Buffer(LoginPC.CharacterInfoPacket.pack({
+								packetID: 0x05,
+								Slot: i,
+								Exists: 1,
+								Character: characters[i]
+							})),
+							350,
+							characters[i].Inventory,
+							3350,
+							characters[i].Storage
+						)
+					);
 				}
 
 				for (var i = charactersLength; i < 3; i++) {

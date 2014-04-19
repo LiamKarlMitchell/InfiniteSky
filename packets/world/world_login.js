@@ -49,14 +49,34 @@ WorldPC.Set(0x02, {
 		// Add the socket/client to the Zone.
 		// Send Character Info
 		console.log('Sending WorldCharacterInfoPacket');
+
+
+		//TODO: Make init function to initialize DB for character and fill the empty spaces if needed
+		var storage = socket.character.Storage;
+		if(storage.length === 0){
+			for(var i = 0; i < 56; i++){
+				socket.character.Storage.push(null);
+			}
+
+			socket.character.markModified('Storage');
+			socket.character.save();
+		}
+
+		var prepareInventoryBuffer = structs.setInventoryStorageOnOffsets(
+					new Buffer(WorldCharacterInfoPacket.pack({
+						PacketID: 0x16,
+						Status: 0,
+						character: socket.character,
+						Unknown: 0x00
+					})),
+					350,
+					socket.character.Inventory,
+					3350,
+					socket.character.Storage
+				);
 		socket.write(
-		new Buffer(
-		WorldCharacterInfoPacket.pack({
-			PacketID: 0x16,
-			Status: 0,
-			character: socket.character,
-			Unknown: 0x00
-		})));
+			prepareInventoryBuffer
+		);
 
 		// Send Faction/Zone Packets
 		// Yeah I know sync is bad but its for testing purposes :P

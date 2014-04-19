@@ -121,6 +121,8 @@ packets.GuildTag_Length=12;
 packets.MessageLength=50;
 packets.GiftCodeLength=32;
 
+packets.MAX_SILVER = 2147483647;
+
 //Enums
 packets.LoginStatus = {
   Success: {value: 0, name: "LoginStatus_Success"}, 
@@ -1147,20 +1149,31 @@ packets.SystemInfoNoticeTimesPacket = restruct.
 // 00000210: 0000 0000 0000 0000 0000 0000 0000 0000  ................
 // 00000220: 00                                       .
 packets.TradeShopItem = restruct.
+    int32lu('').
     int32lu('ItemID').
     int32lu('InventoryIndex').
     int32lu('Amount').
-    int32lu('Price').
-    int32lu("Enchant");
+    int32lu("Price");
 
 // Packet ID: 0x34
 packets.TradeShop = restruct.
-    int8lu('PacketID').
-    string('Name',28).  
+    string('Name',24).  
     // Repeats 5x5 so 25 times
     struct('Items',packets.TradeShopItem,25).
-    int32lu('Unknown2'). // Money Made?
-    int32lu('Unknown3'); // Time Open?
+    pad(4);
+
+packets.TradeShopReply = restruct.
+    int8lu('PacketID').
+    string('Name',24).  
+    // Repeats 5x5 so 25 times
+    struct('Items',packets.TradeShopItem,25).
+    pad(3);
+packets.TradeShopReply2 = restruct.
+    int8lu('PacketID').
+    pad(526);
+
+console.log("Restruct size: " + packets.TradeShop.size);
+console.log("Reply size: " + packets.TradeShopReply2.size);
 
 // When canceling trade request with another player
 //Unhandled Packet ID 39
