@@ -23,7 +23,7 @@ structs.SmallStorageItem = restruct.
 	int32lu('Amount').
 	int8lu('Enchant').
 	int8lu('Combine').
-	int16lu('Unk');
+	int16lu('unk');
 
 structs.SmallStorageItemPet = restruct.
 	int32lu('ID').
@@ -153,7 +153,8 @@ structs.Character = restruct.
 	int32lu('Silver'). // here! // 324
 	struct('Inventory',structs.StorageItem,64).
 	struct('QuickUseItems',structs.QuickUseItem,4).
-	int8lu('UnknownStuff1',1012).
+	int32lu('StorageSilver').
+	int8lu('UnknownStuff1',1008).
  
 	struct('SkillList',structs.QuickUseSkill,30).
 	struct('SkillBar',structs.QuickUseSkill,24).
@@ -186,7 +187,7 @@ structs.Character = restruct.
  int32lu('RealZ'). // 3332
  int32lu('Health'). // 3336
  int32lu('Chi'). // 3340
- int32lu('StorageSilver'). // 3344
+ int32lu('BankSilver'). // 3344
  int32lu(''). // 3348
  int32lu(''). // 3352
  int32lu(''). // 3356
@@ -429,7 +430,7 @@ structs.Character = restruct.
  int32lu(''). // 4304
  int32lu(''). // 4308
  int32lu(''). // 4312
- int32lu('SilverBig'). // 4316
+ int32lu(''). // 4316
  int32lu('ElementalDamage'). // 4320
  int32lu('ElementalDefense'). // 4324
  int32lu('DarkDamage'). // 4328
@@ -437,9 +438,9 @@ structs.Character = restruct.
  int32lu(''). // 4336
  int32lu('ChanceDodge_Hit'). // 4340
  int32lu('DamageBonus'). // 4344
- int32lu('SomeRandomKoreanBuff1'). // 4348
+ int32lu('SilverBig'). // 4348
  int32lu(''). // 4352
- int32lu(''). // 4356 Wrong spot
+ int32lu(''). // 4356
  int32lu(''). // 4360
  int32lu('Daily1'). // 4364
  int32lu('DailyPvPKill'). // 4368
@@ -466,7 +467,7 @@ structs.WREGION = restruct.
 
 });
 
-structs.setInventoryStorageOnOffsets = function setInventoryOnOffset(buffer, offset, inventory, storage_offset, storage){
+structs.setInventoryStorageOnOffsets = function setInventoryOnOffset(buffer, offset, inventory, storage_offset, storage, bank_offset, bank){
     var InventoryBufferSize = structs.StorageItem.size * inventory.length;
     var InventoryBuffer = new Buffer(InventoryBufferSize);
 
@@ -513,7 +514,7 @@ structs.setInventoryStorageOnOffsets = function setInventoryOnOffset(buffer, off
     for(var sI = 0; sI < storage.length; sI++){
         var object = storage[sI];
         var workingBuffer;
-        if(object === null){
+        if(object === null || object === undefined){
             workingBuffer = new Buffer(structs.SmallStorageItem.pack());
             workingBuffer.copy(StorageBuffer, StorageOffset);
         }else{
@@ -543,6 +544,47 @@ structs.setInventoryStorageOnOffsets = function setInventoryOnOffset(buffer, off
     }
 
     StorageBuffer.copy(buffer, storage_offset, 0, StorageBuffer.length);
+
+
+    var BankBufferSize = structs.SmallStorageItem.size * bank.length;
+    var BankBuffer = new Buffer(BankBufferSize);
+
+    var BankOffset = 0;
+
+    for(var i = 0; i < bank.length; i++){
+        var object = bank[i];
+        var workingBuffer;
+        if(object === null || object === undefined){
+            workingBuffer = new Buffer(structs.SmallStorageItem.pack());
+            workingBuffer.copy(BankBuffer, BankOffset);
+        }else{
+            var item = infos.Item[object.ID];
+
+            if(item == undefined){
+                workingBuffer = new Buffer(structs.SmallStorageItem.pack(
+                    object
+                ));
+            }else{
+
+                if(item.ItemType === 22){
+                    workingBuffer = new Buffer(structs.SmallStorageItemPet.pack(
+                        object
+                    ));
+                }else{
+                    workingBuffer = new Buffer(structs.SmallStorageItem.pack(
+                        object
+                    ));
+                }
+            }
+
+            workingBuffer.copy(BankBuffer, BankOffset);
+        }
+
+        BankOffset += structs.SmallStorageItem.size;
+    }
+
+    BankBuffer.copy(buffer, bank_offset, 0, BankBuffer.length);
+
 
     return buffer;
 }

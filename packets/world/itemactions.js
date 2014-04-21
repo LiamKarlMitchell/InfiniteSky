@@ -371,12 +371,49 @@ ItemActions[0x03] = function Recv_EquipItem(client, input) { // COMPLETED
     clientWriteItemActionSuccess(client, input);
 };
 ItemActions[0x04] = function Recv_Move_Item(client, input) {
-    NotImplemented(client, 'Recv_Move_Item', input);
+    var StorageItem = client.character.Storage[input.InventoryIndex];
+    var ExistingItem = client.character.Storage[input.RowPickup];
+
+    if(StorageItem === undefined || StorageItem === null){
+        clientWriteItemActionFailed(client, input);
+        return; 
+    }else{
+        if(input.Amount > 0 && StorageItem.Amount > 0 && StorageItem.Amount <= 99 && input.Amount <= 99 && input.ItemID === StorageItem.ID){
+            var Reminder = StorageItem.Amount - input.Amount;
+            if(ExistingItem === undefined || ExistingItem === null){
+                client.character.Storage[input.RowPickup] = structs.SmallStorageItem.objectify();
+                client.character.Storage[input.RowPickup].Amount = input.Amount;
+                client.character.Storage[input.RowPickup].ID = input.ItemID;
+            }else if(input.ItemID === ExistingItem.ID){
+                if((ExistingItem.Amount+input.Amount) > 99 || (ExistingItem.Amount+input.Amount) < 0){
+                    clientWriteItemActionFailed(client, input);
+                    return; 
+                }else{
+                    client.character.Storage[input.RowPickup].Amount += input.Amount;
+                }
+            }
+
+            if(Reminder === 0){
+                client.character.Storage[input.InventoryIndex] = null;
+            }else{
+                client.character.Storage[input.InventoryIndex].Amount = Reminder;
+            }
+        }else{
+            if(ExistingItem === undefined || ExistingItem === null){
+                client.character.Storage[input.RowPickup] = StorageItem;
+                client.character.Storage[input.InventoryIndex] = null;
+            }else{
+                clientWriteItemActionFailed(client, input);
+                return; 
+            }
+        }
+    }
+
+    client.character.markModified('Storage');
+    client.character.save();
+    clientWriteItemActionSuccess(client, input);
 };
-ItemActions[0x05] = function Recv_UnequipItem(client, input) {
-    NotImplemented(client, 'Recv_UnequipItem', input);
-};
-ItemActions[0x06] = function Recv_StoreItemInGateMaster(client, input) { // COMPLETED
+ItemActions[0x05] = function Recv_StoreItemInCharacterPrivateStorage(client, input) {
     var InventoryItem = client.character.Inventory[input.InventoryIndex];
     var ExistingItem = client.character.Storage[input.RowPickup];
 
@@ -411,18 +448,66 @@ ItemActions[0x06] = function Recv_StoreItemInGateMaster(client, input) { // COMP
         }
 
 
-        var storage = client.character.Storage;
-        for(var i = 0; i < 56; i++){
-            if(storage[i] == undefined)
+        var Storage = client.character.Storage;
+        for(var i = 0; i < 28; i++){
+            if(Storage[i] == undefined)
                 client.character.Storage[i] = null;
         }
 
         client.character.Inventory[input.InventoryIndex] = null;
 
+        client.character.markModified('Inventory');
         client.character.markModified('Storage');
+        client.character.save();
+        clientWriteItemActionSuccess(client, input);
+    }
+};
+ItemActions[0x06] = function Recv_StoreItemInGateMaster(client, input) { // COMPLETED
+    var InventoryItem = client.character.Inventory[input.InventoryIndex];
+    var ExistingItem = client.character.Bank[input.RowPickup];
+
+    if(ExistingItem != undefined || InventoryItem === null || InventoryItem === undefined){
+        clientWriteItemActionFailed(client, input);
+        return;
+    }else{
+        var item = infos.Item[InventoryItem.ID];
+        if(item.ItemType !== 22 && input.Amount > 0 && InventoryItem.Amount !== input.Amount){
+            clientWriteItemActionFailed(client, input);
+            return;
+        }else if(item.ItemType !== 22 && input.Amount === 0 && InventoryItem.Amount !== input.Amount){
+            clientWriteItemActionFailed(client, input);
+            return;
+        }else if(item.ItemType === 22 && input.Amount !== InventoryItem.Activity){
+            clientWriteItemActionFailed(client, input);
+            return;
+        }
+
+
+        if(item.ItemType === 22){
+            client.character.Bank[input.RowPickup] = structs.SmallStorageItemPet.objectify();
+            client.character.Bank[input.RowPickup].ID = InventoryItem.ID;
+            client.character.Bank[input.RowPickup].Growth = InventoryItem.Growth;
+            client.character.Bank[input.RowPickup].Activity = InventoryItem.Activity;
+        }else{
+            client.character.Bank[input.RowPickup] = structs.SmallStorageItem.objectify();
+            client.character.Bank[input.RowPickup].ID = InventoryItem.ID;
+            client.character.Bank[input.RowPickup].Amount = InventoryItem.Amount;
+            client.character.Bank[input.RowPickup].Enchant = InventoryItem.Enchant;
+            client.character.Bank[input.RowPickup].Combine = InventoryItem.Combine;
+        }
+
+
+        var Bank = client.character.Bank;
+        for(var i = 0; i < 56; i++){
+            if(Bank[i] == undefined)
+                client.character.Bank[i] = null;
+        }
+
+        client.character.Inventory[input.InventoryIndex] = null;
+
         client.character.markModified('Inventory');
         client.character.save();
-
+        client.character.saveBank();
         clientWriteItemActionSuccess(client, input);
     }
 
@@ -439,6 +524,8 @@ ItemActions[0x07] = function Recv_SellItem(client, input) { // COMPLETED TODO: M
             clientWriteItemActionFailed(client, input);
             return;
         }else{
+            if(sellingItem.Amount == undefined)
+                input.Amount = 0;
             var sellPrice = input.Amount <= 99 && input.Amount > 0 ? infos.Item[input.ItemID].SalePrice * input.Amount : infos.Item[input.ItemID].SalePrice;
 
             if((client.character.Silver + sellPrice) > MAX_SILVER){
@@ -448,7 +535,7 @@ ItemActions[0x07] = function Recv_SellItem(client, input) { // COMPLETED TODO: M
 
             var Reminder = sellingItem.Amount - input.Amount;
 
-            if(Reminder === 0){
+            if(Reminder === 0 || sellingItem.Amount == undefined){
                 client.character.Inventory[input.InventoryIndex] = null;
             }else if(Reminder > 0 && Reminder < 99){
                 client.character.Inventory[input.InventoryIndex].Amount = Reminder;
@@ -693,15 +780,14 @@ ItemActions[0x0E] = function Recv_UnequipItem(client, input) { // COMPLETED
 };
 ItemActions[0x0F] = function Recv_MoveItemFromStorage(client, input) {
     NotImplemented(client, 'Recv_MoveItemFromStorage', input);
-};
-ItemActions[0x10] = function Recv_GetItemFromGateMasterStorage(client, input) { // COMPLETED
+    console.log(input);
     var existingItem = client.character.Storage[input.InventoryIndex];
 
     if(existingItem == undefined || input.ItemID !== existingItem.ID){
         clientWriteItemActionFailed(client, input);
         return;
     }else{
-        var itemInfo = infos.Item[input.ItemID];
+        var itemInfo = infos.Item[existingItem.ID];
         var getInventoryCollision = client.character.checkInventoryItemCollision(0, input.ColumnMove, input.RowMove, itemInfo.getSlotCount());
     
         if(!getInventoryCollision){
@@ -731,6 +817,47 @@ ItemActions[0x10] = function Recv_GetItemFromGateMasterStorage(client, input) { 
             client.character.markModified("Inventory");
             client.character.markModified("Storage");
             client.character.save();
+            clientWriteItemActionSuccess(client, input);
+        }
+    }
+};
+ItemActions[0x10] = function Recv_GetItemFromGateMasterStorage(client, input) { // COMPLETED
+    var existingItem = client.character.Bank[input.InventoryIndex];
+
+    if(existingItem == undefined || input.ItemID !== existingItem.ID){
+        clientWriteItemActionFailed(client, input);
+        return;
+    }else{
+        var itemInfo = infos.Item[existingItem.ID];
+        var getInventoryCollision = client.character.checkInventoryItemCollision(0, input.ColumnMove, input.RowMove, itemInfo.getSlotCount());
+    
+        if(!getInventoryCollision){
+            clientWriteItemActionFailed(client, input);
+            return;
+        }else{
+            client.character.Bank[input.InventoryIndex] = null;
+            if(itemInfo.ItemType === 22){
+                client.character.Inventory[getInventoryCollision.index] = structs.StorageItemPet.objectify();
+                client.character.Inventory[getInventoryCollision.index].Growth = existingItem.Growth;
+                client.character.Inventory[getInventoryCollision.index].Activity = existingItem.Activity;
+            }else{
+                client.character.Inventory[getInventoryCollision.index] = structs.StorageItem.objectify();
+
+                if(existingItem.Amount > 0 && existingItem.Amount === input.Amount)
+                client.character.Inventory[getInventoryCollision.index].Amount = existingItem.Amount;
+                else client.character.Inventory[getInventoryCollision.index].Amount = 0;
+
+                client.character.Inventory[getInventoryCollision.index].Enchant = existingItem.Enchant;
+                client.character.Inventory[getInventoryCollision.index].Combine = existingItem.Combine;
+            }
+
+
+            client.character.Inventory[getInventoryCollision.index].Column = getInventoryCollision.x;
+            client.character.Inventory[getInventoryCollision.index].Row = getInventoryCollision.y;
+            client.character.Inventory[getInventoryCollision.index].ID = input.ItemID;
+            client.character.markModified("Inventory");
+            client.character.save();
+            client.character.saveBank();
             clientWriteItemActionSuccess(client, input);
         }
     }
@@ -846,15 +973,13 @@ ItemActions[0x13] = function Recv_MoveOnPillbar(client, input) { // COMPLETED
     clientWriteItemActionSuccess(client, input);
 };
 ItemActions[0x14] = function Recv_MoveItem(client, input) { // COMPLETED
-    //NotImplemented(client, 'Recv_MoveItem', input);
-    //console.log(input);
-
     var InventoryItem = client.character.Inventory[input.InventoryIndex];
-    if (
-        InventoryItem === undefined
+
+    if (InventoryItem === undefined
         || InventoryItem === null
         || InventoryItem.ID === 0
         || InventoryItem.ID === undefined
+        || infos.Item[InventoryItem.ID] === undefined
         ) {
         console.log("Something went wrong! InventoryIndex: " + input.InventoryIndex);
         clientWriteItemActionFailed(client, input);
@@ -917,32 +1042,32 @@ ItemActions[0x14] = function Recv_MoveItem(client, input) { // COMPLETED
                 return;
             }
         }else{
-            var PickedItemInventory = client.character.Inventory[input.InventoryIndex];
-
             if(input.Amount > 0){
-                if(input.Amount > PickedItemInventory.Amount || input.Amount <= 0){
+                if(input.Amount > InventoryItem.Amount || input.Amount <= 0){
                     console.log("Hack attempt! User defined amount of moving item which is Equal to 0 or more than stored amount!");
                     clientWriteItemActionFailed(client, input);
                     return;  
-                }else if(input.Amount === PickedItemInventory.Amount){
-                    client.character.Inventory[InventoryItemCollision.index] = PickedItemInventory;
+                }else if(input.Amount === InventoryItem.Amount){
+                    client.character.Inventory[InventoryItemCollision.index] = InventoryItem;
                     client.character.Inventory[input.InventoryIndex] = null;
                     client.character.Inventory[InventoryItemCollision.index].Row = input.RowMove;
                     client.character.Inventory[InventoryItemCollision.index].Column = input.ColumnMove;
+                    client.character.Inventory[InventoryItemCollision.index].ID = InventoryItem.ID;
                 }else{
-                    var Reminder = PickedItemInventory.Amount - input.Amount;
+                    var Reminder = InventoryItem.Amount - input.Amount;
                     client.character.Inventory[input.InventoryIndex].Amount = Reminder;
                     client.character.Inventory[InventoryItemCollision.index] = structs.StorageItem.objectify();
-                    client.character.Inventory[InventoryItemCollision.index].ID = PickedItemInventory.ID;
+                    client.character.Inventory[InventoryItemCollision.index].ID = InventoryItem.ID;
                     client.character.Inventory[InventoryItemCollision.index].Column = InventoryItemCollision.x;
                     client.character.Inventory[InventoryItemCollision.index].Row = InventoryItemCollision.y;
-                    client.character.Inventory[InventoryItemCollision.index].Amount = PickedItemInventory.Amount;
+                    client.character.Inventory[InventoryItemCollision.index].Amount = InventoryItem.Amount;
                 }
             }else{
-                client.character.Inventory[InventoryItemCollision.index] = PickedItemInventory;
+                client.character.Inventory[InventoryItemCollision.index] = InventoryItem;
                 client.character.Inventory[input.InventoryIndex] = null;
                 client.character.Inventory[InventoryItemCollision.index].Row = input.RowMove;
                 client.character.Inventory[InventoryItemCollision.index].Column = input.ColumnMove;
+                client.character.Inventory[InventoryItemCollision.index].ID = InventoryItem.ID;
             }
 
             client.character.markModified('Inventory');
@@ -951,8 +1076,18 @@ ItemActions[0x14] = function Recv_MoveItem(client, input) { // COMPLETED
         }
     }
 };
-ItemActions[0x15] = function sub_462750(client, input) {
-    NotImplemented(client, 'sub_462750', input);
+ItemActions[0x15] = function PlaceSilverToStorage(client, input) { // COMPLETED
+    var MAX_SILVER = packets.MAX_SILVER;
+
+    if((client.character.StorageSilver + input.Amount) > MAX_SILVER || input.Amount < 0 || input.Amount > MAX_SILVER){
+        clientWriteItemActionFailed(client, input);
+        return;
+    }else{
+        client.character.StorageSilver += input.Amount;
+        client.character.Silver -= input.Amount;
+        client.character.save();
+        clientWriteItemActionSuccess(client, input);
+    }
 };
 ItemActions[0x16] = function Recv_GateMasterBankSilver(client, input) { // COMPLETED
     var clientSilver = client.character.Silver;
@@ -963,8 +1098,9 @@ ItemActions[0x16] = function Recv_GateMasterBankSilver(client, input) { // COMPL
         return;
     }else{
         client.character.Silver -= input.Amount;
-        client.character.StorageSilver += input.Amount;
+        client.character.BankSilver += input.Amount;
         client.character.save();
+        client.character.saveBankSilver();
 
         clientWriteItemActionSuccess(client, input);
         return;
@@ -973,20 +1109,31 @@ ItemActions[0x16] = function Recv_GateMasterBankSilver(client, input) { // COMPL
 ItemActions[0x17] = function nullsub_4(client, input) {
     NotImplemented(client, 'nullsub_4', input);
 };
-ItemActions[0x18] = function sub_462840(client, input) {
-    NotImplemented(client, 'sub_462840', input);
-};
-ItemActions[0x19] = function Recv_GateMasterBankGetSilver(client, input) { // COMPLETED
-    var clientSilver = client.character.Silver;
+ItemActions[0x18] = function GetSilverFromStorage(client, input) { // COMPLETED
     var MAX_SILVER = packets.MAX_SILVER;
 
-    if(input.Amount > MAX_SILVER || input.Amount <= 0 || (clientSilver+input.Amount) > MAX_SILVER || (client.character.StorageSilver-input.Amount) < 0){
+    if((client.character.Silver + input.Amount) > MAX_SILVER || input.Amount < 0 || input.Amount > MAX_SILVER){
         clientWriteItemActionFailed(client, input);
         return;
     }else{
         client.character.Silver += input.Amount;
         client.character.StorageSilver -= input.Amount;
         client.character.save();
+        clientWriteItemActionSuccess(client, input);
+    }
+};
+ItemActions[0x19] = function Recv_GateMasterBankGetSilver(client, input) { // COMPLETED
+    var clientSilver = client.character.Silver;
+    var MAX_SILVER = packets.MAX_SILVER;
+
+    if(input.Amount > MAX_SILVER || input.Amount <= 0 || (clientSilver+input.Amount) > MAX_SILVER || (client.character.BankSilver-input.Amount) < 0){
+        clientWriteItemActionFailed(client, input);
+        return;
+    }else{
+        client.character.Silver += input.Amount;
+        client.character.BankSilver -= input.Amount;
+        client.character.save();
+        client.character.saveBankSilver();
 
         clientWriteItemActionSuccess(client, input);
         return;

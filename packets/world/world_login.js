@@ -50,14 +50,70 @@ WorldPC.Set(0x02, {
 		// Send Character Info
 		console.log('Sending WorldCharacterInfoPacket');
 
+		var serverName = socket.character.ServerName;
+
+		if(socket.account.CharacterIndividuals == undefined){
+			socket.account.CharacterIndividuals = {};
+			socket.account.markModified('CharacterIndividuals');
+			socket.account.save();
+		}
+
+		if(socket.account.CharacterIndividuals[serverName] == undefined){
+			socket.account.CharacterIndividuals[serverName] = {};
+			socket.account.markModified('CharacterIndividuals');
+			socket.account.save();
+		}
+
+		if(socket.account.CharacterIndividuals[serverName].Bank == undefined){
+			var tempArray = [];
+			for(var i=0; i< 56; i++){
+				tempArray.push(null);
+			}
+			socket.account.CharacterIndividuals[serverName].Bank = tempArray;
+			socket.account.markModified('CharacterIndividuals');
+			socket.account.save();
+
+		}
+
+		if(socket.account.CharacterIndividuals[serverName].BankSilver == undefined){
+			socket.account.CharacterIndividuals[serverName].BankSilver = 0;
+			socket.account.markModified('CharacterIndividuals');
+			socket.account.save();
+		}
+
+		socket.character.Bank = socket.account.CharacterIndividuals[serverName].Bank;
+		socket.character.BankSilver = socket.account.CharacterIndividuals[serverName].BankSilver;
+
+		socket.character.saveBank = function(){
+			socket.account.CharacterIndividuals[serverName].Bank = this.Bank;
+
+			socket.account.markModified('CharacterIndividuals');
+			socket.account.save();
+		};
+
+		socket.character.saveBankSilver = function(){
+			console.log(this.BankSilver);
+			socket.account.CharacterIndividuals[serverName].BankSilver = this.BankSilver;
+
+			socket.account.markModified('CharacterIndividuals');
+			socket.account.save();
+		};
 
 		//TODO: Make init function to initialize DB for character and fill the empty spaces if needed
 		var storage = socket.character.Storage;
 		if(storage.length === 0){
-			for(var i = 0; i < 56; i++){
+			for(var i = 0; i < 28; i++){
 				socket.character.Storage.push(null);
 			}
 
+			socket.character.markModified('Storage');
+			socket.character.save();
+		}else if(storage.length > 28){
+			var tempArray = [];
+			for(var i = 0; i < 28; i++){
+				tempArray.push(socket.character.Storage[i]);
+			}
+			socket.character.Storage = tempArray;
 			socket.character.markModified('Storage');
 			socket.character.save();
 		}
@@ -71,8 +127,10 @@ WorldPC.Set(0x02, {
 					})),
 					350,
 					socket.character.Inventory,
+					1666,
+					socket.character.Storage,
 					3350,
-					socket.character.Storage
+					socket.character.Bank
 				);
 		socket.write(
 			prepareInventoryBuffer
@@ -94,6 +152,7 @@ WorldPC.Set(0x02, {
 		//asocket.character.state.setFromCharacter(socket.character);
 		//console.log(socket.character.state);
 		//socket.write(socket.character.state.getPacket());
+
 
 		socket.authenticated = true;
 		//socket.character.state.Skill = 0;

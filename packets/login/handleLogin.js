@@ -51,6 +51,87 @@ var LoginPacket = restruct.
 	string('Password', LoginPC.PasswordLength + 1).
 	pad(63);
 
+function setInventoryOnOffset(buffer, offset, inventory, storage_offset, storage){
+	var InventoryBufferSize = structs.StorageItem.size * inventory.length;
+	var InventoryBuffer = new Buffer(InventoryBufferSize);
+
+	var InventoryOffset = 0;
+	for(var i = 0; i < inventory.length; i++){
+		var object = inventory[i];
+		var workingBuffer;
+		if(object == undefined){
+			workingBuffer = new Buffer(structs.StorageItem.pack());
+			workingBuffer.copy(InventoryBuffer, InventoryOffset);
+		}else{
+			var item = infos.Item[object.ID];
+
+			if(item == undefined){
+				workingBuffer = new Buffer(structs.StorageItem.pack(
+					object
+				));
+			}else{
+				if(item.ItemType === 22){
+					workingBuffer = new Buffer(structs.StorageItemPet.pack(
+						object
+					));
+				}else{
+					workingBuffer = new Buffer(structs.StorageItem.pack(
+						object
+					));
+				}
+			}
+
+			if(workingBuffer !== undefined){
+				workingBuffer.copy(InventoryBuffer, InventoryOffset, 0, workingBuffer.length);
+			}
+		}
+		InventoryOffset += structs.StorageItem.size;
+	}
+
+	InventoryBuffer.copy(buffer, offset, 0, InventoryBuffer.length);
+
+	var StorageBufferSize = structs.SmallStorageItem.size * storage.length;
+	var StorageBuffer = new Buffer(StorageBufferSize);
+
+	var StorageOffset = 0;
+
+	for(var sI = 0; sI < storage.length; sI++){
+		var object = storage[sI];
+		var workingBuffer;
+		if(object === null){
+			workingBuffer = new Buffer(structs.SmallStorageItem.pack());
+			workingBuffer.copy(StorageBuffer, StorageOffset);
+		}else{
+			var item = infos.Item[object.ID];
+
+			if(item == undefined){
+				workingBuffer = new Buffer(structs.SmallStorageItem.pack());
+			}else{
+
+				if(item.ItemType === 22){
+					workingBuffer = new Buffer(structs.SmallStorageItemPet.pack(
+						object
+					));
+				}else{
+					workingBuffer = new Buffer(structs.SmallStorageItem.pack(
+						object
+					));
+				}
+			}
+
+			if(workingBuffer !== undefined){
+				workingBuffer.copy(StorageBuffer, StorageOffset, 0, workingBuffer.length);
+			}
+		}
+
+		StorageOffset += structs.SmallStorageItem.size;
+	}
+
+	StorageBuffer.copy(buffer, storage_offset, 0, StorageBuffer.length);
+
+	return buffer;
+}
+
 LoginPC.Set(0x03, {
 	Restruct: LoginPacket,
 	function: function Login(socket,user) {
@@ -78,18 +159,13 @@ LoginPC.Set(0x03, {
 				for (var i = 0; i < charactersLength; i++) {
 					socket.characters[i] = characters[i];
 					socket.write(
-						structs.setInventoryStorageOnOffsets(
+
 							new Buffer(LoginPC.CharacterInfoPacket.pack({
 								packetID: 0x05,
 								Slot: i,
 								Exists: 1,
 								Character: characters[i]
-							})),
-							350,
-							characters[i].Inventory,
-							3350,
-							characters[i].Storage
-						)
+							}))
 					);
 				}
 

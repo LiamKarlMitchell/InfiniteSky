@@ -81,7 +81,8 @@ var characterSchema = mongoose.Schema({
 	StatChi: {type: Number, default: 0 },
 	StatDexterity: {type: Number, default: 0 },
 	StatVitality: {type: Number, default: 0 },
-
+// Maybe Ring: {type: itemEquip, default: null}
+// or default 0 hmm... how very odd
 	Ring: {type: itemEquip, default: null}, // 0
 	Cape: {type: itemEquip, default: null}, // 1
 	Armor: {type: itemEquip, default: null}, // 2

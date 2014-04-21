@@ -303,8 +303,8 @@ vms.depends({
                 'Honor': this.character.Honor,
                 'CurrentHP': this.character.state.CurrentHP,
                 'CurrentChi': this.character.state.CurrentChi,
-                'PetActivity': this.character.Pet.Activity,
-                'PetGrowth': this.character.Pet.Growth
+                'PetActivity': this.character.Pet === null ? 0 : this.character.Pet.Activity,
+                'PetGrowth': this.character.Pet === null ? 0 : this.character.Pet.Growth
             };
             //eyes.inspect(update);
             this.write(new Buffer(packets.HealingReplyPacket.pack(update)));

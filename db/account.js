@@ -1,6 +1,8 @@
 // This file is part of InfiniteSky.
 // Copyright (c) InfiniteSky Dev Teams - Licensed under GNU GPL
 // For more information, see LICENCE in the main folder
+var Mixed = db.mongoose.Schema.Types.Mixed;
+var characterIndi = {};
 
 db.accountSchema = mongoose.Schema({
   _id: { type: Number, unique: true, index: true },
@@ -12,6 +14,7 @@ db.accountSchema = mongoose.Schema({
 	LastIP: String,
 	Pin: {type: String, default: '0000'},
 	LastLogin: { type: Date, default: Date.now },
+	CharacterIndividuals: {type: characterIndi, default: null},
   AP: {type: Number, default: 0}
 });
 

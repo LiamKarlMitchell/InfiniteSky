@@ -54,10 +54,10 @@ WorldPC.Set(0x61, {
 				})));
 				return;
 			}else{
-				client.character.Inventory[input.Item1] = null;
-				if(client.character.Inventory[input.Item2].Combine === undefined)
-				client.character.Inventory[input.Item2].Combine = 1;
-				else client.character.Inventory[input.Item2].Combine += 1;
+				client.character.Inventory[input.Item2] = null;
+				if(client.character.Inventory[input.Item1].Combine === undefined)
+				client.character.Inventory[input.Item1].Combine = 1;
+				else client.character.Inventory[input.Item1].Combine += 1;
 				
 				client.character.Silver -= CombinePrice;
 
