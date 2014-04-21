@@ -4,7 +4,8 @@ vms.depends({name: 'Zone.js', depends: [
     'infos.Item',
     'infos.Skill',
     'db.Character',
-    'packets'
+    'packets',
+    'QuadTree'
 ]
 }, function(){
 
@@ -81,13 +82,18 @@ var NPC = function(ID) {
 };
 
 // END OF NPC Definition
-
-
+Zone.prototype.step = function(delta) {
+	if (this.Loaded) {
+		this.QuadTree.update(delta);
+	}
+}
 
 Zone.prototype.Init = function() {
     this.Loaded = false;
     // TODO: Implement Quadtree for these objects
     this.NPC = [];
+    this.NPCNextID = 1;
+	this.NPCMaxLength = 10000;
     this.Monster = [];
     this.Item = [];
     this.Player = [];
@@ -99,10 +105,24 @@ Zone.prototype.Init = function() {
     NpcAICollection     = new AICollection();
 	ZoneAICollection    = new AICollection();
 
-},
+}
+
+Zone.prototype.clientNodeUpdate = function(node, delta) {
+	//if (this.character && this.character.state) {
+		return { x: this.character.state.Location.X, y: this.character.state.Location.Z, size: this.character.state.Level };
+	//}
+	//return null;
+}
+Zone.prototype.npcUpdate = function(node, delta) {
+	return  { x: this.Location.X, y: this.Location.Z, size: 1 };
+}
+
 Zone.prototype.addSocket = function(socket) {
     // Should check to make sure it dosnt exist already etc.
     this.Clients.push(socket);
+    var node = this.QuadTree.addNode(new QuadTree.QuadTreeNode({ object: socket, update: this.clientNodeUpdate, type: 'client' }));
+    socket.node = node;
+
     if(this.zone_script.onClientJoin) this.zone_script.onClientJoin(socket);
     // Create character state object for this socket
     // Send character state object to all with it being compressed
@@ -112,7 +132,7 @@ Zone.prototype.addSocket = function(socket) {
     0x18, new Buffer(
     packets.ActionReplyPacket.pack(
     socket.character.state))), config.viewable_action_distance);
-},
+}
 Zone.prototype.findCharacterSocket = function(Name) {
     var socket = null;
     // Search connected clients
@@ -124,7 +144,7 @@ Zone.prototype.findCharacterSocket = function(Name) {
         }
     }
     return socket;
-},
+}
 Zone.prototype.findSocketByCharacterID = function(CharacterID) {
     var socket = null;
     // Search connected clients
@@ -136,26 +156,27 @@ Zone.prototype.findSocketByCharacterID = function(CharacterID) {
         }
     }
     return socket;
-},
+}
 Zone.prototype.removeSocket = function(socket) {
     // Remove it from any other updates needed here eg Duel, Monster AI, NPC Talking Too?, Faction Count on Zone etc
     // Remove any zone timers and such
+    this.QuadTree.removeNode(socket.node);
     if(this.zone_script.onClientLeave) this.zone_script.onClientLeave(socket);
     //this.Clients = this.Clients.splice(this.Clients.indexOf(socket), 1);
     this.Clients.slice(this.Clients.indexOf(socket), 1);
-},
+}
 Zone.prototype.forEachClient = function(func) {
     this.Clients.forEach(function(client) {
         if(client.authenticated == false) return;
         return func.call(client);
     });
-},
+}
 Zone.prototype.sendToAll = function(buffer) {
     this.Clients.forEach(function(client) {
         if(client.authenticated == false || !client._handle) return;
         client.write(buffer);
     });
-},
+}
 Zone.prototype.sendToAllArea = function(origional, sendtoself, buffer, distance) {
     this.Clients.forEach(function(client) {
         if(client.authenticated == false || !client._handle) return;
@@ -164,16 +185,17 @@ Zone.prototype.sendToAllArea = function(origional, sendtoself, buffer, distance)
             client.write(buffer);
         }
     });
-},
+}
 Zone.prototype.sendToAllAreaLocation = function(location, buffer, distance, self) {
-    this.Clients.forEach(function(client) {
-        if(client.authenticated == false || !client._handle) return;
-        if(self && client == self) return; // Skip sending to self if self is set
-        if(client.character.state.Location.getDistance(location) <= distance) {
-            client.write(buffer);
-        }
-    });
-},
+	var found = this.QuadTree.query({ CVec3: location, radius: distance, type: 'client' });
+
+	for (var i=0;i<found.length;i++) {
+		if (self && self === found[i].object) continue; // Skip self if required too
+		if (found[i].authenticated === false) continue; // Skip not authenticated clients
+		
+		found[i].object.write(buffer);
+	}
+}
 Zone.prototype.sendToAllClan = function(buffer, clan) {
     this.Clients.forEach(function(client) {
         if(client.authenticated == false || !client._handle) return;
@@ -181,7 +203,7 @@ Zone.prototype.sendToAllClan = function(buffer, clan) {
             client.write(buffer);
         }
     });
-},
+}
 Zone.prototype.getPortal = function(ZoneID) {
     console.log('getPortal ' + ZoneID);
     var portal = null
@@ -193,7 +215,7 @@ Zone.prototype.getPortal = function(ZoneID) {
         }
     }
     return portal;
-},
+}
 Zone.prototype.getPortalEndPoint = function(ZoneID) {
     console.log('getPortalEndPoint ' + ZoneID);
     var portal = null;
@@ -204,7 +226,7 @@ Zone.prototype.getPortalEndPoint = function(ZoneID) {
         }
     }
     return portal;
-},
+}
 
 // NPC Functions
 // NPC
@@ -220,7 +242,7 @@ npc.ID = this.NPCNextID;
 
 this.NPCNextID++;
 
-if (this.NPCNextID > this.NPCsMaxLength) {
+if (this.NPCNextID > this.NPCMaxLength) {
 	this.NPCNextID = 0; // Could find next free slot and if none free overwrite older items?
 	// Quick sort ftw.
 }
@@ -228,65 +250,63 @@ if (this.NPCNextID > this.NPCsMaxLength) {
 npc.Location = spawninfo.Location;
 npc.FacingDirection = spawninfo.Direction;
 
-this.NPCs[npc.ID] = npc;
+this.NPC[npc.ID] = npc;
 
 //if (npc.NPCID == 50) console.log(npc.ID, npc.UniqueID, npc.NPCID);
 return npc;
-},
+}
 
 Zone.prototype.addNPC = function(npc) {
+var zone = this;
+npc.zone = this;
+
+var node = this.QuadTree.addNode(new QuadTree.QuadTreeNode({ object: npc, update: this.npcUpdate }));
+npc.node = node;
+
+
 npc.updateInterval = setInterval(function() {
-	//console.log('Updating information of monster.');
-	// Send the packet to everyone
-	// Send monster to all area
-	// send the packet to all in area. monster.getPacket()
-	zone.sendToAllAreaLocation(npc.Location, npc.getPacket(), config.viewable_action_distance)
+	// Update and send to all in area
+	if (zone.Clients.length > 0) {
+		zone.sendToAllAreaLocation(npc.Location, npc.getPacket(), config.viewable_action_distance);
+	}
 }, 4000);
-// monster.monsterDeathTimer = setTimeout(function() {
-//   console.log('Destroying monster.');
-//   zone.removeMonster(monster.UniqueID);
-//   // Send the packet to everyone
-//   // Send item to all area
-//   // send the packet to all in area. item.getPacket()
-//   // zone.SendToAllAreaLocation( item.Location,item.getPacket(),config.viewable_action_distance )
-// },180000); // 3 min
-this.NPCs[npc.UniqueID] = npc;
+this.NPC[npc.UniqueID] = npc;
 
 // Send it to clients
-this.sendToAllAreaLocation(npc.Location, npc.getPacket(), config.viewable_action_distance);
+zone.sendToAllAreaLocation(npc.Location, npc.getPacket(), config.viewable_action_distance);
 npc.JustSpawned = 0;
 npc.Skill = 0;
-},
+}
 // Expects itemjson to have Row, Column, ID
 // Basicaly storageItemSchema is what we are retriving in character.js
 Zone.prototype.getNPC = function(index) {
 var npc = null;
 console.log('Get npc ' + index);
-if (this.NPCs[index]) {
+if (this.NPC[index]) {
 	console.log('npc Found');
-	npc = this.NPCs[index]; // Check for valid shit later eg distance.
+	npc = this.NPC[index]; // Check for valid shit later eg distance.
 }
 return npc;
-},
-
-Zone.prototype.getNPCWhereID = function(id) {
-var npcs = [];
-
-// Could also just iterate forward.
-for (var index = 0; index != this.NPCs.length; index++) {
-	if (this.NPCs[index] && this.NPCs[index].NPCID == id) npcs.push(this.NPCs[index]);
 }
 
-return npcs;
-},
+Zone.prototype.getNPCWhereID = function(id) {
+var NPC = [];
+
+// Could also just iterate forward.
+for (var index = 0; index != this.NPC.length; index++) {
+	if (this.NPC[index] && this.NPC[index].NPCID == id) NPC.push(this.NPC[index]);
+}
+
+return NPC;
+}
 
 Zone.prototype.removeNPC = function(index) {
-console.log('! CODE removeNPC');
-if (this.NPCs[index]) {
+if (this.NPC[index]) {
 	// Send packet to all saying it got picked up / destroyed
 	console.log('Removing npc ' + index);
-	var npc = this.NPCs[index];
+	var npc = this.NPC[index];
 	npc.onDelete();
+	this.QuadTree.removeNode(npc.node);
 
 	npc.JustSpawned = 3;
 	npc.unknown1 = 1;
@@ -295,36 +315,44 @@ if (this.NPCs[index]) {
 	npc.Rotation[1] = 1;
 
 	this.sendToAllAreaLocation(npc.Location, npc.getPacket(), config.viewable_action_distance);
-	///delete this.NPCs[index];
-	this.NPCs.splice(index, 1);
+	///delete this.NPC[index];
+	this.NPC.splice(index, 1);
 }
-},
+}
 
 Zone.prototype.clearNPC = function() {
 var zone = this;
-this.NPCs.forEach(function(npc, index) {
+this.NPC.forEach(function(npc, index) {
 	if (npc) {
 		zone.removeNPC(npc.UniqueID); // Could use index
 	}
 });
-},
+}
 // End of NPC Functions
 
-
+// TODO: Prevent zones being loaded duplicate times whilst one is still loading.
 Zone.prototype.Load = function(callback) {
     if(this.Loaded) {
         callback('Already Loaded');
         console.log('Zone ' + this.ID + ' is already loaded.');
         return;
-    }
+    }    
     // Start Loading world mesh
+    // Get width and height and offset from world data
+
+    // Create QuadTree
+    this.QuadTree = new QuadTree({x: -10000, y: -10000, size: 20000,
+		depth: config.quadtree_depth || 6,
+		limit: config.quadtree_limit || 10
+	});
+    var zone = this;
     // Monster Spawns
     // NPC Spawns
     // Map Scripts
     // Finally
 
     // TODO: Implement zone loading info
-	// 	async.series([
+	async.series([
 
 	// 	function LoadTerrain(callback) {
 	// 		TerrainLoad.call(zone, zoneinfo.Name, function(err) {
@@ -333,126 +361,130 @@ Zone.prototype.Load = function(callback) {
 	// 		});
 	// 	},
 
-	// 	function LoadMonsterSpawns(callback) {
-	// 		console.log('Loading Monster Spawns for ' + zoneinfo.Name);
-	// 		fs.readFile('data/spawninfo/' + numberZeroFill(zoneinfo.ID, 3) + '.MOB', function(err, data) {
-	// 			if (err) {
-	// 				// Meh
-	// 			} else {
-	// 				var RecordCount = data.readUInt32LE(0);
+		// function LoadMonsterSpawns(callback) {
+		// 	console.log('Loading Monster Spawns for ' + zone.Name);
+		// 	fs.readFile('data/spawninfo/' + _util.padLeft(zone.ID,'0', 3) + '.MOB', function(err, data) {
+		// 		if (err) {
+		// 			// Meh
+		// 		} else {
+		// 			var RecordCount = data.readUInt32LE(0);
 
-	// 				var spawndata = restruct.struct('info', structs.SpawnInfo, RecordCount).unpack(data.slice(4));
-	// 				data = null;
-	// 				var length = spawndata.info.length,
-	// 					element = null;
-	// 				for (var i = 0; i < length; i++) {
-	// 					element = spawndata.info[i];
+		// 			var spawndata = restruct.struct('info', structs.SpawnInfo, RecordCount).unpack(data.slice(4));
+		// 			data = null;
+		// 			var length = spawndata.info.length,
+		// 				element = null;
+		// 			for (var i = 0; i < length; i++) {
+		// 				element = spawndata.info[i];
 
-	// 					var monster = zone.createMonster(element);
-	// 					if (monster) {
+		// 				var monster = zone.createMonster(element);
+		// 				if (monster) {
 
-	// 						zone.addMonster(monster);
+		// 					zone.addMonster(monster);
 
-	// 					}
-	// 					if (monster == null) {
-	// 						//console.log('Failed to load monster '+element.ID+' for zone '+zone.getID());
-	// 					}
-	// 				}
-	// 			}
+		// 				}
+		// 				if (monster == null) {
+		// 					//console.log('Failed to load monster '+element.ID+' for zone '+zone.getID());
+		// 				}
+		// 			}
+		// 		}
 
-	// 			callback(null, true);
-	// 		});
-	// 	}, function LoadNPCSpawns(callback) {
-	// 		console.log('Loading NPC Spawns for ' + zoneinfo.Name);
-	// 		fs.readFile('data/spawninfo/' + numberZeroFill(zoneinfo.ID, 3) + '.NPC', function(err, data) {
-	// 			if (err) {
-	// 				//console.log(err);
-	// 			} else {
-	// 				var RecordCount = data.readUInt32LE(0);
+		// 		callback(null, true);
+		// 	});
+		// },
+		function LoadNPCpawns(callback) {
+			console.log('Loading NPC Spawns for zone ' + zone.ID);
+			fs.readFile('data/spawninfo/' + _util.padLeft(zone.ID,'0', 3) + '.NPC', function(err, data) {
+				if (err) {
+					//console.log(err);
+				} else {
+					var RecordCount = data.readUInt32LE(0);
 
-	// 				//console.log(RecordCount);
-	// 				var spawndata = restruct.struct('info', structs.SpawnInfo, RecordCount).unpack(data.slice(4));
-	// 				data = null;
-	// 				var length = spawndata.info.length,
-	// 					element = null;
-	// 				for (var i = 0; i < length; i++) {
-	// 					element = spawndata.info[i];
-	// 					//eyes.inspect(element);
-	// 					if (element.ID) {
-	// 						var npc = zone.createNPC(element);
-	// 						zone.addNPC(npc);
-	// 					}
-	// 				}
-	// 			}
+					//console.log(RecordCount);
+					var spawndata = restruct.struct('info', structs.SpawnInfo, RecordCount).unpack(data.slice(4));
+					data = null;
+					var length = spawndata.info.length,
+						element = null;
+					for (var i = 0; i < length; i++) {
+						element = spawndata.info[i];
+						//eyes.inspect(element);
+						if (element.ID) {
+							var npc = zone.createNPC(element);
+							zone.addNPC(npc);
+						}
+					}
+				}
 
-	// 			callback(null, true);
-	// 		});
-	// 	},
+				callback(null, true);
+			});
+		}
+		// ,
 
-	// 	function LoadPortals(callback) {
-	// 		console.log('Loading Portals for ' + zoneinfo.Name);
-	// 		fs.readFile('data/world/' + zoneinfo.Name + '_ZONEMOVEREGION.WREGION', function(err, data) {
-	// 			if (err) {
-	// 				//console.log(err);
-	// 			} else {
+		// function LoadPortals(callback) {
+		// 	console.log('Loading Portals for ' + zone.Name);
+		// 	fs.readFile('data/world/' + zone.Name + '_ZONEMOVEREGION.WREGION', function(err, data) {
+		// 		if (err) {
+		// 			//console.log(err);
+		// 		} else {
 
-	// 				var RecordCount = data.readUInt32LE(0);
+		// 			var RecordCount = data.readUInt32LE(0);
 
-	// 				//console.log(RecordCount);
-	// 				var wregion = restruct.struct('info', structs.WREGION, RecordCount).unpack(data.slice(4));
-	// 				data = null;
-	// 				var length = wregion.info.length,
-	// 					element = null;
+		// 			//console.log(RecordCount);
+		// 			var wregion = restruct.struct('info', structs.WREGION, RecordCount).unpack(data.slice(4));
+		// 			data = null;
+		// 			var length = wregion.info.length,
+		// 				element = null;
 
-	// 				for (var i = 0; i < length; i++) {
-	// 					element = wregion.info[i];
-	// 					zone.MoveRegions.push(element);
-	// 				}
-	// 			}
+		// 			for (var i = 0; i < length; i++) {
+		// 				element = wregion.info[i];
+		// 				zone.MoveRegions.push(element);
+		// 			}
+		// 		}
 
-	// 			callback(null, true);
-	// 		});
-	// 	},
+		// 		callback(null, true);
+		// 	});
+		// },
 
-	// 	function LoadSaferegion(callback) {
-	// 		console.log('Loading Safe Region for ' + zoneinfo.Name);
-	// 		fs.readFile('data/world/' + zoneinfo.Name + '_ZONESAFEREGION.WREGION', function(err, data) {
-	// 			if (err) {
-	// 				//error loading
-	// 				//console.log(err);
-	// 			} else {
-	// 				var RecordCount = data.readUInt32LE(0);
+		// function LoadSaferegion(callback) {
+		// 	console.log('Loading Safe Region for ' + zone.Name);
+		// 	fs.readFile('data/world/' + zone.Name + '_ZONESAFEREGION.WREGION', function(err, data) {
+		// 		if (err) {
+		// 			//error loading
+		// 			//console.log(err);
+		// 		} else {
+		// 			var RecordCount = data.readUInt32LE(0);
 
-	// 				var wregion = restruct.struct('info', structs.WREGION, RecordCount).unpack(data.slice(4));
-	// 				data = null;
-	// 				var length = wregion.info.length,
-	// 					element = null;
-	// 				for (var i = 0; i < length; i++) {
-	// 					element = wregion.info[i];
-	// 					if (element.Unknown1 != 0) console.log(element, i, zone.ID, 'id not 0');
-	// 					if (element.Unknown2 != 0) console.log(element, i, zone.ID, 'id not 0');
-	// 					if (element.Unknown3 != 0) console.log(element, i, zone.ID, 'id not 0');
+		// 			var wregion = restruct.struct('info', structs.WREGION, RecordCount).unpack(data.slice(4));
+		// 			data = null;
+		// 			var length = wregion.info.length,
+		// 				element = null;
+		// 			for (var i = 0; i < length; i++) {
+		// 				element = wregion.info[i];
+		// 				if (element.Unknown1 != 0) console.log(element, i, zone.ID, 'id not 0');
+		// 				if (element.Unknown2 != 0) console.log(element, i, zone.ID, 'id not 0');
+		// 				if (element.Unknown3 != 0) console.log(element, i, zone.ID, 'id not 0');
 
-	// 					zone.SafeRegions.push(element);
-	// 				}
-	// 			}
+		// 				zone.SafeRegions.push(element);
+		// 			}
+		// 		}
 
-	// 			callback(null, true);
-	// 		});
-	// 	}], function(err, results) {
-	// 		//console.log('Outputing Anim8or File for '+zone.Name);
-	// 		//zone.OutputAnim8orFile();
-	// 		callback_function(null, {
-	// 			ID: zoneinfo.ID,
-	// 			Loaded: true
-	// 		});
-	// 	});
+		// 		callback(null, true);
+		// 	});
+		// }
+		], function(err, results) {
+			//console.log('Outputing Anim8or File for '+zone.Name);
+			//zone.OutputAnim8orFile();
+			this.Loaded = true;
+			callback(null, {
+				ID: zone.ID,
+				Loaded: true
+			});
+		});
 
 
-	// }
+	//}
 
-
-    callback(null, true);
+	
+    //callback(null, true);
 }
 // TODO: Figure out a way to get prototypal inheritance working with node vm...
 if (typeof(zones) !== 'undefined') {

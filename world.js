@@ -20,6 +20,8 @@ vms.depends({
                 main.events.on('step', function(delta) {
                     world.GameStep(delta);
                 });
+
+                main.events.on('step', this.step);
             },
             running: true
         };

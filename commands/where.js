@@ -6,6 +6,5 @@
 // Command: where
 // Tells you where you are
 GMCommands.AddCommand(new Command('where',20,function command_where(string,client){
-	client.sendInfoMessage('XYZ: '+client.character.state.Location.toString());
-	log('test from where');
+	client.sendInfoMessage(client.character.state.Location.toString());
 }));

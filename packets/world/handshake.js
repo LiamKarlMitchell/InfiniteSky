@@ -9,7 +9,6 @@ WorldPC.Set(0x01, {
 	int32lu('MapID'),
 
 	function: function Handshake(socket, info) {
-		debugger;
 		console.log(socket.id);
 		if (socket.authenticated) return;
 		console.log(info);
