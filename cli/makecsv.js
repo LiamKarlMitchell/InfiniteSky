@@ -57,6 +57,7 @@ cli.makecsv = function CLI_MakeCSV(input) {
 	infoToCSV('Monster',['ID','Name','Health','AttackPower','DefensePower','Critical'],console.log);
 	infoToCSV('Npc',['ID','Name','Chat1','Chat2','Chat3','Chat4','Chat5'],console.log)
 	infoToCSV('Exp',['Level','EXPStart','EXPEnd','SkillPoint'],console.log)
+	infoToCSV('Skill',['ID','Name','Clan','Weapon','PointsToLearn','MaxSkillLevel','Description1','Description2'],console.log)
 };
 
 cli.makecsv.help = function CLI_MakeCSV_help(input) {
