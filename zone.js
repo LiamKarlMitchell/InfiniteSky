@@ -260,7 +260,7 @@ Zone.prototype.addNPC = function(npc) {
 var zone = this;
 npc.zone = this;
 
-var node = this.QuadTree.addNode(new QuadTree.QuadTreeNode({ object: npc, update: this.npcUpdate }));
+var node = this.QuadTree.addNode(new QuadTree.QuadTreeNode({ object: npc, update: this.npcUpdate, type: 'npc' }));
 npc.node = node;
 
 
@@ -473,7 +473,7 @@ Zone.prototype.Load = function(callback) {
 		], function(err, results) {
 			//console.log('Outputing Anim8or File for '+zone.Name);
 			//zone.OutputAnim8orFile();
-			this.Loaded = true;
+			zone.Loaded = true;
 			callback(null, {
 				ID: zone.ID,
 				Loaded: true
