@@ -417,7 +417,7 @@ ItemActions[0x05] = function Recv_StoreItemInCharacterPrivateStorage(client, inp
     var InventoryItem = client.character.Inventory[input.InventoryIndex];
     var ExistingItem = client.character.Storage[input.RowPickup];
 
-    if(ExistingItem != undefined || InventoryItem === null || InventoryItem === undefined){
+    if(ExistingItem != undefined || InventoryItem === null || InventoryItem === undefined || InventoryItem.ID !== input.ItemID){
         clientWriteItemActionFailed(client, input);
         return;
     }else{
@@ -425,7 +425,7 @@ ItemActions[0x05] = function Recv_StoreItemInCharacterPrivateStorage(client, inp
         if(item.ItemType !== 22 && input.Amount > 0 && InventoryItem.Amount !== input.Amount){
             clientWriteItemActionFailed(client, input);
             return;
-        }else if(item.ItemType !== 22 && input.Amount === 0 && InventoryItem.Amount !== input.Amount){
+        }else if(item.ItemType !== 22 && input.Amount > 1 && (InventoryItem.Amount == undefined || InventoryItem.Amount < 1)){
             clientWriteItemActionFailed(client, input);
             return;
         }else if(item.ItemType === 22 && input.Amount !== InventoryItem.Activity){
@@ -535,7 +535,7 @@ ItemActions[0x07] = function Recv_SellItem(client, input) { // COMPLETED TODO: M
 
             var Reminder = sellingItem.Amount - input.Amount;
 
-            if(Reminder === 0 || sellingItem.Amount == undefined){
+            if(Reminder === 0 || sellingItem.Amount == undefined || infos.Item[sellingItem.ID].Stackable === 0){
                 client.character.Inventory[input.InventoryIndex] = null;
             }else if(Reminder > 0 && Reminder < 99){
                 client.character.Inventory[input.InventoryIndex].Amount = Reminder;
@@ -590,17 +590,14 @@ ItemActions[0xB] = function Recv_MoveFromPillBar(client, input) { // COMPLETED
 
     if (!ItemSlot) {
         clientWriteItemActionFailed(client, input);
-        console.log("No slot!");
         return;
     }else{
         if(QuickItem === undefined || QuickItem === null || QuickItem.ID === undefined){
             clientWriteItemActionFailed(client, input);
-            console.log("Quick item undefined?!");
             return;
         }else{
             if(input.Amount > QuickItem.Amount || input.Amount < 0){
                 clientWriteItemActionFailed(client, input);
-                console.log("Input amount exceeds the needs!");
                 return;
             }else if(QuickItem.Amount === input.Amount){
                 client.character.Inventory[ItemSlot.index] = structs.StorageItem.objectify();
@@ -863,12 +860,15 @@ ItemActions[0x10] = function Recv_GetItemFromGateMasterStorage(client, input) { 
     }
 };
 ItemActions[0x11] = function Recv_BuyItem(client, input) { // COMPLETED
-    if(infos.Item[input.ItemID] === infos.Item[input.ItemID]){ // TODO: Check if the Npc has the item in their store
-        if( infos.Item[input.ItemID] === undefined || infos.Item[input.ItemID] === null || input.Amount > 99 || input.Amount < 0){
+    var itemInfo = infos.Item[input.ItemID];
+    var NpcInfo = infos.Npc[input.ItemUniqueID];
+
+    if(itemInfo !== undefined && NpcInfo !== undefined && NpcInfo.Items.indexOf(input.ItemID)){ // TODO: Check if the Npc has the item in their store
+        if( itemInfo === undefined || itemInfo === null || input.Amount > 99 || input.Amount < 0){
             clientWriteItemActionFailed(client, input);
             return;
         }else{
-            if( (client.character.Silver - (infos.Item[input.ItemID].PurchasePrice*input.Amount)) >= 0){
+            if( (client.character.Silver - (itemInfo.PurchasePrice*input.Amount)) >= 0){
                 if(infos.Item[input.ItemID].Stackable === 0 && input.Amount > 0){
                     clientWriteItemActionFailed(client, input);
                     return;
@@ -877,9 +877,10 @@ ItemActions[0x11] = function Recv_BuyItem(client, input) { // COMPLETED
                     return;
                 }
 
-                var InventoryItem = client.character.checkInventoryItemCollision(0, input.ColumnMove, input.RowMove, infos.Item[input.ItemID].getSlotCount());
+                var InventoryItem = client.character.checkInventoryItemCollision(0, input.ColumnMove, input.RowMove, itemInfo.getSlotCount());
                 if(InventoryItem){
-                    client.character.Silver -= infos.Item[input.ItemID].PurchasePrice*input.Amount;
+                    if(input.Amount === 0) input.Amount = 1;
+                    client.character.Silver -= itemInfo.PurchasePrice*input.Amount;
                     client.character.Inventory[InventoryItem.index] = structs.StorageItem.objectify();
                     client.character.Inventory[InventoryItem.index].Column = InventoryItem.x;
                     client.character.Inventory[InventoryItem.index].Row = InventoryItem.y;
@@ -888,10 +889,14 @@ ItemActions[0x11] = function Recv_BuyItem(client, input) { // COMPLETED
                     client.character.markModified("Inventory");
                     client.character.save();
                     clientWriteItemActionSuccess(client, input);
+                    return;
                 }else{
                     clientWriteItemActionFailed(client, input);
                     return;
                 }
+            }else{
+                clientWriteItemActionFailed(client, input);
+                return;
             }
         }
     }else{

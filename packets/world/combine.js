@@ -30,8 +30,8 @@ pad(4);
 WorldPC.Set(0x61, {
 	Restruct: GetCombineRestruct,
 	function: function doCombine(client, input){
-		var CombinePrice = 0; // Move to global?
-		console.log(input);
+		var CombinePrice = 0;
+
 		var Item1 = client.character.Inventory[input.Item1];
 		var Item2 = client.character.Inventory[input.Item2];
 
@@ -54,10 +54,18 @@ WorldPC.Set(0x61, {
 				})));
 				return;
 			}else{
-				client.character.Inventory[input.Item2] = null;
-				if(client.character.Inventory[input.Item1].Combine === undefined)
-				client.character.Inventory[input.Item1].Combine = 1;
-				else client.character.Inventory[input.Item1].Combine += 1;
+				var RandNumber = Math.floor((Math.random()*100)+1);
+
+				var result = 0;
+				if(RandNumber >= 50){
+					if(client.character.Inventory[input.Item1].Combine === undefined)
+					client.character.Inventory[input.Item1].Combine = 1;
+					else client.character.Inventory[input.Item1].Combine += 1;
+
+					client.character.Inventory[input.Item2] = null;
+				}else{
+					result = 1;
+				}
 				
 				client.character.Silver -= CombinePrice;
 
@@ -66,10 +74,10 @@ WorldPC.Set(0x61, {
 
 				client.write(new Buffer(CombineRespond.pack({
 					"PacketID": 0x7F,
-					"Result": 0,
+					"Result": result,
 					"Item1": input.Item1,
 					"Item2": input.Item2,
-					"Price": CombinePrice
+					"Price": CombinePrice 
 				})));
 			}
 		}

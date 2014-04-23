@@ -47,9 +47,6 @@ console.log("Respond size: " + EnchantRespond.size);
 WorldPC.Set(0x3A, {
 	Restruct: ReadEnchantPackeet,
 	function: function enchantItem(client, input){
-		console.log(input);
-		var result = 0;
-
 		var enchantingMat = client.character.Inventory[input.InventoryEnchantIndex];
 		var Item = client.character.Inventory[input.InventoryItemIndex];
 
@@ -81,7 +78,11 @@ WorldPC.Set(0x3A, {
 
 			var enchantValue;
 			var enchantPrice;
-			var result; // Need to be done
+
+			if(Item.Enchant == undefined)
+				client.character.Inventory[input.InventoryItemIndex].Enchant = 0;
+			
+
 			switch(enchantingMat.ID){
 				case 138: // 3%
 				enchantPrice = 20000;
@@ -151,13 +152,32 @@ WorldPC.Set(0x3A, {
 				)));
 				return;
 			}
+			var PredictedEnchant = enchantValue+Item.Enchant;
+			var result = 0; // Need to be done
+			var RandNumber = Math.floor((Math.random()*100)+1);
+			var RollOnItemDamage = Math.floor((Math.random()*100)+1);
 
-			if((enchantValue+Item.Enchant) > 40){
+
+			if(PredictedEnchant > 40){
 				client.character.Inventory[input.InventoryItemIndex].Enchant = 40;
 				enchantValue = (enchantValue+Item.Enchant) - 40;
 			}else{
-				client.character.Inventory[input.InventoryItemIndex].Enchant += enchantValue;
-				console.log("Enchanted");
+				if(Item.Enchant >= 12){
+					// 4 : Item has been damaged -> Item Disappears
+					// 5 : Failed -> He loses the enchant || -1 value
+					//TODO: Include luck advantage on upgrading
+					if(RandNumber <= 50){
+						if(RollOnItemDamage <= 50){
+							result = 4;
+							client.character.Inventory[input.InventoryItemIndex] = null;
+						}else{
+							result = 5;	
+							client.character.Inventory[input.InventoryItemIndex].Enchant -= 1;
+						}
+					}
+				}else{
+					client.character.Inventory[input.InventoryItemIndex].Enchant += enchantValue;
+				}
 			}
 
 			client.character.Silver -= enchantPrice;
@@ -169,7 +189,7 @@ WorldPC.Set(0x3A, {
 			client.write(new Buffer(EnchantRespond.pack(
 				{
 					"PacketID": 0x52,
-					"Result": 0,
+					"Result": result,
 					"InventoryItemIndex": input.InventoryItemIndex,
 					"InventoryEnchantIndex": input.InventoryEnchantIndex,
 					"Price": enchantPrice,

@@ -330,7 +330,7 @@ LoadNpcInfo = function() {
     int32lu("Buy").
     int32lu("Extract").
     int32lu("ListItems").
-    int32lu("Items").
+    int32lu("Unknown01").
     int32lu("Withdraw").
     int32lu("DownGrade").
     int32lu("CombineItems").
@@ -358,11 +358,11 @@ LoadNpcInfo = function() {
     int32lu("Unknown286").
     int32lu("ENDOFLIST").
     int32lu("Unknown287").
-    int32lu("NPCItems", 168). // TODO: Work out NPC items for their shops in a nicer format
-    string("CellFile", 6025).
-    int32lu("Unknown288").
-    int32lu("Unknown289").
-    int32lu("Unknown290"), function onRecordLoad(record) {
+    int8lu("Unk1").
+    int32lu("Items", 168). // TODO: Work out NPC items for their shops in a nicer format
+    int8lu("Unk3", 3).
+    int32lu("Shift8Bytes", 2).
+    string("CellFile", 6025), function onRecordLoad(record) {
         if(record.ID) {
             // Change the prototype so that we have access to methods we want.
             record.__proto__ = NpcInfo.prototype;
