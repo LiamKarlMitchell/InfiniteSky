@@ -5,7 +5,8 @@ vms.depends({name: 'Zone.js', depends: [
     'infos.Skill',
     'db.Character',
     'packets',
-    'QuadTree'
+    'QuadTree',
+    'packets'
 ]
 }, function(){
 
@@ -16,27 +17,6 @@ if(typeof(Zone) === 'undefined') {
     };
     Zone.prototype = {};
 }
-
-
-// NPC Definition
-packets.NPCObject = restruct.
-    //int8lu('Status').
-    int32lu('UniqueID').
-    int32lu('ID').
-    int32lu('NPCID').
-    int32lu('Life').
-    int32lu('Stance').
-    int32lu('Skill').
-    float32l('Frame').
-    struct('Location',structs.CVec3).
-    int32lu('Unknown3',3).
-    float32l('Direction').
-    float32l('TargetDirection').
-    int32ls('TargetObjectIndex').
-    int32lu('Unknown3',4).
-    struct('LocationTo',structs.CVec3).
-    float32l('FacingDirection').
-    int32lu('HP');
 
 // TODO: Convert NPC Definition to a better layout for vmscript
 var NPC = function(ID) {
@@ -61,9 +41,6 @@ var NPC = function(ID) {
 	this.FacingDirection = 0;
 	this.HP = 1;
 
-
-	// Get info from NPCInfo
-	//this.info = NPCInfo.getByID(this.NPCID);
 	// Set up health and stats etc	
 	this.getPacket = function() {
 		var packet = packets.makeCompressedPacket(0x19, new Buffer(packets.NPCObject.pack(this)));
@@ -80,6 +57,143 @@ var NPC = function(ID) {
 		// Set the location to random spot in a circle? :D
 	};
 };
+
+// MONSTER NPC ITEM
+// Move me into new thing
+var Item = function(info) {
+	this.ItemUniqueID = 0;
+	this.SomeID = 0;
+	this.ItemID = info.ID || 1;
+	this.Amount = info.Amount || 1;
+	this.Life = 0;
+	//this.unknown1
+	this.Enchant = 0;
+	//this.unknown2
+	this.Location = new CVec3();
+	this.Owner_Name = info.Owner || '';
+	//this.unknown3
+	//this.Direction
+	this.JustSpawned = 1;
+
+	this.getPacket = function() {
+		var packet = packets.makeCompressedPacket(0x1B, new Buffer(packets.ItemObject.pack(this)));
+		return packet;
+	}
+
+	this.onDelete = function() {
+		// Remove timers and intervals to free up references
+		clearInterval(this.updateInterval);
+		clearTimeout(this.itemTimer);
+	}
+
+	this.setLocationRandomOffset = function(Location, Radius) {
+		// Set the location to random spot in a circle? :D
+	}
+}
+
+var Monster = function(MonsterInfo) {
+	AIModule.AIObject.call(this);
+	this.Attackers = new AIModule.AttackerCollection();
+	this.WalkSpeed = MonsterInfo.WalkSpeed;
+
+	this.RunSpeed = MonsterInfo.RunSpeed;
+	//console.log(this);
+	this.UniqueID = 0;
+	this.AttackID = 2;
+	this.MonsterID = MonsterInfo.ID;
+
+	this.Life = 1;
+	this.Stance = 0;
+	this.Skill = 0;
+	this.Frame = 0;
+	this.Location = new CVec3();
+	this.LocationTo = new CVec3();
+	this.Direction = 0;
+	this.TargetDirection = 0;
+	this.TargetObjectIndex = -1;
+	//'Unknown3',7
+	this.FacingDirection = 0;
+	this.MaxHP = MonsterInfo.Health;
+
+	//Step
+	this.TBlock = Math.floor((Math.random() * 500) + 1);;
+	this.LBlock = 0;
+	this.Velocity = new CVec3();
+
+	this.getOnlineAliveAttackers = function() {
+		var attackers = this.Attackers.sort();
+		var tmp = [];
+		var a = null;
+
+		if (attackers.length) {
+			for (var i in attackers) {
+				a = zone.findSocketByCharacterID(attackers[i].ID);
+				if (a) {
+					if (a.character.state.CurrentHP > 0) {
+						tmp.push({
+							index: i,
+							client: a,
+							Damage: attackers[i].Damage,
+							ID: attackers[i].ID
+						});
+					}
+				}
+			}
+		}
+		return tmp;
+	}
+
+	// Get info from MonsterInfo
+	this.fullHeal = function() {
+		this.HP = MonsterInfo.Health;
+		//this.Chi = this.info.Chi;
+	}
+
+	this.fullHeal();
+	// Need a stat setup here
+	this.getPacket = function() {
+		var packet = packets.makeCompressedPacket(0x1A, new Buffer(packets.MonsterObject.pack(this)));
+		return packet;
+	}
+
+	this.getWSpeed = function() {
+		return this.WalkSpeed;
+	}
+
+	this.getRSpeed = function() {
+		return this.RunSpeed;
+	}
+
+	this.onDelete = function() {
+		this.Clear();
+		Attackers.Clear();
+		this.delete();
+	}
+
+	this.setLocationRandomOffset = function(Location, Radius) {
+		// Set the location to random spot in a circle? :D
+	}
+
+	this.onDeath = function(Killer) {
+		if (Killer) {
+			// Killed by player, monster, npc?
+			switch (typeof(Killer.constructor.name)) {
+			case "Monster":
+				break;
+			case "NPC":
+				break;
+			case "Socket":
+				// Handle Item Drop and Giving EXP/Silver/CP
+				break;
+			case "World":
+				break;
+			}
+		}
+	}
+
+	//this.setAI(MonAICollection.Get('Brain'));
+	//this.setAI(MonAICollection.Get('Explore'));
+}
 
 // END OF NPC Definition
 Zone.prototype.step = function(delta) {
@@ -228,6 +342,195 @@ Zone.prototype.getPortalEndPoint = function(ZoneID) {
     return portal;
 }
 
+// Item
+Zone.prototype.createItem = function(spawninfo) {
+	var item = new Item(spawninfo);
+	item.ItemUniqueID = this.ItemsNextID;
+	this.ItemsNextID++;
+	if (this.ItemsNextID > this.ItemsMaxLength) {
+		this.ItemNextID = 0; // Could find next free slot and if none free overwrite older items?
+		// Quick sort ftw.
+	}
+	//item.UniqueID = spawninfo.UniqueID;
+	item.UniqueID = 2;
+
+	item.Location.set(spawninfo.Location);
+	//item.Velocity.setN(5);
+	item.FacingDirection = spawninfo.Direction;
+
+	return item;
+}
+Zone.prototype.addItem = function(item) {
+	var zone = this;
+
+	var node = this.QuadTree.addNode(new QuadTree.QuadTreeNode({ object: item, update: this.npcUpdate, type: 'item' }));
+	item.node = node;
+
+	item.updateInterval = setInterval(function() {
+		//console.log('Updating information of item.');
+		// Send the packet to everyone
+		// Send item to all area
+		// send the packet to all in area. item.getPacket()
+		zone.sendToAllAreaLocation(item.Location, item.getPacket(), config.viewable_action_distance)
+	}, 4000);
+	item.itemDeathTimer = setTimeout(function() {
+		console.log('Destroying item.');
+		zone.removeItem(item.ItemUniqueID);
+		// Send the packet to everyone
+		// Send item to all area
+		// send the packet to all in area. item.getPacket()
+		// zone.SendToAllAreaLocation( item.Location,item.getPacket(),config.viewable_action_distance )
+	}, 5000); // 3 min 180000
+	this.Items[item.ItemUniqueID] = item;
+
+	// Send it to clients
+	this.sendToAllAreaLocation(item.Location, item.getPacket(), config.viewable_action_distance);
+	item.JustSpawned = 0;
+},
+// Expects itemjson to have Row, Column, ID
+// Basicaly storageItemSchema is what we are retriving in character.js
+Zone.prototype.getItem = function(index) {
+	var item = null;
+	console.log('Get item ' + index);
+	//if (typeof(this.Items[index]) != 'undefined')
+	if (this.Items[index]) {
+		console.log('Item Found');
+		item = this.Items[index]; // Check for valid shit later eg distance.
+	}
+	return item;
+},
+
+// See http://codepen.io/LiamKarlMitchell/pen/LCBnH
+// Need to make similar functions below. And to make the class objects for each.
+Zone.prototype.removeItem = function(index) {
+	//if (typeof(this.Items[id]) != 'undefined')
+	if (this.Items[index]) {
+		// Send packet to all saying it got picked up / destroyed
+		console.log('Removing item ' + index);
+		var item = this.Items[index];
+		item.onDelete();
+		this.QuadTree.removeNode(item.node);
+
+		item.JustSpawned = 3;
+		item.unknown1 = 1;
+		item.unknown2 = 1;
+		//item.Rotation[0]=1;
+		//item.Rotation[1]=1;
+		this.sendToAllAreaLocation(item.Location, item.getPacket(), config.viewable_action_distance);
+		//delete this.Items[index];
+		//this.Items.splice(index,1);
+		delete this.Items[index];
+	}
+}
+
+Zone.prototype.clearItems = function() {
+	var zone = this;
+	this.Items.forEach(function(item, index) {
+		if (item) {
+			zone.removeItem(item.ItemUniqueID); // Could use index
+		}
+	});
+}
+
+// Monster
+Zone.prototype.createMonster = function(spawninfo) {
+	//console.log('creating monster with spawninfo: ',spawninfo);
+	var mi = infos.Monster[spawninfo.ID];
+	if (mi == null) return null;
+	var monster = new Monster(mi);
+	if (monster == null) return null;
+	monster.spawninfo = spawninfo;
+	//monster.UniqueID = spawninfo.UniqueID;
+	monster.UniqueID = 2;
+	monster.ID = this.MonstersNextID;
+
+	this.MonstersNextID++;
+	if (this.MonstersNextID > this.MonstersMaxLength) {
+		this.MonstersNextID = 0; // Could find next free slot and if none free overwrite older items?
+		// Quick sort ftw.
+	}
+
+	monster.Location.set(spawninfo.Location);
+	monster.LocationTo.set(spawninfo.Location);
+	//monster.Velocity.setN(5);
+	monster.FacingDirection = spawninfo.Direction;
+
+	//this.Monsters[monster.ID] = monster;
+	//Objects.CreateNode(monster);
+	//console.log(monster);
+	return monster;
+}
+
+Zone.prototype.addMonster = function(monster) {
+	// monster.updateInterval = setInterval(function() {
+	// 	//console.log('Updating information of monster.');
+	// 	// Send the packet to everyone
+	// 	// Send monster to all area
+	// 	// send the packet to all in area. monster.getPacket()
+	// 	zone.sendToAllAreaLocation(monster.Location, monster.getPacket(), config.viewable_action_distance)
+	// }, 4000);
+	// monster.monsterDeathTimer = setTimeout(function() {
+	//   console.log('Destroying monster.');
+	//   zone.removeMonster(monster.UniqueID);
+	//   // Send the packet to everyone
+	//   // Send item to all area
+	//   // send the packet to all in area. item.getPacket()
+	//   // zone.SendToAllAreaLocation( item.Location,item.getPacket(),config.viewable_action_distance )
+	// },180000); // 3 min
+	var node = this.QuadTree.addNode(new QuadTree.QuadTreeNode({ object: monster, update: this.npcUpdate, type: 'monster' }));
+	monster.node = node;
+
+	this.Monsters[monster.UniqueID] = monster; // won't need in future.
+	//monster.SetAI(MonsterAIs.Get('Stand'));
+	this.Objects.CreateNode(monster); // Set its ai here to spawned?
+	// Send it to clients
+	this.sendToAllAreaLocation(monster.Location, monster.getPacket(), config.viewable_action_distance);
+	monster.JustSpawned = 0;
+	monster.Skill = 1;
+},
+// Expects itemjson to have Row, Column, ID
+// Basicaly storageItemSchema is what we are retriving in character.js
+Zone.prototype.getMonster = function(index) {
+	var monster = null;
+	console.log('Get monster ' + index);
+	if (this.Monsters[index]) {
+		console.log('monster Found');
+		monster = this.Monsters[index]; // Check for valid shit later eg distance.
+	}
+	return monster;
+},
+
+Zone.prototype.removeMonster = function(index) {
+	console.log('! CODE removeMonster');
+	if (this.Monsters[index]) {
+		// Send packet to all saying it got picked up / destroyed
+		console.log('Removing monster ' + index);
+		var monster = this.Monsters[index];
+		monster.onDelete();
+		this.QuadTree.removeNode(monster.node);
+
+		monster.JustSpawned = 3;
+		monster.unknown1 = 1;
+		monster.unknown2 = 1;
+		monster.Rotation[0] = 1;
+		monster.Rotation[1] = 1;
+
+		this.sendToAllAreaLocation(monster.Location, monster.getPacket(), config.viewable_action_distance);
+		//delete this.Monsters[index];
+		this.Monsters.splice(index, 1);
+	}
+}
+
+Zone.prototype.clearMonsters = function() {
+	var zone = this;
+	this.Monsters.forEach(function(monster, index) {
+		if (item) {
+			zone.removeMonster(monster.UniqueID); // Could use index
+		}
+	});
+}
+
+
 // NPC Functions
 // NPC
 Zone.prototype.createNPC = function(spawninfo) {
@@ -284,6 +587,7 @@ var npc = null;
 console.log('Get npc ' + index);
 if (this.NPC[index]) {
 	console.log('npc Found');
+	// return this.QuadTree.nodes[index]?? Lets use Quad Tree
 	npc = this.NPC[index]; // Check for valid shit later eg distance.
 }
 return npc;
@@ -362,7 +666,7 @@ Zone.prototype.Load = function(callback) {
 	// 	},
 
 		// function LoadMonsterSpawns(callback) {
-		// 	console.log('Loading Monster Spawns for ' + zone.Name);
+		// 	console.log('Loading Monster Spawns for ' + zone.ID);
 		// 	fs.readFile('data/spawninfo/' + _util.padLeft(zone.ID,'0', 3) + '.MOB', function(err, data) {
 		// 		if (err) {
 		// 			// Meh
@@ -378,9 +682,7 @@ Zone.prototype.Load = function(callback) {
 
 		// 				var monster = zone.createMonster(element);
 		// 				if (monster) {
-
 		// 					zone.addMonster(monster);
-
 		// 				}
 		// 				if (monster == null) {
 		// 					//console.log('Failed to load monster '+element.ID+' for zone '+zone.getID());
@@ -391,7 +693,7 @@ Zone.prototype.Load = function(callback) {
 		// 		callback(null, true);
 		// 	});
 		// },
-		function LoadNPCpawns(callback) {
+		function LoadNpcspawns(callback) {
 			console.log('Loading NPC Spawns for zone ' + zone.ID);
 			fs.readFile('data/spawninfo/' + _util.padLeft(zone.ID,'0', 3) + '.NPC', function(err, data) {
 				if (err) {
