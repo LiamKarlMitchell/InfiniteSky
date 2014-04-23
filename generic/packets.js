@@ -1167,13 +1167,13 @@ packets.TradeShopReply = restruct.
     string('Name',24).  
     // Repeats 5x5 so 25 times
     struct('Items',packets.TradeShopItem,25).
-    pad(3);
+    pad(4);
 packets.TradeShopReply2 = restruct.
     int8lu('PacketID').
     pad(526);
 
 console.log("Restruct size: " + packets.TradeShop.size);
-console.log("Reply size: " + packets.TradeShopReply2.size);
+console.log("Reply size: " + packets.TradeShopReply.size);
 
 // When canceling trade request with another player
 //Unhandled Packet ID 39
