@@ -34,7 +34,7 @@ GMCommands.AddCommand(new Command('set',60,function command_set(string,client){
 
 		var sendCharUpdate = false;
 
-		switch(ValueName)
+		switch(ValueName.toLowerCase())
 		{
 			case 'silver':
 				// For giving/taking silver
@@ -148,70 +148,161 @@ GMCommands.AddCommand(new Command('set',60,function command_set(string,client){
 				client.account.AP = Value;
 				sendCharUpdate = true;
 			break;
-			case 'Ring':
+			case 'ring':
+				var ii = infos.Item[Value];
+				if (!ii) {
+					client.sendInfoMessage(Value+' is not a valid Item.');
+					break;
+				}
+				if (ii.ItemType !== infos.Item.Type.Ring) {
+					client.sendInfoMessage('Item is not valid Type for this slot.');
+					break;
+				}
 				client.character.Ring.ID = Value;
 				client.character.Ring.Enchant = Value2;
 				client.character.Ring.Combine = Value3;
 				client.character.save();
 				sendCharUpdate = true;
 			break;
-			case 'Cape':
+			case 'cape':
+				var ii = infos.Item[Value];
+				if (!ii) {
+					client.sendInfoMessage(Value+' is not a valid Item.');
+					break;
+				}
+				if (ii.ItemType !== infos.Item.Type.Cape) {
+					client.sendInfoMessage('Item is not valid Type for this slot.');
+					break;
+				}
 				client.character.Cape.ID = Value;
 				client.character.Cape.Enchant = Value2;
 				client.character.Cape.Combine = Value3;
 				client.character.save();
 				sendCharUpdate = true;
 			break;
-			case 'Armor':
+			case 'armor':
+				var ii = infos.Item[Value];
+				if (!ii) {
+					client.sendInfoMessage(Value+' is not a valid Item.');
+					break;
+				}
+				if (ii.ItemType !== infos.Item.Type.Armor) {
+					client.sendInfoMessage('Item is not valid Type for this slot.');
+					break;
+				}
 				client.character.Armor.ID = Value;
 				client.character.Armor.Enchant = Value2;
 				client.character.Armor.Combine = Value3;
 				client.character.save();
 				sendCharUpdate = true;
 			break;
-			case 'Gloves':
+			case 'gloves':
+				var ii = infos.Item[Value];
+				if (!ii) {
+					client.sendInfoMessage(Value+' is not a valid Item.');
+					break;
+				}
+				if (ii.ItemType !== infos.Item.Type.Gloves) {
+					client.sendInfoMessage('Item is not valid Type for this slot.');
+					break;
+				}
 				client.character.Glove.ID = Value;
 				client.character.Glove.Enchant = Value2;
 				client.character.Glove.Combine = Value3;
 				client.character.save();
 				sendCharUpdate = true;
 			break;
-			case 'Amulet':
+			case 'amulet':
+				var ii = infos.Item[Value].Necklace;
+				if (!ii) {
+					client.sendInfoMessage(Value+' is not a valid Item.');
+					break;
+				}
+				if (ii.ItemType !== infos.Item.Type) {
+					client.sendInfoMessage('Item is not valid Type for this slot.');
+					break;
+				}
 				client.character.Amulet.ID = Value;
 				client.character.Amulet.Enchant = Value2;
 				client.character.Amulet.Combine = Value3;
 				client.character.save();
 				sendCharUpdate = true;
 			break;
-			case 'Boots':
+			case 'boots':
+				var ii = infos.Item[Value];
+				if (!ii) {
+					client.sendInfoMessage(Value+' is not a valid Item.');
+					break;
+				}
+				if (ii.ItemType !== infos.Item.Type.Boots) {
+					client.sendInfoMessage('Item is not valid Type for this slot.');
+					break;
+				}
 				client.character.Boot.ID = Value;
 				client.character.Boot.Enchant = Value2;
 				client.character.Boot.Combine = Value3;
 				client.character.save();
 				sendCharUpdate = true;
 			break;
-			case 'Bottle':
+			case 'bottle':
+				var ii = infos.Item[Value];
+				if (!ii) {
+					client.sendInfoMessage(Value+' is not a valid Item.');
+					break;
+				}
+				if (ii.ItemType !== infos.Item.Type.Bottle) {
+					client.sendInfoMessage('Item is not valid Type for this slot.');
+					break;
+				}
 				client.character.CalbashBottle.ID = Value;
 				client.character.CalbashBottle.Enchant = Value2;
 				client.character.CalbashBottle.Combine = Value3;
 				client.character.save();
 				sendCharUpdate = true;
 			break;
-			case 'Weapon':
+			case 'weapon':
+				var ii = infos.Item[Value];
+				if (!ii) {
+					client.sendInfoMessage(Value+' is not a valid Item.');
+					break;
+				}
+
+				if (!(
+					ii.ItemType === infos.Item.Type.Sword ||
+					ii.ItemType === infos.Item.Type.Blade ||
+					ii.ItemType === infos.Item.Type.Marble ||
+					ii.ItemType === infos.Item.Type.Katana ||
+					ii.ItemType === infos.Item.Type.DoubleBlade ||
+					ii.ItemType === infos.Item.Type.Lute ||
+					ii.ItemType === infos.Item.Type.LightBlade ||
+					ii.ItemType === infos.Item.Type.LongSpear ||
+					ii.ItemType === infos.Item.Type.Scepter)) {
+					client.sendInfoMessage('Item is not valid Type for this slot.');
+					break;
+				}
 				client.character.Weapon.ID = Value;
 				client.character.Weapon.Enchant = Value2;
 				client.character.Weapon.Combine = Value3;
 				client.character.save();
 				sendCharUpdate = true;
 			break;
-			case 'Pet':
+			case 'pet':
+				var ii = infos.Item[Value];
+				if (!ii) {
+					client.sendInfoMessage(Value+' is not a valid Item.');
+					break;
+				}
+				if (ii.ItemType !== infos.Item.Type.Pet) {
+					client.sendInfoMessage('Item is not valid Type for this slot.');
+					break;
+				}
 				client.character.Pet.ID = Value;
 				client.character.Pet.Activity = Value2;
 				client.character.Pet.Growth = Value3;
 				client.character.save();
 				sendCharUpdate = true;
 			break;
-			case 'MapID':
+			case 'map':
 				if (zones[Value]) {
 					client.sendInfoMessage('Please relog to load into map if possible.');
 					client.character.MapID = Value;
@@ -228,8 +319,8 @@ GMCommands.AddCommand(new Command('set',60,function command_set(string,client){
 			break;			
 			default:
 				client.sendInfoMessage(ValueName+' is not a valid value to set try one of these');
-				client.sendInfoMessage('silver, statpoints, skillpoints, gender, hair, face, clan, duel_win, duel_loose, name, skill, frame, stance, ap, Ring, Cape, Armor, Glove, Amulet, Boot, Bottle, Weapon, Pet, MapID');
-				return;
+				client.sendInfoMessage('silver, statpoints, skillpoints, gender, hair, face, clan, duel_win, duel_loose, name, skill, frame, stance, ap, ring, cape, armor, glove, amulet, boot, bottle, weapon, pet, mapid');
+				break;
 			break;
 		}
 

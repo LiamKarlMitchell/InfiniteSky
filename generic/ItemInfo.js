@@ -5,7 +5,7 @@
 // Loads the ItemInfo data
 
 // Incase we ever make an editor we could have constructor?
-function ItemInfo(){};
+function ItemInfo(){}; 
 ItemInfo.prototype = {
 	inspect: safeguard_cli.inspect,
 	use: function(socket) {
@@ -177,3 +177,30 @@ restruct.
 
 // If we have not loaded the item info yet then load it
 if (infos.Item === undefined) LoadItemInfo();
+
+infos.Item.Type = {
+	Common: 0,
+	Silver: 1,
+	Assist: 2,
+	Assist2: 3,
+	Mission: 4,
+	SkillBook: 5,
+	Bottle: 6,
+	Necklace: 7,
+	Cape: 8,
+	Armor: 9,
+	Gloves: 10,
+	Ring: 11,
+	Boots: 12,
+	Sword: 13,
+	Blade: 14,
+	Marble: 15,
+	Katana: 16,
+	DoubleBlade: 17,
+	Lute: 18,
+	LightBlade: 19,
+	LongSpear: 20,
+	Scepter: 21,
+	Pet: 22,
+	Assist3: 23
+};

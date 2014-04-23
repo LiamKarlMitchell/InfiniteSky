@@ -240,7 +240,7 @@ LoginPC.Set(0x03, {
 
 				//Need to code a way to find already logged in account on login server
 				console.log('Trying to find account already logged in from world server');
-				//console.log(account);
+				console.log(account);
 				existingLoggedInClient = world.findAccountSocket(account.Username);
 				if (existingLoggedInClient) {
 					console.log('Already Logged In - WorldServer');
