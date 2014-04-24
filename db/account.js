@@ -29,8 +29,8 @@ db.Account.logoutUser = function (socket) {
 	}
 
 	if(socket.zoneTransfer) {
-		console.log('db.Account.logoutUser '+socket.account.name)
-		world.getSocketFromTransferQueue(socket.account.name);
+		console.log('db.Account.logoutUser '+socket.account.Username)
+		world.getSocketFromTransferQueue(socket.account.Username);
 
 		db.Account.update({
 			_id: socket.account._id
