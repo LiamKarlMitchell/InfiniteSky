@@ -30,7 +30,8 @@
     "netmask": ">=1.0.4",
     "socket.io": "^1.0.0-pre",
     "xtend": "^3.0.0",
-    "fast-csv": "^0.2.4"
+    "fast-csv": "^0.2.4",
+    "eyes": "^0.1.8"
   },
   "optionalDependencies ": {
     "express": ""

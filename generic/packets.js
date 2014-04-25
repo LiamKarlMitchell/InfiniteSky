@@ -671,25 +671,6 @@ packets.MonsterObject = restruct.
     float32l('FacingDirection').
     int32lu('HP');
 
-packets.NPCObject = restruct.
-    //int8lu('Status').
-    int32lu('UniqueID').
-    int32lu('ID').
-    int32lu('NPCID').
-    int32lu('Life').
-    int32lu('Stance').
-    int32lu('Skill').
-    float32l('Frame').
-    struct('Location',structs.CVec3).
-    int32lu('Unknown3',3).
-    float32l('Direction').
-    float32l('TargetDirection').
-    int32ls('TargetObjectIndex').
-    int32lu('Unknown3',4).
-    struct('LocationTo',structs.CVec3).
-    float32l('FacingDirection').
-    int32lu('HP');
-
 packets.ChatPacketReply = restruct.
     int8lu('PacketID').
     string('Name',packets.AvatarNameLength+1).

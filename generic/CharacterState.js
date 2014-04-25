@@ -7,15 +7,16 @@
  * @class
  * @classdesc This is a description of the MyClass class.
  */
-var CVec3 = require('./generic/CVec3');
 
-function EquipItem() {
+vms.depends({ Name: 'CharacterState', depends: [ 'WorldPC.ActionReplyPacket', 'CVec3' ] }, function(){
+
+EquipItem = function EquipItem() {
 	this.ID = 0;
 	this.Enchant = 0; 
 	this.Combine = 0;
 }
 
-function StorageItem() {
+StorageItem = function StorageItem() {
 	this.ID = 0;
 	this.Column = 0; 
 	this.Row = 0; 
@@ -23,20 +24,24 @@ function StorageItem() {
 	this.Enchant = 0; 
 }
 
-function QuickUseItem() {
+QuickUseItem = function QuickUseItem() {
 	this.ID = 0;
 	this.Amount = 0;
 }
 
-function SkillItem() {
+SkillItem = function SkillItem() {
 	this.ID = 0;
 	this.Level = 0;
 }
 
+if (typeof(CharacterState_Prototype)==='undefined') {
+	CharacterState_Prototype = {};
+}
 
-function CharacterState() {
+CharacterState = function CharacterState() {
 	// Varables here
-	this.AccountID = -1; //?? // Account ID/Client Index??
+	this.AccountID = -1;
+	this.UniqueID = -1; //?? // Account ID/Client Index??
 	this.CharacterID = -1; //???    // Character ID ???? our new method dosnt use Integer for id.. lawl
 	// Will need to make a map of character._id to integer ID thats unique, like its array index
 	// Can probably handle it same way im thinking of handling items and monsters actually :)
@@ -103,86 +108,86 @@ function CharacterState() {
 
 	// Other misc vars here
 	this.hidden = false;
-
-	// Public Functions
-	this.setAccountID = function(ID) {
-		this.AccountID = ID;
-	};
-
-	this.setCharacterID = function(ID) {
-		this.CharacterID = ID;
-	};
-
-	this.setHP = function(HP) {
-		this.HP = HP;
-	};
-
-	this.respawn = function() {
-		// Respawn
-	};
-
-	this.setFromCharacter = function(character) {
-		character.updateInfos(true);
-		// Set the varables from a character's data
-		this.Name = character.Name;
-
-		//this.FactionCapeThing = 0;//01 girl 02 boy	
-		//this.TraitorFlag = 0;//Change to 03 for traitor?
-		//this.GlowItems = 0;// can make fist glow, weapon, and face (like ts2 vanity)
-		this.Clan = character.Clan;
-		this.Gender = character.Gender;
-		this.Hair = character.Hair;
-		this.Face = character.Face;
-		this.Level = character.Level;
-		this.Honor = character.Contribution;
-
-		// Equips
-		this.Necklace = character.Necklace;
-		this.Cape = character.Cape;
-		this.Armor = character.Armor;
-		this.Glove = character.Glove;
-		this.Ring = character.Ring;
-		this.Boot = character.Boot;
-		this.CalbashBottle = character.CalbashBottle;
-		this.Weapon = character.Weapon;
-		this.Pet = character.Pet;
-
-		this.GuildName = character.GuildName;
-
-		this.TagExist = character.GuildTag !== '' ? true : false;
-		this.GuildTag = character.GuildTag;
-
-		this.Stance = 0; // seems to only change player from fighting to regualr
-		this.Skill = 0; // or action
-		this.Frame = 0; //
-		this.Location = new CVec3(); // Current location
-
-		this.Location.X = character.RealX;
-		this.Location.Y = character.RealY;
-		this.Location.Z = character.RealZ;
-
-		this.LocationTo = new CVec3();
-
-		this.Direction = Math.floor(Math.random() * 360);
-		
-		this.TargetObjectIndex = -1;
-		this.TargetObjectUniqueNumber = -1;
-
-		this.LocationNew = new CVec3();
-		this.FacingDirection = this.Direction;
-
-		this.CurrentHP = character.Health;
-		this.MaxHP = character.statInfo.HP;
-		this.CurrentChi = character.Chi;
-		this.MaxChi = character.statInfo.Chi;
-	};
-
-	// Returns a compressed packet for us to send to whomever
-	this.getPacket = function() {
-		return packets.makeCompressedPacket(0x18,
-			new Buffer(
-				packets.ActionReplyPacket.pack(this)
-			)
-		);
-	};
 }
+
+CharacterState_Prototype.setAccountID = function(ID) {
+	this.AccountID = ID;
+};
+
+CharacterState_Prototype.setCharacterID = function(ID) {
+	this.CharacterID = ID;
+};
+
+CharacterState_Prototype.setHP = function(HP) {
+	this.HP = HP;
+};
+
+CharacterState_Prototype.respawn = function() {
+
+};
+
+CharacterState_Prototype.setFromCharacter = function(character) {
+	character.updateInfos(true);
+	// Set the varables from a character's data
+	this.Name = character.Name;
+
+	//this.FactionCapeThing = 0;//01 girl 02 boy	
+	//this.TraitorFlag = 0;//Change to 03 for traitor?
+	//this.GlowItems = 0;// can make fist glow, weapon, and face (like ts2 vanity)
+	this.Clan = character.Clan;
+	this.Gender = character.Gender;
+	this.Hair = character.Hair;
+	this.Face = character.Face;
+	this.Level = character.Level;
+	this.Honor = character.Contribution;
+
+	// Equips
+	this.Necklace = character.Necklace;
+	this.Cape = character.Cape;
+	this.Armor = character.Armor;
+	this.Glove = character.Glove;
+	this.Ring = character.Ring;
+	this.Boot = character.Boot;
+	this.CalbashBottle = character.CalbashBottle;
+	this.Weapon = character.Weapon;
+	this.Pet = character.Pet;
+
+	this.GuildName = character.GuildName;
+
+	this.TagExist = character.GuildTag !== '' ? true : false;
+	this.GuildTag = character.GuildTag;
+
+	this.Stance = 0; // seems to only change player from fighting to regualr
+	this.Skill = 0; // or action
+	this.Frame = 0; //
+	this.Location = new CVec3(); // Current location
+
+	this.Location.X = character.RealX;
+	this.Location.Y = character.RealY;
+	this.Location.Z = character.RealZ;
+
+	this.LocationTo = new CVec3();
+
+	this.Direction = Math.floor(Math.random() * 360);
+	
+	this.TargetObjectIndex = -1;
+	this.TargetObjectUniqueNumber = -1;
+
+	this.LocationNew = new CVec3();
+	this.FacingDirection = this.Direction;
+
+	this.CurrentHP = character.Health;
+	this.MaxHP = character.statInfo.HP;
+	this.CurrentChi = character.Chi;
+	this.MaxChi = character.statInfo.Chi;
+};
+
+
+// Returns a compressed packet for us to send to whomever
+CharacterState_Prototype.getPacket = function() {	
+	return packets.makeCompressedPacket(0x18,new Buffer(WorldPC.ActionReplyPacket.pack(this)));
+};
+
+CharacterState.prototype = CharacterState_Prototype;
+
+});

@@ -6,10 +6,11 @@ vms.depends({name: 'Zone.js', depends: [
     'db.Character',
     'packets',
     'QuadTree',
-    'packets'
+    'packets',
+    'Npc'
 ]
 }, function(){
-
+console.log('Woo');
 if(typeof(Zone) === 'undefined') {
     Zone = function Zone(ID) {
         this.ID = ID;
@@ -17,46 +18,6 @@ if(typeof(Zone) === 'undefined') {
     };
     Zone.prototype = {};
 }
-
-// TODO: Convert NPC Definition to a better layout for vmscript
-var NPC = function(ID) {
-	//AIModule.AIObject.call(this);
-	AIObject.call(this);
-	//var Attackers = new AIModule.AttackerCollection();
-	var Attackers = new AttackerCollection();
-	this.UniqueID = 0;
-	this._ID = 0; // Faction ID?
-	this.NPCID = ID;
-
-	this.Life = 1;
-	this.Stance = 0;
-	this.Skill = 0;
-	this.Frame = 0;
-	Location = new CVec3();
-	LocationTo = new CVec3();
-	this.Direction = 0;
-	this.TargetDirection = 0;
-	this.TargetObjectIndex = -1;
-	//'Unknown3',7
-	this.FacingDirection = 0;
-	this.HP = 1;
-
-	// Set up health and stats etc	
-	this.getPacket = function() {
-		var packet = packets.makeCompressedPacket(0x19, new Buffer(packets.NPCObject.pack(this)));
-		return packet;
-	};
-
-	this.onDelete = function() {
-		// Remove timers and intervals to free up references
-		clearInterval(this.updateInterval);
-		//clearTimeout(this.monsterDeathTimer);
-	};
-
-	this.setLocationRandomOffset = function(Location, Radius) {
-		// Set the location to random spot in a circle? :D
-	};
-};
 
 // MONSTER NPC ITEM
 // Move me into new thing
@@ -236,16 +197,14 @@ Zone.prototype.addSocket = function(socket) {
     this.Clients.push(socket);
     var node = this.QuadTree.addNode(new QuadTree.QuadTreeNode({ object: socket, update: this.clientNodeUpdate, type: 'client' }));
     socket.node = node;
+    socket.character.state.UniqueID = node.id;
 
     if(this.zone_script.onClientJoin) this.zone_script.onClientJoin(socket);
     // Create character state object for this socket
     // Send character state object to all with it being compressed
     // Setup any timers needed and shit here
     //socket.character.Talk('Hello World!');
-    this.sendToAllAreaLocation(socket.character.state.Location, packets.makeCompressedPacket(
-    0x18, new Buffer(
-    packets.ActionReplyPacket.pack(
-    socket.character.state))), config.viewable_action_distance);
+    this.sendToAllAreaLocation(socket.character.state.Location, socket.character.state.getPacket(), config.viewable_action_distance);
 }
 Zone.prototype.findCharacterSocket = function(Name) {
     var socket = null;
@@ -535,7 +494,7 @@ Zone.prototype.clearMonsters = function() {
 // NPC
 Zone.prototype.createNPC = function(spawninfo) {
 //console.log('creating monster with spawninfo: ',spawninfo);
-var npc = new NPC(spawninfo.ID);
+var npc = new Npc(spawninfo.ID);
 
 npc.spawninfo = spawninfo;
 //npc.UniqueID = spawninfo.UniqueID;
@@ -560,18 +519,19 @@ return npc;
 }
 
 Zone.prototype.addNPC = function(npc) {
-var zone = this;
-npc.zone = this;
+	var zone = this;
+	npc.zone = this;
 
-var node = this.QuadTree.addNode(new QuadTree.QuadTreeNode({ object: npc, update: this.npcUpdate, type: 'npc' }));
-npc.node = node;
+	var node = this.QuadTree.addNode(new QuadTree.QuadTreeNode({ object: npc, update: this.npcUpdate, type: 'npc' }));
+	npc.node = node;
+	npc.UniqueID = node.id;
 
 
-npc.updateInterval = setInterval(function() {
-	// Update and send to all in area
-	if (zone.Clients.length > 0) {
-		zone.sendToAllAreaLocation(npc.Location, npc.getPacket(), config.viewable_action_distance);
-	}
+	npc.updateInterval = setInterval(function() {
+		// Update and send to all in area
+		if (zone.Clients.length > 0) {
+			zone.sendToAllAreaLocation(npc.Location, npc.getPacket(), config.viewable_action_distance);
+		}
 }, 4000);
 this.NPC[npc.UniqueID] = npc;
 

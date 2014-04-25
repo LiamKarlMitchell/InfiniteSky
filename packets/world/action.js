@@ -9,8 +9,8 @@ float32l('Frame').
 struct('Location', structs.CVec3).
 struct('LocationTo', structs.CVec3).
 float32l('Direction').
-int32lu('TargetObjectIndex').
-int32lu('TargetObjectUniqueNumber').
+int32lu('nodeID').
+int32lu('TargetID').
 float32l('UNK3', 4).
 struct('LocationNew', structs.CVec3).
 float32l('FacingDirection').
@@ -58,8 +58,8 @@ WorldPC.ActionReplyPacket = restruct.
 // struct('Location', structs.CVec3).
 // struct('LocationTo', structs.CVec3).
 // float32l('Direction').
-// int32lu('TargetObjectIndex').
-// int32lu('TargetObjectUniqueNumber').
+// int32lu('nodeID').
+// int32lu('TargetID').
 // float32l('UNKnowni6', 4).
 // struct('LocationNew', structs.CVec3).
 // float32l('FacingDirection').
@@ -69,7 +69,7 @@ WorldPC.ActionReplyPacket = restruct.
 // int32lu('CurrentChi').
 // int32lu('otherthings', 171);
     int32lu('CharacterID').
-    int32lu('CharacterTypeIdentifier').
+    int32lu('UniqueID').
     string('Name',packets.CharName_Length+1).
     string('Demostrater',packets.CharName_Length+1).
     string('Child',packets.CharName_Length+1).
@@ -108,8 +108,8 @@ WorldPC.ActionReplyPacket = restruct.
     struct('Location',structs.CVec3).
     struct('LocationTo',structs.CVec3).
     float32l('Direction').
-    int32lu('TargetObjectIndex').
-    int32lu('TargetObjectUniqueNumber').
+    int32lu('nodeID').
+    int32lu('TargetID').
     float32l('UNKnowni6',4).
     struct('LocationNew',structs.CVec3).
     float32l('FacingDirection').
@@ -303,16 +303,14 @@ int8lu('Status').
 int32lu('Action').
 int32lu('CharID1').
 int32lu('CharID2').
-int32lu('TargetObjectUniqueNumber').
-int32lu('TargetObjectIndex').
+int32lu('TargetID').
+int32lu('nodeID').
 int32lu('skillID').
 int32lu('UNknownthings', 10);
 
 //2C
 WorldPC.AttackPacketReply = restruct.
 int32lu('Action'). // 0 your attacking
-
-
 
 int32lu('AttackerID').
 int32lu('AttackerIndex').
@@ -392,6 +390,16 @@ function handleActionPacket(socket, action, update) {
             break;
         }
 
+        var otherNode = null;
+        if (action.nodeID != 4294967295 && action.nodeID != 0) {
+            otherNode = socket.Zone.QuadTree.nodesHash[action.nodeID];
+        }
+
+        if (otherNode) {
+            // TODO: Use information to implement attacking.
+            socket.sendInfoMessage('Selected Node ['+action.nodeID+'] '+otherNode.type);
+        }
+
         var AttackPacket;
 
         // Is Attacking something?
@@ -403,7 +411,7 @@ function handleActionPacket(socket, action, update) {
             //  return;
             // }
             // What is selected
-            if (action.TargetObjectUniqueNumber != 4294967295) // If it is not -1
+            if (action.TargetID != 4294967295) // If it is not -1
             {
 
                 // Set when can attack again
@@ -412,7 +420,7 @@ function handleActionPacket(socket, action, update) {
                 // },500); // Work out time on the kind of action.
                 // Some actions attack 3 time or 2 times more.
 
-                //socket.sendInfoMessage("Selected: "+ action.TargetObjectIndex+' '+ action.TargetObjectUniqueNumber);
+                //socket.sendInfoMessage("Selected: "+ action.nodeID+' '+ action.TargetID);
                 eyes.inspect(action);
                 //socket.character.state.CanAttack = 0;
                 //console.log(socket.character.state.CanAttack);
@@ -421,13 +429,13 @@ function handleActionPacket(socket, action, update) {
                 //console.log('We need to see if we can use one of the ID\'s as an identifyer of object type or maybe assign certian ranges to different object types');
                 //console.log('Should make an object with function to handle attacking other objects.');
                 //console.log('Prototyping and inherientence come into play :)');
-                switch (action.TargetObjectIndex) {
+                switch (action.nodeID) {
                 case 0:
                     // Attacking character
                     {
-                        socket.sendInfoMessage('Attacking character '+action.TargetObjectUniqueNumber);
+                        socket.sendInfoMessage('Attacking character '+action.TargetID);
 
-                        var other = socket.Zone.findSocketByCharacterID(action.TargetObjectUniqueNumber);
+                        var other = socket.Zone.findSocketByCharacterID(action.TargetID);
                         if (other===null) break; // If not found then skip this case.
 
                         other.sendInfoMessage('You are being attacked by '+socket.character.Name);
@@ -452,11 +460,11 @@ function handleActionPacket(socket, action, update) {
                     // Attacking monster
                     {
                         console.log('Attacking monster');
-                        var monster_node = socket.Zone.Objects.GetNodeByID(action.TargetObjectIndex);
+                        var monster_node = socket.Zone.Objects.GetNodeByID(action.nodeID);
                         var monster = monster_node.object;
 
 
-                        //var monster = socket.Zone.getMonster(action.TargetObjectIndex);
+                        //var monster = socket.Zone.getMonster(action.nodeID);
                         //console.log(monster);
                         //console.log(monster_node);
                         if (monster) {
@@ -519,7 +527,7 @@ function handleActionPacket(socket, action, update) {
                     break;
                 default:
                     // Unknown
-                    console.log('Attacking unknown type: ' + action.TargetObjectUniqueNumber);
+                    console.log('Attacking unknown type: ' + action.TargetID);
                 
                     break;
                 }
@@ -553,8 +561,8 @@ function handleActionPacket(socket, action, update) {
         socket.character.state.Direction = action.Direction; //action.Direction;
         socket.character.state.FacingDirection = action.FacingDirection;
 
-        socket.character.state.TargetObjectIndex = action.TargetObjectIndex;
-        socket.character.state.TargetObjectUniqueNumber = action.TargetObjectUniqueNumber;
+        socket.character.state.nodeID = action.nodeID;
+        socket.character.state.TargetID = action.TargetID;
 
         socket.character.state.LocationNew.X = action.LocationNew.X;
         socket.character.state.LocationNew.Y = action.LocationNew.Y;
@@ -580,10 +588,7 @@ function handleActionPacket(socket, action, update) {
     }
 
     //if (socket.character.state.Skill!=1) {
-        socket.Zone.sendToAllArea(socket, true, packets.makeCompressedPacket(
-        0x18, new Buffer(
-        WorldPC.ActionReplyPacket.pack(
-        socket.character.state))), config.viewable_action_distance);
+        socket.Zone.sendToAllArea(socket, true, socket.character.state.getPacket(), config.viewable_action_distance);
     //}
 }
 

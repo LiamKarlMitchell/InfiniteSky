@@ -325,7 +325,7 @@ Dependent.prototype = {
             } else {
               obj = obj[deppath[j]];
             }
-            if (obj === undefined) return false;
+            if (!obj) return false;
           }
       }
     }

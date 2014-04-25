@@ -730,6 +730,13 @@ vms.depends({
                     mapLoadQueue.push(id, world.doneZoneLoad);
                 }
             }
+            world.Loaded = false;
+            mapLoadQueue.drain = function() {
+                if (world.Loaded === false) {
+                    world.Loaded = true;
+                    console.log('Finished loading zones!\nYou can now login to the server.');
+                }
+            }
         } else {
             console.error('\x1B[31mPlease define Zones object in your config.json\x1B[0m');
         }

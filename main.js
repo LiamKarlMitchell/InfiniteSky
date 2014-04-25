@@ -51,6 +51,7 @@ events = require('events');
 hexy = require('hexy').hexy;
 PacketCollection = require('./PacketCollection');
 CachedBuffer = require('./CachedBuffer');
+eyes = require('eyes');
 
 // TODO: Make an improved way to save guard our inspect, we should be able to navigate the servers objects
 // in a nice way. To see their members and propertys but not lag out the console with heaps of useless JSON output.
@@ -142,7 +143,7 @@ config.natTranslations.forEach(function(natTranslation,index) {
 try {
   generic = new vmscript('generic','generic');
   plugins = new vmscript('plugins',null);
-  generic.on('dependent_loaded',function(info) { plugins.emit('dependent_loaded',info); });
+
   plugins.Load('login.js');
   plugins.Load('zone.js');
   plugins.Load('world.js');
@@ -150,6 +151,13 @@ try {
   // TEMP SOLUTION TO GET VMSCRIPT TRIGGER LOADING...
   setInterval(function(){
     plugins.emit('dependent_loaded');
+    generic.emit('dependent_loaded');
+    if (typeof(login) !== 'undefined') {
+      login.packets.scripts.emit('dependent_loaded');
+    }
+    if (typeof(world) !== 'undefined') {
+      world.packets.scripts.emit('dependent_loaded');
+    }
   },5000);
 
   console.log('Plugins to Load: ',config.plugins);
