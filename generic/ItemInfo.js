@@ -5,94 +5,157 @@
 // Loads the ItemInfo data
 
 // Incase we ever make an editor we could have constructor?
-function ItemInfo(){}; 
-ItemInfo.prototype = {
-	inspect: safeguard_cli.inspect,
-	use: function(socket) {
-		// Check item type, only useable items can be used.
-		if ([
-			 // Put Allowed TypeID's here
-			 1, // Pill
-			 21 // Common
-			].indexOf(this.ItemType) === -1
-			) return false;
-		// TODO: Use VM Scripts for item uses when special case.
-		if (infos.item.scripts[this.ID]) {
-			return infos.item.scripts[this.ID](socket);
-		}
-		return false;
-	},
-	getItemType: function() {
-		var ItemType;
-		switch (this.ItemType)
-		{
-			case 1: ItemType = 'Silver Coins'; // SilverCoins
-			case 2: ItemType = 'Assist'; // Assist
-			case 3: ItemType = 'Assist 2'; // Assist seems like its grouped to 2, It contains a different kind of pills,
-				// couple books and enchanting mats of different quality
-			case 4: ItemType = 'Mission';
-			case 5: ItemType = 'Skill books / Art Book';
-			case 6: ItemType = 'Calabash_Bottle'; //testing
-			case 7: ItemType = 'Necklace';
-			case 8: ItemType = 'Cape';
-			case 9: ItemType = 'Armor';
-			case 10: ItemType = 'Gloves';
-			case 11: ItemType = 'Ring';
-			case 12: ItemType = 'Boots';
-			case 13: ItemType = 'Sword';
-			case 14: ItemType = 'Blade';
-			case 15: ItemType = 'Marble';
-			case 16: ItemType = 'Katana';
-			case 17: ItemType = 'Double Blade'; // test
-			case 18: ItemType = 'Lute';
-			case 19: ItemType = 'Light Blade';
-			case 20: ItemType = 'Long Spear';
-			case 21: ItemType = 'Scepter';
-			case 22: ItemType = 'Pet';
-			case 23: ItemType = 'Assist 3'; // Seems like crafting materials at herb master
-			default: ItemType = 'Common'; break;
-		};
-		return ItemType;
-	},
-	getRareness: function() {
-		var Rareness;
-		switch (this.Rareness)
-		{
-			case 0: Rareness = 'Common'; break;
-			case 1: Rareness = 'Uncommon'; break;
-			case 2: Rareness = 'Unique'; break;
-			case 3: Rareness = 'Rare'; break;
-			case 4: Rareness = 'Elite'; break;
-		}
-		return Rareness;
-	},
+if (typeof(ItemInfo_Prototype) === 'undefined') {
+	ItemInfo_Prototype = {};
+}
 
-	toString: function(kind) {
-		switch (kind) {
-			case 'small':
-				return this.ID+' - '+this.Name;
-      break;
-			case 'raretype':
-				return this.ID+' - '+this.Name+' ('+this.getRareness()+')'+' '+this.getItemType();
-			break;
-      default:
-				return this.ID+' - '+this.Name+' ('+this.getRareness()+')'+' '+this.getItemType()+' B:'+this.PurchasePrice+' S:'+this.SalePrice+' Lv:'+this.LevelRequirement;
-			break;
-		}
-	},
-	getSlotCount: function() {
-		var t = this.ItemType;
-	    if (t === 2 || t === 7 || t === 11) {
-	        return 1;
-	    } else {
-	        return 4;
-	    }
-	},
-	isAllowedByClan: function(characterClanID){
-		//TODO: Check up on actuall clan restriction value from Item Info
-		if(this.Clan === 1 || this.Clan === (characterClanID +2)) return true;
+function ItemInfo(){}
+ItemInfo.prototype = ItemInfo_Prototype;
+
+ItemInfo_Prototype.inspect = safeguard_cli.inspect;
+
+ItemInfo_Prototype.use = function(socket) {
+	console.log('ItemType: '+this.ItemType);
+	// Check item type, only useable items can be used.
+	if ([
+		 // Put Allowed TypeID's here
+		 1, // Pill
+		 2,
+		 21 // Common
+		].indexOf(this.ItemType) === -1
+		) {
+		socket.sendInfoMessage('This item cannot be used.');
+		console.error('This item cannot be used.');
 		return false;
+		}
+	
+	// Apply item effects...
+	socket.sendInfoMessage('Using items is not yet implemented.');
+	// Ratio is actually %
+	switch (this.ValueType) {
+		case 1:  // HP Recovery Points
+			socket.character.state.CurrentHP += this.Value1;
+			if (socket.character.state.CurrentHP > socket.character.state.MaxHP) {
+				socket.character.state.CurrentHP = socket.character.state.MaxHP;
+			}
+		break;
+		case 2:  // HP Recovery Ratio
+			socket.character.state.CurrentHP += Value1/100 * socket.character.state.MaxHP;
+			if (socket.character.state.CurrentHP > socket.character.state.MaxHP) {
+				socket.character.state.CurrentHP = socket.character.state.MaxHP;
+			}
+		break;
+		case 3:  // Chi Recovery Points
+			socket.character.state.CurrentChi += this.Value1;
+			if (socket.character.state.CurrentChi > socket.character.state.MaxChi) {
+				socket.character.state.CurrentChi = socket.character.state.MaxChi;
+			}
+		break;
+		case 4:  // Chi Recovery Ratio
+			socket.character.state.CurrentChi += Value1/100 * socket.character.state.MaxChi
+			if (socket.character.state.CurrentChi > socket.character.state.MaxChi) {
+				socket.character.state.CurrentChi = socket.character.state.MaxChi;
+			}
+		break;
+		case 5:  // HP Recovery Ratio & Chi Recovery Ratio
+			socket.character.state.CurrentHP += Value1/100 * socket.character.state.MaxHP;
+			if (socket.character.state.CurrentHP > socket.character.state.MaxHP) {
+				socket.character.state.CurrentHP = socket.character.state.MaxHP;
+			}
+			socket.character.state.CurrentChi += Value1/100 * socket.character.state.MaxChi
+			if (socket.character.state.CurrentChi > socket.character.state.MaxChi) {
+				socket.character.state.CurrentChi = socket.character.state.MaxChi;
+			}
+		break;
+		//case 6:  // Activity Recovery Rate // Maybe for pet?
+		//break;
+		default:
+			var message = 'Unhandled Item Value Type '+ValueType;
+			dumpError(message);
+			socket.sendInfoMessage(message);
+		break;
 	}
+
+	// TODO: Use VM Scripts for item uses when special case.
+	if (infos.Item.scripts && infos.Item.scripts[this.ID]) {
+		return infos.Item.scripts[this.ID](socket);
+	}
+	return false;
+};
+
+ItemInfo_Prototype.getItemType = function() {
+	var ItemType;
+	switch (this.ItemType)
+	{
+		case 1: ItemType = 'Silver Coins'; // SilverCoins
+		case 2: ItemType = 'Assist'; // Assist
+		case 3: ItemType = 'Assist 2'; // Assist seems like its grouped to 2, It contains a different kind of pills,
+			// couple books and enchanting mats of different quality
+		case 4: ItemType = 'Mission';
+		case 5: ItemType = 'Skill books / Art Book';
+		case 6: ItemType = 'Calabash_Bottle'; //testing
+		case 7: ItemType = 'Necklace';
+		case 8: ItemType = 'Cape';
+		case 9: ItemType = 'Armor';
+		case 10: ItemType = 'Gloves';
+		case 11: ItemType = 'Ring';
+		case 12: ItemType = 'Boots';
+		case 13: ItemType = 'Sword';
+		case 14: ItemType = 'Blade';
+		case 15: ItemType = 'Marble';
+		case 16: ItemType = 'Katana';
+		case 17: ItemType = 'Double Blade'; // test
+		case 18: ItemType = 'Lute';
+		case 19: ItemType = 'Light Blade';
+		case 20: ItemType = 'Long Spear';
+		case 21: ItemType = 'Scepter';
+		case 22: ItemType = 'Pet';
+		case 23: ItemType = 'Assist 3'; // Seems like crafting materials at herb master
+		default: ItemType = 'Common'; break;
+	};
+	return ItemType;
+};
+
+ItemInfo_Prototype.getRareness = function() {
+	var Rareness;
+	switch (this.Rareness)
+	{
+		case 0: Rareness = 'Common'; break;
+		case 1: Rareness = 'Uncommon'; break;
+		case 2: Rareness = 'Unique'; break;
+		case 3: Rareness = 'Rare'; break;
+		case 4: Rareness = 'Elite'; break;
+	}
+	return Rareness;
+};
+
+ItemInfo_Prototype.toString = function(kind) {
+	switch (kind) {
+		case 'small':
+			return this.ID+' - '+this.Name;
+  break;
+		case 'raretype':
+			return this.ID+' - '+this.Name+' ('+this.getRareness()+')'+' '+this.getItemType();
+		break;
+  default:
+			return this.ID+' - '+this.Name+' ('+this.getRareness()+')'+' '+this.getItemType()+' B:'+this.PurchasePrice+' S:'+this.SalePrice+' Lv:'+this.LevelRequirement;
+		break;
+	}
+};
+
+ItemInfo_Prototype.getSlotCount = function() {
+	var t = this.ItemType;
+    if (t === 2 || t === 7 || t === 11) {
+        return 1;
+    } else {
+        return 4;
+    }
+};
+
+ItemInfo_Prototype.isAllowedByClan = function(characterClanID){
+	//TODO: Check up on actuall clan restriction value from Item Info
+	if(this.Clan === 1 || this.Clan === (characterClanID +2)) return true;
+	return false;
 };
 
 
@@ -146,8 +209,8 @@ restruct.
   int32ls("SkillBonusAmount1").
   int32ls("SkillBonusAmount2").
   int32ls("SkillBonusAmount3").
-  int32ls("_15").
   int32ls("Stackable").
+  int32ls("ValueType").
   int32ls("Value1").
   int32ls("_16").
   int32ls("_17").

@@ -628,18 +628,36 @@ ItemActions[0xB] = function Recv_MoveFromPillBar(client, input) { // COMPLETED
 };
 ItemActions[0x0C] = function Recv_Use_item(client, input) { // TODO: Heal method on pills and etc. actuall usage of them and update of characters state.
     var UsedItem = client.character.QuickUseItems[input.InventoryIndex];
+    console.log('asd');
     if(UsedItem === null || UsedItem === undefined){
         clientWriteItemActionFailed(client, input);
+        console.log('1');
         return;
     }else{
-        if(UsedItem.ID === undefined || UsedItem.ID !== input.ItemID){
+        console.log('2');
+        if(!UsedItem || UsedItem.ID !== input.ItemID){
+            console.log('3');
             clientWriteItemActionFailed(client, input);
             return;
         }else{
-            var Reminder = UsedItem.Amount-1;
-            if(Reminder === 0)
+            console.log('4');
+            var ii = infos.Item[UsedItem.ID];
+            if (!ii) {
+                console.log('Item '+UsedItem.ID+' DOES NOT EXIST when used...');
+                clientWriteItemActionFailed(client, input);
+                return;
+            }
+
+            console.log('5');
+
+            ii.use(client);
+
+            if(UsedItem.Amount-1===0) {
                 client.character.QuickUseItems[input.InventoryIndex] = null;
-            else client.character.QuickUseItems[input.InventoryIndex].Amount = Reminder;
+            }
+            else {
+                client.character.QuickUseItems[input.InventoryIndex].Amount--;
+            }
 
             client.character.markModified('QuickUseItems');
             client.character.save();

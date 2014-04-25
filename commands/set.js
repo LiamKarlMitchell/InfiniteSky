@@ -158,9 +158,7 @@ GMCommands.AddCommand(new Command('set',60,function command_set(string,client){
 					client.sendInfoMessage('Item is not valid Type for this slot.');
 					break;
 				}
-				client.character.Ring.ID = Value;
-				client.character.Ring.Enchant = Value2;
-				client.character.Ring.Combine = Value3;
+				client.character.Ring = { ID: Value, Enchant: Value2, Combine: Value3 };
 				client.character.save();
 				sendCharUpdate = true;
 			break;
@@ -174,9 +172,7 @@ GMCommands.AddCommand(new Command('set',60,function command_set(string,client){
 					client.sendInfoMessage('Item is not valid Type for this slot.');
 					break;
 				}
-				client.character.Cape.ID = Value;
-				client.character.Cape.Enchant = Value2;
-				client.character.Cape.Combine = Value3;
+				client.character.Cape = { ID: Value, Enchant: Value2, Combine: Value3 };
 				client.character.save();
 				sendCharUpdate = true;
 			break;
@@ -190,9 +186,7 @@ GMCommands.AddCommand(new Command('set',60,function command_set(string,client){
 					client.sendInfoMessage('Item is not valid Type for this slot.');
 					break;
 				}
-				client.character.Armor.ID = Value;
-				client.character.Armor.Enchant = Value2;
-				client.character.Armor.Combine = Value3;
+				client.character.Armor = { ID: Value, Enchant: Value2, Combine: Value3 };
 				client.character.save();
 				sendCharUpdate = true;
 			break;
@@ -206,9 +200,7 @@ GMCommands.AddCommand(new Command('set',60,function command_set(string,client){
 					client.sendInfoMessage('Item is not valid Type for this slot.');
 					break;
 				}
-				client.character.Glove.ID = Value;
-				client.character.Glove.Enchant = Value2;
-				client.character.Glove.Combine = Value3;
+				client.character.Glove = { ID: Value, Enchant: Value2, Combine: Value3 };
 				client.character.save();
 				sendCharUpdate = true;
 			break;
@@ -222,9 +214,7 @@ GMCommands.AddCommand(new Command('set',60,function command_set(string,client){
 					client.sendInfoMessage('Item is not valid Type for this slot.');
 					break;
 				}
-				client.character.Amulet.ID = Value;
-				client.character.Amulet.Enchant = Value2;
-				client.character.Amulet.Combine = Value3;
+				client.character.Amulet = { ID: Value, Enchant: Value2, Combine: Value3 };
 				client.character.save();
 				sendCharUpdate = true;
 			break;
@@ -238,9 +228,7 @@ GMCommands.AddCommand(new Command('set',60,function command_set(string,client){
 					client.sendInfoMessage('Item is not valid Type for this slot.');
 					break;
 				}
-				client.character.Boot.ID = Value;
-				client.character.Boot.Enchant = Value2;
-				client.character.Boot.Combine = Value3;
+				client.character.Boot = { ID: Value, Enchant: Value2, Combine: Value3 };
 				client.character.save();
 				sendCharUpdate = true;
 			break;
@@ -254,9 +242,7 @@ GMCommands.AddCommand(new Command('set',60,function command_set(string,client){
 					client.sendInfoMessage('Item is not valid Type for this slot.');
 					break;
 				}
-				client.character.CalbashBottle.ID = Value;
-				client.character.CalbashBottle.Enchant = Value2;
-				client.character.CalbashBottle.Combine = Value3;
+				client.character.CalbashBottle = { ID: Value, Enchant: Value2, Combine: Value3 };
 				client.character.save();
 				sendCharUpdate = true;
 			break;
@@ -280,9 +266,7 @@ GMCommands.AddCommand(new Command('set',60,function command_set(string,client){
 					client.sendInfoMessage('Item is not valid Type for this slot.');
 					break;
 				}
-				client.character.Weapon.ID = Value;
-				client.character.Weapon.Enchant = Value2;
-				client.character.Weapon.Combine = Value3;
+				client.character.Weapon = { ID: Value, Enchant: Value2, Combine: Value3 };
 				client.character.save();
 				sendCharUpdate = true;
 			break;
@@ -296,9 +280,7 @@ GMCommands.AddCommand(new Command('set',60,function command_set(string,client){
 					client.sendInfoMessage('Item is not valid Type for this slot.');
 					break;
 				}
-				client.character.Pet.ID = Value;
-				client.character.Pet.Activity = Value2;
-				client.character.Pet.Growth = Value3;
+				client.character.Pet = { ID: Value, Enchant: Value2, Combine: Value3 };
 				client.character.save();
 				sendCharUpdate = true;
 			break;
@@ -316,10 +298,19 @@ GMCommands.AddCommand(new Command('set',60,function command_set(string,client){
 				{
 					client.sendInfoMessage('Zone not found');
 				}
-			break;			
+			break;
+			case 'disguise':
+				var mi = infos.Monster[Value];
+				if (!mi && Value != 0) {
+					client.sendInfoMessage('Monster '+Value+' Does not exist.');
+					return;
+				}
+				client.character.state.MonsterDisguise = Value;
+				sendCharUpdate = true;
+			break;
 			default:
 				client.sendInfoMessage(ValueName+' is not a valid value to set try one of these');
-				client.sendInfoMessage('silver, statpoints, skillpoints, gender, hair, face, clan, duel_win, duel_loose, name, skill, frame, stance, ap, ring, cape, armor, glove, amulet, boot, bottle, weapon, pet, mapid');
+				client.sendInfoMessage('silver, statpoints, skillpoints, gender, hair, face, clan, duel_win, duel_loose, name, skill, frame, stance, ap, ring, cape, armor, glove, amulet, boot, bottle, weapon, pet, mapid, disguise');
 				break;
 			break;
 		}

@@ -580,10 +580,7 @@ function handleActionPacket(socket, action, update) {
 
 
     if (socket.character.state.hidden) {
-        socket.write(packets.makeCompressedPacket(
-        0x18, new Buffer(
-        WorldPC.ActionReplyPacket.pack(
-        socket.character.state))));
+        socket.write(socket.character.state.getPacket());
         return;
     }
 

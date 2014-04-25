@@ -597,7 +597,7 @@ vms.depends({
     world.findAccountSocket = function(name) {
         for(var i = 0; i < world.clients.length; i++) {
             if(world.clients[i].authenticated) {
-                if(world.clients[i].ai.Username === name) {
+                if(world.clients[i].account.Username === name) {
                     return world.clients[i];
                 }
             }
