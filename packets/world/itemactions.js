@@ -524,22 +524,25 @@ ItemActions[0x07] = function Recv_SellItem(client, input) { // COMPLETED TODO: M
             clientWriteItemActionFailed(client, input);
             return;
         }else{
-            if(sellingItem.Amount == undefined)
-                input.Amount = 0;
-            var sellPrice = input.Amount <= 99 && input.Amount > 0 ? infos.Item[input.ItemID].SalePrice * input.Amount : infos.Item[input.ItemID].SalePrice;
 
+            if (input.Amount == 0) input.Amount = 1;
+
+            var sellPrice = infos.Item[input.ItemID].SalePrice * input.Amount;
+            // Auto convert to gold?
             if((client.character.Silver + sellPrice) > MAX_SILVER){
                 clientWriteItemActionFailed(client, input);
                 return;
             }
 
-            var Reminder = sellingItem.Amount - input.Amount;
+            if (input.Amount > 0 && input.Amount <= sellingItem.Amount) {
 
-            if(Reminder === 0 || sellingItem.Amount == undefined || infos.Item[sellingItem.ID].Stackable === 0){
-                client.character.Inventory[input.InventoryIndex] = null;
-            }else if(Reminder > 0 && Reminder < 99){
-                client.character.Inventory[input.InventoryIndex].Amount = Reminder;
-            }else{
+                client.character.Inventory[input.InventoryIndex].Amount-=input.Amount;
+                
+                if (sellingItem.Amount === 0) {
+                    client.character.Inventory[input.InventoryIndex] = null;
+                }
+            }
+            else {
                 clientWriteItemActionFailed(client, input);
                 return;
             }
@@ -1327,7 +1330,12 @@ WorldPC.Set(0x14, {
         if (!client.authenticated) return;
         client.sendInfoMessage('Handling Item Action: ' + input.ActionType);
         if (ItemActions[input.ActionType]) {
-            ItemActions[input.ActionType](client, input);
+            try {
+                ItemActions[input.ActionType](client, input);
+            } catch (ex) {
+                dumpError(ex);
+                clientWriteItemActionFailed(client, input);
+            }
         } else {
             console.log('Unhandled Item Action: ' + input.ActionType);
             NotImplemented(input.ActionType);

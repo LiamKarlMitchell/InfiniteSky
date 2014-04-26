@@ -15,7 +15,6 @@ ItemInfo.prototype = ItemInfo_Prototype;
 ItemInfo_Prototype.inspect = safeguard_cli.inspect;
 
 ItemInfo_Prototype.use = function(socket) {
-	console.log('ItemType: '+this.ItemType);
 	// Check item type, only useable items can be used.
 	if ([
 		 // Put Allowed TypeID's here
