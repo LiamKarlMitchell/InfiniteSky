@@ -8,7 +8,8 @@ vms.depends({name: 'Zone.js', depends: [
     'QuadTree',
     'packets',
     'Npc',
-    'Monster'
+    'Monster',
+    'Item'
 ]
 }, function(){
 
@@ -23,43 +24,12 @@ Zone = function Zone(ID) {
 Zone.prototype = Zone_Prototype;
 
 
-var Item = function(info) {
-	this.ItemUniqueID = 0;
-	this.SomeID = 0;
-	this.ItemID = info.ID || 1;
-	this.Amount = info.Amount || 1;
-	this.Life = 0;
-	//this.unknown1
-	this.Enchant = 0;
-	//this.unknown2
-	this.Location = new CVec3();
-	this.Owner_Name = info.Owner || '';
-	//this.unknown3
-	//this.Direction
-	this.JustSpawned = 1;
-
-	this.getPacket = function() {
-		var packet = packets.makeCompressedPacket(0x1B, new Buffer(packets.ItemObject.pack(this)));
-		return packet;
-	}
-
-	this.onDelete = function() {
-		// Remove timers and intervals to free up references
-		clearInterval(this.updateInterval);
-		clearTimeout(this.itemTimer);
-	}
-
-	this.setLocationRandomOffset = function(Location, Radius) {
-		// Set the location to random spot in a circle? :D
-	}
-}
-
 // END OF NPC Definition
 Zone_Prototype.step = function(delta) {
 	if (this.Loaded) {
 		this.QuadTree.update(delta);
 	}
-}
+};
 
 Zone_Prototype.Init = function() {
     this.Loaded = false;
@@ -72,23 +42,27 @@ Zone_Prototype.Init = function() {
     this.Player = [];
     this.Clients = [];
 
+    this.MoveRegions = [];
+	this.SafeRegions = [];
+
     this.zone_script = {};
 
     MonsterAICollection = new AICollection();
     NpcAICollection     = new AICollection();
 	ZoneAICollection    = new AICollection();
 
-}
+};
 
 Zone_Prototype.clientNodeUpdate = function(node, delta) {
 	//if (this.character && this.character.state) {
 		return { x: this.character.state.Location.X, y: this.character.state.Location.Z, size: this.character.state.Level };
 	//}
 	//return null;
-}
+};
+
 Zone_Prototype.npcUpdate = function(node, delta) {
 	return  { x: this.Location.X, y: this.Location.Z, size: 1 };
-}
+};
 
 Zone_Prototype.addSocket = function(socket) {
     // Should check to make sure it dosnt exist already etc.
@@ -103,7 +77,8 @@ Zone_Prototype.addSocket = function(socket) {
     // Setup any timers needed and shit here
     //socket.character.Talk('Hello World!');
     this.sendToAllAreaLocation(socket.character.state.Location, socket.character.state.getPacket(), config.viewable_action_distance);
-}
+};
+
 Zone_Prototype.findCharacterSocket = function(Name) {
     var socket = null;
     // Search connected clients
@@ -115,7 +90,8 @@ Zone_Prototype.findCharacterSocket = function(Name) {
         }
     }
     return socket;
-}
+};
+
 Zone_Prototype.findSocketByCharacterID = function(CharacterID) {
     var socket = null;
     // Search connected clients
@@ -127,27 +103,32 @@ Zone_Prototype.findSocketByCharacterID = function(CharacterID) {
         }
     }
     return socket;
-}
+};
+
 Zone_Prototype.removeSocket = function(socket) {
     // Remove it from any other updates needed here eg Duel, Monster AI, NPC Talking Too?, Faction Count on Zone etc
     // Remove any zone timers and such
-    this.QuadTree.removeNode(socket.node);
+    console.log('Removing Socket');
+    this.QuadTree.removeNode(socket.node.id);
     if(this.zone_script.onClientLeave) this.zone_script.onClientLeave(socket);
     //this.Clients = this.Clients.splice(this.Clients.indexOf(socket), 1);
     this.Clients.slice(this.Clients.indexOf(socket), 1);
-}
+};
+
 Zone_Prototype.forEachClient = function(func) {
     this.Clients.forEach(function(client) {
         if(client.authenticated == false) return;
         return func.call(client);
     });
-}
+};
+
 Zone_Prototype.sendToAll = function(buffer) {
     this.Clients.forEach(function(client) {
         if(client.authenticated == false || !client._handle) return;
         client.write(buffer);
     });
-}
+};
+
 Zone_Prototype.sendToAllArea = function(origional, sendtoself, buffer, distance) {
     this.Clients.forEach(function(client) {
         if(client.authenticated == false || !client._handle) return;
@@ -156,7 +137,8 @@ Zone_Prototype.sendToAllArea = function(origional, sendtoself, buffer, distance)
             client.write(buffer);
         }
     });
-}
+};
+
 Zone_Prototype.sendToAllAreaLocation = function(location, buffer, distance, self) {
 	var found = this.QuadTree.query({ CVec3: location, radius: distance, type: 'client' });
 
@@ -166,7 +148,8 @@ Zone_Prototype.sendToAllAreaLocation = function(location, buffer, distance, self
 		
 		found[i].object.write(buffer);
 	}
-}
+};
+
 Zone_Prototype.sendToAllClan = function(buffer, clan) {
     this.Clients.forEach(function(client) {
         if(client.authenticated == false || !client._handle) return;
@@ -174,10 +157,11 @@ Zone_Prototype.sendToAllClan = function(buffer, clan) {
             client.write(buffer);
         }
     });
-}
+};
+
 Zone_Prototype.getPortal = function(ZoneID) {
     console.log('getPortal ' + ZoneID);
-    var portal = null
+    var portal = null;
     for(var i = 0; i < this.MoveRegions.length; ++i) {
         console.log(i, this.MoveRegions[i].ZoneID, i % 2);
         if(i % 2 == 0 && this.MoveRegions[i].ZoneID === ZoneID) {
@@ -186,7 +170,8 @@ Zone_Prototype.getPortal = function(ZoneID) {
         }
     }
     return portal;
-}
+};
+
 Zone_Prototype.getPortalEndPoint = function(ZoneID) {
     console.log('getPortalEndPoint ' + ZoneID);
     var portal = null;
@@ -197,31 +182,27 @@ Zone_Prototype.getPortalEndPoint = function(ZoneID) {
         }
     }
     return portal;
-}
+};
+
 
 // Item
 Zone_Prototype.createItem = function(spawninfo) {
 	var item = new Item(spawninfo);
-	item.ItemUniqueID = this.ItemsNextID;
-	this.ItemsNextID++;
-	if (this.ItemsNextID > this.ItemsMaxLength) {
-		this.ItemNextID = 0; // Could find next free slot and if none free overwrite older items?
-		// Quick sort ftw.
-	}
-	//item.UniqueID = spawninfo.UniqueID;
-	item.UniqueID = 2;
 
-	item.Location.set(spawninfo.Location);
-	//item.Velocity.setN(5);
-	item.FacingDirection = spawninfo.Direction;
+	if (typeof(spawninfo) === 'object' && item.Location) {
+		item.Location.set(spawninfo.Location);
+		item.FacingDirection = spawninfo.Direction;
+	}
 
 	return item;
-}
+};
+
 Zone_Prototype.addItem = function(item) {
 	var zone = this;
 
 	var node = this.QuadTree.addNode(new QuadTree.QuadTreeNode({ object: item, update: this.npcUpdate, type: 'item' }));
 	item.node = node;
+	item.UniqueID = node.id;
 
 	item.updateInterval = setInterval(function() {
 		//console.log('Updating information of item.');
@@ -231,19 +212,19 @@ Zone_Prototype.addItem = function(item) {
 		zone.sendToAllAreaLocation(item.Location, item.getPacket(), config.viewable_action_distance)
 	}, 4000);
 	item.itemDeathTimer = setTimeout(function() {
-		console.log('Destroying item.');
-		zone.removeItem(item.ItemUniqueID);
+		//console.log('Destroying item.');
+		zone.removeItem(item.UniqueID);
 		// Send the packet to everyone
 		// Send item to all area
 		// send the packet to all in area. item.getPacket()
 		// zone.SendToAllAreaLocation( item.Location,item.getPacket(),config.viewable_action_distance )
-	}, 5000); // 3 min 180000
-	this.Items[item.ItemUniqueID] = item;
+	}, 180000); // 3 min 180000
 
 	// Send it to clients
 	this.sendToAllAreaLocation(item.Location, item.getPacket(), config.viewable_action_distance);
 	item.JustSpawned = 0;
-},
+};
+
 // Expects itemjson to have Row, Column, ID
 // Basicaly storageItemSchema is what we are retriving in character.js
 Zone_Prototype.getItem = function(index) {
@@ -255,39 +236,33 @@ Zone_Prototype.getItem = function(index) {
 		item = this.Items[index]; // Check for valid shit later eg distance.
 	}
 	return item;
-},
+};
+
 
 // See http://codepen.io/LiamKarlMitchell/pen/LCBnH
 // Need to make similar functions below. And to make the class objects for each.
-Zone_Prototype.removeItem = function(index) {
+Zone_Prototype.removeItem = function(nodeID) {
 	//if (typeof(this.Items[id]) != 'undefined')
-	if (this.Items[index]) {
+	// TODO: Find a way to tell client item has gone.
 		// Send packet to all saying it got picked up / destroyed
-		console.log('Removing item ' + index);
-		var item = this.Items[index];
-		item.onDelete();
-		this.QuadTree.removeNode(item.node);
+		console.log('Removing item ' + nodeID);
+		var node = this.QuadTree.nodesHash[nodeID];
+		if (node) {
+			var item = node.object;
+			item.onDelete();
+			this.QuadTree.removeNode(nodeID);
 
-		item.JustSpawned = 3;
-		item.unknown1 = 1;
-		item.unknown2 = 1;
-		//item.Rotation[0]=1;
-		//item.Rotation[1]=1;
-		this.sendToAllAreaLocation(item.Location, item.getPacket(), config.viewable_action_distance);
-		//delete this.Items[index];
-		//this.Items.splice(index,1);
-		delete this.Items[index];
-	}
-}
+			//item.JustSpawned = 3;
+			item.Life = 0;
+			item.ItemID = 0;
+
+			//this.sendToAllAreaLocation(item.Location, item.getPacket(), config.viewable_action_distance);
+		}
+};
 
 Zone_Prototype.clearItems = function() {
-	var zone = this;
-	this.Items.forEach(function(item, index) {
-		if (item) {
-			zone.removeItem(item.ItemUniqueID); // Could use index
-		}
-	});
-}
+	console.log('Clear all items not yet implemented.');
+};
 
 // Monster
 Zone_Prototype.createMonster = function(spawninfo) {
@@ -316,7 +291,7 @@ Zone_Prototype.createMonster = function(spawninfo) {
 	//Objects.CreateNode(monster);
 	//console.log(monster);
 	return monster;
-}
+};
 
 Zone_Prototype.createMonster = function(spawninfo) {
 	var monster = new Monster(spawninfo.ID);
@@ -339,7 +314,7 @@ Zone_Prototype.createMonster = function(spawninfo) {
 	//this.Monsters[monster.ID] = monster;
 
 	return monster;
-}
+};
 
 Zone_Prototype.addMonster = function(monster) {
 	var zone = this;
@@ -367,7 +342,7 @@ Zone_Prototype.addMonster = function(monster) {
 	monster.Skill = 1;
 	// Should be set to spawn?
 	//monster.SetAI(MonsterAIs.Get('Stand'));
-}
+};
 // Expects itemjson to have Row, Column, ID
 // Basicaly storageItemSchema is what we are retriving in character.js
 Zone_Prototype.getMonster = function(index) {
@@ -378,7 +353,7 @@ Zone_Prototype.getMonster = function(index) {
 		monster = this.Monsters[index]; // Check for valid shit later eg distance.
 	}
 	return monster;
-},
+};
 
 Zone_Prototype.removeMonster = function(index) {
 	console.log('! CODE removeMonster');
@@ -399,7 +374,7 @@ Zone_Prototype.removeMonster = function(index) {
 		//delete this.Monsters[index];
 		this.Monsters.splice(index, 1);
 	}
-}
+};
 
 Zone_Prototype.clearMonsters = function() {
 	var zone = this;
@@ -408,7 +383,7 @@ Zone_Prototype.clearMonsters = function() {
 			zone.removeMonster(monster.UniqueID); // Could use index
 		}
 	});
-}
+};
 
 
 // NPC Functions
@@ -436,7 +411,7 @@ this.NPC[npc.ID] = npc;
 
 //if (npc.NPCID == 50) console.log(npc.ID, npc.UniqueID, npc.NPCID);
 return npc;
-}
+};
 
 Zone_Prototype.addNPC = function(npc) {
 	var zone = this;
@@ -463,7 +438,8 @@ this.NPC[npc.UniqueID] = npc;
 zone.sendToAllAreaLocation(npc.Location, npc.getPacket(), config.viewable_action_distance);
 npc.JustSpawned = 0;
 //npc.Skill = 0;
-}
+};
+
 // Expects itemjson to have Row, Column, ID
 // Basicaly storageItemSchema is what we are retriving in character.js
 Zone_Prototype.getNPC = function(index) {
@@ -475,7 +451,7 @@ if (this.NPC[index]) {
 	npc = this.NPC[index]; // Check for valid shit later eg distance.
 }
 return npc;
-}
+};
 
 Zone_Prototype.getNPCWhereID = function(id) {
 var NPC = [];
@@ -486,7 +462,7 @@ for (var index = 0; index != this.NPC.length; index++) {
 }
 
 return NPC;
-}
+};
 
 Zone_Prototype.removeNPC = function(index) {
 if (this.NPC[index]) {
@@ -506,7 +482,7 @@ if (this.NPC[index]) {
 	///delete this.NPC[index];
 	this.NPC.splice(index, 1);
 }
-}
+};
 
 Zone_Prototype.clearNPC = function() {
 var zone = this;
@@ -515,7 +491,7 @@ this.NPC.forEach(function(npc, index) {
 		zone.removeNPC(npc.UniqueID); // Could use index
 	}
 });
-}
+};
 // End of NPC Functions
 
 // TODO: Prevent zones being loaded duplicate times whilst one is still loading.
@@ -602,62 +578,61 @@ Zone_Prototype.Load = function(callback) {
 
 				callback(null, true);
 			});
+		},
+
+		function LoadPortals(callback) {
+			console.log('Loading Portals for ' + zone.ID);
+			fs.readFile('data/world/Z' + _util.padLeft(zone.ID,'0', 3) + '_ZONEMOVEREGION.WREGION', function(err, data) {
+				if (err) {
+					//console.log(err);
+				} else {
+
+					var RecordCount = data.readUInt32LE(0);
+
+					//console.log(RecordCount);
+					var wregion = restruct.struct('info', structs.WREGION, RecordCount).unpack(data.slice(4));
+					data = null;
+					var length = wregion.info.length,
+						element = null;
+
+					for (var i = 0; i < length; i++) {
+						element = wregion.info[i];
+						zone.MoveRegions.push(element);
+					}
+				}
+
+				callback(null, true);
+			});
+		},
+
+		function LoadSaferegion(callback) {
+			console.log('Loading Safe Region for ' + zone.ID);
+			fs.readFile('data/world/Z' + _util.padLeft(zone.ID,'0', 3) + '_ZONESAFEREGION.WREGION', function(err, data) {
+				if (err) {
+					//error loading
+					//console.log(err);
+				} else {
+					var RecordCount = data.readUInt32LE(0);
+
+					var wregion = restruct.struct('info', structs.WREGION, RecordCount).unpack(data.slice(4));
+					data = null;
+					var length = wregion.info.length,
+						element = null;
+					for (var i = 0; i < length; i++) {
+						element = wregion.info[i];
+						if (element.Unknown1 != 0) console.log(element, i, zone.ID, 'id not 0');
+						if (element.Unknown2 != 0) console.log(element, i, zone.ID, 'id not 0');
+						if (element.Unknown3 != 0) console.log(element, i, zone.ID, 'id not 0');
+
+						zone.SafeRegions.push(element);
+					}
+				}
+
+				callback(null, true);
+			});
 		}
-		// ,
-
-		// function LoadPortals(callback) {
-		// 	console.log('Loading Portals for ' + zone.Name);
-		// 	fs.readFile('data/world/' + zone.Name + '_ZONEMOVEREGION.WREGION', function(err, data) {
-		// 		if (err) {
-		// 			//console.log(err);
-		// 		} else {
-
-		// 			var RecordCount = data.readUInt32LE(0);
-
-		// 			//console.log(RecordCount);
-		// 			var wregion = restruct.struct('info', structs.WREGION, RecordCount).unpack(data.slice(4));
-		// 			data = null;
-		// 			var length = wregion.info.length,
-		// 				element = null;
-
-		// 			for (var i = 0; i < length; i++) {
-		// 				element = wregion.info[i];
-		// 				zone.MoveRegions.push(element);
-		// 			}
-		// 		}
-
-		// 		callback(null, true);
-		// 	});
-		// },
-
-		// function LoadSaferegion(callback) {
-		// 	console.log('Loading Safe Region for ' + zone.Name);
-		// 	fs.readFile('data/world/' + zone.Name + '_ZONESAFEREGION.WREGION', function(err, data) {
-		// 		if (err) {
-		// 			//error loading
-		// 			//console.log(err);
-		// 		} else {
-		// 			var RecordCount = data.readUInt32LE(0);
-
-		// 			var wregion = restruct.struct('info', structs.WREGION, RecordCount).unpack(data.slice(4));
-		// 			data = null;
-		// 			var length = wregion.info.length,
-		// 				element = null;
-		// 			for (var i = 0; i < length; i++) {
-		// 				element = wregion.info[i];
-		// 				if (element.Unknown1 != 0) console.log(element, i, zone.ID, 'id not 0');
-		// 				if (element.Unknown2 != 0) console.log(element, i, zone.ID, 'id not 0');
-		// 				if (element.Unknown3 != 0) console.log(element, i, zone.ID, 'id not 0');
-
-		// 				zone.SafeRegions.push(element);
-		// 			}
-		// 		}
-
-		// 		callback(null, true);
-		// 	});
-		// }
 		], function(err, results) {
-			//console.log('Outputing Anim8or File for '+zone.Name);
+			//console.log('Outputing Anim8or File for '+zone.ID);
 			//zone.OutputAnim8orFile();
 			zone.Loaded = true;
 			callback(null, {
@@ -671,7 +646,7 @@ Zone_Prototype.Load = function(callback) {
 
 	
     //callback(null, true);
-}
+};
 // TODO: Figure out a way to get prototypal inheritance working with node vm...
 if (typeof(zones) !== 'undefined') {
 	for (var zone in zones) {

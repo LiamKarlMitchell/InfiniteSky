@@ -12,13 +12,15 @@ GMCommands.AddCommand(new Command('portalgo',60,function command_bring(string,cl
 	}
 
 	var Zone = client.Zone;
-	var MoveRegions = Zone.MoveRegions;
 	
-	if (i>=MoveRegions.length) i = 0;
+	if (i>=Zone.MoveRegions.length) {
+		client.sendInfoMessage('No portal of this index.');
+		return;
+	}
 	
 	var location = new CVec3();
-	location.X = MoveRegions[i].X;
-	location.Y = MoveRegions[i].Y;
-	location.Z = MoveRegions[i].Z;
-	if (client.Teleport(location,Zone.getID())==false) client.sendInfoMessage('Teleport Failed');
+	location.X = Zone.MoveRegions[i].X;
+	location.Y = Zone.MoveRegions[i].Y;
+	location.Z = Zone.MoveRegions[i].Z;
+	if (client.Teleport(location,Zone.ID)==false) client.sendInfoMessage('Teleport Failed');
 }));

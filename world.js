@@ -419,7 +419,7 @@ vms.depends({
             // Send character update packet
             this.Zone.sendToAllArea(this, true, packets.makeCompressedPacket(
             0x18, new Buffer(
-            packets.ActionReplyPacket.pack(
+            WorldPC.ActionReplyPacket.pack(
             this.character.state))), config.viewable_action_distance);
             return true;
         }
@@ -460,10 +460,11 @@ vms.depends({
                 }
             }
             if(typeof(socket.Zone) != 'undefined') {
+                console.log('LogoutUser remove socket');
                 socket.Zone.removeSocket(socket);
             }
             console.log('socket.LogoutUser ' + socket.Username);
-            world.getSocketFromTransferQueue(this.account.Username)
+            world.getSocketFromTransferQueue(this.account.Username);
         }
         socket.on('error', function(err) {
             console.log('Client #' + socket.clientID + ' error: ', err);
@@ -527,7 +528,7 @@ vms.depends({
         socket.sendActionStateToArea = function() {
             this.Zone.sendToAllArea(this, true, packets.makeCompressedPacket(
             0x18, new Buffer(
-            packets.ActionReplyPacket.pack(
+            WorldPC.ActionReplyPacket.pack(
             this.character.state))), config.viewable_action_distance);
         }
         socket.sendInfoMessage = function(message) {

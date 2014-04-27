@@ -71,6 +71,10 @@ WorldPC.Set(0x01, {
 				socket.character.MapID = socket.character.ToMapID;
 				socket.character.save();
 
+				// How to remove from login server?
+				if (oldsocket.Zone) {
+					oldsocket.Zone.removeSocket(oldsocket);
+				}
 				delete oldsocket;
 			} else {
 				console.log('Could not find Zone ' + socket.character.MapID);

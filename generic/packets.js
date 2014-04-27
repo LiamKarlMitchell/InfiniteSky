@@ -492,21 +492,6 @@ packets.ItemActionPacket = restruct.
     int32lu('Unknown10').
     int32lu('Unknown11');
 
-packets.ItemObject = restruct.
-    int32lu('ItemUniqueID').
-    int32lu('SomeID').
-    int32lu('ItemID').
-    int32lu('Life').
-    int32lu('unknown1').
-    int32lu('Enchant').
-    int32lu('Amount').
-    int32lu('unknown2').
-    struct('Location',structs.CVec3).
-    string('Owner_Name',packets.CharName_Length+1).
-    int8lu('unknown3',3).
-    int32lu('Rotation',2).
-    int32lu('JustSpawned');
-
 packets.AttackPacket = restruct.
     int8lu('PacketID').
     int8lu('Status').

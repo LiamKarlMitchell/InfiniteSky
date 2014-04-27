@@ -55,7 +55,7 @@ WorldPC.Set(0x08, {
 
 		var TransferZone = zones[request.ZoneID];
 		if (TransferZone) {
-			socket.sendInfoMessage('Zone [' + TransferZone.getName() + '] Exists');
+			socket.sendInfoMessage('Zone [' + (TransferZone.Name || TransferZone.ID) + '] Exists');
 
 			var PortalStart = null;
 			var PortalEnd = null;
@@ -74,7 +74,7 @@ WorldPC.Set(0x08, {
 
 			if (PortalStart) {
 				for (var i = TransferZone.MoveRegions.length - 1; i >= 0; i--) {
-					if (TransferZone.MoveRegions[i].ZoneID === socket.Zone.getID()) {
+					if (TransferZone.MoveRegions[i].ZoneID === socket.Zone.ID) {
 						PortalEnd = TransferZone.MoveRegions[i];
 						console.log(i,PortalEnd);
 						break;
@@ -113,7 +113,7 @@ WorldPC.Set(0x08, {
 					// 	// int32ls('Z').
 					// 	// int32ls('Radius');
 					// 	Portal = {
-					// 		ZoneID: socket.Zone.getID(),
+					// 		ZoneID: socket.Zone.ID,
 					// 		X: socket.character.state.Location.X,
 					// 		Y: socket.character.state.Location.Y,
 					// 		Z: socket.character.state.Location.Z,
@@ -135,11 +135,11 @@ WorldPC.Set(0x08, {
 					// 	// 	}
 					// 	// 	else
 					// 	// 	{
-					// 	// 		TransferZone.getPortalEndPoint(socket.Zone.getID());
+					// 	// 		TransferZone.getPortalEndPoint(socket.Zone.ID);
 					// 	// 	}
 					// 	// PORTALS ARE FUCKED RIGHT NOW
 					// 	socket.sendInfoMessage('Portals are fucked right now!');
-					// 	//PortalEndPoint = TransferZone.getPortalEndPoint(socket.Zone.getID());
+					// 	//PortalEndPoint = TransferZone.getPortalEndPoint(socket.Zone.ID);
 					// 	if (PortalEndPoint == null) {
 					// 		PortalEndPoint = TransferZone.getPortal(0);
 					// 	}

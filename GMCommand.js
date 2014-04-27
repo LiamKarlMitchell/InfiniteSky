@@ -66,7 +66,7 @@ var GMCommands = function() {
                 try {
                     command.Execute.call(this, CommandText, client);
                 } catch(ex) {
-                    console.log(ex);
+                    dumpError(ex);
                     if(client.account.Level >= 80) {
                         client.sendInfoMessage(ex.toString());
                     }

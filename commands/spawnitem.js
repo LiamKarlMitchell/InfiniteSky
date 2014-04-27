@@ -44,7 +44,6 @@ GMCommands.AddCommand(new Command('spawnitem',60,function command_spawnitem(stri
 
 			var itemspawn = client.Zone.createItem(spawninfo);
 			client.Zone.addItem(itemspawn);
-			console.log(itemspawn);
 			return;
 		}
 	client.sendInfoMessage("Item "+string+" not found.");
