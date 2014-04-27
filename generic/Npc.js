@@ -13,27 +13,28 @@ if (typeof(Npc_Prototype)==='undefined') {
 }
 
 Npc_Prototype.StatePacket = restruct.
-    int32lu('ID').
-    int32lu('UniqueID').
-    int32lu('NPCID').
-    int32lu('Life').
-    int32lu('Stance').
-    int32lu('Skill').
-    float32l('Frame').
-    struct('Location',structs.CVec3).
-    int32lu('Unknown3',3).
-    float32l('Direction').
-    float32l('TargetDirection').
-    int32ls('TargetObjectIndex').
-    int32lu('Unknown3',4).
-    struct('LocationTo',structs.CVec3).
-    float32l('FacingDirection').
-    int32lu('HP');
+	int32lu('UniqueID').
+	int32lu('ID').
+	int32lu('OtherID').
+	int32lu('Life').
+	int32lu('Stance').
+	int32lu('Skill').
+	float32l('Frame').
+	struct('Location',structs.CVec3).
+	int32lu('Unknown3',3).
+	float32l('Direction').
+	float32l('TargetDirection').
+	int32ls('TargetObjectIndex').
+	int32lu('Unknown3',4).
+	struct('LocationTo',structs.CVec3).
+	float32l('FacingDirection').
+	int32lu('HP');
 
 Npc = function Npc(ID) {
 	this.info = infos.Npc[ID];
 	if (!this.info) {
-		throw new Error('NPC ID '+ID+' does not exist in Npc Info.');
+		dumpError(new Error('NPC ID '+ID+' does not exist in Npc Info.'));
+		return null;
 	}
 
 	AIObject.call(this);
@@ -41,14 +42,14 @@ Npc = function Npc(ID) {
 
 	this.UniqueID = 0; // Set to node.id we receive from QuadTree
 	this._ID = 0; // Faction ID?
-	this.NPCID = ID;
+	this.OtherID = ID;
 
 	this.Life = 1;
 	this.Stance = 0;
 	this.Skill = 0;
 	this.Frame = 0;
-	Location = new CVec3();
-	LocationTo = new CVec3();
+	this.Location = new CVec3();
+	this.LocationTo = new CVec3();
 	this.Direction = 0;
 	this.TargetDirection = 0;
 	this.TargetObjectIndex = -1;
@@ -59,9 +60,6 @@ Npc = function Npc(ID) {
 
 Npc.prototype = Npc_Prototype;
 
-Npc_Prototype.stuff = function() {
-	console.log('Hi '+this.Name+' how are you?');
-}
 
 Npc_Prototype.getPacket = function() {
 	return packets.makeCompressedPacket(0x19, new Buffer(this.StatePacket.pack(this)));

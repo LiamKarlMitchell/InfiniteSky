@@ -18,56 +18,6 @@ float32l('Health').
 int32lu('Unknown10');
 
 WorldPC.ActionReplyPacket = restruct.
-// int32lu('CharacterID').
-// int32lu('CharacterTypeIdentifier').
-// string('Name', packets.CharName_Length + 1).
-// string('Demostrater', packets.CharName_Length + 1).
-// string('Child', packets.CharName_Length + 1).
-// int8lu('UnknownI1').
-// int32lu('FactionCapeThing').
-// int32lu('UnknownI2').
-// int32lu('TraitorFlag').
-// int32lu('UnknownI3').
-// int32lu('UnknownI4').
-// int32lu('GlowItems').
-// int32lu('UnknownI5', 2).
-// int32lu('Clan').
-// int32lu('Gender').
-// int32lu('Hair').
-// int32lu('Face').
-// int32lu('Level').
-// int32lu('Honor').
-// struct('Necklace', structs.Equipt).
-// struct('Cape', structs.Equipt).
-// struct('Armor', structs.Equipt).
-// struct('Glove', structs.Equipt).
-// struct('Ring', structs.Equipt).
-// struct('Boot', structs.Equipt).
-// struct('CalbashBottle', structs.Equipt).
-// struct('Weapon', structs.Equipt).
-// struct('Pet', structs.Pet).
-// int32lu('Unknown5').
-// string('GuildName', packets.GuildName_Length + 1).
-// int8lu('Unknown6', 10).
-// int16lu('TagExist').
-// string('ClanTag', packets.GuildTag_Length + 1).
-// string('Unknown7', 14).
-// int32lu('Stance').
-// int32lu('Skill').
-// float32l('Frame').
-// struct('Location', structs.CVec3).
-// struct('LocationTo', structs.CVec3).
-// float32l('Direction').
-// int32lu('nodeID').
-// int32lu('TargetID').
-// float32l('UNKnowni6', 4).
-// struct('LocationNew', structs.CVec3).
-// float32l('FacingDirection').
-// int32lu('MaxHP').
-// int32lu('CurrentHP').
-// int32lu('MaxChi').
-// int32lu('CurrentChi').
-// int32lu('otherthings', 171);
     int32lu('CharacterID').
     int32lu('UniqueID').
     string('Name',packets.CharName_Length+1).
@@ -411,7 +361,7 @@ function handleActionPacket(socket, action, update) {
             //  return;
             // }
             // What is selected
-            if (action.TargetID != 4294967295) // If it is not -1
+            if (action.TargetID != 4294967295 && otherNode) // If it is not -1
             {
 
                 // Set when can attack again
@@ -429,13 +379,13 @@ function handleActionPacket(socket, action, update) {
                 //console.log('We need to see if we can use one of the ID\'s as an identifyer of object type or maybe assign certian ranges to different object types');
                 //console.log('Should make an object with function to handle attacking other objects.');
                 //console.log('Prototyping and inherientence come into play :)');
-                switch (action.nodeID) {
-                case 0:
+                switch (otherNode.type) {
+                case 'client':
                     // Attacking character
                     {
                         socket.sendInfoMessage('Attacking character '+action.TargetID);
 
-                        var other = socket.Zone.findSocketByCharacterID(action.TargetID);
+                        var other = otherNode.object;
                         if (other===null) break; // If not found then skip this case.
 
                         other.sendInfoMessage('You are being attacked by '+socket.character.Name);
@@ -456,41 +406,23 @@ function handleActionPacket(socket, action, update) {
                             
                     }
                     break;
-                case 2:
+                case 'monster':
                     // Attacking monster
                     {
                         console.log('Attacking monster');
-                        var monster_node = socket.Zone.Objects.GetNodeByID(action.nodeID);
-                        var monster = monster_node.object;
+                        var monster = otherNode.object;
 
 
                         //var monster = socket.Zone.getMonster(action.nodeID);
                         //console.log(monster);
                         //console.log(monster_node);
                         if (monster) {
-
-                            var monsterinfo = MonsterInfo.getByID(monster.MonsterID);
-                            //console.log(monsterinfo.Name);
-                            //console.log('Logging out locations:',monster.LocationTo.toString(),socket.character.state.Location.toString());
-                            //monster.Skill=12;
-                            //console.log(monster.getAttackers());
-                            //monster.Skill=Math.ceil(Math.random()*15);
-                            // monster.FacingDirection = socket.character.state.Location.get2DDirection(monster.Location);
-                            // monster.LocationTo.set(socket.character.state.Location);
-                            // monster.HP = 0; //Math.floor(Math.random() * 1000);
-                            //console.log('Angle between monster and character is '+monster.Location.get2DDirection(socket.character.state.Location));
-                            // Check if able to attack
-                            // Do battle caculation 
-                            //Monster.damage(socket,Damage);
-                            // socket.giveEXP(Damage)
-                            //socket.Zone.sendToAllAreaLocation(monster.Location,monster.getPacket(),config.viewable_action_distance);
-                            ///
                             AttackPacket = {
                                 Action: 0,
                                 // 0 if your attacking otherwise 5,6,7 or 1 if skill
                                 AttackerID: socket.character.state.CharacterID,
-                                AttackerIndex: socket.character.state.Index,
-                                DefenderID: monster.MonsterID,
+                                AttackerIndex: socket.character.state.UniqueID,
+                                DefenderID: monster.OtherID,
                                 DefenderIndex: monster.UniqueID,
                                 Status: 1,
                                 // Depends on attacker or defender | hit or miss, block or not |
@@ -503,7 +435,7 @@ function handleActionPacket(socket, action, update) {
                             };
 
                             monster.Attackers.regulate(socket.character._id, AttackPacket.TotalDamage);
-                            monster.HP -= AttackPacket.TotalDamage;
+                            //monster.HP -= AttackPacket.TotalDamage; // Commented out of now as we dont want to kill things just yet without an AI
                             console.log("Client attacking monster " + monster.HP + "::" + AttackPacket.TotalDamage);
                             socket.giveEXP(AttackPacket.TotalDamage); // Give HP relative to the damage we have done
                             socket.write(packets.makeCompressedPacket(0x2C, new Buffer(WorldPC.AttackPacketReply.pack(AttackPacket))));
@@ -518,7 +450,7 @@ function handleActionPacket(socket, action, update) {
                         }
                     }
                     break;
-                case 3:
+                case 'npc':
                     // Attacking npc
                     {
                         console.log('Attacking npc');

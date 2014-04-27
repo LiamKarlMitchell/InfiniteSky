@@ -8,6 +8,7 @@ vms.depends({name: 'Login Server', depends: [
     'infos.Skill.Loaded',
     'db.Account',
     'db.Character',
+    'CharacterState',
     'world',
     'packets'
 ]

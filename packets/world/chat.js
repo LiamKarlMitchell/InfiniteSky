@@ -72,8 +72,8 @@ WorldPC.Set(0x3E, {
 
 	function: function FactionChatRecv(socket, input) {
 
-		if (input.Message.indexOf('/') == 0) {
-			GMCommand.Execute(input.Message.substr(1), socket); // Need to remove the / so everything after it.
+		if (input.Message.indexOf('/') === 0) {
+			GMCommands.Execute(input.Message.substr(1), socket); // Need to remove the / so everything after it.
 			return;
 		}
 		console.log("[Faction] " + socket.character.Name + ": " + input.Message);
@@ -93,8 +93,8 @@ WorldPC.Set(0x09, {
 
 	function: function WhisperChatRecv(socket, input) {
 
-		if (input.Message.indexOf('/') == 0) {
-			GMCommand.Execute(input.Message.substr(1), socket); // Need to remove the / so everything after it.
+		if (input.Message.indexOf('/') === 0) {
+			GMCommands.Execute(input.Message.substr(1), socket); // Need to remove the / so everything after it.
 			return;
 		}
 		console.log("[Whisper] " + socket.character.Name + ">" + input.NameTo + ": " + input.Message);

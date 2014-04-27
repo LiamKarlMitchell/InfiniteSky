@@ -14,7 +14,7 @@ GMCommands.AddCommand(new Command('spawnmonster',60,function command_spawnmonste
 
 	// Get Amount from string
 
-	var monster = MonsterInfo.getByID(ID);
+	var monster = infos.Monster[ID];
 	if (monster!=null)
 	{
 		client.sendInfoMessage("Monster found "+monster.ID+" "+monster.Name);

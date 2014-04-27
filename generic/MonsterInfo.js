@@ -26,7 +26,7 @@ LoadMonsterInfo = function() {
 	// Could wrap in try catch and remove infos.Item if failed load for some error in structure etc/
 	infos.Monster = new GameInfoLoader('005_00004.IMG',
 restruct.
-  int32lu("ID"). // 0
+    int32lu("ID"). // 0
     string("Name",24). // 4
     int32lu("Unknown1C"). //2E
     int32lu("Unknown32"). // 32
