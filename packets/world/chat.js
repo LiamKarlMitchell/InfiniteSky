@@ -29,6 +29,17 @@ string('Name', 13).
 string('NameTo', 13).
 string('Message', 51);
 
+WorldPC.WhisperChatStatus = restruct.
+int8lu('PacketID').
+string('Name', 13).
+int8lu('Status').
+int32ls('ZoneID').
+int32ls('Unknown2');
+
+// Status:
+// 0 nothing
+// 1 disconnected
+// 2 not same clan
 
 // WorldPC.Set(0x06,{
 // 	function: function(socket, data) {
@@ -90,6 +101,17 @@ WorldPC.Set(0x09, {
 
 		var Other = world.findCharacterSocket(input.NameTo);
 		if (Other) {
+			if (
+				(config.whisper_other_clan || false) == false &&
+				Other.character.Clan != socket.character.Clan) {
+				socket.write(new Buffer(WorldPC.WhisperChatStatus.pack({
+					PacketID: 0x1D,
+					Name: input.NameTo,
+					Status: 2,
+					ZoneID: -1,
+					Unknown2: -1
+				})));
+			}
 			Other.write(new Buffer(
 			WorldPC.ChatPacketReply.pack({
 				PacketID: 0x2A,
@@ -97,7 +119,13 @@ WorldPC.Set(0x09, {
 				Message: input.Message
 			})));
 		} else {
-			client.sendInfoMessage(input.NameTo + ' not found.');
+			socket.write(new Buffer(WorldPC.WhisperChatStatus.pack({
+				PacketID: 0x1D,
+				Name: input.NameTo,
+				Status: 1,
+				ZoneID: -1,
+				Unknown2: -1
+			})));
 		}
 	}
 });
