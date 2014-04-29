@@ -86,31 +86,32 @@ ItemInfo_Prototype.getItemType = function() {
 	var ItemType;
 	switch (this.ItemType)
 	{
-		case 1: ItemType = 'Silver Coins'; // SilverCoins
-		case 2: ItemType = 'Assist'; // Assist
-		case 3: ItemType = 'Assist 2'; // Assist seems like its grouped to 2, It contains a different kind of pills,
-			// couple books and enchanting mats of different quality
-		case 4: ItemType = 'Mission';
-		case 5: ItemType = 'Skill books / Art Book';
-		case 6: ItemType = 'Calabash_Bottle'; //testing
-		case 7: ItemType = 'Necklace';
-		case 8: ItemType = 'Cape';
-		case 9: ItemType = 'Armor';
-		case 10: ItemType = 'Gloves';
-		case 11: ItemType = 'Ring';
-		case 12: ItemType = 'Boots';
-		case 13: ItemType = 'Sword';
-		case 14: ItemType = 'Blade';
-		case 15: ItemType = 'Marble';
-		case 16: ItemType = 'Katana';
-		case 17: ItemType = 'Double Blade'; // test
-		case 18: ItemType = 'Lute';
-		case 19: ItemType = 'Light Blade';
-		case 20: ItemType = 'Long Spear';
-		case 21: ItemType = 'Scepter';
-		case 22: ItemType = 'Pet';
-		case 23: ItemType = 'Assist 3'; // Seems like crafting materials at herb master
-		default: ItemType = 'Common'; break;
+		case 1: ItemType = 'SilverCoins'; break; // SilverCoins
+		case 2: ItemType = 'Common'; break; // Stackable to 99
+		case 3: ItemType = 'Assist'; break; // Assist seems like its grouped to 2, It contains a different kind of pills,
+			// couple books and enchanting mats of different quality They are not stacked
+		case 4: ItemType = 'Mission'; break;
+		case 5: ItemType = 'SkillBook'; break;
+		case 6: ItemType = 'CalabashBottle'; break; //testing
+		case 7: ItemType = 'Necklace'; break;
+		case 8: ItemType = 'Cape'; break;
+		case 9: ItemType = 'Outfit'; break; // Armor
+		case 10: ItemType = 'Gloves'; break;
+		case 11: ItemType = 'Ring'; break;
+		case 12: ItemType = 'Shoes'; break; // Boots
+		case 13: ItemType = 'Sword'; break;
+		case 14: ItemType = 'Blade'; break;
+		case 15: ItemType = 'Marble'; break;
+		case 16: ItemType = 'Katana'; break;
+		case 17: ItemType = 'DoubleBlade'; break; // test
+		case 18: ItemType = 'Lute'; break;
+		case 19: ItemType = 'LightBlade'; break;
+		case 20: ItemType = 'LongSpear'; break;
+		case 21: ItemType = 'Scepter'; break;
+		case 22: ItemType = 'Pet'; break; // Sacred Animal
+		case 23: ItemType = 'AssistStackable'; break; // Seems like crafting materials at herb master
+		case 24: ItemType = 'Common'; break;
+		default: ItemType = ''; break;
 	};
 	return ItemType;
 };
@@ -150,6 +151,10 @@ ItemInfo_Prototype.getSlotCount = function() {
         return 4;
     }
 };
+
+ItemInfo_Prototype.isStackable = function() {
+	return this.ItemType === infos.Item.Type.Common || this.ItemType === infos.Item.Type.AssistStackable;
+}
 
 ItemInfo_Prototype.isAllowedByClan = function(characterClanID){
 	//TODO: Check up on actuall clan restriction value from Item Info
@@ -239,21 +244,19 @@ restruct.
 
 // If we have not loaded the item info yet then load it
 if (infos.Item === undefined) LoadItemInfo();
-
 infos.Item.Type = {
-	Common: 0,
-	Silver: 1,
-	Assist: 2,
-	Assist2: 3,
+	SilverCoins: 1,
+	Common: 2,
+	Assist: 3,
 	Mission: 4,
 	SkillBook: 5,
-	Bottle: 6,
+	CalabashBottle: 6,
 	Necklace: 7,
 	Cape: 8,
-	Armor: 9,
+	Outfit: 9,
 	Gloves: 10,
 	Ring: 11,
-	Boots: 12,
+	Shoes: 12,
 	Sword: 13,
 	Blade: 14,
 	Marble: 15,
@@ -264,5 +267,6 @@ infos.Item.Type = {
 	LongSpear: 20,
 	Scepter: 21,
 	Pet: 22,
-	Assist3: 23
+	AssistStackable: 23,
+	AssistAgain: 24
 };
