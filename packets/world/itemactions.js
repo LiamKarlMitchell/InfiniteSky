@@ -101,10 +101,119 @@ function getStackingIventoryItemIndex(inventory, page, x1, y1, itemID){
 
 ItemActions = [];
 ItemActions[0x00] = function Recv_PickupItem(client, input) {
-    NotImplemented(client, 'Recv_PickupItem', input);
+    console.log(input);
+
+    var item = client.Zone.getItem(input.ItemUniqueID);
+    if (item) {
+        console.log(item.info.Name);
+
+        // TODO: Check Owner name if not our own name then we cannot pick up
+        if (item.OwnerName !== '' && item.OwnerName !== client.character.Name) {
+            console.log('Cant pickup another persons item.');
+            client.sendInfoMessage('Cant pickup another persons item.');
+            clientWriteItemActionFailed(client, input);
+            return;
+        }
+
+        // If money.
+        if (item.ItemID === 1) {
+            // TODO: Handle too much silver etc turn to gold?
+            client.character.Silver += item.Amount;
+            client.Zone.removeItem(input.ItemUniqueID);
+            client.character.save();
+            clientWriteItemActionSuccess(client, input);
+            return;
+        }
+        
+        if (input.InventoryIndex>32) {
+            console.log('Inventory Index is outside bounds of array. '+input.InventoryIndex);
+            clientWriteItemActionFailed(client, input);
+            return;
+        }
+
+        var invitem = client.character.Inventory[input.InventoryIndex];
+        // Already exists in slot
+        if (invitem) {
+            console.log('Already in inventory at that slot attempting update.');
+
+            if (invitem.ID !== item.ItemID) {
+                console.log('Inventory ID not match ItemID');
+                clientWriteItemActionFailed(client, input);
+                return;
+            }
+
+            // Check if stackable
+            if (!item.info.isStackable()) {
+                console.log('Item not stackable...');
+                clientWriteItemActionFailed(client, input);
+                return;
+            }
+
+            // TODO: Check row and columns match for pickup
+
+            // Check stack limit
+            if (item.Amount + invitem.Amount > 99) {
+                // TODO: Test if we can pick up item that would put a stack over its limit.
+                // What happens? Does it make use of multiple slots?
+                // Does it drop the remainder?
+                console.log('Over Stackable Amount.');
+                clientWriteItemActionFailed(client, input);
+                return;
+            }
+
+            invitem.Amount += item.Amount;
+        } else {
+            console.log('Putting item in inventory.');
+            // TODO: Check row and columns within bounds
+            invitem = { ID: item.ItemID, Amount: item.Amount, Enchant: item.Enchant, Combine: item.Combine, Column: input.ColumnPickup,Row: input.RowPickup };
+            client.character.Inventory[input.InventoryIndex] = invitem;
+        }
+
+        client.Zone.removeItem(input.ItemUniqueID);
+        clientWriteItemActionSuccess(client, input);
+    } else {
+        clientWriteItemActionFailed(client, input);
+        return;
+    }
+
 };
 ItemActions[0x01] = function Recv_DropItem(client, input) {
-    NotImplemented(client, 'Recv_DropItem', input);
+    if(input.ItemID == 1) {
+        // Dropping silver
+        if(client.character.Silver >= input.Amount) {
+            client.Zone.addItem(client.Zone.createItem({ ID: 1, Amount: input.Amount, Owner: client.character.Name, Location: client.character.state.Location  }));
+            client.character.Silver -= input.Amount;
+        } else {
+            client.sendInfoMessage('You dont have that amount of silver in your inventory');
+            clientWriteItemActionFailed(client, input);
+            return;
+        }
+    } else {
+        // Dropping Item
+        var theItem = null;
+        theItem = client.character.Inventory[input.InventoryIndex];
+
+        if (theItem) {
+            // Check that this specific item can be dropped? Some items might be bound to the character.
+            if(theItem.Amount >= input.Amount) {
+                client.Zone.addItem(client.Zone.createItem({ ID: theItem.ID, Amount: input.Amount, Enchant: theItem.Enchant, Combine: theItem.Combine, Owner: client.character.Name, Location: client.character.state.Location  }));
+                theItem.Amount -= input.Amount;
+                if((input.Amount == 0 && theItem.Amount == 1) || theItem.Amount <= 0) delete client.character.Inventory[input.InventoryIndex];
+            } else {
+                clientWriteItemActionFailed(client, input);
+                client.sendInfoMessage('You dont have that amount of items in your inventory');// just for debug..
+                return;
+            }
+        } else {
+            clientWriteItemActionFailed(client, input);
+            client.sendInfoMessage('Debug: Internal error item null');
+            return;
+        }
+    }
+
+    client.character.markModified('Inventory');
+    client.character.save();
+    clientWriteItemActionSuccess(client, input);
 };
 ItemActions[0x02] = function Recv_MoveToPillBar(client, input) { // COMPLETED
     var InventoryItem = client.character.Inventory[input.InventoryIndex];
@@ -890,10 +999,10 @@ ItemActions[0x11] = function Recv_BuyItem(client, input) { // COMPLETED
             return;
         }else{
             if( (client.character.Silver - (itemInfo.PurchasePrice*input.Amount)) >= 0){
-                if(infos.Item[input.ItemID].Stackable === 0 && input.Amount > 0){
+                if(!itemInfo.isStackable() && input.Amount > 0){
                     clientWriteItemActionFailed(client, input);
                     return;
-                }else if(infos.Item[input.ItemID].Stackable > 0 && (input.Amount === 0 || input.Amount > 99 || input.Amount < 0)){
+                }else if(itemInfo.isStackable() && (input.Amount === 0 || input.Amount > 99 || input.Amount < 0)){
                     clientWriteItemActionFailed(client, input);
                     return;
                 }

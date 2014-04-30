@@ -22,51 +22,20 @@ Item_Prototype.StatePacket = restruct.
     int32lu('Amount').
     int32lu('Combine').
     struct('Location',structs.CVec3).
-    string('Owner_Name',packets.CharName_Length+1).
+    string('OwnerName',packets.CharName_Length+1).
     int8lu('unknown3',3).
     int32lu('Rotation',2).
     int32lu('JustSpawned');
 
-
-Item = function(info) {
-	this.UniqueID = 0;
-	this.SomeID = 0;
-	this.ItemID = info.ID || 1;
-	this.Amount = info.Amount || 1;
-	this.Life = 0;
-	//this.unknown1
-	this.Enchant = 0;
-	//this.unknown2
-	this.Location = new CVec3();
-	this.Owner_Name = info.Owner || '';
-	//this.unknown3
-	//this.Direction
-	this.JustSpawned = 1;
-
-	this.getPacket = function() {
-		var packet = packets.makeCompressedPacket(0x1B, new Buffer(packets.ItemObject.pack(this)));
-		return packet;
-	}
-
-	this.onDelete = function() {
-		// Remove timers and intervals to free up references
-		clearInterval(this.updateInterval);
-	}
-
-	this.setLocationRandomOffset = function(Location, Radius) {
-		// Set the location to random spot in a circle? :D
-	}
-}
-
 Item = function Item(info) {
-	this.Owner_Name = '';
+	this.OwnerName = '';
 	this.Enchant = 0;
 	this.Combine = 0;
 
 	if (typeof(info) === 'number') {
 		info = { ID: info };
 	} else {
-		this.Owner_Name = info.Owner || '';
+		this.OwnerName = info.Owner || '';
 		this.Enchant = info.Enchant || 0;
 		this.Combine = info.Combine || 0;
 	}
@@ -87,9 +56,10 @@ Item = function Item(info) {
 	this.Frame = 0;
 	this.Location = new CVec3();
 	this.Direction = 0;
-	this.FacingDirection = 0;
+	this.FacingDirection = Math.round(Math.random()*360);
 	this.HP = 1; // Find out max hp for this Item and set it.
-}
+	this.JustSpawned = 1;
+};
 
 Item.prototype = Item_Prototype;
 
@@ -101,6 +71,9 @@ Item_Prototype.getPacket = function() {
 Item_Prototype.onDelete = function() {
 	// Remove references/timers we might have
 	clearInterval(this.updateInterval);
+	clearTimeout(this.itemDeathTimer);
+	clearTimeout(this.itemOwnerTimer);
+	// TODO: clear timeout for the owner removal timer.
 }
 
 });

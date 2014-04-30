@@ -213,7 +213,7 @@ restruct.
   int32ls("SkillBonusAmount1").
   int32ls("SkillBonusAmount2").
   int32ls("SkillBonusAmount3").
-  int32ls("Stackable").
+  int32ls("_14").
   int32ls("ValueType").
   int32ls("Value1").
   int32ls("_16").

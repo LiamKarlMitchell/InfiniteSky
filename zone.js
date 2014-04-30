@@ -191,7 +191,9 @@ Zone_Prototype.createItem = function(spawninfo) {
 
 	if (typeof(spawninfo) === 'object' && item.Location) {
 		item.Location.set(spawninfo.Location);
-		item.FacingDirection = spawninfo.Direction;
+		if (spawninfo.Direction) {
+			item.FacingDirection = spawninfo.Direction;
+		}
 	}
 
 	return item;
@@ -212,13 +214,14 @@ Zone_Prototype.addItem = function(item) {
 		zone.sendToAllAreaLocation(item.Location, item.getPacket(), config.viewable_action_distance)
 	}, 4000);
 	item.itemDeathTimer = setTimeout(function() {
-		//console.log('Destroying item.');
 		zone.removeItem(item.UniqueID);
-		// Send the packet to everyone
-		// Send item to all area
-		// send the packet to all in area. item.getPacket()
-		// zone.SendToAllAreaLocation( item.Location,item.getPacket(),config.viewable_action_distance )
-	}, 180000); // 3 min 180000
+	}, 180000); // 3 min 180000 ms
+
+	if (item.OwnerName != '') {
+		item.itemOwnerTimer = setTimeout(function() {
+			item.OwnerName = '';			
+		}, 5000); // 5 sec
+	}
 
 	// Send it to clients
 	this.sendToAllAreaLocation(item.Location, item.getPacket(), config.viewable_action_distance);
@@ -231,9 +234,10 @@ Zone_Prototype.getItem = function(index) {
 	var item = null;
 	console.log('Get item ' + index);
 	//if (typeof(this.Items[index]) != 'undefined')
-	if (this.Items[index]) {
+	var node = this.QuadTree.nodesHash[index];
+	if (node && node.type === 'item') {
 		console.log('Item Found');
-		item = this.Items[index]; // Check for valid shit later eg distance.
+		item = node.object;
 	}
 	return item;
 };
@@ -247,16 +251,16 @@ Zone_Prototype.removeItem = function(nodeID) {
 		// Send packet to all saying it got picked up / destroyed
 		console.log('Removing item ' + nodeID);
 		var node = this.QuadTree.nodesHash[nodeID];
-		if (node) {
+		if (node && node.type === 'item') {
 			var item = node.object;
 			item.onDelete();
 			this.QuadTree.removeNode(nodeID);
 
-			//item.JustSpawned = 3;
+			item.JustSpawned = 3;
 			item.Life = 0;
 			item.ItemID = 0;
 
-			//this.sendToAllAreaLocation(item.Location, item.getPacket(), config.viewable_action_distance);
+			this.sendToAllAreaLocation(item.Location, item.getPacket(), config.viewable_action_distance);
 		}
 };
 
