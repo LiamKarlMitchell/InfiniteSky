@@ -2,10 +2,10 @@
 // Copyright (c) InfiniteSky Dev Teams - Licensed under GNU GPL
 // For more information, see LICENCE in the main folder
 var GetCombineRestruct = restruct.
-int32lu('Item1').
-int32lu('Item2').
-int32lu('Unk3').
-int32lu('Unk4');
+  int32lu('Item1').
+  int32lu('Item2').
+  int32lu('Unk3').
+  int32lu('Unk4');
 
   // v2 = *(_DWORD *)(RecvBuffer + 2);
   // v3 = *(_DWORD *)(RecvBuffer + 10);
@@ -13,13 +13,13 @@ int32lu('Unk4');
   // result = *(_DWORD *)(RecvBuffer + 14);
   // v1 = *(_BYTE *)(RecvBuffer + 1);
 
-  var CombineRespond = restruct.
-int8lu("PacketID").
-int8lu('Result').
-int32lu('Item1').
-int32lu('Item2').
-int32lu('Price').
-pad(4);
+var CombineRespond = restruct.
+  int8lu("PacketID").
+  int8lu('Result').
+  int32lu('Item1').
+  int32lu('Item2').
+  int32lu('Price').
+  pad(4);
 
 // Results:
 // 0 = Success
