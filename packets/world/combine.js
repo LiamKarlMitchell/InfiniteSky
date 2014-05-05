@@ -31,9 +31,51 @@ WorldPC.Set(0x61, {
 	Restruct: GetCombineRestruct,
 	function: function doCombine(client, input){
 		var CombinePrice = 0;
-
+		
 		var Item1 = client.character.Inventory[input.Item1];
 		var Item2 = client.character.Inventory[input.Item2];
+		
+		// Combination rates
+		var CombineRate = 0;
+		switch(Item2.Combine)
+		{
+			case 1:
+				combineRate = 85;
+				break;
+			case 2:
+				combineRate = 80;
+				break;
+			case 3:
+				combineRate = 75;
+				break;
+			case 4:
+				combineRate = 70;
+				break;
+			case 5:
+				combineRate = 65;
+				break;
+			case 6:
+				combineRate = 60;
+				break;
+			case 7:
+				combineRate = 55;
+				break;
+			case 8:
+				combineRate = 50;
+				break;
+			case 9:
+				combineRate = 45;
+				break;
+			case 10:
+				combineRate = 40;
+				break;
+			case 11:
+				combineRate = 35;
+				break;
+			case 12:
+				combineRate = 30;
+				break;
+		}
 
 		if(Item1 === undefined || Item1 === null || Item2 === undefined || Item2 === null){
 				client.write(new Buffer(CombineRespond.pack({
@@ -57,7 +99,7 @@ WorldPC.Set(0x61, {
 				var RandNumber = Math.floor((Math.random()*100)+1);
 
 				var result = 0;
-				if(RandNumber >= 50){
+				if(RandNumber <= combineRate){
 					if(client.character.Inventory[input.Item1].Combine === undefined)
 					client.character.Inventory[input.Item1].Combine = 1;
 					else client.character.Inventory[input.Item1].Combine += 1;
