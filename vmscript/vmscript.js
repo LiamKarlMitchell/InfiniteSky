@@ -181,7 +181,6 @@ this.addDependent = function(dependent) {
                       if (typeof(global[global.module.name].transfer) === 'function' ) {
                         transfer = global[global.module.name].transfer();
                         console.log(global[global.module.name].transfer());
-                        console.log(global[global.module.name].testa());
                       }
                       // If prototype is set
                       global[global.module.name].__proto__ = module.exports.prototype;
