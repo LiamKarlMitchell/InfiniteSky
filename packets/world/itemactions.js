@@ -1384,8 +1384,8 @@ ItemActions[0x1F] = function Recv_LearnSkill(client, input) { // Completed
 ItemActions[0x20] = function sub_462C20(client, input) {
     NotImplemented(client, 'sub_462C20', input);
 };
-ItemActions[0x21] = function sub_462C60(client, input) {
-    NotImplemented(client, 'sub_462C60', input);
+ItemActions[0x21] = function Recv_BindAutoBuffSkill(client, input) {
+    NotImplemented(client, 'Recv_BindAutoBuffSkill', input);
 };
 ItemActions[0x22] = function sub_462CE0(client, input) {
     NotImplemented(client, 'sub_462CE0', input);
