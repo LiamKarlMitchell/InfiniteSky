@@ -8,7 +8,7 @@
 GMCommands.AddCommand(new Command('spawnmonster',60,function command_spawnmonster(string,client){
 	if (string.length==0) return;
 	// Get ID from string
-	var ID = string;
+	var ID = Number(string);
 
 	// Get XYZ from string?
 

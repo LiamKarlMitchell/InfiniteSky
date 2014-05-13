@@ -12,7 +12,7 @@ GMCommands.AddCommand(new Command('skillinfo',0,function command_skillinfo(strin
 	if (ID)
 	{
 		client.sendInfoMessage("Finding skill where ID is "+ID);
-		var skill = SkillInfo.getByID(ID);
+		var skill = infos.Skill[ID];
 		if (skill)
 		{
 			client.sendInfoMessage(skill.toString());
@@ -24,7 +24,7 @@ GMCommands.AddCommand(new Command('skillinfo',0,function command_skillinfo(strin
 		return;
 	}
 
-	var skills = SkillInfo.getByNameLike(string);
+	var skills = infos.Skil.getByNameLike(string);
 	client.sendInfoMessage("Finding skills where name is like "+string);
 	for(var i=0;i<skills.length;i++)
 	{

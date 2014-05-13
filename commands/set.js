@@ -16,15 +16,15 @@ GMCommands.AddCommand(new Command('set',60,function command_set(string,client){
 
 		if (s.length>=2)
 		{
-			Value = s[1];
+			Value = Number(s[1]);
 		}
 		if (s.length>=3)
 		{
-			Value2 = s[2];
+			Value2 = Number(s[2]);
 		}
 		if (s.length>=4)
 		{
-			Value3 = s[3];
+			Value3 = Number(s[3]);
 		}
 
 		if (isNaN(Value) || isNaN(Value2) || isNaN(Value3)) {
