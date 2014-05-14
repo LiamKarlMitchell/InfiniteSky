@@ -124,7 +124,7 @@ WorldPC.Set(0x3A, {
 				break;
 			}
 
-			if(Item.Enchant >= 40){
+			if(Item.Enchant >= 120){
 				client.write(new Buffer(EnchantRespond.pack(
 					{
 						"PacketID": 0x52,

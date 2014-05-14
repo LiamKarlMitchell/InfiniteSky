@@ -7,8 +7,10 @@
 // clears the characters inventory
 GMCommands.AddCommand(new Command('clearinventory',20,function command_clearinventory(string,client){
 		// Clear the inventory
-		client.character.Inventory.length = 0;
+		for (var i=0;;i<client.character.Inventory.length;i++) {
+			client.character.Inventory[i] = null;
+		}
 		client.character.markModified('Inventory');
 		client.character.save();
-        client.sendInfoMessage('Please log out and back in for changes to apply.');
+        client.sendInfoMessage('Please log out and back in for changes to apply or type /load.');
 }));
