@@ -29,7 +29,7 @@ ItemInfo_Prototype.use = function(socket) {
 		}
 	
 	// Apply item effects...
-	socket.sendInfoMessage('Using items is not yet implemented.');
+	// socket.sendInfoMessage('Using items is not yet implemented.');
 	// Ratio is actually %
 	switch (this.ValueType) {
 		case 1:  // HP Recovery Points
@@ -39,7 +39,7 @@ ItemInfo_Prototype.use = function(socket) {
 			}
 		break;
 		case 2:  // HP Recovery Ratio
-			socket.character.state.CurrentHP += Value1/100 * socket.character.state.MaxHP;
+			socket.character.state.CurrentHP += this.Value1/100 * socket.character.state.MaxHP;
 			if (socket.character.state.CurrentHP > socket.character.state.MaxHP) {
 				socket.character.state.CurrentHP = socket.character.state.MaxHP;
 			}
@@ -51,17 +51,17 @@ ItemInfo_Prototype.use = function(socket) {
 			}
 		break;
 		case 4:  // Chi Recovery Ratio
-			socket.character.state.CurrentChi += Value1/100 * socket.character.state.MaxChi
+			socket.character.state.CurrentChi += this.Value1/100 * socket.character.state.MaxChi
 			if (socket.character.state.CurrentChi > socket.character.state.MaxChi) {
 				socket.character.state.CurrentChi = socket.character.state.MaxChi;
 			}
 		break;
 		case 5:  // HP Recovery Ratio & Chi Recovery Ratio
-			socket.character.state.CurrentHP += Value1/100 * socket.character.state.MaxHP;
+			socket.character.state.CurrentHP += this.Value1/100 * socket.character.state.MaxHP;
 			if (socket.character.state.CurrentHP > socket.character.state.MaxHP) {
 				socket.character.state.CurrentHP = socket.character.state.MaxHP;
 			}
-			socket.character.state.CurrentChi += Value1/100 * socket.character.state.MaxChi
+			socket.character.state.CurrentChi += this.Value1/100 * socket.character.state.MaxChi
 			if (socket.character.state.CurrentChi > socket.character.state.MaxChi) {
 				socket.character.state.CurrentChi = socket.character.state.MaxChi;
 			}

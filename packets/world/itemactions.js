@@ -1437,7 +1437,7 @@ WorldPC.Set(0x14, {
     Restruct: WorldPC.ItemActionPacket,
     function: function handleItemActionPacket(client, input) {
         if (!client.authenticated) return;
-        client.sendInfoMessage('Handling Item Action: ' + input.ActionType);
+        if (client.debug) { client.sendInfoMessage('Handling Item Action: ' + input.ActionType); }
         if (ItemActions[input.ActionType]) {
             try {
                 ItemActions[input.ActionType](client, input);

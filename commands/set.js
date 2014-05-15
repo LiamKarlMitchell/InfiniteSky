@@ -329,14 +329,7 @@ GMCommands.AddCommand(new Command('set',60,function command_set(string,client){
 			// );
 			client.character.updateInfos();
 
-			client.Zone.sendToAllArea(client,true,packets.makeCompressedPacket(		
-				0x18,
-				new Buffer(
-						packets.ActionReplyPacket.pack(
-							client.character.state
-							)
-						)
-				),config.viewable_action_distance
+			client.Zone.sendToAllArea(client,true,client.character.state.getPacket(),config.viewable_action_distance
 			);
 		}
 		//client.send2FUpdate();
