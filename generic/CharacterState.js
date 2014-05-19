@@ -152,7 +152,7 @@ CharacterState_Prototype.setFromCharacter = function(character) {
 	this.Weapon = character.Weapon;
 	this.Pet = character.Pet;
 
-	this.GuildName = character.GuildName;
+	this.GuildName = character.GuildName; 
 
 	this.TagExist = character.GuildTag !== '' ? true : false;
 	this.GuildTag = character.GuildTag;

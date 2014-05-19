@@ -1456,4 +1456,4 @@ WorldPC.Set(0x14, {
             client.sendInfoMessage('The inventory action ' + input.ActionType + ' has not been coded into the server. Please report this to a developer and tell them what you were doing at the time.');
         }
     }
-});
+}); 
