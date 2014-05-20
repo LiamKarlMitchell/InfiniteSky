@@ -24,21 +24,23 @@ var util = {
   dumpError: dumpError,
 
   logHex: function(data) {
-    console.log("\n");
-    var testSplit = data.toString("hex");
-    testSplit = testSplit.match(/../g);
+    console.log(hexy(data));
+    
+    // console.log("\n");
+    // var testSplit = data.toString("hex");
+    // testSplit = testSplit.match(/../g);
 
-    var lineVal = "";
-    var hexCounter = 0;
-    for(var i = 0; i < testSplit.length; i++) {
-      lineVal += testSplit[i] + " ";
-      hexCounter++;
-      if(hexCounter == 15) {
-        console.log(lineVal);
-        lineVal = "";
-        hexCounter = 0;
-      }
-    }
+    // var lineVal = "";
+    // var hexCounter = 0;
+    // for(var i = 0; i < testSplit.length; i++) {
+    //   lineVal += testSplit[i] + " ";
+    //   hexCounter++;
+    //   if(hexCounter == 15) {
+    //     console.log(lineVal);
+    //     lineVal = "";
+    //     hexCounter = 0;
+    //   }
+    // }
   },
 
 

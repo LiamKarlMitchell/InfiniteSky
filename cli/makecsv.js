@@ -53,11 +53,11 @@ var filename = "./data/translation/"+name+".csv";
 
 
 cli.makecsv = function CLI_MakeCSV(input) {
-	infoToCSV('Item',['ID','Name','Rareness','ItemType','LevelRequirement','HonorPointReq','SkillBonusID1','SkillBonusID2','SkillBonusID3','SkillBonusAmount1','SkillBonusAmount2','SkillBonusAmount3','Description2','Description3'],console.log);
+	infoToCSV('Item',['ID','Name','Rareness','ItemType','LevelRequirement','HonorPointReq','SkillBonusID1','SkillBonusID2','SkillBonusID3','SkillBonusAmount1','SkillBonusAmount2','SkillBonusAmount3','Description1','Description2','Description3'],console.log);
 	infoToCSV('Monster',['ID','Name','Health','AttackPower','DefensePower','Critical'],console.log);
 	infoToCSV('Npc',['ID','Name','Chat1','Chat2','Chat3','Chat4','Chat5'],console.log)
 	infoToCSV('Exp',['Level','EXPStart','EXPEnd','SkillPoint'],console.log)
-	infoToCSV('Skill',['ID','Name','Clan','Weapon','PointsToLearn','MaxSkillLevel','Description1','Description2'],console.log)
+	infoToCSV('Skill',['ID','Name','Clan','Weapon','PointsToLearn','MaxSkillLevel','Description1','Description2', 'Description3'],console.log)
 };
 
 cli.makecsv.help = function CLI_MakeCSV_help(input) {
