@@ -24,7 +24,11 @@ GMCommands.AddCommand(new Command('skillinfo',0,function command_skillinfo(strin
 		return;
 	}
 
+<<<<<<< HEAD
 	var skills = infos.Skill.getByNameLike(string);
+=======
+	var skills = infos.Skil.getByNameLike(string);
+>>>>>>> upstream/master
 	client.sendInfoMessage("Finding skills where name is like "+string);
 	for(var i=0;i<skills.length;i++)
 	{

@@ -2,6 +2,6 @@
 // Copyright (c) InfiniteSky Dev Teams - Licensed under GNU GPL
 // For more information, see LICENCE in the main folder
 
-WorldPC.onDisconnected = function (socket) {
+WorldPC.onDisconnected = function (client) {
 
 }

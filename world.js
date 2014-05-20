@@ -503,6 +503,11 @@ vms.depends({
             if(this.authenticated == false) {
                 return;
             }
+
+            
+            this.character.Health = this.character.state.CurrentHP;
+            this.character.Chi = this.character.state.CurrentChi;
+            
             // Need to store zone transfer location different to current location.
             if(this.zoneTransfer) {
                 console.log('removeDisconnectedCharacter ' + this.acocunt.Username)

@@ -53,7 +53,7 @@ SkillInfo.prototype = {
         
         var SkillModifiers = {};
         for (var name in this.ModifiersStart) {
-            SkillModifiers[name] = (this.infos.ModifiersEnd[name] - this.ModifiersStart[name]) * Scale;
+            SkillModifiers[name] = (this.ModifiersEnd[name] - this.ModifiersStart[name]) * Scale;
         }
 
         return SkillModifiers;
@@ -83,7 +83,7 @@ LoadSkillInfo = function() {
     int32lu('Weapon'). // 48  
     string('Description1',51). // 52  
     string('Description2',51). // 103 
-    string('Description2',50). // 154 
+    string('Description3',50). // 154 
     int32lu(). // 204 
     int32lu(). // 208 
     int32lu(). // 212 

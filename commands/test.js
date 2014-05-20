@@ -6,6 +6,7 @@
 // Command: test
 // Used to test
 GMCommands.AddCommand(new Command('test', 80, function(string, client) {
+<<<<<<< HEAD
 function clientWriteItemActionSuccess(client, input){
     client.write(new Buffer(packets.ItemActionReplyPacket2.pack({
         PacketID: 0x2B,
@@ -45,6 +46,13 @@ RowMove: 5
 	// client.sendInfoMessage(JSON.stringify(vmscript.getNamespace('generic')));
 	// var cvars = generic.Modifiers[client.character.Clan];
 	// var statInfo = client.character.statInfo;
+=======
+	
+	client.sendInfoMessage("HP is "+client.character.state.CurrentHP+'/'+client.character.state.MaxHP);
+	// var cvars = generic.Modifiers[client.character.Clan];
+	var statInfo = client.character.statInfo;
+	console.log(statInfo);
+>>>>>>> upstream/master
 	// var DamageBonus = 0;
 	// var WeaponType = 0;
 
