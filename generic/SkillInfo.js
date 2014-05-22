@@ -5,40 +5,40 @@
 // Loads the SkillInfo data
 
 var SkillData = restruct.
-    int32lu('ChiCost').
-    int32lu('DegreeOfDefensiveSkill').
-    int32lu('ChiRecovery').
-    int32lu('ChanceToAcupressure').
-    int32lu('ChanceToUnstun').
-    int32lu('AirWalkDistance').
-    int32lu('EnergyBall').
-    int32lu('DamageIncreased').
-    int32lu().
-    int32lu('AttackRangeApplied').
-    int32lu('DamageApplied').
-    int32lu('OnlyForLightDamage').
-    int32lu('OnlyForShadowDamage').
-    int32lu('OnlyForDarkDamage').
-    int32lu('ChanceToHitApplied').
-    int32lu('EffectiveDuration').
-    int32lu('IncreasedDamage').
-    int32lu('IncreasedDefense').
-    int32lu().
-    int32lu().
-    int32lu('IncreasedLightResistance').
-    int32lu('IncreasedShadowResistance').
-    int32lu('IncreasedDarkResistance').
-    int32lu('IncreasedChanceToHit').
-    int32lu('IncreasedChanceToDodge').
-    int32lu('IncreasedMovementSpeed').
-    int32lu('IncreasedAttackSpeed').
-    int32lu('IncreasedLuck').
-    int32lu('EnchancedChanceToDeadlyBlow').
-    int32lu('ChanceToReturnDamage').
-    int32lu('IncreasedAcupressureDefense').
-    int32lu('ChanceToRemoveIncreaseEffect').
-    int32lu('HPRegenerationPoints').
-    int32lu('ChiRegenerationPoints');
+    int32ls('ChiCost').
+    int32ls('DegreeOfDefensiveSkill').
+    int32ls('ChiRecovery').
+    int32ls('ChanceToAcupressure').
+    int32ls('ChanceToUnstun').
+    int32ls('AirWalkDistance').
+    int32ls('EnergyBall').
+    int32ls('DamageIncreased').
+    int32ls().
+    int32ls('AttackRangeApplied').
+    int32ls('DamageApplied').
+    int32ls('OnlyForLightDamage').
+    int32ls('OnlyForShadowDamage').
+    int32ls('OnlyForDarkDamage').
+    int32ls('ChanceToHitApplied').
+    int32ls('EffectiveDuration').
+    int32ls('IncreasedDamage').
+    int32ls('IncreasedDefense').
+    int32ls().
+    int32ls().
+    int32ls('IncreasedLightResistance').
+    int32ls('IncreasedShadowResistance').
+    int32ls('IncreasedDarkResistance').
+    int32ls('IncreasedChanceToHit').
+    int32ls('IncreasedChanceToDodge').
+    int32ls('IncreasedMovementSpeed').
+    int32ls('IncreasedAttackSpeed').
+    int32ls('IncreasedLuck').
+    int32ls('EnchancedChanceToDeadlyBlow').
+    int32ls('ChanceToReturnDamage').
+    int32ls('IncreasedAcupressureDefense').
+    int32ls('ChanceToRemoveIncreaseEffect').
+    int32ls('HPRegenerationPoints').
+    int32ls('ChiRegenerationPoints');
 
 // Incase we ever make an editor we could have constructor?
 function SkillInfo(){};
@@ -84,100 +84,100 @@ LoadSkillInfo = function() {
     string('Description1',51). // 52  
     string('Description2',51). // 103 
     string('Description3',50). // 154 
-    int32lu(). // 204 
-    int32lu(). // 208 
-    int32lu(). // 212 
-    int32lu(). // 216 
-    int32lu(). // 220 
-    int32lu(). // 224 
-    int32lu(). // 228 
-    int32lu(). // 232 
-    int32lu(). // 236 
-    int32lu(). // 240 
-    int32lu(). // 244 
-    int32lu(). // 248 
-    int32lu(). // 252 
-    int32lu(). // 256 
-    int32lu(). // 260 
-    int32lu(). // 264 
-    int32lu(). // 268 
-    int32lu(). // 272 
-    int32lu(). // 276 
-    int32lu(). // 280 
-    int32lu(). // 284 
-    int32lu(). // 288 
-    int32lu(). // 292 
-    int32lu(). // 296 
-    int32lu(). // 300 
-    int32lu(). // 304 
-    int32lu(). // 308 
-    int32lu(). // 312 
-    int32lu(). // 316 
-    int32lu(). // 320 
-    int32lu(). // 324 
-    int32lu(). // 328 
-    int32lu(). // 332 
-    int32lu(). // 336 
-    int32lu(). // 340 
-    int32lu(). // 344 
-    int32lu(). // 348 
-    int32lu(). // 352 
-    int32lu(). // 356 
-    int32lu(). // 360 
-    int32lu(). // 364 
-    int32lu(). // 368 
-    int32lu(). // 372 
-    int32lu(). // 376 
-    int32lu(). // 380 
-    int32lu(). // 384 
-    int32lu(). // 388 
-    int32lu(). // 392 
-    int32lu(). // 396 
-    int32lu(). // 400 
-    int32lu(). // 404 
-    int32lu(). // 408 
-    int32lu(). // 412 
-    int32lu(). // 416 
-    int32lu(). // 420 
-    int32lu(). // 424 
-    int32lu(). // 428 
-    int32lu(). // 432 
-    int32lu(). // 436 
-    int32lu(). // 440 
-    int32lu(). // 444 
-    int32lu(). // 448 
-    int32lu(). // 452 
-    int32lu(). // 456 
-    int32lu(). // 460 
-    int32lu(). // 464 
-    int32lu(). // 468 
-    int32lu(). // 472 
-    int32lu(). // 476 
-    int32lu(). // 480 
-    int32lu(). // 484 
-    int32lu(). // 488 
-    int32lu(). // 492 
-    int32lu(). // 496 
-    int32lu(). // 500 
-    int32lu(). // 504 
-    int32lu(). // 508 
-    int32lu(). // 512 
-    int32lu(). // 516 
-    int32lu(). // 520 
-    int32lu(). // 524 
-    int32lu(). // 528 
-    int32lu(). // 532 
-    int32lu(). // 536 
-    int32lu(). // 540 
-    int32lu(). // 544 
-    int32lu(). // 548 
-    int32lu(). // 552 
-    int32lu(). // 556 
-    int32lu(). // 560 
-    int32lu(). // 564 
+    int32ls(). // 204 
+    int32ls(). // 208 
+    int32ls(). // 212 
+    int32ls(). // 216 
+    int32ls(). // 220 
+    int32ls(). // 224 
+    int32ls(). // 228 
+    int32ls(). // 232 
+    int32ls(). // 236 
+    int32ls(). // 240 
+    int32ls(). // 244 
+    int32ls(). // 248 
+    int32ls(). // 252 
+    int32ls(). // 256 
+    int32ls(). // 260 
+    int32ls(). // 264 
+    int32ls(). // 268 
+    int32ls(). // 272 
+    int32ls(). // 276 
+    int32ls(). // 280 
+    int32ls(). // 284 
+    int32ls(). // 288 
+    int32ls(). // 292 
+    int32ls(). // 296 
+    int32ls(). // 300 
+    int32ls(). // 304 
+    int32ls(). // 308 
+    int32ls(). // 312 
+    int32ls(). // 316 
+    int32ls(). // 320 
+    int32ls(). // 324 
+    int32ls(). // 328 
+    int32ls(). // 332 
+    int32ls(). // 336 
+    int32ls(). // 340 
+    int32ls(). // 344 
+    int32ls(). // 348 
+    int32ls(). // 352 
+    int32ls(). // 356 
+    int32ls(). // 360 
+    int32ls(). // 364 
+    int32ls(). // 368 
+    int32ls(). // 372 
+    int32ls(). // 376 
+    int32ls(). // 380 
+    int32ls(). // 384 
+    int32ls(). // 388 
+    int32ls(). // 392 
+    int32ls(). // 396 
+    int32ls(). // 400 
+    int32ls(). // 404 
+    int32ls(). // 408 
+    int32ls(). // 412 
+    int32ls(). // 416 
+    int32ls(). // 420 
+    int32ls(). // 424 
+    int32ls(). // 428 
+    int32ls(). // 432 
+    int32ls(). // 436 
+    int32ls(). // 440 
+    int32ls(). // 444 
+    int32ls(). // 448 
+    int32ls(). // 452 
+    int32ls(). // 456 
+    int32ls(). // 460 
+    int32ls(). // 464 
+    int32ls(). // 468 
+    int32ls(). // 472 
+    int32ls(). // 476 
+    int32ls(). // 480 
+    int32ls(). // 484 
+    int32ls(). // 488 
+    int32ls(). // 492 
+    int32ls(). // 496 
+    int32ls(). // 500 
+    int32ls(). // 504 
+    int32ls(). // 508 
+    int32ls(). // 512 
+    int32ls(). // 516 
+    int32ls(). // 520 
+    int32ls(). // 524 
+    int32ls(). // 528 
+    int32ls(). // 532 
+    int32ls(). // 536 
+    int32ls(). // 540 
+    int32ls(). // 544 
+    int32ls(). // 548 
+    int32ls(). // 552 
+    int32ls(). // 556 
+    int32ls(). // 560 
+    int32ls(). // 564 
     int32lu('PointsToLearn'). // 232 
-    int32lu('MaxSkillLevel'). // 236 
-    int32lu(). // 240 
+    int32ls('MaxSkillLevel'). // 236 
+    int32ls(). // 240 
     struct('ModifiersStart',SkillData).
     struct('ModifiersEnd',SkillData),
 

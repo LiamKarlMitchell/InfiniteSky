@@ -1,125 +1,125 @@
-ID,Name,Clan,Weapon,PointsToLearn,MaxSkillLevel,Description1,Description2
-1,Heavenly Serenity,2,1,1,20,Training method devised by Taoist Upholder,mind.
-2,Walk in the Clouds,2,1,2,20,Skill to move around with the body as light as ,
-3,Soaring Dragon,2,1,5,20,Airwalk to soar into the air like a ,
-4,Finger of Light,2,1,1,20,Skill to power over the enemy by channeling ,fingertip.
-5,Finger of Darkness,2,1,1,20,Skill to reverse the damage done by the Finger,light through a fingertip.
-6,Thunderous Roar,2,1,1,20,Explosive roar of letting out the body¡¯s energy,
-7,Azure Wall,2,1,1,20,Use of inner energy to build up a defense to,much as possible.
-8,Crane Atop Pine,2,2,1,30,Flashy Levitation skill that  ,inspiration from a soaring crane.
-9,Autumn Blizzard,2,2,1,30,Skill powerful enough to blow away a mountain ,developed by Swordsman Gowonho.
-10,Solar Flare,2,2,1,30,Offensive skill that localizes the Autumn ,characteristic of Swordsman Gowonho.
-11,Divine Protection,2,2,1,28,Defensive skill that temporarily boosts the ,tree¡¯s strength that cannot compromised even in
-12,Haeseo Stroke,2,3,1,30,Simple yet powerful skill that resembles a,
-13,Gentleman¡¯s Pen,2,3,1,30,Advanced form of the Haeseo Stroke that slays ,stroke.
-14,Fury Strike,2,3,1,30,Skill to swipe all enemies in the vicinities ,
-15,Lightning Flash,2,3,1,28,Skill to temporarily boost the offensive power ,through the tip of a sword to capture 
-16,Tiger¡¯s Roar,2,4,1,30,Explosive outburst of inner energy towards the ,Song¡¯s hatred towards the evil.
-17,Dragon¡¯s Roar,2,4,1,30,Series of powerful attacks developed by Song,the clouds.
-18,Hyeonmu¡¯s Fist,2,4,1,30,Powerful skill that attacks enemies in the ,hatred towards the evil.
-19,Soaring Phoenix,2,4,1,28,Skill developed by Song to lighten the body,
-20,Five-Star Peak,3,1,1,20,Impact-oriented skill for manipulating the,
-21,Traceless Steps,3,1,2,20,The fastest skill among 3 Clans works developed,from the ¡°Forgotten Age.¡±
-22,Pegasus¡¯ Sprint,3,1,5,20,Airwalk that resembles the sprint of ,
-23,Death¡¯s Finger,3,1,1,20,Skill to stop the blood flow of an enemy by,through a fingertip.
-24,Heavenly Finger,3,1,1,20,Skill to reverse the damage done by the Death ,darkness through a fingertip.
-25,Invisible Arrows,3,1,1,20,Explosive outburst of all the inner-force of ,
-26,Hurricane Winds,3,1,1,20,Breathing technique that maximizes the impact,force of the body.
-27,Black Fingers,3,5,1,30,Simple yet practical skill developed by ,simplicity.
-28,Assassin¡¯s Blade,3,5,1,30,Series of simple and well-defined movements,experience on the battlefield.
-29,Deadly Palms,3,5,1,30,Powerful skill that can attack all enemies in ,Jeong.
-30,Soaring Power,3,5,1,28,Skill to temporarily boost the offensive power.,
-31,Fatal Slice ,3,6,1,30,Skill that results in the maximum effect with ,on the Upper Leaf Crown by Golden Moon Kiiler.
-32,Fist of Steel,3,6,1,30,Fatal attack skill that effectively hits the ,developed based on the Upper Leaf Crown by 
-33,Deadly Whirlpool,3,6,1,30,Skill useful when in need to fight off a number,by Golden Moon Kiiler God.
-34,Godly Firewall,3,6,1,28,Defensive skill to prevent fatal injuries that,attacks from the enemies by building up a 
-35,Icy Moon¡¯s Ray,3,7,1,30,Skill to attack the enemy with the frozen ,developed by Seolgang.
-36,"Ghost's Death Wail",3,7,1,30,Skill also developed by Seolgang to injure,
-37,Lunar Sonata ,3,7,1,30,Skill developed based on the music written by ,
-38,Music of the Wind,3,7,1,28,Skill developed by Seolgang to lighten the,nature¡¯s energy in the surroundings.
-39,Dark Star Focus,4,1,1,20,Skill developed by Hyeolryu for Yaksa,"based on extraordinary aura,"
-40,Ghostly Feet,4,1,2,20,Skill to move around without making any sounds,
-41,Warlock¡¯s Jump,4,1,5,20,Powerful skill that allows you to rise into the,
-42,Black Dagger,4,1,1,20,Skill that twists the blood flow of the enemy ,through a fingertip.
-43,White Dagger,4,1,1,20,Skill that reverses the damage done by the ,of this world through a fingertip.
-44,Lightning Strike,4,1,1,20,Explosive roar of letting out the body¡¯s energy,
-45,Dark Blizzard,4,1,1,20,Skill that stimulates rage in a warlock who,
-46,One-handed Blast,4,8,1,30,The most powerful skill found effective in a ,of exaggerated movements.
-47,Bloody Assassin,4,8,1,30,Offensive skill of sharp and cruel nature that ,destroy all that come in its way.
-48,Bloody Whirlpool,4,8,1,30,Offensive skill to attack all enemies in the,
-49,Steel Wall,4,8,1,28,Skill that firms up all muscles in the body to,
-50,Ghostly Pierce,4,9,1,30,Violent skill that uses spears developed by,
-51,Bloodbath Sword,4,9,1,30,Skill that can cut a steel armor into two ,reputation.
-52,Banshee¡¯s Cry,4,9,1,30,Skill that can attack all enemies in the ,
-53,Mindless Rage,4,9,1,28,Skill that focuses on offensive works with no,Yaksa.
-54,Spiritual Sink ,4,10,1,30,Skill developed by Bodyguard Wangrim to,spirit and hurt him.
-55,Bloody Lightning,4,10,1,30,Skill used for severely injuring the enemy by ,Bodyguard Wangrim.
-56,Deadly Blows,4,10,1,30,Skill that puts a strong curse on all enemies,once.
-57,Pegasus¡¯ Feet,4,10,1,28,Spell that lightens the body to speed up the,
-58,Whirlwind,2,2,1,35,Simple skill that uses the body¡¯s turn and a,on a series of controlled movements.
-59,Dragon Blade,2,2,1,35,Offensive skill that resembles a dragon rising , 
-60,Devil¡¯s Strike,2,3,1,35,Advanced skill that consists of a series of ,
-61,Flash of Rage,2,3,1,35,Improved form of the Gentleman¡¯s Pen developed,shortcomings.
-62,Dragon Typhoon,2,4,1,35,Skill that captures the anger against the evil,typhoon.
-63,"Four Gods' blows",2,4,1,35,A series of fatal strikes by Four Gods that,life.
-64,Dark Glimmer,3,5,1,35,Offensive skill that uses the centripetal force,black dragon circling around its prey.
-65,Rain of Arrows,3,5,1,35,Improved form of the Assassin¡¯s Blade of ,addressing the previous skill¡¯s shortcomings.
-66,Dragon¡¯s Whirl,3,6,1,35,Improved form of the Rain of Arrows that uses ,impact developed by Golden Moon Killer himself.
-67,Dark Typhoon,3,6,1,35,The final form of a series of offensive ,based on the Fist of Steel.
-68,Frozen Thunder,3,7,1,35,"Skill developed by Imyak, who became",by improving upon shortcomings of 
-69,Flash from Heaven,3,7,1,35,Skill crafted based on an excerpt from Imyak¡¯s,injuries with the sound energy.
-70,Aeroblast,4,8,1,35,Destructive skill that could rumble down the ,a collision.
-71,Bloody Sword,4,8,1,35,Black Swordsman¡¯s secret weapon of which the ,sky into two pieces.
-72,Demon¡¯s Breath,4,9,1,35,Improved form of the Ghostly Pierce developed,addressing the previous skill¡¯s shortcomings.
-73,"Devil's Illusion",4,9,1,35,A series of attacks used by Dark Spirit Force,
-74,"Devil's Hallucination",4,10,1,35,Improved form of the Spiritual Sink developed,
-75,"Devil's Spirit",4,10,1,35,Powerful offensive skill that encompasses all ,by Bodyguard Wangrim.
-76,5-Star Formation,1,1,1,20,Formation favorable to the friendly that can ,effective attack.
-77,Oval Formation,1,1,1,20,Formation favorable to the friendly that can ,effectiveness.
-78,Slaughter Formation,1,1,1,20,Formation that puts an emphasis on maximizing,that can cause the strongest blow to the 
-79,Tiger Army Formation,1,1,1,30,Formation for all the friendly to exploit ,
-80,Stunning Blow Formation,1,1,1,30,Formation to encircle the enemies and take,
-81,Slicing Wind Formation,1,1,1,30,Formation to attack all the enemies in the ,
-82,Heavenly Shield,1,1,1,30,Skill to create an invisible shield around the,surrounding.
-83,Heavenly Blow,1,1,1,30,Skill to boost the reflex that can strike the ,the whole body¡¯s energy into one spot.
-84,"Garuda's Song",1,1,1,30,Skill known to repel the impurities and bad ,the surrounding.
-85,Fire Blast Sword,2,2,1,40,Skill known to have been developed by legendary,
-86,Supernova,2,2,1,40,Skill known to have been developed by legendary,
-87,Sunray¡¯s Stroke,2,3,1,40,Secret weapon of Ildoyangdan Sect developed by,
-88,Phantom Thunder,2,3,1,40,A series of slashing movements strong enough,
-89,Dragon Thunder,2,4,1,40,Explosive outburst of the body¡¯s inner-force,
-90,"Shadowmere's Step",2,4,1,40,Fist-based skill developed by legendary ,
-91,Black Thunder,3,5,1,40,Posture developed by an unknown master of Fujin,
-92,Dark Fist,3,5,1,40,Offensive skill that fully exploits the speedy,
-93,Fluttering Blossoms,3,6,1,40,Double Blade skill developed by legendary,
-94,"Demon King's Fist",3,6,1,40,Fatal attack skill that maximizes the impact of,
-95,Icy Explosion,3,7,1,40,"Skill developed by legendary Weolseon,",
-96,Moon¡¯s Shadow,3,7,1,40,Improved form of the skill first developed by ,
-97,Bloody Fist,4,8,1,40,Skill developed by legendary Majecheonsal.,
-98,"Mad Demon's Way",4,8,1,40,Skill that consists of powerful slashing ,along with the Bloody Fist.
-99,"Demon Hunter's Blow",4,9,1,40,Skill of unknown origin from the Forgotten Age,
-100,Attack of the Heavens,4,9,1,40,Skill from the Forgotten Age improved upon by,strengths of a spear.
-101,Dark Heart¡¯s Blow,4,10,1,40,Skill that physically maximizes all thoughts ,known to have been developed by legendary 
-102,Spiritual Ruin,4,10,1,40,Skill known to have been developed by legendary,
-103,Heavenly Repulsion,1,1,50,100,Powerful defense skill that uses the reaction,enemy.
-104,Reverse Flow ,1,1,50,100,Skill that instantly switches the direction of,location of veins.
-105,Heavenly Destruction,1,1,50,100,Skill to rattle the enemy¡¯s bodily order as if,
-106,Channeled Revival,2,1,1,10,Spell from the old days that can revive the,martial arts in the highest rank treatment that
-107,Soul Recovery,2,1,1,10,Treatment for those with injured soul and ,ill¡¯s spirit and energy.
-108,Inner- Force Healing,3,1,1,10,Treatment known to be able to revive the dead,medical treatment by stimulating the body¡¯s 
-109,Spirit¡¯s Return,3,1,1,10,Spell originally used for waking up the one who,ill recover the strength.
-110,Spirit Recovery,4,1,1,10,Spell recorded to have brought back the dead ,remains to date and in use to boost Yaksa¡¯s
-111,"Light's Awakening",4,1,1,10,Spell originally used for stimulating the weak ,help Yaksa recover from its fatigue.
-112,Fiery Dragon,2,2,50,120,Ultimate swordsman¡¯s skill developed by,
-113,Thunderous Dragon,2,3,50,120,Ultimate skill developed by legendary Doshin,
-114,Spirit of Pegasus,2,4,50,120,Skill of the greatest power developed by ,
-115,Deadly Thunder,3,5,50,120,Skill with an unknown origin believed to be ,the Black Thunder.
-116,Ghostly Gust,3,6,50,120,Powerful skill developed by legendary warrior ,
-117,Lunar Explosion,3,7,50,120,Deadly skill known to have been developed by,to stand shouler-to-shoulder with the
-118,Destructive Swirl,4,8,50,120,Skill known to have been given its final form,
-119,Bloody Gallop,4,9,50,120,Skill with an unknown origin of which the power,
-120,Devilish Blast,4,10,50,120,Skill of the ultimate power that legendary Wang,
-,,,,,,,
-,,,,,,,
-,,,,,,,
-,,,,,,,
+ID,Name,Description1,Description2,Description3,Clan,Weapon,PointsToLearn,MaxSkillLevel
+1,Heavenly Serenity,Training method devised by Taoist Upholder,Gwanine to maintain the clearest state of ,mind.,2,1,1,20
+2,Walk in the Clouds,Skill to move around with the body as light as ,a holy man walking in the clouds.,,2,1,2,20
+3,Soaring Dragon,Airwalk to soar into the air like a ,dragon over the universe.,,2,1,5,20
+4,Finger of Light,Skill to power over the enemy by channeling ,fundamental energy of light through a ,fingertip.,2,1,1,20
+5,Finger of Darkness,Skill to reverse the damage done by the Finger,of Light by channeling fundamental energy of ,light through a fingertip.,2,1,1,20
+6,Thunderous Roar,Explosive roar of letting out the body¡¯s energy,for an immediate effect.,,2,1,1,20
+7,Azure Wall,Use of inner energy to build up a defense to,prevent the organic balance from breaking as ,much as possible.,2,1,1,20
+8,Crane Atop Pine,Flashy Levitation skill that  ,Swordsman Gowonho developed based on the ,inspiration from a soaring crane.,2,2,1,30
+9,Autumn Blizzard,Skill powerful enough to blow away a mountain ,like the spirit of a virtuous man also ,developed by Swordsman Gowonho.,2,2,1,30
+10,Solar Flare,Offensive skill that localizes the Autumn ,Blizzard with strong and controlled movements ,characteristic of Swordsman Gowonho.,2,2,1,30
+11,Divine Protection,Defensive skill that temporarily boosts the ,body¡¯s defense developed by capturing an old ,tree¡¯s strength that cannot compromised even in,2,2,1,28
+12,Haeseo Stroke,Simple yet powerful skill that resembles a,virtuous man¡¯s penmanship.,,2,3,1,30
+13,Gentleman¡¯s Pen,Advanced form of the Haeseo Stroke that slays ,the enemy¡¯s head like a virtuous man¡¯s brush ,stroke.,2,3,1,30
+14,Fury Strike,Skill to swipe all enemies in the vicinities ,like the rage of Jupiter.,,2,3,1,30
+15,Lightning Flash,Skill to temporarily boost the offensive power ,by channeling fundamental energy of light ,through the tip of a sword to capture ,2,3,1,28
+16,Tiger¡¯s Roar,Explosive outburst of inner energy towards the ,enemies like a hungry tiger¡¯s roar that mirrors,Song¡¯s hatred towards the evil.,2,4,1,30
+17,Dragon¡¯s Roar,Series of powerful attacks developed by Song,that resembles a blue dragon¡¯s roar summoning,the clouds.,2,4,1,30
+18,Hyeonmu¡¯s Fist,Powerful skill that attacks enemies in the ,vicinities developed by Song to reflect his,hatred towards the evil.,2,4,1,30
+19,Soaring Phoenix,Skill developed by Song to lighten the body,and move around freely.,,2,4,1,28
+20,Five-Star Peak,Impact-oriented skill for manipulating the,inner energy developed by Fujin.,,3,1,1,20
+21,Traceless Steps,The fastest skill among 3 Clans works developed,based on the legendary Traceless Steps in Snow ,from the ¡°Forgotten Age.¡±,3,1,2,20
+22,Pegasus¡¯ Sprint,Airwalk that resembles the sprint of ,Pegasus in snow.,,3,1,5,20
+23,Death¡¯s Finger,Skill to stop the blood flow of an enemy by,channeling the fundamental energy of darkness ,through a fingertip.,3,1,1,20
+24,Heavenly Finger,Skill to reverse the damage done by the Death ,by Finger by channeling fundamental energy of ,darkness through a fingertip.,3,1,1,20
+25,Invisible Arrows,Explosive outburst of all the inner-force of ,the body for a one-time impact on enemies.,,3,1,1,20
+26,Hurricane Winds,Breathing technique that maximizes the impact,of an attack by pulling together all the inner-,force of the body.,3,1,1,20
+27,Black Fingers,Simple yet practical skill developed by ,Jeong who promoted the beauty of ,simplicity.,3,5,1,30
+28,Assassin¡¯s Blade,Series of simple and well-defined movements,developed by Jeong based on his rich ,experience on the battlefield.,3,5,1,30
+29,Deadly Palms,Powerful skill that can attack all enemies in ,"the vicinities at once, also developed by ",Jeong.,3,5,1,30
+30,Soaring Power,Skill to temporarily boost the offensive power.,,,3,5,1,28
+31,Fatal Slice ,Skill that results in the maximum effect with ,the fewest possible movements developed based,on the Upper Leaf Crown by Golden Moon Kiiler.,3,6,1,30
+32,Fist of Steel,Fatal attack skill that effectively hits the ,enemy¡¯s all vital spots in a blink of an eye ,developed based on the Upper Leaf Crown by ,3,6,1,30
+33,Deadly Whirlpool,Skill useful when in need to fight off a number,of enemies at once developed ,by Golden Moon Kiiler God.,3,6,1,30
+34,Godly Firewall,Defensive skill to prevent fatal injuries that,can come about from different from different ,attacks from the enemies by building up a ,3,6,1,28
+35,Icy Moon¡¯s Ray,Skill to attack the enemy with the frozen ,hell¡¯s icicle using the strings of a Lute ,developed by Seolgang.,3,7,1,30
+36,"Ghost's Death Wail",Skill also developed by Seolgang to injure,the enemy using the dark energy of a Lute.,,3,7,1,30
+37,Lunar Sonata ,Skill developed based on the music written by ,Seolgang to grieve the death of his sister.,,3,7,1,30
+38,Music of the Wind,Skill developed by Seolgang to lighten the,body to make movements faster by absorbing the,nature¡¯s energy in the surroundings.,3,7,1,28
+39,Dark Star Focus,Skill developed by Hyeolryu for Yaksa,that can be used for building up inner-force ,"based on extraordinary aura,",4,1,1,20
+40,Ghostly Feet,Skill to move around without making any sounds,as if you were a ghost floating in air.,,4,1,2,20
+41,Warlock¡¯s Jump,Powerful skill that allows you to rise into the,air in a crafts-like manner.,,4,1,5,20
+42,Black Dagger,Skill that twists the blood flow of the enemy ,by channeling the dark energy of the underworld,through a fingertip.,4,1,1,20
+43,White Dagger,Skill that reverses the damage done by the ,Black Dagger by channeling the positive energy,of this world through a fingertip.,4,1,1,20
+44,Lightning Strike,Explosive roar of letting out the body¡¯s energy,for a temporary effect.,,4,1,1,20
+45,Dark Blizzard,Skill that stimulates rage in a warlock who,will in turn speed up his attacks.,,4,1,1,20
+46,One-handed Blast,The most powerful skill found effective in a ,small-distance battle that consists of a series,of exaggerated movements.,4,8,1,30
+47,Bloody Assassin,Offensive skill of sharp and cruel nature that ,resembles Black Swordsman¡¯s personality that can,destroy all that come in its way.,4,8,1,30
+48,Bloody Whirlpool,Offensive skill to attack all enemies in the,vicinities at once.,,4,8,1,30
+49,Steel Wall,Skill that firms up all muscles in the body to,boost the defensive power.,,4,8,1,28
+50,Ghostly Pierce,Violent skill that uses spears developed by,Battle King.,,4,9,1,30
+51,Bloodbath Sword,Skill that can cut a steel armor into two ,pieces most fittingly to Battle King¡¯s ,reputation.,4,9,1,30
+52,Banshee¡¯s Cry,Skill that can attack all enemies in the ,vicinities at once.,,4,9,1,30
+53,Mindless Rage,Skill that focuses on offensive works with no,regards to defensive works as would an enraged,Yaksa.,4,9,1,28
+54,Spiritual Sink ,Skill developed by Bodyguard Wangrim to,put a spell on the enemy to drain him of his ,spirit and hurt him.,4,10,1,30
+55,Bloody Lightning,Skill used for severely injuring the enemy by ,making him hallucinate also developed by ,Bodyguard Wangrim.,4,10,1,30
+56,Deadly Blows,Skill that puts a strong curse on all enemies,in the vicinities to cause internal injuries at,once.,4,10,1,30
+57,Pegasus¡¯ Feet,Spell that lightens the body to speed up the,movements in the battlefield.,,4,10,1,28
+58,Whirlwind,Simple skill that uses the body¡¯s turn and a,sword with much of the destructive power based,on a series of controlled movements.,2,2,1,35
+59,Dragon Blade,Offensive skill that resembles a dragon rising ,above the clouds newly developed by Gowonho, ,2,2,1,35
+60,Devil¡¯s Strike,Advanced skill that consists of a series of ,short and exaggerated strikes of a sword.,,2,3,1,35
+61,Flash of Rage,Improved form of the Gentleman¡¯s Pen developed,by addressing the previous skill¡¯s ,shortcomings.,2,3,1,35
+62,Dragon Typhoon,Skill that captures the anger against the evil,as a dragon fiercely flies cutting across a ,typhoon.,2,4,1,35
+63,"Four Gods' blows",A series of fatal strikes by Four Gods that,Song put together towards the end of his ,life.,2,4,1,35
+64,Dark Glimmer,Offensive skill that uses the centripetal force,to maximize the fatal impact in the form of a,black dragon circling around its prey.,3,5,1,35
+65,Rain of Arrows,Improved form of the Assassin¡¯s Blade of ,extraordinary power developed by Jeong by ,addressing the previous skill¡¯s shortcomings.,3,5,1,35
+66,Dragon¡¯s Whirl,Improved form of the Rain of Arrows that uses ,as few movements as possible for the maximum ,impact developed by Golden Moon Killer himself.,3,6,1,35
+67,Dark Typhoon,The final form of a series of offensive ,strikes newly developed by Golden Moon Killer ,based on the Fist of Steel.,3,6,1,35
+68,Frozen Thunder,"Skill developed by Imyak, who became","Schlool of Musicianss Master after Seolgang, ",by improving upon shortcomings of ,3,7,1,35
+69,Flash from Heaven,Skill crafted based on an excerpt from Imyak¡¯s,favorite song used to induce internal ,injuries with the sound energy.,3,7,1,35
+70,Aeroblast,Destructive skill that could rumble down the ,space itself by maximizing the impact of ,a collision.,4,8,1,35
+71,Bloody Sword,Black Swordsman¡¯s secret weapon of which the ,destructive power is strong enough to split the,sky into two pieces.,4,8,1,35
+72,Demon¡¯s Breath,Improved form of the Ghostly Pierce developed,by Battle King by ,addressing the previous skill¡¯s shortcomings.,4,9,1,35
+73,"Devil's Illusion",A series of attacks used by Dark Spirit Force,Sect put together by Battle King.,,4,9,1,35
+74,"Devil's Hallucination",Improved form of the Spiritual Sink developed,by Wangrim for a greater impact.,,4,10,1,35
+75,"Devil's Spirit",Powerful offensive skill that encompasses all ,spells of Worldly Dark Magic Sect put together,by Bodyguard Wangrim.,4,10,1,35
+76,5-Star Formation,Formation favorable to the friendly that can ,improve the possibility of success for an ,effective attack.,1,1,1,20
+77,Oval Formation,Formation favorable to the friendly that can ,confuse the enemies and sink their attacks¡¯ ,effectiveness.,1,1,1,20
+78,Slaughter Formation,Formation that puts an emphasis on maximizing,the destructive power of the Brute Force Formation,that can cause the strongest blow to the ,1,1,1,20
+79,Tiger Army Formation,Formation for all the friendly to exploit ,Defensive Skill.,,1,1,1,30
+80,Stunning Blow Formation,Formation to encircle the enemies and take,their consciousness at once.,,1,1,1,30
+81,Slicing Wind Formation,Formation to attack all the enemies in the ,premise at once.,,1,1,1,30
+82,Heavenly Shield,Skill to create an invisible shield around the,body by gathering the nature¡¯s energy from the,surrounding.,1,1,1,30
+83,Heavenly Blow,Skill to boost the reflex that can strike the ,enemy with the most fatal attack by channeling,the whole body¡¯s energy into one spot.,1,1,1,30
+84,"Garuda's Song",Skill known to repel the impurities and bad ,fortunes by gathering the nature¡¯s energy from,the surrounding.,1,1,1,30
+85,Fire Blast Sword,Skill known to have been developed by legendary,Geomseong.,,2,2,1,40
+86,Supernova,Skill known to have been developed by legendary,Geomseong.,,2,2,1,40
+87,Sunray¡¯s Stroke,Secret weapon of Ildoyangdan Sect developed by,legendary Doshin.,,2,3,1,40
+88,Phantom Thunder,A series of slashing movements strong enough,to break the steel.,,2,3,1,40
+89,Dragon Thunder,Explosive outburst of the body¡¯s inner-force,in a manner that a dragon summons the thunder. ,,2,4,1,40
+90,"Shadowmere's Step",Fist-based skill developed by legendary ,Gweonwang.,,2,4,1,40
+91,Black Thunder,Posture developed by an unknown master of Fujin,from the ancient time.,,3,5,1,40
+92,Dark Fist,Offensive skill that fully exploits the speedy,and destructive movements.,,3,5,1,40
+93,Fluttering Blossoms,Double Blade skill developed by legendary,warrior Mujeong.,,3,6,1,40
+94,"Demon King's Fist",Fatal attack skill that maximizes the impact of,Double Blade.,,3,6,1,40
+95,Icy Explosion,"Skill developed by legendary Weolseon,",Master of Lute.,,3,7,1,40
+96,Moon¡¯s Shadow,Improved form of the skill first developed by ,Weolseon.,,3,7,1,40
+97,Bloody Fist,Skill developed by legendary Majecheonsal.,,,4,8,1,40
+98,"Mad Demon's Way",Skill that consists of powerful slashing ,movements legendary Majecheonsal developed,along with the Bloody Fist.,4,8,1,40
+99,"Demon Hunter's Blow",Skill of unknown origin from the Forgotten Age,improved upon by somebody in later years,,4,9,1,40
+100,Attack of the Heavens,Skill from the Forgotten Age improved upon by,somebody in later years to highlight the ,strengths of a spear.,4,9,1,40
+101,Dark Heart¡¯s Blow,Skill that physically maximizes all thoughts ,originated from the dark corner of human mind,known to have been developed by legendary ,4,10,1,40
+102,Spiritual Ruin,Skill known to have been developed by legendary,Myeongwang.,,4,10,1,40
+103,Heavenly Repulsion,Powerful defense skill that uses the reaction,to the impact and bounce the hit back to the ,enemy.,1,1,50,100
+104,Reverse Flow ,Skill that instantly switches the direction of,energy flow inside the body as well as the ,location of veins.,1,1,50,100
+105,Heavenly Destruction,Skill to rattle the enemy¡¯s bodily order as if,his spirit were sucked out of him.,,1,1,50,100
+106,Channeled Revival,Spell from the old days that can revive the,dead known to have been used by masters of ,martial arts in the highest rank treatment that,2,1,1,10
+107,Soul Recovery,Treatment for those with injured soul and ,courage from the old days known to tend to the ,ill¡¯s spirit and energy.,2,1,1,10
+108,Inner- Force Healing,Treatment known to be able to revive the dead,from the ancient time currently in use as a ,medical treatment by stimulating the body¡¯s ,3,1,1,10
+109,Spirit¡¯s Return,Spell originally used for waking up the one who,"lost the soul, and currently in use to help the",ill recover the strength.,3,1,1,10
+110,Spirit Recovery,Spell recorded to have brought back the dead ,from the ancient time of which only a part ,remains to date and in use to boost Yaksa¡¯s,4,1,1,10
+111,"Light's Awakening",Spell originally used for stimulating the weak ,by the power of darkness recently improved to,help Yaksa recover from its fatigue.,4,1,1,10
+112,Fiery Dragon,Ultimate swordsman¡¯s skill developed by,legendary Geomseong.,,2,2,50,120
+113,Thunderous Dragon,Ultimate skill developed by legendary Doshin,after witnessing a dragon flying in the clouds.,,2,3,50,120
+114,Spirit of Pegasus,Skill of the greatest power developed by ,legendary Gwenwang.,,2,4,50,120
+115,Deadly Thunder,Skill with an unknown origin believed to be ,developed by the same person who came up with,the Black Thunder.,3,5,50,120
+116,Ghostly Gust,Powerful skill developed by legendary warrior ,Mujeong.,,3,6,50,120
+117,Lunar Explosion,Deadly skill known to have been developed by,"the legendary master of Lute, Weolseon,",to stand shouler-to-shoulder with the,3,7,50,120
+118,Destructive Swirl,Skill known to have been given its final form,by legendary Cheonsal Maje.,,4,8,50,120
+119,Bloody Gallop,Skill with an unknown origin of which the power,is unmatchable even by the Banshee¡¯s Cry.,,4,9,50,120
+120,Devilish Blast,Skill of the ultimate power that legendary Wang,Myeong claimed to be the world¡¯s best.,,4,10,50,120
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,

@@ -9,11 +9,12 @@
 // Each reloadable thing should consist of a description and a function. Lets store these in an array.
 vms.depends({name: "CLI_Reload", depends: 'infos.Item,infos.Npc,infos.Monster,infos.Skill'},function (){
 var reloadables = {
-  'config': [ 'Reloads config file: '+_util.configFile, _util.loadConfig() ],
+  'config': [ 'Reloads config file: ', _util.loadConfig ],
   'item': [ 'Reloads item info: ', infos.Item.Reload ],
   'npc': [ 'Reloads npc info: ', infos.Npc.Reload ],
   'monster': [ 'Reloads monster info: ', infos.Monster.Reload ],
-  'skill': [ 'Reloads skill info: ', infos.Skill.Reload ]
+  'skill': [ 'Reloads skill info: ', infos.Skill.Reload ],
+  'all': [ 'Reloads all of the above!' ] // Must be last
 };
 
 // TODO: Reload other things
@@ -22,6 +23,15 @@ var reloadables = {
 // Not Implemented - iteminfo - Reloads item info\n\
 // Not Implemented - spawns - Reloads monster and npc spawns\n';
 cli.reload = function CLI_Reload(input) {
+  if (input == 'all') {
+    for (var thing in reloadables) {
+      if (reloadables.hasOwnProperty(thing) && thing !== 'all') {
+        console.log('Reloading '+thing);
+        reloadables[thing][1]();
+      }
+    }
+    return;
+  }
   if (reloadables[input] !== undefined) {
     console.log('Reloading '+input);
     return reloadables[input][1]();

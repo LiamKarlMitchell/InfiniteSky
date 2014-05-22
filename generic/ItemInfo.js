@@ -188,7 +188,7 @@ restruct.
   int32lu("SalePrice").
   int32ls("_13").
   int32ls("Capacity").
-  int32lu("LevelRequirement").
+  int32ls("LevelRequirement").
   int32ls("HonorPointReq").
   int32ls("_15a").
   int32ls("Strength").

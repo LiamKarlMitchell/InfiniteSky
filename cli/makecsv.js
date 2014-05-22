@@ -42,7 +42,7 @@ function infoToCSV(name,keys,callback) {
 // Write CSV to a fileof the records
 var filename = "./data/translation/"+name+".csv";
   csv
-   .writeToPath(filename, records, {headers: true, quote: '"', escape: '\\',delimiter: '|'})
+   .writeToPath(filename, records, {headers: true})
    .on("finish", function(){
    	  callback(null, "Done writing "+filename);
    });  
