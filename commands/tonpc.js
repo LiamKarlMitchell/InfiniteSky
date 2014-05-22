@@ -12,12 +12,12 @@ GMCommands.AddCommand(new Command('tonpc',0,function command_tonpc(string,client
 	var npc = null;
 	if (ID)
 	{
-		npc = NPCInfo.getByID(ID);
+		npc = infos.Npc[ID];
 		client.sendInfoMessage("Going to NPC by ID not yet implemented.");
 	}
 	else
 	{
-		var npcs = NPCInfo.getByNameLike(string);
+		var npcs = infos.Npc.getByNameLike(string);
 		if (npcs.length>0)
 		{
 			for (var i=0;i<npcs.length;i++)

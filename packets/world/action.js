@@ -471,42 +471,227 @@ function handleActionPacket(socket, action, update) {
 
                                 // monster.info
                                 // monster.info.ImproveStone1_Chance
-                                if (monster.info.ImproveStone1_Chance && monster.info.ImproveStone1_ID)  {
-                                    // Get random number 
-                                    if (Math.random() * 10000 <= monster.info.ImproveStone1_Chance * config.ItemDropRate) {
-                                    // Compare to chance
-                                    // If can spawn item spawn it
+                                // if (monster.info.ImproveStone1_Chance && monster.info.ImproveStone1_ID && infos.Item[monster.info.ImproveStone1_ID])  {
+                                //     // Get random number 
+                                //     if (Math.random() * 10000 <= monster.info.ImproveStone1_Chance * config.ItemDropRate) {
+                                //     // Compare to chance
+                                //     // If can spawn item spawn it
 
+                                //         var spawninfo = {
+                                //                     'ID': monster.info.ImproveStone1_ID,
+                                //                     'Amount': 1,
+                                //                     'Location': monster.Location,
+                                //                     'Owner': socket.character.Name
+                                //                     };
+
+                                //         var itemspawn = socket.Zone.createItem(spawninfo);
+                                //         socket.Zone.addItem(itemspawn);
+                                //     }
+                                // }
+
+                                // if (monster.info.ImproveStone2_Chance && monster.info.ImproveStone2_ID && infos.Item[monster.info.ImproveStone2_ID])  {
+                                //     if (Math.random() * 100000 <= monster.info.ImproveStone2_Chance * config.ItemDropRate) {
+                                //         var spawninfo = {
+                                //                     'ID': monster.info.ImproveStone2_ID,
+                                //                     'Amount': 1,
+                                //                     'Location': monster.Location,
+                                //                     'Owner': socket.character.Name
+                                //                     };
+                                //         var itemspawn = socket.Zone.createItem(spawninfo);
+                                //         socket.Zone.addItem(itemspawn);
+                                //     }
+                                // }
+
+
+                                if (monster.info.Unknown56+75000 && monster.info.Unknown60 && monster.info.Unknown64 && infos.Item[monster.info.Unknown60] && infos.Item[monster.info.Unknown64])  {
+                                    if (Math.random() * 100000 <= 75000+monster.info.Unknown56 * config.ItemDropRate) {
+                                        var itemID;
+                                        if (Math.random() < 0.5) {
+                                            // Heads
+                                            itemID = monster.info.Unknown60;
+                                        } else {
+                                            // Tails
+                                            itemID = monster.info.Unknown64;
+                                        }
                                         var spawninfo = {
-                                                    'ID': monster.info.ImproveStone1_ID,
+                                                    'ID': itemID,
                                                     'Amount': 1,
                                                     'Location': monster.Location,
                                                     'Owner': socket.character.Name
                                                     };
-
                                         var itemspawn = socket.Zone.createItem(spawninfo);
                                         socket.Zone.addItem(itemspawn);
                                     }
                                 }
 
-                                if (monster.info.ImproveStone2_Chance && monster.info.ImproveStone2_ID)  {
-                                    // Get random number 
-                                    if (Math.random() * 100000 <= monster.info.ImproveStone2_Chance * config.ItemDropRate) {
-                                    // Compare to chance
-                                    // If can spawn item spawn it
 
+                                if (monster.info.Unknown56 && monster.info.Unknown60 && infos.Item[monster.info.Unknown60])  {
+                                    if (Math.random() * 100000 <= monster.info.Unknown56 * config.ItemDropRate) {
                                         var spawninfo = {
-                                                    'ID': monster.info.ImproveStone2_ID,
+                                                    'ID': monster.info.Unknown60,
                                                     'Amount': 1,
                                                     'Location': monster.Location,
                                                     'Owner': socket.character.Name
                                                     };
-
                                         var itemspawn = socket.Zone.createItem(spawninfo);
                                         socket.Zone.addItem(itemspawn);
                                     }
-                                }                                                                   
-                            }
+                                }
+
+
+                                if (monster.info.PetDropChance && monster.info.PetID2 && infos.Item[monster.info.PetID2])  {
+                                    if (Math.random() * 100000 <= monster.info.PetDropChance * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID': monster.info.PetID2,   
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+                            
+ 
+                                if (monster.info.Unknown796 && monster.info.Unknown800 && infos.Item[monster.info.Unknown800])  {
+                                    if (Math.random() * 100000 <= monster.info.Unknown796 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID':  monster.info.Unknown800,  
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+                                if (monster.info.Unknown804 && monster.info.Unknown808 && infos.Item[monster.info.Unknown808])  {
+                                    if (Math.random() * 100000 <= monster.info.Unknown804 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID':  monster.info.Unknown808,  
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+                                if (monster.info.Unknown812 && monster.info.Unknown816 && infos.Item[monster.info.Unknown816])  {
+                                    if (Math.random() * 100000 <= monster.info.Unknown812 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID':  monster.info.Unknown816,  
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+                                
+                                if (monster.info.Unknown820 && monster.info.Unknown824 && infos.Item[monster.info.Unknown824])  {
+                                    if (Math.random() * 100000 <= monster.info.Unknown820 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID':  monster.info.Unknown824,  
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+
+                                if (monster.info.Unknown820 && monster.info.Unknown824 && infos.Item[monster.info.Unknown824])  {
+                                    if (Math.random() * 100000 <= monster.info.Unknown820 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID':  monster.info.Unknown824,  
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+                                if (monster.info.Unknown828 && monster.info.Unknown832 && infos.Item[monster.info.Unknown832])  {
+                                    if (Math.random() * 100000 <= monster.info.Unknown828 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID':  monster.info.Unknown832,  
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+                                 if (monster.info.Unknown828 && monster.info.Unknown832 && infos.Item[monster.info.Unknown832])  {
+                                    if (Math.random() * 100000 <= monster.info.Unknown828 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID':  monster.info.Unknown832,  
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+                             
+
+
+                                if (monster.info.Unknown836 && monster.info.Unknown840 && infos.Item[monster.info.Unknown840])  {
+                                    if (Math.random() * 100000 <= monster.info.Unknown836 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID':  monster.info.Unknown840,  
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+ 
+                                if (monster.info.Unknown844 && monster.info.Unknown848 && infos.Item[monster.info.Unknown848])  {
+                                    if (Math.random() * 100000 <= monster.info.Unknown844 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID':  monster.info.Unknown848,  
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+                                if (monster.info.Unknown844 && monster.info.Unknown848 && infos.Item[monster.info.Unknown848])  {
+                                    if (Math.random() * 100000 <= monster.info.Unknown844 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID':  monster.info.Unknown848,  
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+
+
+
+                                // End of Monster Dead
+                            } 
 
                             socket.giveEXP(AttackPacket.TotalDamage); // Give HP relative to the damage we have done
                             socket.write(packets.makeCompressedPacket(0x2C, new Buffer(WorldPC.AttackPacketReply.pack(AttackPacket))));
