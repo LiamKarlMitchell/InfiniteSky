@@ -5,7 +5,7 @@
 /////////////////////////////////////////////////////////////
 // Command: giveskills
 // gives character some skills to test
-GMCommands.AddCommand(new Command('setskills',1,fution command_giveskills(string,client){
+GMCommands.AddCommand(new Command('setskills',1,function command_giveskills(string,client){
    for (var i=1;i<30;i++) {
      client.character.SkillList[i] = { ID: i+1, Level: 1 }
    }

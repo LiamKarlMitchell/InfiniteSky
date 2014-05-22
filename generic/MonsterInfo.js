@@ -206,7 +206,7 @@ restruct.
     int32lu("Unknown708"). // 708
     int32lu("Unknown712"). // 712
     int32lu("Unknown716"). // 716
-    int32lu("Unknown720"). // 720
+    int32lu("Unknown720"). // 720 2 for stones and LOA etc 1 everything else.
     int32lu("ImproveStone1_Chance"). // 724
     int32lu("ImproveStone1_ID"). // 728
     int32lu("ImproveStone2_Chance"). // 732

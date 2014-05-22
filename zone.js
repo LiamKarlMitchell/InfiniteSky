@@ -326,7 +326,7 @@ Zone_Prototype.addMonster = function(monster) {
 
 	var node = this.QuadTree.addNode(new QuadTree.QuadTreeNode({ object: monster, update: this.npcUpdate, type: 'monster' }));
 	if (!node) {
-		dumpError('Problem adding monster it is outside bounds of quadtree no doubt.');
+		if (config.errorLevel >= 4) dumpError('Problem adding monster it is outside bounds of quadtree no doubt.');
 		return;
 	}
 	monster.node = node;
@@ -423,7 +423,7 @@ Zone_Prototype.addNPC = function(npc) {
 
 	var node = this.QuadTree.addNode(new QuadTree.QuadTreeNode({ object: npc, update: this.npcUpdate, type: 'npc' }));
 	if (!node) {
-		dumpError('Problem adding npc it is outside bounds of quadtree no doubt.');
+		if (config.errorLevel >= 4) dumpError('Problem adding npc it is outside bounds of quadtree no doubt.');
 		return;
 	}
 	npc.node = node;
@@ -509,7 +509,7 @@ Zone_Prototype.Load = function(callback) {
     // Get width and height and offset from world data
 
     // Create QuadTree
-    this.QuadTree = new QuadTree({x: -10000, y: -10000, size: 20000,
+    this.QuadTree = new QuadTree({x: -100000000, y: -100000000, size: 100000000,
 		depth: config.quadtree_depth || 6,
 		limit: config.quadtree_limit || 10
 	});

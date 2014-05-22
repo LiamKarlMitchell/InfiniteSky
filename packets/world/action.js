@@ -426,7 +426,7 @@ function handleActionPacket(socket, action, update) {
                                 DefenderIndex: monster.UniqueID,
                                 Status: 1,
                                 // Depends on attacker or defender | hit or miss, block or not |
-                                TotalDamage: 10,
+                                TotalDamage: socket.character.statInfo.Damage,
                                 Deadly: 1,
                                 Light: 0,
                                 Shadow: 0,
@@ -434,9 +434,80 @@ function handleActionPacket(socket, action, update) {
                                 DamageHP: 1 // Deadly bypasses defense
                             };
 
+                            console.log(socket.character.statInfo);
+// Things we could use from character statInfo
+// statInfo.Luck
+// statInfo.Damage
+// statInfo.HitRate
+// statInfo.Dodge
+// statInfo.Defense
+// statInfo.LightDamage
+// statInfo.ShadowDamage
+// statInfo.DarkDamage
+
                             monster.Attackers.regulate(socket.character._id, AttackPacket.TotalDamage);
                             //monster.HP -= AttackPacket.TotalDamage; // Commented out of now as we dont want to kill things just yet without an AI
-                            console.log("Client attacking monster " + monster.HP + "::" + AttackPacket.TotalDamage);
+                            console.log("Client attacking monster HP" + monster.HP + " hurt for " + AttackPacket.TotalDamage);
+                            
+                            console.log("Client attacking monster HP" + monster.HP + " hurt for " + AttackPacket.TotalDamage);
+                            
+                            monster.HP -= AttackPacket.TotalDamage;
+                            if (monster.HP<0) {
+                                monster.HP = 0;
+                                socket.sendInfoMessage('You killed the monster!');
+                                monster.HP = monster.info.Health;
+
+                                // Drop items etc
+
+                                // var spawninfo = {
+                                //         'ID': 1,
+                                //         'Amount': Math.floor((Math.random() * 10-19<=  )+ Min)
+                                //         'Location': monster.Location,
+                                //         'Owner': socket.character.Name
+                                //         };
+
+                                        //var itemspawn = socket.Zone.createItem(spawninfo);
+                                        //socket.Zone.addItem(itemspawn);
+
+                                // monster.info
+                                // monster.info.ImproveStone1_Chance
+                                if (monster.info.ImproveStone1_Chance && monster.info.ImproveStone1_ID)  {
+                                    // Get random number 
+                                    if (Math.random() * 10000 <= monster.info.ImproveStone1_Chance * config.ItemDropRate) {
+                                    // Compare to chance
+                                    // If can spawn item spawn it
+
+                                        var spawninfo = {
+                                                    'ID': monster.info.ImproveStone1_ID,
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+                                if (monster.info.ImproveStone2_Chance && monster.info.ImproveStone2_ID)  {
+                                    // Get random number 
+                                    if (Math.random() * 100000 <= monster.info.ImproveStone2_Chance * config.ItemDropRate) {
+                                    // Compare to chance
+                                    // If can spawn item spawn it
+
+                                        var spawninfo = {
+                                                    'ID': monster.info.ImproveStone2_ID,
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }                                                                   
+                            }
+
                             socket.giveEXP(AttackPacket.TotalDamage); // Give HP relative to the damage we have done
                             socket.write(packets.makeCompressedPacket(0x2C, new Buffer(WorldPC.AttackPacketReply.pack(AttackPacket))));
                             

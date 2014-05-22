@@ -172,25 +172,25 @@ restruct.
   int32lu("Rareness").
   int32lu("ItemType").
   int32lu("DisplayItem2D").
-  int32lu("_1").
+  int32ls("_1").
   int32lu("Level"). // Double as LevelRequirement?
   int32lu("Clan").
-  int32lu("_4").
-  int32lu("_5").
-  int32lu("_6").
-  int32lu("_7").
-  int32lu("_8").
-  int32lu("_9").
-  int32lu("_10").
-  int32lu("_11").
-  int32lu("_12").
+  int32ls("_4").
+  int32ls("_5").
+  int32ls("_6").
+  int32ls("_7").
+  int32ls("_8").
+  int32ls("_9").
+  int32ls("_10").
+  int32ls("_11").
+  int32ls("_12").
   int32lu("PurchasePrice").
   int32lu("SalePrice").
-  int32lu("_13").
-  int32lu("Capacity").
+  int32ls("_13").
+  int32ls("Capacity").
   int32lu("LevelRequirement").
-  int32lu("HonorPointReq").
-  int32lu("_15a").
+  int32ls("HonorPointReq").
+  int32ls("_15a").
   int32ls("Strength").
   int32ls("Dexterity").
   int32ls("Vitality").

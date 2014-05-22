@@ -7,7 +7,7 @@
 // clears the characters inventory
 GMCommands.AddCommand(new Command('clearinventory',20,function command_clearinventory(string,client){
 		// Clear the inventory
-		for (var i=0;;i<client.character.Inventory.length;i++) {
+		for (var i=0;i<client.character.Inventory.length;i++) {
 			client.character.Inventory[i] = null;
 		}
 		client.character.markModified('Inventory');
