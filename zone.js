@@ -509,7 +509,8 @@ Zone_Prototype.Load = function(callback) {
     // Get width and height and offset from world data
 
     // Create QuadTree
-    this.QuadTree = new QuadTree({x: -100000000, y: -100000000, size: 100000000,
+    this.QuadTree = new QuadTree({
+    	x: -50000, y: -50000, size: 100000,
 		depth: config.quadtree_depth || 6,
 		limit: config.quadtree_limit || 10
 	});
