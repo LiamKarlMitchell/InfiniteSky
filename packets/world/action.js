@@ -433,7 +433,8 @@ function handleActionPacket(socket, action, update) {
                                 Dark: 0,
                                 DamageHP: 1 // Deadly bypasses defense
                             };
-
+                            // Testing only
+                            AttackPacket.TotalDamage = 13370000;
                             console.log(socket.character.statInfo);
 // Things we could use from character statInfo
 // statInfo.Luck
@@ -468,43 +469,139 @@ function handleActionPacket(socket, action, update) {
 
                                         //var itemspawn = socket.Zone.createItem(spawninfo);
                                         //socket.Zone.addItem(itemspawn);
-
+                                var TotalDropChance = 100000;
                                 // monster.info
                                 // monster.info.ImproveStone1_Chance
-                                // if (monster.info.ImproveStone1_Chance && monster.info.ImproveStone1_ID && infos.Item[monster.info.ImproveStone1_ID])  {
-                                //     // Get random number 
-                                //     if (Math.random() * 10000 <= monster.info.ImproveStone1_Chance * config.ItemDropRate) {
-                                //     // Compare to chance
-                                //     // If can spawn item spawn it
+                                if (monster.info.ImproveStone1_Chance && monster.info.ImproveStone1_ID && infos.Item[monster.info.ImproveStone1_ID])  {
+                                    // Get random number 
+                                    if (Math.random() * TotalDropChance <= monster.info.ImproveStone1_Chance * config.ItemDropRate) {
+                                    // Compare to chance
+                                    // If can spawn item spawn it
 
-                                //         var spawninfo = {
-                                //                     'ID': monster.info.ImproveStone1_ID,
-                                //                     'Amount': 1,
-                                //                     'Location': monster.Location,
-                                //                     'Owner': socket.character.Name
-                                //                     };
+                                        var spawninfo = {
+                                                    'ID': monster.info.ImproveStone1_ID,
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
 
-                                //         var itemspawn = socket.Zone.createItem(spawninfo);
-                                //         socket.Zone.addItem(itemspawn);
-                                //     }
-                                // }
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
 
-                                // if (monster.info.ImproveStone2_Chance && monster.info.ImproveStone2_ID && infos.Item[monster.info.ImproveStone2_ID])  {
-                                //     if (Math.random() * 100000 <= monster.info.ImproveStone2_Chance * config.ItemDropRate) {
-                                //         var spawninfo = {
-                                //                     'ID': monster.info.ImproveStone2_ID,
-                                //                     'Amount': 1,
-                                //                     'Location': monster.Location,
-                                //                     'Owner': socket.character.Name
-                                //                     };
-                                //         var itemspawn = socket.Zone.createItem(spawninfo);
-                                //         socket.Zone.addItem(itemspawn);
-                                //     }
-                                // }
+                                if (monster.info.ImproveStone2_Chance && monster.info.ImproveStone2_ID && infos.Item[monster.info.ImproveStone2_ID])  {
+                                    if (Math.random() * TotalDropChance <= monster.info.ImproveStone2_Chance * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID': monster.info.ImproveStone2_ID,
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
 
 
+// Don't need heads or tails do value chance after its decided if it will drop too also cant have ; then more maths and needs to be in ()
+                                // Unknown188 is Silver Drop Chance
+                                // Unknown192 is Silver Min
+                                // Unknown196 is Silver Max
+                                if (monster.info.Unknown188 && monster.info.Unknown192 && monster.info.Unknown196)  {
+                                    console.log('Checking silver drop for: ', monster.info.Unknown188 +' - '+ monster.info.Unknown192 +' - '+ monster.info.Unknown196);
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown188 * config.ItemDropRate) {
+
+                                        var amount = Math.floor( (Math.random() * (monster.info.Unknown196-monster.info.Unknown192)) + monster.info.Unknown192);
+                                        console.log('Dropping Silver ('+amount+')');
+                                        var spawninfo = {
+                                                    'ID': 1,
+                                                    'Amount': amount,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+                               
+
+                                // for pills 
+                                if (monster.info.Unknown200 && monster.info.Unknown204 && infos.Item[monster.info.Unknown204])  {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown200 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID': monster.info.Unknown204,
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+
+                                // for pills 
+                                if (monster.info.Unknown208 && monster.info.Unknown212 && infos.Item[monster.info.Unknown212])  {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown208 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID': monster.info.Unknown212,
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+                                // for pills 
+                                if (monster.info.Unknown224 && monster.info.Unknown228 && infos.Item[monster.info.Unknown228])  {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown224 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID': monster.info.Unknown228,
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+                                // for pills 
+                                if (monster.info.Unknown232 && monster.info.Unknown236 && infos.Item[monster.info.Unknown236])  {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown232 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID': monster.info.Unknown236,
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+                                // for pills 
+                                if (monster.info.Unknown216 && monster.info.Unknown220 && infos.Item[monster.info.Unknown220])  {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown216 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID': monster.info.Unknown220,
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+
+                                // For Pills
                                 if (monster.info.Unknown56+75000 && monster.info.Unknown60 && monster.info.Unknown64 && infos.Item[monster.info.Unknown60] && infos.Item[monster.info.Unknown64])  {
-                                    if (Math.random() * 100000 <= 75000+monster.info.Unknown56 * config.ItemDropRate) {
+                                    if (Math.random() * TotalDropChance <= 75000+monster.info.Unknown56 * config.ItemDropRate) {
                                         var itemID;
                                         if (Math.random() < 0.5) {
                                             // Heads
@@ -526,7 +623,7 @@ function handleActionPacket(socket, action, update) {
 
 
                                 if (monster.info.Unknown56 && monster.info.Unknown60 && infos.Item[monster.info.Unknown60])  {
-                                    if (Math.random() * 100000 <= monster.info.Unknown56 * config.ItemDropRate) {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown56 * config.ItemDropRate) {
                                         var spawninfo = {
                                                     'ID': monster.info.Unknown60,
                                                     'Amount': 1,
@@ -540,7 +637,7 @@ function handleActionPacket(socket, action, update) {
 
 
                                 if (monster.info.PetDropChance && monster.info.PetID2 && infos.Item[monster.info.PetID2])  {
-                                    if (Math.random() * 100000 <= monster.info.PetDropChance * config.ItemDropRate) {
+                                    if (Math.random() * TotalDropChance <= monster.info.PetDropChance * config.ItemDropRate) {
                                         var spawninfo = {
                                                     'ID': monster.info.PetID2,   
                                                     'Amount': 1,
@@ -553,8 +650,485 @@ function handleActionPacket(socket, action, update) {
                                 }
                             
  
+                                // Monster Boss Drops
+                                if (monster.info.Unknown240 && monster.info.Unknown244 && infos.Item[monster.info.Unknown244])  {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown240 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID': monster.info.Unknown244,
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+
+
+                                // Monster Boss Drops
+                                if (monster.info.Unknown248 && monster.info.Unknown252 && infos.Item[monster.info.Unknown252])  {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown248 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID': monster.info.Unknown252,
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+
+                                // Monster Boss Drops
+                                if (monster.info.Unknown256 && monster.info.Unknown260 && infos.Item[monster.info.Unknown260])  {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown256 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID': monster.info.Unknown260,
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+
+                                // Monster Boss Drops
+                                if (monster.info.Unknown264 && monster.info.Unknown268 && infos.Item[monster.info.Unknown268])  {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown264 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID': monster.info.Unknown268,
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+
+                                // Monster Drops
+                                if (monster.info.Unknown272 && monster.info.Unknown276 && infos.Item[monster.info.Unknown276])  {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown272 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID': monster.info.Unknown276,
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+
+                                // Monster Drops
+                                if (monster.info.Unknown280 && monster.info.Unknown284 && infos.Item[monster.info.Unknown284])  {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown280 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID': monster.info.Unknown284,
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+
+                                // Monster Drops Quest Item ''Blue marked''
+                                if (monster.info.Unknown288 && monster.info.Unknown292 && infos.Item[monster.info.Unknown292])  {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown288 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID': monster.info.Unknown292,
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+
+                                // Monster Drops Quest Item ''Blue marked''
+                                if (monster.info.Unknown296 && monster.info.Unknown300 && infos.Item[monster.info.Unknown300])  {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown296 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID': monster.info.Unknown300,
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+
+                                // Monster Drops Quest Item ''Blue marked''
+                                if (monster.info.Unknown304 && monster.info.Unknown308 && infos.Item[monster.info.Unknown308])  {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown304 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID': monster.info.Unknown308,
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+
+                                // Monster Drops Quest Item ''Blue marked''
+                                if (monster.info.Unknown304 && monster.info.Unknown308 && infos.Item[monster.info.Unknown308])  {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown304 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID': monster.info.Unknown308,
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+
+                                  // Monster Drops combine items for Elixers '' can be crafted at herbmaster''
+                                if (monster.info.Unknown612 && monster.info.Unknown616 && infos.Item[monster.info.Unknown616])  {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown612 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID': monster.info.Unknown616,
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+
+                                 // Monster Drops combine items for Elixers '' can be crafted at herbmaster''
+                                if (monster.info.Unknown620 && monster.info.Unknown624 && infos.Item[monster.info.Unknown624])  {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown620 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID': monster.info.Unknown624,
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+
+                                 // Monster Drops combine items for Elixers '' can be crafted at herbmaster''
+                                if (monster.info.Unknown628 && monster.info.Unknown632 && infos.Item[monster.info.Unknown632])  {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown628 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID': monster.info.Unknown632,
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+
+
+                                 // Monster Drops combine items for Elixers '' can be crafted at herbmaster''
+                                if (monster.info.Unknown628 && monster.info.Unknown632 && infos.Item[monster.info.Unknown632])  {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown628 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID': monster.info.Unknown632,
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+
+
+                                 // Monster Drops combine items for Elixers '' can be crafted at herbmaster''
+                                if (monster.info.Unknown636 && monster.info.Unknown640 && infos.Item[monster.info.Unknown640])  {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown636 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID': monster.info.Unknown640,
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+
+
+                                 // Monster Drops combine items for Elixers '' can be crafted at herbmaster''
+                                if (monster.info.Unknown644 && monster.info.Unknown648 && infos.Item[monster.info.Unknown648])  {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown644 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID': monster.info.Unknown648,
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+                                 // Monster Drops combine items for Elixers '' can be crafted at herbmaster''
+                                if (monster.info.Unknown652 && monster.info.Unknown656 && infos.Item[monster.info.Unknown656])  {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown652 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID': monster.info.Unknown656,
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+
+                                 // Monster Drops combine items for skills HD HR HF '' can be crafted at elder''
+                                if (monster.info.Unknown668 && monster.info.Unknown672 && infos.Item[monster.info.Unknown672])  {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown668 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID': monster.info.Unknown672,
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+
+
+
+
+                                 // Monster Drops combine items for skills HD HR HF '' can be crafted at elder''
+                                if (monster.info.Unknown668 && monster.info.Unknown676 && infos.Item[monster.info.Unknown676])  {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown668 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID': monster.info.Unknown676,
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+
+
+                                 // Monster Drops combine items for skills HD HR HF '' can be crafted at elder''
+                                if (monster.info.Unknown668 && monster.info.Unknown680 && infos.Item[monster.info.Unknown680])  {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown668 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID': monster.info.Unknown680,
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+                                 // Monster Drops combine items for skills HD HR HF '' can be crafted at elder''
+                                if (monster.info.Unknown668 && monster.info.Unknown688 && infos.Item[monster.info.Unknown688])  {
+                                    if (Math.random() * TotalDropChance <= monster.info.UUnknown668 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID': monster.info.Unknown688,
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+
+
+                            // Monster Drops combine items for skills HD HR HF '' can be crafted at elder''
+                                if (monster.info.Unknown668 && monster.info.Unknown692 && infos.Item[monster.info.Unknown692])  {
+                                    if (Math.random() * TotalDropChance <= monster.info.UUnknown668 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID': monster.info.Unknown692,
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+     
+
+
+                            // Monster Drops combine items for skills HD HR HF '' can be crafted at elder''
+                                if (monster.info.Unknown668 && monster.info.Unknown700 && infos.Item[monster.info.Unknown700])  {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown668 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID': monster.info.Unknown700,
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+                            // Monster Drops combine items for skills HD HR HF '' can be crafted at elder''
+                                if (monster.info.Unknown668 && monster.info.Unknown704 && infos.Item[monster.info.Unknown704])  {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown668 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID': monster.info.Unknown704,
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+
+        // Monster Drops combine items for skills HD HR HF '' can be crafted at elder''
+                                if (monster.info.Unknown668 && monster.info.Unknown708 && infos.Item[monster.info.Unknown708])  {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown668 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID': monster.info.Unknown708,
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+
+     // Monster Drops combine items for skills HD HR HF '' can be crafted at elder''
+                                if (monster.info.Unknown668 && monster.info.Unknown712 && infos.Item[monster.info.Unknown712])  {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown668 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID': monster.info.Unknown712,
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+
+
+     // Monster Drops combine items for skills HD HR HF '' can be crafted at elder''
+                                if (monster.info.Unknown668 && monster.info.Unknown716 && infos.Item[monster.info.Unknown716])  {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown668 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID': monster.info.Unknown716,
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+
+
+     // Monster Drops Elite pets and Rare master pets
+                                if (monster.info.Unknown764 && monster.info.Unknown768 && infos.Item[monster.info.Unknown768])  {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown764 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID': monster.info.Unknown768,
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+
+     // Monster Drops Elite pets and Rare master pets
+                                if (monster.info.Unknown772 && monster.info.Unknown776 && infos.Item[monster.info.Unknown776])  {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown772 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID': monster.info.Unknown776,
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+
+     // Monster Drops Elite pets and Rare master pets
+                                if (monster.info.Unknown780 && monster.info.Unknown784 && infos.Item[monster.info.Unknown784])  {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown780 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID': monster.info.Unknown784,
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+
+     // Monster Drops Elite pets and Rare master pets
+                                if (monster.info.Unknown788 && monster.info.Unknown792 && infos.Item[monster.info.Unknown792])  {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown788 * config.ItemDropRate) {
+                                        var spawninfo = {
+                                                    'ID': monster.info.Unknown792,
+                                                    'Amount': 1,
+                                                    'Location': monster.Location,
+                                                    'Owner': socket.character.Name
+                                                    };
+                                        var itemspawn = socket.Zone.createItem(spawninfo);
+                                        socket.Zone.addItem(itemspawn);
+                                    }
+                                }
+
+
+//// line
+
                                 if (monster.info.Unknown796 && monster.info.Unknown800 && infos.Item[monster.info.Unknown800])  {
-                                    if (Math.random() * 100000 <= monster.info.Unknown796 * config.ItemDropRate) {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown796 * config.ItemDropRate) {
                                         var spawninfo = {
                                                     'ID':  monster.info.Unknown800,  
                                                     'Amount': 1,
@@ -567,7 +1141,7 @@ function handleActionPacket(socket, action, update) {
                                 }
 
                                 if (monster.info.Unknown804 && monster.info.Unknown808 && infos.Item[monster.info.Unknown808])  {
-                                    if (Math.random() * 100000 <= monster.info.Unknown804 * config.ItemDropRate) {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown804 * config.ItemDropRate) {
                                         var spawninfo = {
                                                     'ID':  monster.info.Unknown808,  
                                                     'Amount': 1,
@@ -580,7 +1154,7 @@ function handleActionPacket(socket, action, update) {
                                 }
 
                                 if (monster.info.Unknown812 && monster.info.Unknown816 && infos.Item[monster.info.Unknown816])  {
-                                    if (Math.random() * 100000 <= monster.info.Unknown812 * config.ItemDropRate) {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown812 * config.ItemDropRate) {
                                         var spawninfo = {
                                                     'ID':  monster.info.Unknown816,  
                                                     'Amount': 1,
@@ -593,7 +1167,7 @@ function handleActionPacket(socket, action, update) {
                                 }
                                 
                                 if (monster.info.Unknown820 && monster.info.Unknown824 && infos.Item[monster.info.Unknown824])  {
-                                    if (Math.random() * 100000 <= monster.info.Unknown820 * config.ItemDropRate) {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown820 * config.ItemDropRate) {
                                         var spawninfo = {
                                                     'ID':  monster.info.Unknown824,  
                                                     'Amount': 1,
@@ -607,7 +1181,7 @@ function handleActionPacket(socket, action, update) {
 
 
                                 if (monster.info.Unknown820 && monster.info.Unknown824 && infos.Item[monster.info.Unknown824])  {
-                                    if (Math.random() * 100000 <= monster.info.Unknown820 * config.ItemDropRate) {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown820 * config.ItemDropRate) {
                                         var spawninfo = {
                                                     'ID':  monster.info.Unknown824,  
                                                     'Amount': 1,
@@ -620,7 +1194,7 @@ function handleActionPacket(socket, action, update) {
                                 }
 
                                 if (monster.info.Unknown828 && monster.info.Unknown832 && infos.Item[monster.info.Unknown832])  {
-                                    if (Math.random() * 100000 <= monster.info.Unknown828 * config.ItemDropRate) {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown828 * config.ItemDropRate) {
                                         var spawninfo = {
                                                     'ID':  monster.info.Unknown832,  
                                                     'Amount': 1,
@@ -633,7 +1207,7 @@ function handleActionPacket(socket, action, update) {
                                 }
 
                                  if (monster.info.Unknown828 && monster.info.Unknown832 && infos.Item[monster.info.Unknown832])  {
-                                    if (Math.random() * 100000 <= monster.info.Unknown828 * config.ItemDropRate) {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown828 * config.ItemDropRate) {
                                         var spawninfo = {
                                                     'ID':  monster.info.Unknown832,  
                                                     'Amount': 1,
@@ -648,7 +1222,7 @@ function handleActionPacket(socket, action, update) {
 
 
                                 if (monster.info.Unknown836 && monster.info.Unknown840 && infos.Item[monster.info.Unknown840])  {
-                                    if (Math.random() * 100000 <= monster.info.Unknown836 * config.ItemDropRate) {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown836 * config.ItemDropRate) {
                                         var spawninfo = {
                                                     'ID':  monster.info.Unknown840,  
                                                     'Amount': 1,
@@ -662,7 +1236,7 @@ function handleActionPacket(socket, action, update) {
 
  
                                 if (monster.info.Unknown844 && monster.info.Unknown848 && infos.Item[monster.info.Unknown848])  {
-                                    if (Math.random() * 100000 <= monster.info.Unknown844 * config.ItemDropRate) {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown844 * config.ItemDropRate) {
                                         var spawninfo = {
                                                     'ID':  monster.info.Unknown848,  
                                                     'Amount': 1,
@@ -675,7 +1249,7 @@ function handleActionPacket(socket, action, update) {
                                 }
 
                                 if (monster.info.Unknown844 && monster.info.Unknown848 && infos.Item[monster.info.Unknown848])  {
-                                    if (Math.random() * 100000 <= monster.info.Unknown844 * config.ItemDropRate) {
+                                    if (Math.random() * TotalDropChance <= monster.info.Unknown844 * config.ItemDropRate) {
                                         var spawninfo = {
                                                     'ID':  monster.info.Unknown848,  
                                                     'Amount': 1,
