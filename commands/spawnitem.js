@@ -13,8 +13,16 @@ GMCommands.AddCommand(new Command('spawnitem',60,function command_spawnitem(stri
 
     var s = string.split(' ');
 
+
 	if (s.length>=1) {
-		ID = Number(s[0]);
+		if (isNaN(s[0])) {
+			var items = infos.Item.getByNameLike(s[0]);
+			if (items.length) {
+				ID = items[0].ID;
+			}
+		} else {
+			ID = Number(s[0]);
+		}
 	}
 	if (s.length>=2) {
 		Amount = Number(s[1]);
@@ -25,7 +33,7 @@ GMCommands.AddCommand(new Command('spawnitem',60,function command_spawnitem(stri
 	// Get Amount from string
 
 	var item = infos.Item[ID];
-	if (item!==null)
+	if (item)
 	{
 		client.sendInfoMessage("Item found "+item.ID+" "+item.Name+' Spawning '+Amount);
 		var spawninfo = {
