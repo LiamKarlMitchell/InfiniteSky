@@ -434,7 +434,7 @@ function handleActionPacket(socket, action, update) {
                                 DamageHP: 1 // Deadly bypasses defense
                             };
                             // Testing only
-                            AttackPacket.TotalDamage (Math.random() = 156465*324512 <=
+                            AttackPacket.TotalDamage = 9999999999
                             console.log(socket.character.statInfo);
 // Things we could use from character statInfo
 // statInfo.Luck
