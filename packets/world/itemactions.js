@@ -28,23 +28,23 @@ var NotImplemented = function(client, name, input) {
 };
 
 function clientWriteItemActionFailed(client, input){
-	client.write(new Buffer(packets.ItemActionReplyPacket2.pack({
-		PacketID: 0x2B,
-		ActionType: input.ActionType,
-		ItemUniqueID: input.ItemUniqueID,
-		ItemUniqueID2: input.ItemUniqueID2,
-		ItemID: input.ItemID,
-		Unknown3: input.Unknown3,
-		Unknown4: input.Unknown4,
-		Unknown5: input.Unknown5,
-		Amount: input.Amount,
-		InventoryIndex: input.InventoryIndex,
-		RowDrop: input.RowDrop,
-		ColumnPickup: input.ColumnPickup,
-		RowPickup: input.RowPickup,
-		ColumnMove: input.ColumnMove,
-		RowMove: input.RowMove,
-		Failed: 1
+    client.write(new Buffer(packets.ItemActionReplyPacket2.pack({
+        PacketID: 0x2B,
+        ActionType: input.ActionType,
+        ItemUniqueID: input.ItemUniqueID,
+        ItemUniqueID2: input.ItemUniqueID2,
+        ItemID: input.ItemID,
+        Unknown3: input.Unknown3,
+        Unknown4: input.Unknown4,
+        Unknown5: input.Unknown5,
+        Amount: input.Amount,
+        InventoryIndex: input.InventoryIndex,
+        RowDrop: input.RowDrop,
+        ColumnPickup: input.ColumnPickup,
+        RowPickup: input.RowPickup,
+        ColumnMove: input.ColumnMove,
+        RowMove: input.RowMove,
+        Failed: 1
     })));
 }
 
@@ -132,6 +132,8 @@ ItemActions[0x00] = function Recv_PickupItem(client, input) {
         }
 
         var invitem = client.character.Inventory[input.InventoryIndex];
+
+        console.log('Inventory Item: ', invitem);
         // Already exists in slot
         if (invitem) {
             console.log('Already in inventory at that slot attempting update.');
@@ -175,6 +177,9 @@ ItemActions[0x00] = function Recv_PickupItem(client, input) {
         clientWriteItemActionFailed(client, input);
         return;
     }
+    
+    client.character.markModified('Inventory');
+    client.character.save();
 
 };
 ItemActions[0x01] = function Recv_DropItem(client, input) {
@@ -1384,8 +1389,8 @@ ItemActions[0x1F] = function Recv_LearnSkill(client, input) { // Completed
 ItemActions[0x20] = function sub_462C20(client, input) {
     NotImplemented(client, 'sub_462C20', input);
 };
-ItemActions[0x21] = function sub_462C60(client, input) {
-    NotImplemented(client, 'sub_462C60', input);
+ItemActions[0x21] = function Recv_BindAutoBuffSkill(client, input) {
+    NotImplemented(client, 'Recv_BindAutoBuffSkill', input);
 };
 ItemActions[0x22] = function sub_462CE0(client, input) {
     NotImplemented(client, 'sub_462CE0', input);
@@ -1425,12 +1430,12 @@ int32lu('Unknown5').
 int32lu('Amount').
 int32lu('InventoryIndex').
 int32lu('RowDrop').
-int32lu('ColumnPickup').
 int32lu('RowPickup').
+int32lu('ColumnPickup').
 int32lu('ColumnMove').
 int32lu('RowMove').
 int32lu('Enchant').
-int32lu('Unknown10').
+int32lu('Unknown10').// item use ( autobuff book brought it to here)
 int32lu('Unknown11');
 
 WorldPC.Set(0x14, {
@@ -1451,4 +1456,4 @@ WorldPC.Set(0x14, {
             client.sendInfoMessage('The inventory action ' + input.ActionType + ' has not been coded into the server. Please report this to a developer and tell them what you were doing at the time.');
         }
     }
-});
+}); 

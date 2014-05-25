@@ -172,7 +172,7 @@ restruct.
   int32lu("Rareness").
   int32lu("ItemType").
   int32lu("DisplayItem2D").
-  int32lu("_1").
+  int32ls("_1").
   int32lu("Level"). // Double as LevelRequirement?
   int32lu("Clan").
   int32ls("_4").

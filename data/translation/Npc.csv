@@ -17,7 +17,6 @@ ID,Name,Chat1,Chat2,Chat3,Chat4,Chat5
 16,Light Guard,Have you heard of the Tiger Army?,"Unlike us, they're Lord of Light's bodyguards.",There are many talented people under the ,command of Chungwon Upholder Mr Yong.,½²~ ±×·±µ¥ ÀÌ¸»Àº ºñ¹ÐÀÔ´Ï´Ù!!
 17,Light Guard,±×¡¦ ±Ù¹«Áß ÀÌ»ó¹«!,ÈÞ~ ¿ì¸® ´ëÀåÀÎÁÙ ¾Ë¾ÒÀÝ¾Æ!,,,
 18,Bounty Hunter Chudal,Do you want to see me smile?,As you wish.,Wa ha ha ha ha.,Wa ha ha ha ha.,Wa ha ha ha ha!00000
-19,Light Guard,"\"±ÝºØ¹«»çµéÀº ¾î·Á¼­ºÎÅÍ °°Àº Àü¼ú, ÀüÅõ±³À°À»\"",¹Þ½À´Ï´Ù. ±×·¡¼­ Á¶Á÷È­µÈ Àü¼ú¿¡ ´ÉÇÏÁö¿ä.,´ë±Ô¸ð ÀüÅõ¿¡¼­´Â ÀÌ·¸°Ô Á¶Á÷ÀûÀÎ ¿òÁ÷ÀÓÀº,¾öÃ»³­ À§·ÂÀ» ¹ßÇÏÁö¸¸ °³ÀÎÀüÅõ¿¡¼­´Â,°°Àº±ÞÀÇ °í¼ö¿¡°Ô´Â ¹Ð¸®´Â ÇüÆÝÀÔ´Ï´Ù.
 20,Yellow Gate Master,±×·¡. ¹«¾ùÀ» µµ¿Í ÁÙ±î ÀþÀºÀÌ?,,,,
 21,Light Guard,±ÝÈ£±ºÀº ³Ê¹« ¾ö°ÝÇØ¡¦ °¡²û ¼ûÀÌ ¸·Èú¶§°¡ ÀÖ¾î.,³» Ä£±¸µéÀº ¿ì¸®¸¦ ºÎ·¯¿öÇÏÁö¸¸ ¾Æ¸¶ ÇÏ·çµµ,¹öÆ¼Áö ¸øÇÒ°Å¾ß. ±×·¡µµ ºÀ±Þ³¯ÀÌµÇ¸é È®½ÇÈ÷,±ÝÈ£±ºÀÎ°ÍÀÌ ÀÚ¶û½º·´´Ü ¸»¾ß. ÇÏÇÏÇÏ!,±×³ªÀú³ª ´ÙÀ½ ºÀ±ÞÀº ¾ðÁ¦ ¹Þ³ª? ÂÁ¡¦
 22,Elder Sangwan,.....,What do you want?,......?,,
@@ -117,7 +116,7 @@ ID,Name,Chat1,Chat2,Chat3,Chat4,Chat5
 116,Captain Hap,"I'll make it short.",Show them hell. Show the bastards from Yaoguai,what happens when a Yaksa gets angry!,,
 117,Nangi Master Hong,Life is a gamble! Make it or break it.,"Young man, what are you waiting for?",Go for it! ,"You may not be as good as I am, but ",you look like a gambler yourself.
 118,Nangi Master Sadang,People say that Nangi Master Hong is better than I.,"They don't know what they're talking about!","I'm too old to run a gambling house with him,",but he and I used to gamble like crazy,and neither of us gave up.
-119,Nangi Master Hechun,Gambling is actually luck.,But you need skill to be lucky.,You look lucky today.,"Ha, ha, ha.",
+119,Nangi Master Hechun,Gambling is actually luck.,But you need skill to be lucky.,You look lucky today.,"Ha, ha, ha.", 
 120,Chaser Namgun,"It's called Bakka Cave but it's just a name.",There are no traces indicating that scholars,gathered here in the past.,There are many ordinary caves with a name and ,a make-belive story.
 121,Seeker Nengi,"This is the worst place I've been to.","There is no sunlight, and the whole place",is covered with rotten mold and smell.,"And I can't even wash myself and I smell.",Dang. This place is driving me nuts.
 122,Finder Usan,Chipung and I go way back.,"It's been more than ten years since we",worked together as chasers.,"Back then, I was a young man like you.","Of course you look old for your age. He, he."
@@ -127,7 +126,7 @@ ID,Name,Chat1,Chat2,Chat3,Chat4,Chat5
 126,Captain Mungil,"Dang, my hands are itching.","But then I can't strike them first.","This is why I don't like being a guard captain.",I would have attacked the Guanyin and Jinong.,
 127,Captain Banghyon,This is a battlefield.,Death is certain for careless people.,"I've lost many men because of it.","I don't want to repeat the same mistake.",
 128,Captain Samagon,"People tell me that you're tough.","You should be, since Elder Sangwan, the second","most powerful man in Fujin, said it.","When time permits, fight with me.",I love fighting.
-129,Captain Sagongan,Guarding the gate is a terrible job.,You must scrutinize every passersby very closely.,And you have to act quickly on everything.,Not many people can work as a guard.,
+129,Captain Sagongan,Guarding the gate is a terrible job.,You must scrutinize every passersby very closely.,And you have to act quickly on everything.,Not many people can work as a guard., 
 130,Captain Hansa,I hate the Yaoguai the most.,Your teacher Ryusal must feel the same way.,They have no pride whatsoever.,All they do is make fighting dolls.,"Don't you agree?"
 131,Captain Gonmyon,Sangon is my little brother.,"He's my little brother, but he's tough.","If he wasn't wounded in the past, he would be",doing something better than working as a ,Guard Captain like you..
 132,Chaser Josung,..,±×·¡ ³»°¡ ¹Ù·Î Á¶¼þÀÌ³×.,¹«½¼ÀÏÀÎ°¡?,,

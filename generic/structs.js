@@ -146,7 +146,7 @@ structs.Character = restruct.
 	struct('Glove',structs.Equipt). // 256
 	struct('Ring',structs.Equipt). // 268
 	struct('Boot',structs.Equipt). // 280
-	struct('CalbashBottle',structs.Equipt). //Unknown Equip // 292
+	struct('CalbashBottle',structs.Equipt). //Unknown Equip( using calbash improves ur dmg and reduces ur def(hotkey Q)item ingame ID 90030) // 292
 	struct('Weapon',structs.Equipt). // 304
 	struct('Pet',structs.Pet). // 316
 	int32lu('storageUse'). // 320
