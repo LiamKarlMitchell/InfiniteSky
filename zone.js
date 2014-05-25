@@ -461,8 +461,13 @@ Zone_Prototype.getNPCWhereID = function(id) {
 var NPC = [];
 
 // Could also just iterate forward.
-for (var index = 0; index != this.NPC.length; index++) {
-	if (this.NPC[index] && this.NPC[index].NPCID == id) NPC.push(this.NPC[index]);
+
+for (var index = 0; index < this.NPC.length; index++) {
+	if (this.NPC[index] && this.NPC[index].OtherID === id) {
+		console.log('ID '+this.NPC[index].OtherID+' is === '+id);
+		NPC.push(this.NPC[index]);
+		console.log(this.NPC[index].NPCID)
+	}
 }
 
 return NPC;

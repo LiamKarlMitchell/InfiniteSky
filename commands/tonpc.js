@@ -26,10 +26,10 @@ GMCommands.AddCommand(new Command('tonpc',0,function command_tonpc(string,client
 				if (zoneNPCS.length>0)
 				{
 					// NPC's found on current map matching the ID
-					// Find nearest one and teleport you to it.
-					client.sendInfoMessage("Found NPC "+npcs[i]._ID+" ("+zoneNPCS[0].UniqueID+") "+npcs[i].Name+" on current Map");
+					// TODO: Find nearest one and teleport you to it.
+					client.sendInfoMessage("Found NPC "+npcs[i]._ID+" ("+zoneNPCS[i].UniqueID+") "+npcs[i].Name+" on current Map");
 
-					if (client.Teleport(zoneNPCS[0].Location)==false) client.sendInfoMessage('Move Zone Failed');
+					if (client.Teleport(zoneNPCS[i].Location)==false) client.sendInfoMessage('Move Zone Failed');
 					return;
 				}
 			}
