@@ -8,14 +8,26 @@
 GMCommands.AddCommand(new Command('spawnmonster',60,function command_spawnmonster(string,client){
 	if (string.length==0) return;
 	// Get ID from string
-	var ID = Number(string);
+	var ID;
+	
+	if (isNaN(string)) {
+		var monsters = infos.Monster.getByNameLike(string);
+			if (monsters.length) {
+				ID = monsters[0].ID;
+		}
+	} else {
+		ID = Number(string);
+	}
+
+
+	Number(string);
 
 	// Get XYZ from string?
 
 	// Get Amount from string
 
 	var monster = infos.Monster[ID];
-	if (monster!=null)
+	if (monster)
 	{
 		client.sendInfoMessage("Monster found "+monster.ID+" "+monster.Name);
 		var spawninfo = {

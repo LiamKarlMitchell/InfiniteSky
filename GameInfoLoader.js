@@ -128,32 +128,41 @@ GameInfoLoader.prototype.Load = function(filename, structure, onRecordFunction) 
 
 				filepath = path.join(config.data_dir || 'data','translation',csvFile);
 
-				csv
-				 .fromPath(filepath, {quote: '"', escape: '\\',delimiter: ',', headers: true})
-				 .on("record", function(data){
-				     var record = self[data[columns[0]]];
-				     if (record) {
-					     for (var i=1;i<columns.length;i++) {
-					     	record[columns[i]] = data[columns[i]];
-					     }
-				 	 } else {
-				 	 	record = {};
-				 	 	for (var i=0;i<columns.length;i++) {
-				 	 		record[columns[i]] = data[columns[i]];
-				 	 	}
-				 	 	
-				 	 	record = onRecordFunction(record);
-				 	 	if (record !== undefined && record.ID) {
-				 	 		self.infos[record[columns[0]]] = record;
-				 	 		self[record[columns[0]]] = record;
-				 	 	}
-				 	 	//dumpError('Record '+data[columns[0]]+' not found in file: '+filename);
-				 	 }
-				 })
-				 .on("end", function(){
-				    self.Loaded = true;
-					main.events.emit('gameinfo_loaded',filename);
-				 });
+				fs.exists(filepath, function(exists) {
+					if (!exists) {
+						dumpError('Server cannot load "'+filepath+'" skipping translation csv.');
+						self.Loaded = true;
+						main.events.emit('gameinfo_loaded',filename);
+						return;
+					}
+					csv
+					 .fromPath(filepath, {quote: '"', escape: '\\',delimiter: ',', headers: true})
+					 .on("record", function(data){
+					     var record = self[data[columns[0]]];
+					     if (record) {
+						     for (var i=1;i<columns.length;i++) {
+						     	record[columns[i]] = data[columns[i]];
+						     }
+					 	 } else {
+					 	 	record = {};
+					 	 	for (var i=0;i<columns.length;i++) {
+					 	 		record[columns[i]] = data[columns[i]];
+					 	 	}
+					 	 	
+					 	 	record = onRecordFunction(record);
+					 	 	if (record !== undefined && record.ID) {
+					 	 		self.infos[record[columns[0]]] = record;
+					 	 		self[record[columns[0]]] = record;
+					 	 	}
+					 	 	//dumpError('Record '+data[columns[0]]+' not found in file: '+filename);
+					 	 }
+					 })
+					 .on("end", function(){
+					    self.Loaded = true;
+						main.events.emit('gameinfo_loaded',filename);
+					 });
+
+				});
 
 			};
 
