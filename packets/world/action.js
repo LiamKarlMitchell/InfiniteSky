@@ -266,10 +266,10 @@ int32lu('AttackerID').
 int32lu('AttackerIndex').
 int32lu('DefenderID').
 int32lu('DefenderIndex').
-int32lu(''). // Skill ID?
-int32lu('').
-int32lu('').
-int32lu('').
+int32lu('A'). // Skill ID?
+int32lu('B').
+int32lu('C').
+int32lu('D').
 int32lu('Status'). // Depends on attacker or defender | hit or miss, block or not |
 int32lu('TotalDamage').
 int16lu('Deadly').
@@ -414,28 +414,45 @@ function handleActionPacket(socket, action, update) {
 
 
                         //var monster = socket.Zone.getMonster(action.nodeID);
-                        //console.log(monster);
+                        
                         //console.log(monster_node);
+
                         if (monster) {
                             AttackPacket = {
                                 Action: 0,
                                 // 0 if your attacking otherwise 5,6,7 or 1 if skill
                                 AttackerID: socket.character.state.CharacterID,
                                 AttackerIndex: socket.character.state.UniqueID,
-                                DefenderID: monster.OtherID,
+                                DefenderID: monster.ID,
                                 DefenderIndex: monster.UniqueID,
                                 Status: 1,
                                 // Depends on attacker or defender | hit or miss, block or not |
                                 TotalDamage: socket.character.statInfo.Damage,
-                                Deadly: 1,
+                                Deadly: 0,
                                 Light: 0,
                                 Shadow: 0,
                                 Dark: 0,
-                                DamageHP: 1 // Deadly bypasses defense
+                                DamageHP: 0 // Deadly bypasses defense
                             };
                             // Testing only
-                            AttackPacket.TotalDamage = 9999999999
-                            console.log(socket.character.statInfo);
+                            //AttackPacket.TotalDamage = 9999999999
+                            //console.log(socket.character.statInfo);
+
+                            var dmg = socket.character.statInfo.Damage;
+                            var dmgPrecentBonus = 1.50;
+                            var maxDmg = socket.character.statInfo.Damage * dmgPrecentBonus;
+
+                            AttackPacket.TotalDamage = Math.floor( (Math.random() * ( maxDmg - dmg )) + dmg );
+
+                            AttackPacket.TotalDamage -= monster.info.DefensePower;
+                            if (AttackPacket.TotalDamage < 0) {
+                                AttackPacket.TotalDamage = 0;
+                            }
+
+                            AttackPacket.DamageHP = AttackPacket.TotalDamage;
+                            monster.HP -= AttackPacket.TotalDamage;
+
+
 // Things we could use from character statInfo
 // statInfo.Luck
 // statInfo.Damage
