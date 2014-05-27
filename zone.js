@@ -92,6 +92,19 @@ Zone_Prototype.findCharacterSocket = function(Name) {
     return socket;
 };
 
+Zone_Prototype.findCharacterSocket = function(Name) {
+    var socket = null;
+    // Search connected clients
+    //console.log('There are this many clients in zone ' + this.Clients.length);
+    for(var i = 0; i < this.Clients.length; ++i) {
+        if(this.Clients[i].character.Name == Name && this.Clients[i]._handle) {
+            socket = this.Clients[i];
+            break;
+        }
+    }
+    return socket;
+};
+
 Zone_Prototype.findSocketByCharacterID = function(CharacterID) {
     var socket = null;
     // Search connected clients
@@ -103,6 +116,16 @@ Zone_Prototype.findSocketByCharacterID = function(CharacterID) {
         }
     }
     return socket;
+};
+
+Zone.prototype.findCharacterSocketNodeID = function(ID) {
+	// Search connected world.clients
+	for(var i = 0; i < this.Clients.length; ++i) {
+	    if(this.Clients[i].node.id == ID && this.Clients[i]._handle) {
+	        return this.Clients[i];
+	    }
+	}
+	return null;
 };
 
 Zone_Prototype.removeSocket = function(socket) {

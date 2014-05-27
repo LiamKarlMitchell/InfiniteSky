@@ -35,15 +35,16 @@ int8lu('Mode');
 WorldPC.DuelAcceptDeny = restruct.
 string('Name', 13).
 int8lu('Denied').
-int8lu('Value').
-int32lu('').
-int32lu('');
+int32lu('Value').
+int32lu('Value2').
+int8lu('Value3');
 
-WorldPC.DuelAccept = restruct.
+WorldPC.DuelRequest = restruct.
 int8lu('PacketID').
 string('Name',13).
-int32lu('Denied').
-int32lu('Value');
+int8lu("Result");
+
+console.log(WorldPC.DuelAcceptDeny.size);
 
 function handleDuelInvitePacket(socket, data) {
 	socket.sendInfoMessage('Duel Invite too ' + data.Name);
@@ -52,18 +53,13 @@ function handleDuelInvitePacket(socket, data) {
 		// Check that the receipent is net.Socket(options);ot already in a duel
 		// If they are not then send the request.
 		//socket.sendInfoMessage('Other char ' + data.Name + ' found');
-		socket.sendInfoMessage(socket.character.Name + ' trying to duel but its not coded yet.');
-		other.sendInfoMessage(socket.character.Name + ' trying to duel you but its not coded yet.');
-		// other.write(
-		// new Buffer(
-		// WorldPC.DuelAccept.pack({
-
-		// 	PacketID: 0x36,
-		// 	Name: socket.character.Name,
-		// 	Mode: data.Value1
-		// }
-
-		// )));
+		other.write(
+		new Buffer(
+		WorldPC.DuelRequest.pack({
+			"PacketID": 0x36,
+			"Name": socket.character.Name
+		}
+		)));
 
 		// Request accepted
 		//38 45 73 69 6D 75 00 00 00 00 00 00 00 00 00 02
@@ -76,36 +72,120 @@ function handleDuelInvitePacket(socket, data) {
 
 
 function handleDuelAcceptDeny(socket, data) {
-	socket.sendInfoMessage('Duel Accept/Deny too ' + data.Name);
 	var other = socket.Zone.findCharacterSocket(data.Name);
 	if (other) {
-		other.sendInfoMessage('Duel Accept/Deny from ' + socket.character.Name);
 		other.write(
 		new Buffer(WorldPC.DuelAcceptDeny.pack({
 			PacketID: 0x38,
 			Name: other.character.Name,
-			Denied: data.Denied // 1 denied else accepted
+			Denied: 0 // 1 denied else accepted
 		})));
 	}
 }
 
-WorldPC.Set(0x20, { // Duel Invite Pills Allowed);
+WorldPC.Set(0x20, {
 	Restruct: WorldPC.RequestPlayer,
 
 	function: handleDuelInvitePacket
 });
 
-WorldPC.Set(0x21, { // Duel Invite Pills Disabled);
-	Restruct: WorldPC.RequestPlayer,
+var requestRespondToInviter = restruct.
+int8lu("PacketID").
+string('Name', 13).
+int8lu('Respond').
+int8lu('Respond2');
 
-	function: handleDuelInvitePacket
-});
+console.log(requestRespondToInviter.size);
+
+var startDuel = restruct.
+int8lu('PacketID').
+int8lu('Unk1').
+int8lu('Unk2');
+
+var endDuel = restruct.
+int8lu('PacketID');
 
 WorldPC.Set(0x22, { // Duel accept/deny
 	Restruct: WorldPC.DuelAcceptDeny,
 
-	function: handleDuelAcceptDeny
+	function: function duelAcceptDeny2(client, input){
+		console.log(input);
+		var Inviter = world.findCharacterSocket(input.Name);
+		if(input.Denied === 0){
+			console.log("Send respond...");
+			Inviter.write(new Buffer(requestRespondToInviter.pack({
+				"PacketID": 0x38,
+				"Name": client.character.Name
+			})));
+			Inviter.write(new Buffer(startDuel.pack({
+				"PacketID": 0x39,
+				"Unk1": 1,
+				"Unk2": 1
+			})));
+			client.write(new Buffer(startDuel.pack({
+				"PacketID": 0x39,
+				"Unk1": 1,
+				"Unk2": 0
+			})));
+			client.character.state.dueling = 1;
+			Inviter.character.state.dueling = 1;
+
+			client.character.state.duel_challenger = 0;
+			Inviter.character.state.duel_challenger = 1;
+
+			client.character.state.setFromCharacter(client.character);
+			Inviter.character.state.setFromCharacter(Inviter.character);
+			setTimeout(function(){
+				Inviter.write(new Buffer(endDuel.pack({
+					"PacketID": 0x3A
+				})));
+				client.write(new Buffer(endDuel.pack({
+					"PacketID": 0x3A
+				})));
+
+
+				client.character.state.dueling = 0;
+				Inviter.character.state.dueling = 0;
+
+				client.character.state.duel_challenger = 0;
+				Inviter.character.state.duel_challenger = 0;
+
+				client.character.state.setFromCharacter(client.character);
+				Inviter.character.state.setFromCharacter(Inviter.character);
+			}, 180000);
+		}else if(input.Denied === 1){
+			Inviter.write(new Buffer(requestRespondToInviter.pack({
+				"PacketID": 0x38,
+				"Name": client.character.Name,
+				"Respond": 1
+			})));
+		}
+	}
 });
+
+var duelTimedOutRecv = restruct.
+string("Name", 13);
+
+WorldPC.Set(0x24, {
+	Restruct: duelTimedOutRecv,
+	function: function handleDuelTimeOut(client, input){
+		client.write(new Buffer(endDuel.pack({
+			"PacketID": 0x3A
+		})));
+	}
+});
+
+// WorldPC.Set(0x21, { // Duel Invite Pills Disabled);
+// 	Restruct: WorldPC.RequestPlayer,
+
+// 	function: handleDuelInvitePacket
+// });
+
+// WorldPC.Set(0x22, { // Duel accept/deny
+// 	Restruct: WorldPC.DuelAcceptDeny,
+
+// 	function: handleDuelAcceptDeny
+// });
 
 
 // WorldPC.ChatPacketReply = restruct.
