@@ -116,6 +116,33 @@ ItemInfo_Prototype.getItemType = function() {
 	return ItemType;
 };
 
+ItemInfo_Prototype.InventoryItemType = function() {
+	var ItemType;
+	switch (this.ItemType)
+	{
+		case 6: ItemType = 'CalbashBottle'; break;
+		case 7: ItemType = 'Amulet'; break;
+		case 8: ItemType = 'Cape'; break;
+		case 9: ItemType = 'Armor'; break;
+		case 10: ItemType = 'Glove'; break;
+		case 11: ItemType = 'Ring'; break;
+		case 12: ItemType = 'Boot'; break;
+		case 13:
+		case 14:
+		case 15:
+		case 16:
+		case 17:
+		case 18:
+		case 19:
+		case 20:
+		case 21: 
+			ItemType = 'Weapon';
+		break;
+		case 22: ItemType = 'Pet'; break;
+	};
+	return ItemType;
+};
+
 ItemInfo_Prototype.getRareness = function() {
 	var Rareness;
 	switch (this.Rareness)

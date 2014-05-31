@@ -17,6 +17,11 @@ structs.Equipt= restruct.
 	int8lu('Enchant'). // 1 = 3%
 	int8lu('Combine').
 	int16lu('Unknown');
+	
+structs.ItemEquip = restruct.
+	int32lu('ID').
+	int8lu('Enchant'). // 1 = 3%
+	int8lu('Combine');
 
 structs.SmallStorageItem = restruct.
 	int32lu('ID').
@@ -35,6 +40,11 @@ structs.Pet= restruct.
 	int16lu('Unknown').
 	int16lu('Activity').
 	int32lu('Growth'); // 1250 = 0.001
+
+structs.PetEquip = restruct.
+	int32lu("ID").
+	int16lu('Activity').
+	int32lu('Growth');
 
 structs.StorageItem = restruct.
 	int32lu("ID").

@@ -66,7 +66,6 @@ SkillInfo.prototype = {
             break;
         }
     }
-
 };
 
 LoadSkillInfo = function() {
@@ -76,7 +75,11 @@ LoadSkillInfo = function() {
     this.InfoStruct = restruct.
     int32lu("ID").
     string("Name",28).
-    int32lu(). // 32  
+    // Categories
+    // 1 = General
+    // 3 and 4 = Support
+    // 2 = Attack
+    int32lu("Category"). // 32  
     int32lu(). // 36  
     int32lu('SpriteStartID'). // 40  
     int32lu('Clan'). // 44  

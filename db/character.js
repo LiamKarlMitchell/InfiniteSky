@@ -291,7 +291,7 @@ characterSchema.methods.checkItemSlotFree = function(Column,Row,SlotSize,ItemID)
 	return true;
 }
 
-characterSchema.methods.checkInventoryItemCollision = function checkInventoryItemCollision(page, x1, y1, s1) {
+characterSchema.methods.checkInventoryItemCollision = function(x1, y1, s1) {
     if(x1 < 0 || y1 < 0) return false;
     var inventory = this.Inventory;
 
@@ -305,34 +305,44 @@ characterSchema.methods.checkInventoryItemCollision = function checkInventoryIte
         }
     }
     var freeInventoryIndex;
-    for (var i = 0; i < 32+(page*32); i++) {
-        var object = inventory[i + (page * 32)];
-        if (object !== undefined && object !== null) {
-            var itemInfo = infos.Item[object.ID];
-            if (itemInfo !== undefined) {
-                var size = itemInfo.getSlotCount();
-                var posX = object.Column;
-                var posY = object.Row;
-
-                reservedSlots[posX][posY] = true;
-                if(size===4){
-                    reservedSlots[posX][posY+1] = true;
-                    reservedSlots[posX+1][posY] = true;
-                    reservedSlots[posX+1][posY+1] = true;
-                }
-            }
-
-        }else if(freeInventoryIndex === undefined && object === null){
+    for (var i = 0; i < 64; i++) {
+        var object = inventory[i];
+        
+        if(freeInventoryIndex === undefined && !object){
             freeInventoryIndex = i;
+        }
+
+        if(!object) continue;
+
+    	var itemInfo = infos.Item[object.ID];
+    	if(!itemInfo)
+    		return false;
+    	
+    	if(object.Column === undefined || object.Column === null || object.Row === null || object.Row === undefined || !object.ID){
+    		console.log("Inventory item has row or column or id as null");
+    		return false;
+    	}
+
+    	var itemType = infos.Item[object.ID].ItemType;
+        var size = itemType === 2 || itemType === 7 || itemType === 11 ? 1 : 4;
+        var posX = object.Column;
+        var posY = object.Row;
+
+
+        reservedSlots[posY][posX] = true;
+        if(size===4){
+            reservedSlots[posY][posX+1] = true;
+            reservedSlots[posY+1][posX] = true;
+            reservedSlots[posY+1][posX+1] = true;
         }
     }
 
-    if(s1 === 1 && reservedSlots[x1][y1]) return false;
-    if(s1 === 4 && (reservedSlots[x1][y1] === undefined || reservedSlots[x1+1][y1] === undefined || reservedSlots[x1][y1+1] === undefined || reservedSlots[x1+1][y1+1] === undefined)) return false;
-    if(s1 === 4 && (reservedSlots[x1][y1] || reservedSlots[x1+1][y1] || reservedSlots[x1][y1+1] || reservedSlots[x1+1][y1+1])) return false;
+    if(s1 === 1 && reservedSlots[y1][x1]) return false;
+    if(s1 === 4 && (reservedSlots[y1][x1] === undefined || reservedSlots[y1+1][x1] === undefined || reservedSlots[y1][x1+1] === undefined || reservedSlots[y1+1][x1+1] === undefined)) return false;
+    if(s1 === 4 && (reservedSlots[y1][x1] || reservedSlots[y1+1][x1] || reservedSlots[x1][x1+1] || reservedSlots[y1+1][x1+1])) return false;
 
 
-    return {index: freeInventoryIndex, x: x1, y: y1, page: page};
+    return {InventoryIndex: freeInventoryIndex, MoveRow: x1, MoveColumn: y1};
 }
 
 //Constructor

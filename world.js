@@ -484,6 +484,16 @@ vms.depends({
         socket.on('close', function() {
             console.log('Client #' + socket.clientID + ' closed connection');
             console.log('world.js needs to remove socket from zone it is in too. and tell all party/guild its offline etc');
+            
+            if(socket.character.Party){
+                console.log("Was in party...");
+                if(socket.character.Party.leader.character.Name === socket.character.Name){
+                    socket.character.Party.disband();
+                }else{
+                    socket.character.Party.logoutCharacter(socket.character.Name);
+                }
+            }
+            
             removeDisconnectedCharacter.call(socket);
             //Let client know how many people are playing on server
             try {
@@ -556,7 +566,7 @@ vms.depends({
         //Handle socket disconnection
         socket.on('end', function() {
             console.log('Client #' + socket.clientID + ' ended connection');
-            world.clients.splice(world.clients.indexOf(socket), 1);
+            world.removeClient(socket);
             delete world[socket.clientID];
             db.Account.logoutUser(socket);
         });
@@ -570,7 +580,7 @@ vms.depends({
         // Should maybe look at using room or list rather than array of socket object.
         socket.on('close', function() {
             console.log('Client #' + socket.clientID + ' closed connection');
-            world.clients.splice(world.clients.indexOf(socket), 1);
+            world.removeClient(socket);
             delete world[socket.clientID];
             //var i = allworld.clients.indexOf(socket);
             //delete allworld.clients[i];
@@ -578,7 +588,7 @@ vms.depends({
         });
         socket.on('disconnect', function() {
             console.log('Client #' + socket.clientID + ' disconnected');
-            world.clients.splice(world.clients.indexOf(socket), 1);
+            world.removeClient(socket);
             delete world[socket.clientID];
             //var i = allworld.clients.indexOf(socket);
             //delete allworld.clients[i];
@@ -618,11 +628,10 @@ vms.depends({
             }
         }
         return null;
-    }
+    };
     world.findCharacterSocket = function(Name) {
-        // Search connected world.clients
         for(var i = 0; i < world.clients.length; ++i) {
-            if(world.clients[i].character.Name == Name && world.clients[i]._handle) {
+            if(world.clients[i].character.Name == Name && world.clients[i].authenticated) {
                 return world.clients[i];
             }
         }
@@ -712,7 +721,12 @@ vms.depends({
     }
     world.removeClient = function(socket) {
         // Call Remove Hooks
-        world.clients.splice(world.clients.indexOf(socket), 1);
+        for(var i=0; i < world.clients.length; i++){
+            if(world.clients[i] && world.clients[i].character.Name === socket.character.Name){
+                world.clients.splice(i, 1);
+                break;
+            }
+        }
     }
     world.zoneLoaded = function(err, id) {
         if(err) {

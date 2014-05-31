@@ -4,4 +4,4 @@
 
 LoginPC.onDisconnected = function (socket) {
 
-}
+};
