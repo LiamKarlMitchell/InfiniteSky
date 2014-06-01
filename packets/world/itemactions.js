@@ -633,6 +633,7 @@ ItemActions[0x09] = function Recv_GoldToCoins(client, input) {
         return;
     }
 
+
     client.character.save();
     clientWriteItemActionSuccess(client, input);
 };
