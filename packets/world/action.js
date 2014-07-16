@@ -26,7 +26,7 @@ int8lu('Enchant').
 int8lu('Combine').
 int16lu('Unknown');
 
-WorldPC.ActionReplyPacket = restruct.
+var size = restruct.
     int32lu('CharacterID').
     int32lu('UniqueID').
     string('Name',packets.CharName_Length+1).
@@ -57,18 +57,62 @@ WorldPC.ActionReplyPacket = restruct.
     struct('Pet', structs.Pet).
     int32lu('Unknown5').
     string('GuildName',packets.GuildName_Length+1). // 24
-    int32lu(''). // 20
-    int32lu(''). // 16
-    int32lu(''). // 12
-    int32lu(''). // 12
-    int32lu(''). // 8
-    int8lu('').
-    int8lu('').
-    int8lu('').
+    int32lu('test1'). // 20
+    int32lu('test2'). // 16
+    int32lu('test3'). // 12
+    int32lu('test4'). // 12
+    int32lu('test5'). // 8
+    int8lu('test6').
+    int8lu('test7').
+    int8lu('test8');
+
+var Buff = restruct.
+int16lu('Amount').
+int16lu('Time');
+
+WorldPC.ActionReplyPacket = restruct.
+    int32lu('CharacterID').
+    int32lu('UniqueID').
+    string('Name',packets.CharName_Length+1).
+    string('Demostrater',packets.CharName_Length+1).
+    string('Child',packets.CharName_Length+1).
+    int8lu('UnknownI1').
+    int32lu('FactionCapeThing').
+    int32lu('UnknownI2').
+    int32lu('TraitorFlag').
+    int32lu('UnknownI3').
+    int32lu('UnknownI4').
+    int32lu('GlowItems').
+    int32lu('UnknownI5',2).
+    int32lu('Clan').
+    int32lu('Gender').
+    int32lu('Hair').
+    int32lu('Face').
+    int32lu('Level'). // 92
+    int32lu('Honor').
+    struct('Necklace', structs.Equipt).
+    struct('Cape', structs.Equipt).
+    struct('Armor', structs.Equipt).
+    struct('Glove', structs.Equipt).
+    struct('Ring', structs.Equipt).
+    struct('Boot', structs.Equipt).
+    struct('CalbashBottle', structs.Equipt).
+    struct('Weapon', structs.Equipt).
+    struct('Pet', structs.Pet).
+    int32lu('Unknown5'). 
+    string('GuildName',packets.GuildName_Length+1).
+    int32lu('test1').
+    int32lu('test2').
+    int32lu('test3').
+    int32lu('test4').
+    int32lu('test5').
+    int8lu('test6').
+    int8lu('test7').
+    int8lu('test8').
     int32lu('InParty').
-    int32lu(''). // 16
-    int32lu(''). // 12
-    int32lu(''). // 12
+    int32lu('test9').
+    int32lu('test10'). 
+    int32lu('test11').
     int32lu('Stance').
     int32lu('Skill').
     float32l('Frame').
@@ -77,37 +121,17 @@ WorldPC.ActionReplyPacket = restruct.
     float32l('Direction').
     int32lu('nodeID').
     int32lu('TargetID').
-    float32l('UNKnowni6',4).
+    int32lu('a').
+    int32lu('b').
+    int32lu('SkillID').
+    int32lu('SkillLevel').
     struct('LocationNew',structs.CVec3).
     float32l('FacingDirection').
     int32lu('MaxHP').
     int32lu('CurrentHP').
     int32lu('MaxChi').
-    int32lu('CurrentChi').
-
-int32lu('_Unknown1').
-int32lu('_Unknown2').
-int32lu('_Unknown3').
-int32lu('_Unknown4').
-int32lu('_Unknown5').
-int32lu('_Unknown6').
-int32lu('_Unknown7').
-int32lu('_Unknown8').
-int32lu('_Unknown9').
-int32lu('_Unknown10').
-int32lu('_Unknown11').
-int32lu('_Unknown12').
-int32lu('_Unknown13').
-int32lu('_Unknown14').
-int32lu('_Unknown15').
-int32lu('_Unknown16').
-int32lu('_Unknown17').
-int32lu('_Unknown18').
-int32lu('_Unknown19').
-int32lu('_Unknown20').
-int32lu('_Unknown21').
-int32lu('_Unknown22').
-
+    int32lu('CurrentChi'). // === 372
+    struct('Buffs', Buff, 22).
 int32lu('MonsterDisguise'). // The ID of a monster to disguise as
 
 int32lu('_Unknown23').
@@ -122,7 +146,7 @@ string('StoreName', 28).
 struct('StoreItems', WorldPC.personalShopItem, 25).
 int32lu('_oUnknown133').
 int32lu('_oUnknown134').
-int32lu('_oUnknown135').
+int32lu('DisplayBuffs').
 int32lu('_oUnknown136').
 int32lu('_oUnknown137'). // 130
 int32lu('_oUnknown138').
@@ -165,6 +189,27 @@ int16lu('Shadow').
 int16lu('Dark').
 int32ls('DamageHP');
 
+var runningPacket = restruct.
+int8lu('PacketID').
+int8lu('Unk1').
+int32lu('Action'). // 0 your attacking
+
+int32lu('AttackerID').
+int32lu('AttackerIndex').
+int32lu('DefenderID').
+int32lu('DefenderIndex').
+int32lu('A'). // Skill ID?
+int32lu('B').
+int32lu('C').
+int32lu('D').
+int32lu('Status'). // Depends on attacker or defender | hit or miss, block or not |
+int32lu('TotalDamage').
+int16lu('Deadly').
+int16lu('Light').
+int16lu('Shadow').
+int16lu('Dark').
+int32ls('DamageHP');
+
 // WorldPC.SpecialMovement = restruct.
 // int32lu('Action'). // 0 your attacking
 // int32lu(''). // Skill ID?
@@ -187,7 +232,7 @@ function handleActionPacket(socket, action, update) {
         //console.log('LocationTo: ' + JSON.stringify(action.LocationTo));
         //console.log('LocationNew: ' + JSON.stringify(action.LocationNew));
     //}
-
+    if(socket.character.state.Running === undefined) socket.character.state.Running = false;
     if (socket.character.state.CurrentHP > 0) {
 
         socket.character.state.Stance = action.Stance;
@@ -196,31 +241,48 @@ function handleActionPacket(socket, action, update) {
         switch (action.Skill) {
         case 0:
             //console.log("Spawn");
+            socket.character.state.Moving = false;
             break;
         case 1:
+            //console.log(action);
             //console.log("Standing");
+            //console.log("Standing");
+            socket.character.state.Moving = false;
             break;
         case 2:
-            //console.log("Walking");
+            // console.log("Walking");
+            socket.character.state.Moving = true;
             break;
         case 5:
-            //console.log('Attack 5');
+            console.log('Attack 5');
             break;
         case 6:
-            //console.log('Attack 6');
+            console.log('Attack 6');
             break;
         case 7:
-            //console.log('Attack 7');
+            console.log('Attack 7');
             break;
         case 33: 
-            //console.log('Fly');
+            console.log('Fly');
+            socket.character.state.Moving = true;
             break;
         case 32:
             //console.log('Run');
+            socket.character.state.Moving = true;
             break;  
         case 37: 
             //console.log('Come Down');
+            socket.character.state.Moving = true;
             break;
+            
+        case 44:
+            //console.log("Aoe attack?");
+            //console.log(action);
+            break;
+            
+        case 62:
+
+        break;
 
         default: 
             socket.sendInfoMessage("Skill:("+action.Skill+") is not registered");
@@ -1171,7 +1233,7 @@ function handleActionPacket(socket, action, update) {
                                 // End of Monster Dead
                             } 
 
-                            socket.giveEXP(AttackPacket.TotalDamage); // Give HP relative to the damage we have done
+                            //socket.giveEXP(AttackPacket.TotalDamage); // Give HP relative to the damage we have done
                             socket.write(packets.makeCompressedPacket(0x2C, new Buffer(WorldPC.AttackPacketReply.pack(AttackPacket))));
                             
                             // var DefenderPacket = AttackPacket;
@@ -1211,6 +1273,7 @@ function handleActionPacket(socket, action, update) {
 // }
         socket.character.state.Frame = action.Frame;
         socket.character.state.Stance = action.Stance;
+        
         //console.log('frame: '+action.Frame);
 
         socket.character.state.Location.X = action.Location.X;

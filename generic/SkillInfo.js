@@ -13,7 +13,7 @@ var SkillData = restruct.
     int32ls('AirWalkDistance').
     int32ls('EnergyBall').
     int32ls('DamageIncreased').
-    int32ls().
+    int32ls('Unk1').
     int32ls('AttackRangeApplied').
     int32ls('DamageApplied').
     int32ls('OnlyForLightDamage').
@@ -23,8 +23,8 @@ var SkillData = restruct.
     int32ls('EffectiveDuration').
     int32ls('IncreasedDamage').
     int32ls('IncreasedDefense').
-    int32ls().
-    int32ls().
+    int32ls('Unk2').
+    int32ls('CastTime').
     int32ls('IncreasedLightResistance').
     int32ls('IncreasedShadowResistance').
     int32ls('IncreasedDarkResistance').
@@ -120,7 +120,7 @@ LoadSkillInfo = function() {
     int32ls(). // 324 
     int32ls(). // 328 
     int32ls(). // 332 
-    int32ls(). // 336 
+    int32ls('ChiUsage'). // 336 
     int32ls(). // 340 
     int32ls(). // 344 
     int32ls(). // 348 
@@ -191,10 +191,8 @@ LoadSkillInfo = function() {
         if (record.ID) {
             // All % should be / 100 from game data.
             for (var name in record.ModifiersStart) {
-                record.ModifiersStart[name] = record.ModifiersStart[name] / 100;
-            }
-            for (var name in record.ModifiersEnd) {
-                record.ModifiersEnd[name] = record.ModifiersEnd[name] / 100;
+                record.ModifiersStart[name] = record.ModifiersStart[name]/100;
+                record.ModifiersEnd[name] = record.ModifiersEnd[name]/100;
             }
         }   
     }

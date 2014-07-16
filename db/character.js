@@ -291,58 +291,89 @@ characterSchema.methods.checkItemSlotFree = function(Column,Row,SlotSize,ItemID)
 	return true;
 }
 
-characterSchema.methods.checkInventoryItemCollision = function(x1, y1, s1) {
-    if(x1 < 0 || y1 < 0) return false;
+characterSchema.methods.checkInventoryItemCollision = function(x, y, size) {
     var inventory = this.Inventory;
-
-    var reservedSlots = [];
-
-    var pageSize = 8;
-    for(var initArraySize8 = 0; initArraySize8 < pageSize; initArraySize8++){
-        reservedSlots[initArraySize8] = [];
-        for(var initArraySize8Row = 0; initArraySize8Row < pageSize; initArraySize8Row++){
-            reservedSlots[initArraySize8][initArraySize8Row] = false;
-        }
+    
+    if((x < 0 || y < 0) || (size === 4 && (y+1 > 7 || x+1 > 7))){
+        console.log("Out of bonds");
+        return;
     }
+
+    var reservedSlots = {x:[], y:[]};
+    if(size === 4){
+        reservedSlots.x.push(x);
+        reservedSlots.x.push(x+1);
+        reservedSlots.y.push(y);
+        reservedSlots.y.push(y+1);
+    }else{
+        reservedSlots.x.push(x);
+        reservedSlots.y.push(y);
+    }
+    
     var freeInventoryIndex;
+    
     for (var i = 0; i < 64; i++) {
         var object = inventory[i];
-        
-        if(freeInventoryIndex === undefined && !object){
-            freeInventoryIndex = i;
+        if(object === null){
+        	if(freeInventoryIndex === undefined){
+        		freeInventoryIndex = i;
+        	}	
+        	continue;
         }
-
-        if(!object) continue;
-
-    	var itemInfo = infos.Item[object.ID];
-    	if(!itemInfo)
-    		return false;
-    	
-    	if(object.Column === undefined || object.Column === null || object.Row === null || object.Row === undefined || !object.ID){
-    		console.log("Inventory item has row or column or id as null");
-    		return false;
-    	}
-
-    	var itemType = infos.Item[object.ID].ItemType;
-        var size = itemType === 2 || itemType === 7 || itemType === 11 ? 1 : 4;
-        var posX = object.Column;
-        var posY = object.Row;
-
-
-        reservedSlots[posY][posX] = true;
-        if(size===4){
-            reservedSlots[posY][posX+1] = true;
-            reservedSlots[posY+1][posX] = true;
-            reservedSlots[posY+1][posX+1] = true;
+        
+        if(!object) {
+            
+            break;
+        }
+        
+        var itemInfo = infos.Item[object.ID];
+        
+        if(!itemInfo){
+            
+            break;
+        }
+        
+        if(reservedSlots.x.indexOf(object.Column) >= 0 && reservedSlots.y.indexOf(object.Row) >= 0){
+            console.log("Intersection of item: " + itemInfo.Name);
+            return false;
         }
     }
+    
+    if(!freeInventoryIndex) return false;
 
-    if(s1 === 1 && reservedSlots[y1][x1]) return false;
-    if(s1 === 4 && (reservedSlots[y1][x1] === undefined || reservedSlots[y1+1][x1] === undefined || reservedSlots[y1][x1+1] === undefined || reservedSlots[y1+1][x1+1] === undefined)) return false;
-    if(s1 === 4 && (reservedSlots[y1][x1] || reservedSlots[y1+1][x1] || reservedSlots[x1][x1+1] || reservedSlots[y1+1][x1+1])) return false;
+    return {InventoryIndex: freeInventoryIndex, MoveRow: x, MoveColumn: y};
+}
 
+/*
+	lvl 1:
+		experience: 221
+		levelup: 222
+		1tick: 0.45%
+		
+	lvl 2:
+		experience: 510
+		levelup: 511
+		1tick: 0.35%
+		
+	lvl 3:
+		experience: 855
+		levelup: 856
+		1tick: 0.29%	
+		
+	lvl 4:
+		experience: 1244
+		levelup: 1245
+		1tick: 0.26%	
+*/
 
-    return {InventoryIndex: freeInventoryIndex, MoveRow: x1, MoveColumn: y1};
+var xp_table = [];
+var base = 221;
+
+for(var i=1; i<=4; i++){
+	xp_table.push({
+		level: i,
+		experience: (222/100*10)
+	});
 }
 
 //Constructor

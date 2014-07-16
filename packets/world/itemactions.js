@@ -181,7 +181,7 @@ ItemActions[0x00] = function Recv_PickupItem(client, input) {
         } else {
             console.log('Putting item in inventory.');
             // TODO: Check row and columns within bounds
-            invitem = { ID: item.ItemID, Amount: item.Amount, Enchant: item.Enchant, Combine: item.Combine, Column: input.ColumnPickup,Row: input.RowPickup };
+            invitem = { ID: item.ItemID, Amount: item.Amount, Enchant: item.Enchant, Combine: item.Combine, Column: input.PickupRow,Row: input.PickupColumn};
             client.character.Inventory[input.InventoryIndex] = invitem;
         }
 
@@ -633,7 +633,6 @@ ItemActions[0x09] = function Recv_GoldToCoins(client, input) {
         return;
     }
 
-
     client.character.save();
     clientWriteItemActionSuccess(client, input);
 };
@@ -712,7 +711,11 @@ ItemActions[0xB] = function Recv_MoveFromPillBar(client, input) {
 // TODO: Check if has pills, get the amount to be recovered
 // TODO: Recovery and state update
 ItemActions[0x0C] = function Recv_Use_item(client, input) {
-    console.log(input);
+    //console.log(input);
+    //if(input.ItemID === 30){
+        client.character.state.CurrentChi = client.character.state.MaxChi;
+        client.send2FUpdate();
+    //}
     clientWriteItemActionFailed(client, input);
     // var UsedItem = client.character.QuickUseItems[input.InventoryIndex];
     // console.log('asd');
@@ -981,6 +984,129 @@ ItemActions[0x10] = function Recv_GetItemFromGateMasterStorage(client, input) {
     clientWriteItemActionSuccess(client, input);
 };
 
+// var checkInventoryItemCollision = function(x, y, size) {
+//     // "Paint" only those positions that we are interested in, if we are putting
+//         // Item 0,0 of size 4 we paint only 0,0 0,1 1,0 1,1
+        
+//         // Implement the deMorgan's law rectangler intersection
+        
+//         // if(x1 < 0 || y1 < 0) return false;
+//         // var inventory = this.Inventory;
+
+//         // var reservedSlots = [];
+
+//         // var pageSize = 8;
+//         // for(var initArraySize8 = 0; initArraySize8 < pageSize; initArraySize8++){
+//         //     reservedSlots[initArraySize8] = [];
+//         //     for(var initArraySize8Row = 0; initArraySize8Row < pageSize; initArraySize8Row++){
+//         //         reservedSlots[initArraySize8][initArraySize8Row] = 0;
+//         //     }
+//         // }
+
+//         // var freeInventoryIndex;
+//         // for (var i = 0; i < 64; i++) {
+//         //     var object = inventory[i];
+            
+//         //     if(freeInventoryIndex === undefined && !object){
+//         //         freeInventoryIndex = i;
+//         //     }
+
+//         //     if(!object) continue;
+
+//         //  var itemInfo = infos.Item[object.ID];
+//         //  if(!itemInfo){
+//         //      console.log("No item info of " + object.ID);
+//         //      return false;
+//         //  }
+            
+//         //  if(object.Column === undefined || object.Column === null || object.Row === null || object.Row === undefined || !object.ID){
+//         //      console.log("Inventory item has row or column or id as null");
+//         //      return false;
+//         //  }
+
+//         //  var itemType = infos.Item[object.ID].ItemType;
+//         //     var size = itemType === 2 || itemType === 7 || itemType === 11 ? 1 : 4;
+//         //     var posX = object.Column;
+//         //     var posY = object.Row;
+
+
+//         //     reservedSlots[posY][posX] = 1;
+//         //     if(size===4){
+//         //         reservedSlots[posY][posX+1] = 1;
+//         //         reservedSlots[posY+1][posX] = 1;
+//         //         reservedSlots[posY+1][posX+1] = 1;
+//         //     }
+//         // }
+
+//         // if(s1 === 1 && reservedSlots[y1][x1]){
+//         //  console.log("Intersection detected on checking size: 1");
+//         //  return false;
+//         // }
+
+//         // if(s1 === 4 && (reservedSlots[y1][x1] === undefined || reservedSlots[y1+1][x1] === undefined || reservedSlots[y1][x1+1] === undefined || reservedSlots[y1+1][x1+1] === undefined)){
+//         //  console.log("Intersection detected on checking size: 4 and fidning and undefined slot");
+//         //  return false;
+//         // }
+        
+//         // if(s1 === 4 && (reservedSlots[y1][x1] === 1 || reservedSlots[y1+1][x1] === 1 || reservedSlots[x1][x1+1] === 1 || reservedSlots[y1+1][x1+1] === 1)){
+//         //  console.log(reservedSlots[y1][x1]);
+//         //  console.log(reservedSlots[y1+1][x1]);
+//         //  console.log(reservedSlots[y1][x1+1]);
+//         //  console.log(reservedSlots[y1+1][x1+1]);
+//         //  console.log("Intersection detected on checking size: 4");
+//         //  return false;
+//         // }
+
+//         // return {InventoryIndex: freeInventoryIndex, MoveRow: x1, MoveColumn: y1};
+        
+//         // Row = x
+//         // Column = y
+        
+//     var inventory = this.Inventory;
+    
+//     if((x < 0 || y < 0) || (size === 4 && (y+1 > 7 || x+1 > 7))){
+//         console.log("Out of bonds");
+//         return;
+//     }
+
+//     var reservedSlots = {x:[], y:[]};
+//     if(size === 4){
+//         reservedSlots.x.push(x);
+//         reservedSlots.x.push(x+1);
+//         reservedSlots.y.push(y);
+//         reservedSlots.y.push(y+1);
+//     }else{
+//         reservedSlots.x.push(x);
+//         reservedSlots.y.push(y);
+//     }
+    
+//     for (var i = 0; i < 64; i++) {
+//         var object = inventory[i];
+//         if(object === null) continue;
+        
+//         if(!object) {
+            
+//             break;
+//         }
+        
+//         var itemInfo = infos.Item[object.ID];
+        
+//         if(!itemInfo){
+            
+//             break;
+//         }
+        
+//         if(reservedSlots.x.indexOf(object.Column) >= 0 && reservedSlots.y.indexOf(object.Row) >= 0){
+//             console.log("Intersection of item: " + itemInfo.Name);
+//             return false;
+//         }
+//     }
+
+//     return false;
+// }
+
+
+
 // Revision Date: 5:54 AM 5/30/2014
 // TODO: Check the distance between client and npc to make sure hes standing near
 ItemActions[0x11] = function Recv_BuyItemFromNpc(client, input) {
@@ -992,6 +1118,7 @@ ItemActions[0x11] = function Recv_BuyItemFromNpc(client, input) {
     
     var NpcInfo = infos.Npc[input.NodeID];
     if(!NpcInfo){
+        console.log("No npc info");
         clientWriteItemActionFailed(client, input);
         return;
     }
@@ -999,29 +1126,34 @@ ItemActions[0x11] = function Recv_BuyItemFromNpc(client, input) {
     var itemInfo = infos.Item[input.ItemID];
     
     if(!itemInfo){
+        console.log("No item info");
         clientWriteItemActionFailed(client, input);
         return;
     }
     
     // Does the npc sell the required item
     if(NpcInfo.Items.indexOf(input.ItemID) < 0){
+        console.log("Item isnt in the shop");
         clientWriteItemActionFailed(client, input);
         return;
     }
     
     if(input.Amount > 99 || input.Amount < 0){
+        console.log("Amount hack detected");
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
-    var collision = client.character.checkInventoryItemCollision(input.MoveColumn, input.MoveRow, itemInfo.getSlotCount());
-
+    console.log(input);
+    var collision = client.character.checkInventoryItemCollision(input.MoveColumn, input.MoveRow, getSlotCount(itemInfo.ItemType), client.character.Inventory);
+    console.log(collision);
     if(!collision){
+        console.log("Collision detected");
         clientWriteItemActionFailed(client, input);
         return;
     }
     
     if(client.character.Inventory[input.EquipIndex]){
+        console.log("Existing item");
         clientWriteItemActionFailed(client, input);
         return;
     }
@@ -1029,6 +1161,7 @@ ItemActions[0x11] = function Recv_BuyItemFromNpc(client, input) {
     var itemPrice = itemInfo.PurchasePrice*(input.Amount === 0 ? 1 : input.Amount);
     
     if((client.character.Silver - itemPrice) < 0){
+        console.log("Not enough silver");
         clientWriteItemActionFailed(client, input);
         return;
     }
