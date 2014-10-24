@@ -81,11 +81,30 @@ LoginPC.Set(0x09, {
 		}
 
 		// If map id is a faction map id and your not of that clan or map is not open, you should be reset to yaggnok
-
+		
 
 
 		// The Character State object for use in world for moving and health etc.
 		socket.character.state = new CharacterState();
+
+		console.log("# getting guild infos for character");
+
+		var guildObj = world.findGuildByName(socket.character.GuildName);
+		if(guildObj && socket.character.GuildName){
+			console.log("# is guild object and character has guildname setted");
+			if(!guildObj.isMember(socket)){
+				socket.character.GuildName = null;
+				socket.character.save();
+			}
+		}else if(socket.character.GuildName){
+			console.log("# character has guild name setted, so erase it");
+			socket.character.GuildName = null;
+			socket.character.save();
+
+		}
+		// console.log(socket.character.GuildAccess);
+		// socket.character.GuildAccess = 2;
+
 		socket.character.state.setAccountID(socket.account._id); // Not Actuall Account ID :( but we can go this.account._id for that.
 		socket.character.state.setCharacterID(socket.character._id); // characterID should increment.
 		socket.character.state.setFromCharacter(socket.character);
@@ -96,7 +115,8 @@ LoginPC.Set(0x09, {
 		// Add to WorldServer client transfer.
 		socket.character.state.ToLocation = socket.character.state.Location;
 		socket.character.ToMapID = socket.character.MapID;
-		
+
+
 		socket.zoneTransfer = true;
 		world.addSocketToTransferQueue(socket);
 

@@ -16,7 +16,6 @@ WorldPC.Set(0x17, {
 			.int32lu('Unknown2'), // Size of 4
 	function: function EquipCheckRecv(socket, input) {
 	    //TODO: Check the character state vs packet.input
-
 	    socket.character.state.setFromCharacter(socket.character);
 	}
 });

@@ -52,7 +52,7 @@ var characterSchema = mongoose.Schema({
 	AccountID: Number,
 	ServerName: String,
 
-	Guild: { type: String, index: true },
+	GuildName: { type: String, index: true, default: null },
 	Title: { type: String },
 
 	IsGM: {type: Number, default: 0 },
@@ -293,6 +293,11 @@ characterSchema.methods.checkItemSlotFree = function(Column,Row,SlotSize,ItemID)
 
 characterSchema.methods.checkInventoryItemCollision = function(x, y, size) {
     var inventory = this.Inventory;
+    console.log("We are got new item collision update");
+    // Calculate the direction of moving item
+    // Then if we move item upwards or to the left and has 4 squares space
+    // We can only move it when it intersects with the same item only by 2 squares
+    // allowed on the side we are direct to.
     
     if((x < 0 || y < 0) || (size === 4 && (y+1 > 7 || x+1 > 7))){
         console.log("Out of bonds");
@@ -322,14 +327,14 @@ characterSchema.methods.checkInventoryItemCollision = function(x, y, size) {
         }
         
         if(!object) {
-            
+            console.log("Intersection object error");
             break;
         }
         
         var itemInfo = infos.Item[object.ID];
         
         if(!itemInfo){
-            
+            console.log("No item info for item of ID: " + object.ID);
             break;
         }
         
@@ -339,7 +344,10 @@ characterSchema.methods.checkInventoryItemCollision = function(x, y, size) {
         }
     }
     
-    if(!freeInventoryIndex) return false;
+    if(freeInventoryIndex === undefined){
+    	console.log("No free index?");
+    	return false;
+    }
 
     return {InventoryIndex: freeInventoryIndex, MoveRow: x, MoveColumn: y};
 }
@@ -365,16 +373,6 @@ characterSchema.methods.checkInventoryItemCollision = function(x, y, size) {
 		levelup: 1245
 		1tick: 0.26%	
 */
-
-var xp_table = [];
-var base = 221;
-
-for(var i=1; i<=4; i++){
-	xp_table.push({
-		level: i,
-		experience: (222/100*10)
-	});
-}
 
 //Constructor
 delete mongoose.models['character_mongoose'];

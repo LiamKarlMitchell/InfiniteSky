@@ -112,6 +112,7 @@ var CachedBuffer = function(packet_collection, options) {
                                 console.log('PacketSize: ' + packet.Restruct.size);
                             }
                             try {
+                                // We need a buffer to be passed to final function to be able to restruct that in separated way cause to guild handler method changes input
                                 packet.
                                 function(this, packet.Restruct.unpack(this.data.slice(position, position + packet.Restruct.size)), packetID);
                             } catch(ex) {

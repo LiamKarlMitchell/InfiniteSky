@@ -118,6 +118,8 @@ WorldPC.Set(0x02, {
 			socket.character.save();
 		}
 
+
+
 		var prepareInventoryBuffer = structs.setInventoryStorageOnOffsets(
 					new Buffer(WorldCharacterInfoPacket.pack({
 						PacketID: 0x16,
@@ -132,14 +134,18 @@ WorldPC.Set(0x02, {
 					3350,
 					socket.character.Bank
 				);
+
 		socket.write(
 			prepareInventoryBuffer
 		);
+
+
 
 		// Send Faction/Zone Packets
 		// Yeah I know sync is bad but its for testing purposes :P
 		// We MUST move this into a packet rather than using a file sometime soon.
 		socket.write(WorldDataPacket);
+		socket.Zone.sendToAllArea(socket, true, socket.character.state.getPacket(), config.viewable_action_distance);
 		//socket.write(fs.readFileSync('./data/WorldDataPacket/World1.pac'));
 		// socket.write(WorldDataPacket.ActionReplyPacket.pack({
 		// 	AccountID: 12

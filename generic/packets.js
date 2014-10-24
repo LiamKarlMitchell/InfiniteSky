@@ -657,7 +657,6 @@ packets.GamblerDiceGameReply = restruct.
 // 00000130: 4200 a001 0000 0000 0000 0000 0000       B.?...........
 
 packets.GuildPacket = restruct.
-    int8lu('PacketID'). // 116
     int8lu('Action').
     string('CharacterName',packets.CharName_Length+1).
     string('GuildName',packets.GuildName_Length+1).
@@ -858,7 +857,9 @@ packets.TradeShop = restruct.
     string('Name',24).  
     // Repeats 5x5 so 25 times
     struct('Items',packets.TradeShopItem,25).
-    pad(4);
+    pad(12);
+
+console.log(packets.TradeShop.size);
 
 packets.TradeShopReply = restruct.
     int8lu('PacketID').
@@ -869,9 +870,6 @@ packets.TradeShopReply = restruct.
 packets.TradeShopReply2 = restruct.
     int8lu('PacketID').
     pad(526);
-
-console.log("Restruct size: " + packets.TradeShop.size);
-console.log("Reply size: " + packets.TradeShopReply.size);
 
 // When canceling trade request with another player
 //Unhandled Packet ID 39

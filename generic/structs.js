@@ -13,7 +13,7 @@ structs.CVec3= restruct.
 
 structs.Equipt= restruct.
 	int32lu('ID').
-	int32lu('RequiredHonor').
+	int32lu('Capacity').
 	int8lu('Enchant'). // 1 = 3%
 	int8lu('Combine').
 	int16lu('Unknown');
@@ -176,13 +176,13 @@ structs.Character = restruct.
 
 	string('Friends',13,10).
 
-	int8ls(''). // 3270
+	int8ls('InGuild'). // 3270
 	int8ls(''). // 3271
 	int32lu(''). // 3272
 	int32lu(''). // 3276
 	int32lu(''). // 3280
 	int32lu(''). // 3284
-	int32lu(''). // 3288
+	int32lu('GuildAccess'). // 3288
 	int32lu(''). // 3292
 	int32lu(''). // 3296
 	int32lu(''). // 3300
@@ -477,6 +477,13 @@ structs.WREGION = restruct.
 
 });
 
+var cbFix = restruct.
+	int32lu("ID").
+	int32lu("Column").
+	int32lu("Row").
+	int32lu("Capacity").
+	int32lu("Unknown");
+
 structs.setInventoryStorageOnOffsets = function setInventoryOnOffset(buffer, offset, inventory, storage_offset, storage, bank_offset, bank){
     var InventoryBufferSize = structs.StorageItem.size * inventory.length;
     var InventoryBuffer = new Buffer(InventoryBufferSize);
@@ -500,7 +507,11 @@ structs.setInventoryStorageOnOffsets = function setInventoryOnOffset(buffer, off
                     workingBuffer = new Buffer(structs.StorageItemPet.pack(
                         object
                     ));
-                }else{
+				}else if(item.ItemType === 6){
+					workingBuffer = new Buffer(cbFix.pack(
+						object
+					));
+				}else{
                     workingBuffer = new Buffer(structs.StorageItem.pack(
                         object
                     ));
@@ -540,7 +551,11 @@ structs.setInventoryStorageOnOffsets = function setInventoryOnOffset(buffer, off
                     workingBuffer = new Buffer(structs.SmallStorageItemPet.pack(
                         object
                     ));
-                }else{
+				}else if(item.ItemType === 6){
+					workingBuffer = new Buffer(cbFix.pack(
+						object
+					));
+				}else{
                     workingBuffer = new Buffer(structs.SmallStorageItem.pack(
                         object
                     ));
@@ -580,7 +595,11 @@ structs.setInventoryStorageOnOffsets = function setInventoryOnOffset(buffer, off
                     workingBuffer = new Buffer(structs.SmallStorageItemPet.pack(
                         object
                     ));
-                }else{
+				}else if(item.ItemType === 6){
+					workingBuffer = new Buffer(cbFix.pack(
+						object
+					));
+				}else{
                     workingBuffer = new Buffer(structs.SmallStorageItem.pack(
                         object
                     ));
