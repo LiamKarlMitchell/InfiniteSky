@@ -46,6 +46,16 @@ int8lu('Exists').
 struct('Character', structs.Character).
 int8lu('Unknown');
 
+
+var cbFix = restruct.
+	int32lu("ID").
+	int32lu("Column").
+	int32lu("Row").
+	int16lu("Capacity").
+	int16lu("Capacity").
+	int16lu("Capacity").
+	int16lu("Capacity");
+
 var LoginPacket = restruct.
 	string('Username', LoginPC.UsernameLength + 1).
 	string('Password', LoginPC.PasswordLength + 1).

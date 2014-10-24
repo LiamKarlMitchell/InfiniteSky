@@ -934,7 +934,10 @@
                 }
             });
         },
-
+        debug: function(){
+            console.log("SIZE: " + this.size);
+            return new Restruct(this, 0, []);
+        },
         // 32-bit unsigned little-endian integer.
         int32lu: function(k, n, buf) {
             if(typeof n === "undefined") {
@@ -1500,11 +1503,6 @@
                     }
                 }
             });
-        },
-
-        test: function(k, s, n){
-            console.log(binary.offset);
-            console.log(binary.array);
         },
 		
 		// Floats

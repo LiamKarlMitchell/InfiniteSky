@@ -2,6 +2,7 @@
 // Copyright (c) InfiniteSky Dev Teams - Licensed under GNU GPL
 // For more information, see LICENCE in the main folder
 
+
 WorldPC.ActionPacket = restruct.
 int32lu('Stance').
 int32lu('Skill').
@@ -76,14 +77,13 @@ WorldPC.ActionReplyPacket = restruct.
     string('Name',packets.CharName_Length+1).
     string('Demostrater',packets.CharName_Length+1).
     string('Child',packets.CharName_Length+1).
-    int8lu('UnknownI1').
+    int8lu('Unk', 1).
     int32lu('FactionCapeThing').
-    int32lu('UnknownI2').
+    int32lu('Unk', 1).
     int32lu('TraitorFlag').
-    int32lu('UnknownI3').
-    int32lu('UnknownI4').
+    int32lu('Unk', 2).
     int32lu('GlowItems').
-    int32lu('UnknownI5',2).
+    int32lu('Unk',2).
     int32lu('Clan').
     int32lu('Gender').
     int32lu('Hair').
@@ -99,20 +99,17 @@ WorldPC.ActionReplyPacket = restruct.
     struct('CalbashBottle', structs.Equipt).
     struct('Weapon', structs.Equipt).
     struct('Pet', structs.Pet).
-    int32lu('Unknown5'). 
+    int32lu(''). 
     string('GuildName',packets.GuildName_Length+1).
-    int32lu('test1').
-    int32lu('test2').
-    int32lu('test3').
-    int32lu('test4').
-    int32lu('test5').
-    int8lu('test6').
-    int8lu('test7').
-    int8lu('test8').
-    int32lu('InParty').
-    int32lu('test9').
-    int32lu('test10'). 
-    int32lu('test11').
+    int8lu('', 3).
+    int32lu('LeaderFlag').
+    int8lu('LeaderSubFlag').
+    int8lu('', 15).
+    // string('GuildName2',packets.GuildName_Length+1).
+
+    int8lu('InParty').
+    int8lu('', 15).
+
     int32lu('Stance').
     int32lu('Skill').
     float32l('Frame').
@@ -121,8 +118,8 @@ WorldPC.ActionReplyPacket = restruct.
     float32l('Direction').
     int32lu('nodeID').
     int32lu('TargetID').
-    int32lu('a').
-    int32lu('b').
+    int32lu('').
+    int32lu('').
     int32lu('SkillID').
     int32lu('SkillLevel').
     struct('LocationNew',structs.CVec3).
@@ -134,29 +131,29 @@ WorldPC.ActionReplyPacket = restruct.
     struct('Buffs', Buff, 22).
 int32lu('MonsterDisguise'). // The ID of a monster to disguise as
 
-int32lu('_Unknown23').
-int32lu('_Unknown24').
+int32lu('').
+int32lu('').
+
 int8lu('dueling').
 int8lu('duel_challenger'). // 0 blue 1 gold
-int8lu('_Unknown25').
+int8lu('Unk1', 1).
 int8lu('Store'). // 0 none 1 open 2 open but empty
 
 
 string('StoreName', 28).
 struct('StoreItems', WorldPC.personalShopItem, 25).
-int32lu('_oUnknown133').
-int32lu('_oUnknown134').
+int8lu('Unk1', 8).
 int32lu('DisplayBuffs').
-int32lu('_oUnknown136').
-int32lu('_oUnknown137'). // 130
-int32lu('_oUnknown138').
-int32lu('_oUnknown139').
-int32lu('_oUnknown140').
-int32lu('_oUnknown141').
-int32lu('_oUnknown142'). // 135
-int32lu('_oUnknown143').
-int32lu('_oUnknown144').
-int32lu('_oUnknown145');
+int32lu('Unk1', 1).
+int32lu('Unk1', 1). // 130
+int32lu('Unk1', 1).
+int32lu('Unk1', 1).
+int32lu('Unk1', 1).
+int32lu('Unk1', 1).
+int32lu('Unk1', 1). // 135
+int32lu('Unk1', 1).
+int32lu('Unk1', 1).
+int32lu('Unk1', 1);
 
 WorldPC.AttackPacket = restruct.
 int8lu('PacketID').
@@ -167,31 +164,10 @@ int32lu('CharID2').
 int32lu('TargetID').
 int32lu('nodeID').
 int32lu('skillID').
-int32lu('UNknownthings', 10);
+int8lu('Unk', 40);
 
 //2C
 WorldPC.AttackPacketReply = restruct.
-int32lu('Action'). // 0 your attacking
-
-int32lu('AttackerID').
-int32lu('AttackerIndex').
-int32lu('DefenderID').
-int32lu('DefenderIndex').
-int32lu('A'). // Skill ID?
-int32lu('B').
-int32lu('C').
-int32lu('D').
-int32lu('Status'). // Depends on attacker or defender | hit or miss, block or not |
-int32lu('TotalDamage').
-int16lu('Deadly').
-int16lu('Light').
-int16lu('Shadow').
-int16lu('Dark').
-int32ls('DamageHP');
-
-var runningPacket = restruct.
-int8lu('PacketID').
-int8lu('Unk1').
 int32lu('Action'). // 0 your attacking
 
 int32lu('AttackerID').
@@ -224,14 +200,60 @@ int32ls('DamageHP');
         
 // }
 
-function handleActionPacket(socket, action, update) {
+console.log(WorldPC.ActionReplyPacket.size);
 
-    //if (socket.debug) {
-        //console.log('Action: '+ action.Skill);
-        //console.log('Location: ' + JSON.stringify(action.Location));
-        //console.log('LocationTo: ' + JSON.stringify(action.LocationTo));
-        //console.log('LocationNew: ' + JSON.stringify(action.LocationNew));
-    //}
+function handleActionPacket(socket, action, update) {
+    socket.character.state.GlowItems = 5136;
+    socket.character.state.Unk = [36, 36];
+    // return;
+    // socket.character.state.GuildName = "";
+    // socket.character.state.LeaderFlag = 0;
+    // socket.character.state.LeaderSubFlag = 0;
+
+    // if(socket.character.state.DoNotSendFurther) return;
+    // socket.character.state.Unk = [
+    //     1,
+    //     1,
+    //     1,
+    //     1,
+    //     1,
+    //     1,
+    //     1,
+    //     1,
+    //     1,
+    //     1,
+    //     1,
+    //     1,
+    //     1,
+    //     1,
+    //     1,
+    //     1,
+    //     1,
+    //     1,
+    //     1,
+    //     1,
+    //     1,
+    //     1,
+    //     1,
+    //     1,
+    //     1,
+    //     1,
+    //     1,
+    //     1,
+    //     1,
+    //     1,
+    //     1,
+    //     1,
+    //     1,
+    //     1,
+    //     1,
+    //     1
+    // ];
+
+    // socket.character.state.InParty = 0;
+
+    // socket.character.state.GlowItems = 10;
+
     if(socket.character.state.Running === undefined) socket.character.state.Running = false;
     if (socket.character.state.CurrentHP > 0) {
 

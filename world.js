@@ -15,7 +15,10 @@ vms.depends({
                 });
                 console.log('World server starting listen on port: ' + config.ports.world);
                 this.server.listen(config.ports.world);
+
                 this.loadAllZones();
+                world.prepareGuilds();
+
                 main.events.emit('world_started');
                 main.events.on('step', function(delta) {
                     world.GameStep(delta);
@@ -791,6 +794,143 @@ vms.depends({
             console.log('Zone Not Loaded');
         }
     }
+
+    if(!world.guilds){
+        world.guilds = {};
+    }
+
+    world.guildBindFunctionsOnCreate = function(gObj){
+        gObj.isMember = function(socket){
+            console.log('# Checking if character is a member of guild');
+            for(var i=0; i<gObj.Members.length; i++){
+                var member = gObj.Members[i];
+                if(!member) continue;
+                if(socket.character.Name === member.Name){
+                    console.log(socket.character.Name + ' is Member of: ' + socket.character.GuildName);
+                    member.Socket = socket;
+                    socket.character.Guild = gObj;
+                    socket.character.GuildMemberObj = member;
+                    socket.character.Guild.setState(socket);
+                    return true;
+                }
+            }
+            return null;
+        }
+
+        gObj.removeMember = function(socket){
+            console.log("# removing member from guild");
+            for(var i=0; i<gObj.Members.length; i++){
+                var member = gObj.Members[i];
+                if(socket.character.Name === member.Name){
+                    delete gObj.Members[i];
+                    socket.character.GuildName = null;
+                    socket.character.Guild = null;
+                    socket.character.GuildMemberObj = null;
+
+                    socket.character.save();
+                }
+            }
+        }
+
+        gObj.getLeader = function(){
+            // TODO: If online check of socket and return socket or obj with socket
+            for(var i=0; i<gObj.Members.length; i++){
+                var member = gObj.Members[i];
+                if(member.LeaderFlag === 2){
+                    return member;
+                }
+            }
+        }
+
+        gObj.addMember = function(socket){
+            gObj.Members.push(
+                {
+                    Name: socket.character.Name,
+                    LeaderFlag: 0 // 2 = master, 1 = Assistant, 0 = Member
+                }
+            );
+            if(!gObj.isMember(socket)) return;
+            gObj.setState(socket);
+            gObj.save();
+        }
+
+        gObj.setMember = function(socket){
+            socket.character.GuildMemberObj.LeaderFlag = 0;
+            socket.character.Guild.setState(socket);
+        }
+
+        gObj.setAssistant = function(socket){
+            socket.character.GuildMemberObj.LeaderFlag = 1;
+            socket.character.Guild.setState(socket);
+        }
+
+        gObj.setLeader = function(socket){
+            socket.character.GuildMemberObj.LeaderFlag = 2;
+            socket.character.Guild.setState(socket);
+        }
+
+        gObj.setState = function(socket){
+            console.log("Settings state for: " + socket.character.Name);
+            switch(socket.character.GuildMemberObj.LeaderFlag){
+                case 0:
+                socket.character.state.LeaderFlag = 1;
+                socket.character.state.LeaderSubFlag = 3;
+                socket.character.GuildAccess = 2;
+                break;
+
+                case 1:
+                socket.character.state.LeaderFlag = 4;
+                socket.character.state.LeaderSubFlag = 1;
+                socket.character.GuildAccess = 1;
+                break;
+
+                case 2:
+                socket.character.state.LeaderFlag = 0;
+                socket.character.state.LeaderSubFlag = 0;
+                socket.character.GuildAccess = 0;
+                break;
+            }
+
+            socket.character.InGuild = 1;
+            socket.character.state.setFromCharacter(socket.character);
+            socket.character.save();
+        }
+    }
+
+    world.prepareGuilds = function(){
+        console.log('# Preparing guilds');
+        db.Guild.find({}, function(error, guild) {
+            if (error) {
+                // Handle error here
+                dumpError(error);
+                return;
+            }
+
+            for(var i=0; i < guild.length; i++){
+                var gObj = guild[i];
+                world.guilds[gObj.Name] = gObj;
+                world.guildBindFunctionsOnCreate(world.guilds[gObj.Name]);
+            }
+
+            console.log("# Total of " + guild.length + " has been loaded");
+        });
+    }
+
+    world.findGuildByName = function(name){
+        if(!name){
+            console.log("# there was no guild name to be look for");
+            return;
+        }
+
+        if(world.guilds[name]){
+            console.log("# we found a guild. In world.guilds object");
+            return world.guilds[name];
+        }else{
+            console.log("# guild have not been found");
+            return null;
+        }
+    }
+
 
     if(world.start) {
         world.start();

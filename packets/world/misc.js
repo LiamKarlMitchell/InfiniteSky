@@ -21,26 +21,26 @@ WorldPC.Set(139, {
 WorldPC.Set(0x7B, {
 	Restruct: restruct.int32lu('ID').int32lu('Amount'),
 
-	function: function(socket, data) {
-		socket.sendInfoMessage('Bottle drinking not yet implemented');
+	function: function(client, input) {
+		client.sendInfoMessage('Bottle drinking not yet implemented');
+		console.log(input);
 
+		// if (socket.character.CalbashBottle.ID && socket.character.CalbashBottle.Enchant) {
+		// 	//socket.character.CalbashBottle.ID = Value;
+		// 	//socket.character.CalbashBottle.Enchant = Value2;
+		// 	//socket.character.CalbashBottle.Combine = Value3;
+		// 	socket.character.CalbashBottle.Enchant--;
+		// }
 
-		if (socket.character.CalbashBottle.ID && socket.character.CalbashBottle.Enchant) {
-			//socket.character.CalbashBottle.ID = Value;
-			//socket.character.CalbashBottle.Enchant = Value2;
-			//socket.character.CalbashBottle.Combine = Value3;
-			socket.character.CalbashBottle.Enchant--;
-		}
+		// socket.character.state.Skill = 17;
+		// socket.character.state.Frame = 0;
 
-		socket.character.state.Skill = 17;
-		socket.character.state.Frame = 0;
+		// socket.character.updateInfos();
 
-		socket.character.updateInfos();
-
-		socket.Zone.sendToAllArea(socket, true, packets.makeCompressedPacket(
-		0x18, new Buffer(
-		packets.ActionReplyPacket.pack(
-		socket.character.state))), config.viewable_action_distance);
+		// socket.Zone.sendToAllArea(socket, true, packets.makeCompressedPacket(
+		// 0x18, new Buffer(
+		// packets.ActionReplyPacket.pack(
+		// socket.character.state))), config.viewable_action_distance);
 	}
 });
 

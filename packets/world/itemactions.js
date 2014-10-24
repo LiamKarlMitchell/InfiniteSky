@@ -1324,7 +1324,10 @@ ItemActions[0x14] = function MoveItem_InInventory(client, input) {
     }
     
     var collision = client.character.checkInventoryItemCollision(input.MoveColumn, input.MoveRow, getSlotCount(itemInfo.ItemType));
-
+    if(!collision){
+        clientWriteItemActionFailed(client, input);
+        return;
+    }
     var inventory = client.character.Inventory;
     if(itemInfo.isStackable() && input.Amount >= 1){
         var reminder = invItem.Amount - input.Amount;
@@ -1608,8 +1611,8 @@ ItemActions[0x22] = function sub_462CE0(client, input) {
 ItemActions[0x23] = function sub_462D50(client, input) {
     NotImplemented(client, 'sub_462D50', input);
 };
-ItemActions[0x24] = function sub_462FD0(client, input) {
-    NotImplemented(client, 'sub_462FD0', input);
+ItemActions[0x24] = function ChiefGuildBox_StoreItem(client, input) {
+    NotImplemented(client, 'ChiefGuildBox_StoreItem', input);
 };
 ItemActions[0x25] = function sub_4631E0(client, input) {
     NotImplemented(client, 'sub_4631E0', input);
