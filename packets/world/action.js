@@ -232,6 +232,7 @@ function handleActionPacket(socket, action, update) {
         //console.log('LocationTo: ' + JSON.stringify(action.LocationTo));
         //console.log('LocationNew: ' + JSON.stringify(action.LocationNew));
     //}
+    socket.sendInfoMessage('Action '+action.Skill+' recv');
     if(socket.character.state.Running === undefined) socket.character.state.Running = false;
     if (socket.character.state.CurrentHP > 0) {
 

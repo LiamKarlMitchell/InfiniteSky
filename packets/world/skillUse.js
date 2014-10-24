@@ -33,9 +33,16 @@ WorldPC.Set(0x19, {
 			
 			client.character.state.DisplayBuffs = 1;
 			
-			client.character.state.CurrentChi -= input.ChiUsage;
+			//client.character.state.CurrentChi -= input.ChiUsage;
             client.character.state.SkillID = input.SkillID;
 			client.character.state.SkillLevel = input.SkillLevel;
+
+			client.character.state.Stance = 0;
+			if (input.SkillID === 2) {
+				client.character.state.Skill = 32;
+			}
+			//client.character.state.Skill = input.SkillID;
+			client.character.state.Frame = 0;
 			// var amount;
 			// var BuffCode;
 			// var unk;
@@ -99,12 +106,9 @@ WorldPC.Set(0x19, {
 			// 	Unk2: 0
 			// }));
 			// client.write(buffer);
-			if(!client.character.state.Moving)
+
+			client.sendInfoMessage('Using Skill '+input.SkillID);
 			client.write(client.character.state.getPacket());
-			
-			//if(!client.character.state.Moving){
-				//client.write(client.character.state.getPacket());
-			//}
 		}
 	}
 });
