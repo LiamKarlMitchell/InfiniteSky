@@ -396,6 +396,8 @@ function handleActionPacket(socket, action, update) {
                         //console.log(monster_node);
 
                         if (monster) {
+                            // TODO Look at using Generic.Battle.calculate
+                            //AttackPacket = Generic.Battle.calculate(socket.character,monster);
                             AttackPacket = {
                                 Action: 0,
                                 // 0 if your attacking otherwise 5,6,7 or 1 if skill

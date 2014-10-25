@@ -38,6 +38,14 @@ Monster = function Monster(ID) {
 		return null;
 	}
 
+	this.statInfo = {
+		Damage: this.info.Damage,
+		Defense: this.info.Defense,
+		LightDamage: 0,
+		ShadowDamage: 0,
+		DarkDamage: 0,
+	};
+
 	AIObject.call(this);
 	this.Attackers = new AttackerCollection();
 	this.WalkSpeed = this.info.WalkSpeed;

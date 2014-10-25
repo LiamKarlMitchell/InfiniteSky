@@ -11,8 +11,13 @@ generic.Battle = {
  //    statInfo: {}
  // }
  // it will return attack packet information
-  calculate: function attackCharacter(a,b) {
-	var Hurt = a.statInfo.Damage; // - b.statInfo.Defense
+
+  damage: function damage(a_damage,b_defense) {
+  	return (((Math.random() * 0.15)-0.05) * a_damage) + (a_damage - b_defense);
+  },
+
+  calculate: function calculate(a,b) {
+	var Hurt = this.damage(a.statInfo.Damage,b.statInfo.Defense);
 
 	var AttackPacket = {
 			Action: 0,
