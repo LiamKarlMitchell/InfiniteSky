@@ -846,7 +846,7 @@ packets.SystemInfoNoticeTimesPacket = restruct.
 // 00000210: 0000 0000 0000 0000 0000 0000 0000 0000  ................
 // 00000220: 00                                       .
 packets.TradeShopItem = restruct.
-    int32lu('').
+    int32lu('Unknown').
     int32lu('ItemID').
     int32lu('InventoryIndex').
     int32lu('Amount').
@@ -859,6 +859,7 @@ packets.TradeShop = restruct.
     struct('Items',packets.TradeShopItem,25).
     pad(12);
 
+
 console.log(packets.TradeShop.size);
 
 packets.TradeShopReply = restruct.
@@ -867,6 +868,8 @@ packets.TradeShopReply = restruct.
     // Repeats 5x5 so 25 times
     struct('Items',packets.TradeShopItem,25).
     pad(4);
+
+console.log(packets.TradeShopReply.size);
 packets.TradeShopReply2 = restruct.
     int8lu('PacketID').
     pad(526);

@@ -605,6 +605,7 @@ ItemActions[0x06] = function Recv_StoreItemInGateMaster(client, input) {
 
 // Revision Date: 12:06 PM 5/31/2014
 ItemActions[0x08] = function Recv_CoinsToGold(client, input) {
+    console.log(input);
     if(client.character.Silver >= 1000000000){
         client.character.Silver -= 1000000000;
         client.character.SilverBig++;
@@ -1234,6 +1235,8 @@ ItemActions[0x07] = function Recv_SellItemToNpc(client, input) {
     }else{
         client.character.Inventory[input.InventoryIndex].Amount = reminder;
     }
+
+    console.log(input);
     
     
     client.character.markModified("Inventory");

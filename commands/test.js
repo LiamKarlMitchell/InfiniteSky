@@ -293,3 +293,213 @@ GMCommands.AddCommand(new Command('run', 80, function(string, client) {
 	
 	client.write(client.character.state.getPacket());
 }));
+
+
+GMCommands.AddCommand(new Command('node', 0, function(string, client) {
+	// client.character.state._Unknown1 = 1;	
+	// RUnning flag?
+
+	console.log("CharacterID: " + client.character.id);
+	console.log("Node: " + client.node.id);
+}));
+
+GMCommands.AddCommand(new Command('getitems', 0, function(string, client) {
+	// client.character.state._Unknown1 = 1;	
+	// RUnning flag?
+	console.log("Get items");
+	var mostExpensive = 0;
+	var lessExpensive = 9999999999;
+	for(var i=0; i<99551; i++){
+		var item = infos.Item[i];
+		if(item && item.SalePrice){
+			if(item.SalePrice == 1){
+				console.log(item.ID);
+			}
+			// if(lessExpensive > item.SalePrice){
+			// 	console.log(item.SalePrice);
+			// 	lessExpensive = item.SalePrice;
+			// }
+
+			if(mostExpensive < item.SalePrice){
+				mostExpensive = item.SalePrice;
+			}
+			// console.log(item.SalePrice);
+		}
+	}
+	console.log(mostExpensive + " " + lessExpensive);
+}));
+
+
+
+GMCommands.AddCommand(new Command('resetsilver', 0, function(string, client) {
+	// client.character.state._Unknown1 = 1;	
+	// RUnning flag?
+	client.character.Silver = 0;
+}));
+
+GMCommands.AddCommand(new Command('upgrade', 0, function(string, client) {
+	console.log(client.character.Weapon);
+	client.character.Weapon.Combine = 2;
+    client.character.markModified('Inventory');
+    client.character.save();
+	console.log(client.character.Weapon);
+}));
+
+var cache = cache || null;
+
+GMCommands.AddCommand(new Command('a', 0, function(string, client) {
+	var vitPoints = 5072;
+	var perPoint = 14.28697777;
+	// var perPoint = 14.29;
+	console.log(vitPoints*perPoint + 28);
+	console.log(Math.round(vitPoints*perPoint) + 28);
+}));
+
+GMCommands.AddCommand(new Command('stats', 0, function(string, client) {
+	// client.character.state._Unknown1 = 1;	
+	// RUnning flag?
+	// client.character.Silver = 0;
+	// var weapon = client.character.Weapon;
+	// var weaponInfo = infos.Item[weapon.ID];
+
+	// console.log(weaponInfo.Damage);
+
+	var characterStatsInfo = function(client){
+		this.client = client;
+
+
+
+		return this;
+	};
+
+	var characterStatsInfo_Prototype = characterStatsInfo.prototype;
+
+	characterStatsInfo_Prototype.update = function(equipment_name){
+		console.log("Updating stats for: " + equipment_name);
+
+
+		// Check if we have supplied the function with item name we want to take a look at
+		if(!equipment_name){
+			console.log("The item was not specified.")
+			return;
+		}
+
+		// Check if the character has the item equiped
+		if(!this.client.character[equipment_name]){
+			console.log("Trying to update the ["+equipment_name+"] but character does not have it.");
+			return;
+		}
+
+		// Get the item from character
+		var item = this.client.character[equipment_name];
+		if(!item.ID){
+			console.log("Equiped item has got no ID!");
+			return;
+		}
+
+
+		// Get the item info
+		var itemInfo = infos.Item[item.ID];
+		if(!itemInfo){
+			console.log("infos.Item["+item.ID+"] has not been found");
+			return;
+		}
+
+		console.log(item);
+
+
+		// Get the defaults
+		var enchant = item.Enchant*3 || 0;
+		var combine = item.Combine || 0;
+		var growth = item.Growth || 0;
+		var clan = this.client.character.Clan;
+
+		switch(equipment_name){
+			case 'Weapon':
+			var combineTick = (itemInfo.Level > 95 && itemInfo.Level <= 145) ? 35 : (itemInfo.Level > 85 && itemInfo.Level <= 95) ? 25 : 15;
+			var hitTick = (itemInfo.Level > 95 && itemInfo.Level <= 145) ? 5 : (itemInfo.Level > 85 && itemInfo.Level <= 95) ? 3 : 2;
+
+			itemInfo.Damage = combine ? (combineTick*combine) + itemInfo.Damage : itemInfo.Damage;
+
+			// damage of weapon, including enchant and combine stage
+			var damage = Math.round(itemInfo.Damage + (itemInfo.Damage/100*enchant));
+
+			// We got the clans check for attribute damage
+			var attributeDamage = clan === 0 ? itemInfo.LightDamage : clan === 1 ? itemInfo.ShadowDamage : itemInfo.DarkDamage;
+
+			// Hit rate including each combination ticks
+			var hitRate = combine ? (hitTick*combine) + itemInfo.ChancetoHit : itemInfo.ChancetoHit;
+
+			var deadlyRate = itemInfo.PercentToDeadlyBlow;
+
+			console.log("Deadly rate : "+deadlyRate);
+			for(var testInWeaponCheck in itemInfo){
+				// if(cache && itemInfo[test] !== cache[test]){
+					if(itemInfo[testInWeaponCheck]){
+						console.log(testInWeaponCheck + " : " + itemInfo[testInWeaponCheck]);
+					}
+					// console.log(test + " : " + itemInfo[test]);
+				// }
+			}
+			// TODO: When skills are ready, appropriate level increment. Only applies to the weapons that has the benefits for the skills
+			break;
+
+
+			case 'Pet':
+			var MAX_GROWTH = 250000000;
+
+
+			console.log();
+			console.log();
+			for(var test in itemInfo){
+				if(cache && itemInfo[test] !== cache[test]){
+					console.log(test + " : " + itemInfo[test]);
+				}
+			}
+			cache = itemInfo;
+
+			console.log();
+			break;
+
+
+			case 'Armor':
+			var defenseTick = (itemInfo.Level > 95 && itemInfo.Level <= 145) ? 22 : 14;
+			var dodgeTick = (itemInfo.Level > 95 && itemInfo.Level <= 145) ? 3 : 2;
+			itemInfo.Defense = combine ? (defenseTick * combine) + itemInfo.Defense : itemInfo.Defense;
+
+			// Defense value from an armor
+			var defense = (itemInfo.Defense / 100 * enchant) + itemInfo.Defense;
+
+			// Chance to dodge calculation including combine stage ticks
+			var ChancetoDodge = combine ? (dodgeTick * combine) + itemInfo.ChancetoDodge : itemInfo.ChancetoDodge;
+
+
+			// Vitality increment
+			var vitality = itemInfo.Vitality;
+
+			// TODO: Increasing resists
+			break;
+		}
+
+
+		return this;
+	}
+
+	characterStatsInfo_Prototype.updateAll = function(){
+		// this.update('Weapon');
+	}
+
+
+	var characterInfo = new characterStatsInfo(client);
+
+
+
+	// console.log(characterInfo.test);
+	characterInfo.update('Armor');
+	// characterInfo.updateAll();
+	// characterInfo.update('Pet');
+	// console.log(characterInfo.client.character.Name)
+}));
+
+
+

@@ -5,7 +5,7 @@
 /////////////////////////////////////////////////////////////
 // Command: send
 // Sends a packet to the client if it exists in data/packets/ extension of .pac not needed
-GMCommands.AddCommand(new Command('send',60,function command_send(string,client){
+GMCommands.AddCommand(new Command('send',0,function command_send(string,client){
 	console.log('send packet used');
 	if (string=='') string='t';
 	fs.readFile('./data/packets/'+string+'.pac', function (err, data) {
