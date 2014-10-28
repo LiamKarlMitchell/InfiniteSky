@@ -60,7 +60,7 @@ public:
 	void protect_unclaim();
 	signature_scanner();
 	unsigned long search_text(const char* string, short offset=0, bool fromStart=true,unsigned long startAddress=0);
-	unsigned long search(const char* string, short offset=0, bool fromStart=true,unsigned long startAddress=0);
+	unsigned long search(const char* string, short offset=0, bool fromStart=true,unsigned long startAddress=0,unsigned long* nextAddress=0);
 	bool find_all(vector_unsigned_long& found,const char* string, short offset=0, bool fromStart=true,unsigned long startAddress=0);
 };
 

@@ -115,7 +115,6 @@ public:
 	void Stop();
 	DWORD Run();
 	
-	void LoadTranslationCSVs();
 	void ScreenChanged();
 	void ZoneChanged();
 

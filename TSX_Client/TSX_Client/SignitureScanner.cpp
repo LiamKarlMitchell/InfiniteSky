@@ -87,7 +87,7 @@ unsigned long signature_scanner::search_text(const char* string, short offset, b
 
 // Fixed it up so that it dosnt try to cast whats at the location as an unsigned long* rather it just passes the pointer back.
 // Unless we have XXXX marking the address we want casted into the pointer :).
-unsigned long signature_scanner::search(const char* string, short offset, bool fromStart, unsigned long startAddress)
+unsigned long signature_scanner::search(const char* string, short offset, bool fromStart, unsigned long startAddress,unsigned long* nextAddress)
 {
 	unsigned int p_length = strlen(string);// Pattern's length
 
@@ -172,6 +172,10 @@ unsigned long signature_scanner::search(const char* string, short offset, bool f
 				delete[] buffer;
 				const char* s_offset = strstr(string, "X");
 
+				if (nextAddress != NULL) {
+					*nextAddress = i+1;
+				}
+
 				if (s_offset != NULL)
 				{
 					// Set page protection back to what it was origionaly
@@ -211,17 +215,16 @@ unsigned long signature_scanner::search(const char* string, short offset, bool f
 
 bool signature_scanner::find_all(vector_unsigned_long& found,const char* string, short offset, bool fromStart,unsigned long startAddress)
 {
-	vector_unsigned_long results;
-
-	// Not sure if I should clear it to start with?
-	//results.clear();
+	vector_unsigned_long::size_type size = found.size();
 
 	unsigned long address = startAddress;
+	unsigned long nextAddress;
+	nextAddress = startAddress;
 
-	while(address = search(string,offset,fromStart,address))
+	while(address = search(string,offset,fromStart,nextAddress,&nextAddress))
 	{
-		results.push_back(address);
+		found.push_back(address);
 	}
 	
-	return !results.empty();
+	return !size == found.size();
 }
