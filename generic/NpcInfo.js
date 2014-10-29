@@ -319,14 +319,14 @@ LoadNpcInfo = function() {
     int32lu("Enchant").
     int32lu("Refill").
     int32lu("Antique").
-    int32lu("Reset Stat").
+    int32lu("ResetStat").
     int32lu("ExpGuild").
     int32lu("CombineScrolls").
     int32lu("JoinBattle").
     int32lu("Leave").
     int32lu("Upgrade").
-    int32lu("Place Bet").
-    int32lu("Move").
+    int32lu("PlaceBet").
+    int32lu("Move2").
     int32lu("Buy").
     int32lu("Extract").
     int32lu("ListItems").

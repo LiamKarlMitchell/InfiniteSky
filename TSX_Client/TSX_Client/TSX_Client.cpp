@@ -135,7 +135,7 @@ void TSX_Client::LoadTranslationCSVs() {
 	vector_unsigned_long infoLocations;
 	infoLocations.clear();
 	int index;
-	char *infoKinds[] = { "Levels", "Items", "Skills", "Monsters", "NPC", "Quests"};
+	char *infoKinds[] = { "Levels", "Items", "Skills", "Monsters", "NPCs", "Quests"};
 	
 	bool hadToWait = false;
 TryToFindAllInfoLocations:
@@ -200,6 +200,7 @@ TryToFindAllInfoLocations:
 		{
 			switch (index) {
 				case 1:
+				case 2:
 					VirtualQuery((void*)(*(unsigned long*)*it), &meminfo, sizeof(MEMORY_BASIC_INFORMATION));
 					VirtualProtect( ( PVOID )meminfo.BaseAddress, meminfo.RegionSize, PAGE_EXECUTE_READWRITE, &dwPage_Protection );
 				break;
@@ -228,7 +229,7 @@ TryToFindAllInfoLocations:
 							unsigned int ItemID = atoi(output_map[header.front()].c_str());
 							//string Name,Description1,Description2,Description3;
 							//int Level,ItemType,Rareness,Clan,LevelRequirement,HonorPointReq,PurchasePrice,SalePrice,DisplayItem2D,Strength,Dexterity,Vitality,Chi,Luck,Damage,Defense,LightDamage,ShadowDamage,DarkDamage,LightResistance,ShawdowResistance,DarkResistance,ChancetoHit,ChancetoDodge,PercentToDeadlyBlow,ValueType,Value1,SkillBonusID1,SkillBonusID2,SkillBonusID3,SkillBonusAmount1,SkillBonusAmount2,SkillBonusAmount3;
-							unsigned long addy = (*(unsigned long*)*it) + (352*(ItemID-1));
+							unsigned long addy = (*(unsigned long*)*it) + (sizeof(sItemInfo)*(ItemID-1));
 							//// TODO optimize memory protection writing & reverting.
 							Log.Write("[%04u] %s at address %08X", ItemID, output_map["Name"].c_str(), addy);
 
@@ -249,6 +250,20 @@ TryToFindAllInfoLocations:
 
 							}
 						break;
+						case 4: {
+							unsigned int ItemID = atoi(output_map[header.front()].c_str());
+							unsigned long addy = (*(unsigned long*)*it) + (sizeof(sNPCInfo)*(ItemID-1));
+							sNPCInfo* ni = (sNPCInfo*)addy;
+							Log.Write("[%04u] %s at address %08X", ItemID, output_map["Name"].c_str(), addy);
+
+							strncpy(ni->Name,output_map["Name"].c_str(),28);
+							strncpy(ni->Chat1,output_map["Chat1"].c_str(),51);
+							strncpy(ni->Chat2,output_map["Chat2"].c_str(),51);
+							strncpy(ni->Chat3,output_map["Chat3"].c_str(),51);
+							strncpy(ni->Chat4,output_map["Chat4"].c_str(),51);
+							strncpy(ni->Chat5,output_map["Chat5"].c_str(),51);
+						}
+						break;
 					}
 
 				}
@@ -263,6 +278,7 @@ TryToFindAllInfoLocations:
 		
 		switch (index) {
 			case 1:
+			case 2:
 				VirtualProtect( ( PVOID )meminfo.BaseAddress, meminfo.RegionSize, dwPage_Protection, NULL );
 			break;
 		}
