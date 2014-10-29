@@ -62,6 +62,12 @@ DWORD OurRecvPacketFunction(byte* Buffer,uint PacketSize)
 void TSX_Client::Start()
 {
 	RunDLL=true;
+
+	if (GetAsyncKeyState(VK_F12))
+	{
+		MessageBox(0,"Paused","TSX Paused",MB_OK);
+	}
+
 	thread.set(this, &TSX_Client::Run);
 	thread.start();
 }
@@ -128,17 +134,48 @@ void TSX_Client::LoadTranslationCSVs() {
 	// Find spawninfos in game memory
 	vector_unsigned_long infoLocations;
 	infoLocations.clear();
-	int index = 0;
+	int index;
 	char *infoKinds[] = { "Levels", "Items", "Skills", "Monsters", "NPC", "Quests"};
-
+	
+	bool hadToWait = false;
+TryToFindAllInfoLocations:
 	Log.Write("Finding all info locations in game memory.");
 	sig->find_all(infoLocations, "68????????B9XXXXXXXXE8????????85C075??68????????68????????68????????55FF15????????5B5F5E33C05D81C4????????C3",4);
 
 	MEMORY_BASIC_INFORMATION meminfo;
 	DWORD dwPage_Protection;
-
+	
+	// Check if infos are loaded
+	index = 0;
 	for(vector_unsigned_long::iterator it = infoLocations.begin(); it != infoLocations.end(); ++it) {
 		if (index == 6) break;
+		switch (index)
+		{	
+			// TODO Check infos have loaded correctly.
+			// This should probably check a flag somewhere... the game must set them right?
+			case 1:
+				Log.Write("Address of %s info is %08X which points too %08X",infoKinds[index],*it,(*(unsigned long*)*it));
+			if ((*(unsigned long*)*it) == 0x00000000) {
+					infoLocations.clear();
+					Log.Write("Problem finding address for %s info maybe it is not yet loaded.",infoKinds[index]);
+					hadToWait = true;
+					Sleep(100);
+					goto TryToFindAllInfoLocations;
+			}
+			break;
+		}
+		index++;
+	}
+
+	// Wait for 2 sec just to be sure I hope...
+	if (hadToWait) {
+		Sleep(2000);
+	}
+	
+	index = 0;
+	for(vector_unsigned_long::iterator it = infoLocations.begin(); it != infoLocations.end(); ++it) {
+		if (index == 6) break;
+
 		Log.Write("Infos %i %s at address %08X",index,infoKinds[index],*it);
 
 		char FileName[255] = {0};
@@ -987,11 +1024,6 @@ void TSX_Client::Init()
 	MOBSpawns = new SpawnInfoManager(ZoneID,"MOB");
 	if (NPCSpawns) delete NPCSpawns;
 	NPCSpawns = new SpawnInfoManager(ZoneID,"NPC");	
-
-	if (GetAsyncKeyState(VK_F12))
-	{
-		MessageBox(0,"Paused","TSX Paused",MB_OK);
-	}
 
 	if (ini->GetInt("LoadTranslations",1)) {
 		LoadTranslationCSVs();
