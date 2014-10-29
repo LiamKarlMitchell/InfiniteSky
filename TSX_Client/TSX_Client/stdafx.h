@@ -48,9 +48,6 @@
 #include "SignitureScanner.h"
 #include "Ini.h"
 
-#define strtk_no_tr1_or_boost
-#include "strtk\strtk.hpp"
-
 // NtHookEngine
 #include "NtHookEngine.h"
 

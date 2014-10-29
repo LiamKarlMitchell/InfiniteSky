@@ -9,6 +9,8 @@
 #include "TSX_Client.h"
 
 #include "detourxs.h"
+#include "csv-parser\csv_parser.hpp"
+
 
 TSX_Client DLL;
 
@@ -122,6 +124,117 @@ HANDLE WINAPI hook_CreateFileW(LPCWSTR lpFileName,DWORD dwDesiredAccess,DWORD dw
 	//return Result;
 }
 
+void TSX_Client::LoadTranslationCSVs() {
+	// Find spawninfos in game memory
+	vector_unsigned_long infoLocations;
+	infoLocations.clear();
+	int index = 0;
+	char *infoKinds[] = { "Levels", "Items", "Skills", "Monsters", "NPC", "Quests"};
+
+	Log.Write("Finding all info locations in game memory.");
+	sig->find_all(infoLocations, "68????????B9XXXXXXXXE8????????85C075??68????????68????????68????????55FF15????????5B5F5E33C05D81C4????????C3",4);
+
+	MEMORY_BASIC_INFORMATION meminfo;
+	DWORD dwPage_Protection;
+
+	for(vector_unsigned_long::iterator it = infoLocations.begin(); it != infoLocations.end(); ++it) {
+		if (index == 6) break;
+		Log.Write("Infos %i %s at address %08X",index,infoKinds[index],*it);
+
+		char FileName[255] = {0};
+
+		//// Items.csv 005_00002.IMG
+		//// Skills.csv 005_00004.IMG
+		//// Monsters.csv 005_00004.IMG
+		//// NPC.csv 005_00006.IMG
+		//// Quests.csv 005_00007.IMG
+
+		sprintf(FileName,"data\\translation\\%s.csv",infoKinds[index]);
+		Log.Write("Opening Translation %s",FileName);
+
+	    CSV_Parser csv_parser;
+		CSV_FIELDS header;
+		KEY_VAL_FIELDS output_map;
+		STR line;
+
+		// Open the CSV file
+		std::ifstream test_file(FileName);
+		if(test_file.is_open())
+		{
+			switch (index) {
+				case 1:
+					VirtualQuery((void*)(*(unsigned long*)*it), &meminfo, sizeof(MEMORY_BASIC_INFORMATION));
+					VirtualProtect( ( PVOID )meminfo.BaseAddress, meminfo.RegionSize, PAGE_EXECUTE_READWRITE, &dwPage_Protection );
+				break;
+			}
+
+			unsigned int lineNumber = 1;
+			while(getline(test_file, line))
+			{
+				//Log.Write("CSV line - %s",line.c_str());
+				if (lineNumber == 1) {
+					if (!csv_parser.parse_line(line, header)) {
+						Log.Write("Error encountered while parsing the header input line: %u data: %s",line.c_str());
+						break;
+					}
+					lineNumber++;
+					continue;
+				}
+				
+				if(csv_parser.parse_line(line, header, output_map))
+				{
+					switch (index) {
+						case 1: { // Items
+							// TODO Make this dynamically read the header and store the column titiles.
+							// Then for each cell on rows if column title is name overwrite the item name and so on..
+							//string ID,Name,Description1,Description2,Description3;
+							unsigned int ItemID = atoi(output_map[header.front()].c_str());
+							//string Name,Description1,Description2,Description3;
+							//int Level,ItemType,Rareness,Clan,LevelRequirement,HonorPointReq,PurchasePrice,SalePrice,DisplayItem2D,Strength,Dexterity,Vitality,Chi,Luck,Damage,Defense,LightDamage,ShadowDamage,DarkDamage,LightResistance,ShawdowResistance,DarkResistance,ChancetoHit,ChancetoDodge,PercentToDeadlyBlow,ValueType,Value1,SkillBonusID1,SkillBonusID2,SkillBonusID3,SkillBonusAmount1,SkillBonusAmount2,SkillBonusAmount3;
+							unsigned long addy = (*(unsigned long*)*it) + (352*(ItemID-1));
+							//// TODO optimize memory protection writing & reverting.
+							Log.Write("[%04u] %s at address %08X", ItemID, output_map["Name"].c_str(), addy);
+
+							sItemInfo* ii = (sItemInfo*)addy;
+							////strncpy((char*)addy+4,Name.c_str(),28);
+
+
+							//// TODO: iterate through header use it to get field from output_map and set it appropriately into the info in game memory
+							//CONST_MAP_ITR it = output_map.begin();
+							//   for (; it != output_map.end(); ++it) {
+							//	Log.Write("Key - %s, Value - %s",it->first.c_str(),it->second.c_str());
+							//}
+
+							strncpy(ii->Name,output_map["Name"].c_str(),28);
+							strncpy(ii->Description1,output_map["Description1"].c_str(),25);
+							strncpy(ii->Description2,output_map["Description2"].c_str(),25);
+							strncpy(ii->Description3,output_map["Description3"].c_str(),25);
+
+							}
+						break;
+					}
+
+				}
+				else
+				{
+					Log.Write("Error encountered while parsing the input line: %u data: %s",line.c_str());
+				}
+				output_map.clear();
+				lineNumber++;
+			}
+		}
+		
+		switch (index) {
+			case 1:
+				VirtualProtect( ( PVOID )meminfo.BaseAddress, meminfo.RegionSize, dwPage_Protection, NULL );
+			break;
+		}
+
+		header.clear();
+		index++;
+	}
+}
+
 DWORD TSX_Client::Run()
 {
 	Log.Remove();
@@ -141,110 +254,7 @@ DWORD TSX_Client::Run()
 		if (DevButtons) {
 
 		if (GetAsyncKeyState(VK_F3)) {
-			// Find spawninfos in game memory
-			vector_unsigned_long infoLocations;
-			infoLocations.clear();
-			int index = 0;
-			char *infoKinds[] = { "Levels", "Items", "Skills", "Monsters", "NPC", "Quests"};
-
-			Log.Write("Finding all info locations in game memory.");
-			sig->find_all(infoLocations, "68????????B9XXXXXXXXE8????????85C075??68????????68????????68????????55FF15????????5B5F5E33C05D81C4????????C3",4);
-			//sig->find_all(infoLocations, "D905XXXXXXXXD805????????D91D????????",4);
-
-			MEMORY_BASIC_INFORMATION meminfo;
-			DWORD dwPage_Protection;
-
-			for(vector_unsigned_long::iterator it = infoLocations.begin(); it != infoLocations.end(); ++it) {
-				if (index == 6) break;
-				Log.Write("Index %i %s at address %X",index,infoKinds[index],*it);
-
-				char FileName[255] = {0};
-
-				//// Items.csv 005_00002.IMG
-				//// Skills.csv 005_00004.IMG
-				//// Monsters.csv 005_00004.IMG
-				//// NPC.csv 005_00006.IMG
-				//// Quests.csv 005_00007.IMG
-
-				
-				sprintf(FileName,"data\\translation\\%s.csv",infoKinds[index]);
-				Log.Write("Trying to load Translation %s",FileName);
-
-					strtk::token_grid::options options;
-					options.column_delimiters = ",\n";
-					options.support_dquotes = true;
-
-					strtk::token_grid translation_grid(FileName,options);
-					bool Error=false;
-					for (size_t r = 0; r < translation_grid.row_count(); ++r)
-					{
-						strtk::token_grid::row_type row = translation_grid.row(r);
-						//Log.Write(row.as_string().c_str());
-						//strtk::token_grid::row_type row = translation_grid.row(r);
-						//size_t column_count = row.size();
-						if (r==0) continue; // Skip Header
-						//if (column_count<2) break; // Get out of this row looping as theres not enough columns
-						if (index==1) // If items csv
-						{
-							int ItemID = 0;
-							// TODO Make this dynamically read the header and store the column titiles.
-							// Then for each cell on rows if column title is name overwrite the item name and so on..
-							string ID,Name,Description1,Description2,Description3;
-							if (row.parse(ItemID,Name))
-							{
-								Log.Write("Parse Success");
-								Log.Write("%i %s",ItemID,Name.c_str());
-								unsigned long addy = (*(unsigned long*)*it) + (352*(ItemID-1));
-								// TODO optimize memory protection writing & reverting.
-								VirtualQuery((void*)addy, &meminfo, sizeof(MEMORY_BASIC_INFORMATION));
-								Log.Write("Patching info data at address %X region size %u",addy,meminfo.RegionSize);
-								VirtualProtect( ( PVOID )meminfo.BaseAddress, meminfo.RegionSize, PAGE_EXECUTE_READWRITE, &dwPage_Protection );
-								strncpy((char*)addy+4,Name.c_str(),28);
-								VirtualProtect( ( PVOID )meminfo.BaseAddress, meminfo.RegionSize, dwPage_Protection, NULL );
-							}
-							else
-							{
-								Log.Write("Parse Failed");
-							}
-							
-						}
-						//if (ID==0) continue; // Skip the row if ID not set
-
-						//switch(i)
-						//{
-						//	case 0:// Items.csv 005_00002.IMG
-						//		if (column_count<5)
-						//		{
-						//			Error=true;
-						//			break;
-						//		}
-						//		else
-						//		{
-						//			// For each column do your thing.
-						//			Log.Write("ID %u Name %s",ID,row.get<string>(1).c_str());
-						//		}
-						//		break;
-						//	case 1:// Skills.csv 005_00004.IMG
-						//		break;
-						//	case 2:// Monsters.csv 005_00004.IMG
-						//		break;
-						//	case 3:// NPC.csv 005_00006.IMG
-						//		break;
-						//	case 4:// Quests.csv 005_00007.IMG
-						//		break;
-						//}
-				}
-
-				switch (index) {
-					case 0:
-					break;
-					case 1:
-						Log.Write("Overwrite the translation data for Items. Name and Description etc.");
-					break;
-
-				}
-				index++;
-			}
+			LoadTranslationCSVs();
 		}
 
 		if (GetAsyncKeyState(VK_F12)!=0)
@@ -981,6 +991,10 @@ void TSX_Client::Init()
 	if (GetAsyncKeyState(VK_F12))
 	{
 		MessageBox(0,"Paused","TSX Paused",MB_OK);
+	}
+
+	if (ini->GetInt("LoadTranslations",1)) {
+		LoadTranslationCSVs();
 	}
 
 	if (ini->GetInt("HookFileLoading",1))

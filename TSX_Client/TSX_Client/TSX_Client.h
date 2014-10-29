@@ -44,6 +44,81 @@ uint MyChatPacket(uint length);
 uint MyGameguardKeyPacket(uint length);
 uint hookRecvLogPacket(uint length);
 
+
+// Structures
+#pragma pack(push, 1)
+struct sItemInfo
+{
+  DWORD ID;
+  char Name[28];
+  DWORD Rareness;
+  DWORD ItemType;
+  DWORD DisplayItem2D;
+  DWORD _1;
+  DWORD _2;
+  DWORD _3;
+  DWORD _4;
+  DWORD _5;
+  DWORD _6;
+  DWORD _7;
+  DWORD _8;
+  DWORD _9;
+  DWORD _10;
+  DWORD _11;
+  DWORD _12;
+  DWORD PurchasePrice;
+  DWORD SalePrice;
+  DWORD _13;
+  DWORD Capacity;
+  DWORD LevelRequirement;
+  DWORD HonorPointReq;
+  DWORD _15a;
+  DWORD Strength;
+  DWORD Dexterity;
+  DWORD Vitality;
+  DWORD Chi;
+  DWORD Luck;
+  DWORD Damage;
+  DWORD Defense;
+  DWORD LightDamage;
+  DWORD ShadowDamage;
+  DWORD DarkDamage;
+  DWORD LightResistance;
+  DWORD ShawdowResistance;
+  DWORD DarkResistance;
+  DWORD ChancetoHit;
+  DWORD ChancetoDodge;
+  DWORD PercentToDeadlyBlow;
+  DWORD SkillBonusID1;
+  DWORD SkillBonusID2;
+  DWORD SkillBonusID3;
+  DWORD SkillBonusAmount1;
+  DWORD SkillBonusAmount2;
+  DWORD SkillBonusAmount3;
+  DWORD _15;
+  DWORD ValueType1;
+  DWORD Value1;
+  DWORD _16;
+  DWORD _17;
+  DWORD Refinement;
+  DWORD ChancetoEarnExperiencePointsfromFinalhit;
+  DWORD ExperiencePointEarnedfromFinalhit_PERCENTBONUS_;
+  DWORD _18;
+  DWORD _19;
+  DWORD DecreaseChiConsumption;
+  DWORD DodgeDeadlyBlow;
+  DWORD IncreaseAllSKillMastery;
+  DWORD _20;
+  DWORD _21;
+  DWORD _22;
+  DWORD _23;
+  char Description1[25];
+  char Description2[25];
+  char Description3[25];
+  char _pad;
+};
+#pragma pack(pop)
+
 class TSX_Client
 {
 private:
@@ -114,6 +189,7 @@ public:
 	void Start();
 	void Stop();
 	DWORD Run();
+	void LoadTranslationCSVs();
 	
 	void ScreenChanged();
 	void ZoneChanged();

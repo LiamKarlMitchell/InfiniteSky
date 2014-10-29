@@ -309,10 +309,10 @@
 				>
 			</File>
 			<Filter
-				Name="strtk"
+				Name="csv-parser"
 				>
 				<File
-					RelativePath=".\strtk\strtk.hpp"
+					RelativePath=".\csv-parser\csv_parser.hpp"
 					>
 				</File>
 			</Filter>

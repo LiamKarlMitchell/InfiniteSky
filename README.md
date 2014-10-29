@@ -145,6 +145,18 @@ HookFileLoading = 1
 DevButtons = 1
 ```
 
+## Create Game Accounts
+You will want to create some game accounts too use.
+To make a GM account use
+````
+/createaccount Name Password 100
+````
+
+The 100 us the level.
+
+Try also /help for other commands.
+If you want information on game info try infos.Item[1].Name or other attributes.
+
 ## Notes
 
 The server will take a while to start, be patient.
