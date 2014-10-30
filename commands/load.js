@@ -29,6 +29,7 @@ db.Character.find({
 				client.character = characters[0];
 				client.character.state = s;
 				// client.character.updateInfos(true);
+				client.character.infos = new generic.characterStatsInfoObj(client);
 				client.character.infos.updateAll();
 				client.character.state.setFromCharacter(client.character);
 
