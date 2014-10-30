@@ -450,6 +450,8 @@ ItemActions[0x05] = function Recv_StoreItemInCharacterPrivateStorage(client, inp
         clientWriteItemActionFailed(client, input);
         return;
     }
+
+    console.log("test");
     
     var inventory = client.character.Inventory;
     var invItem = inventory[input.InventoryIndex];
@@ -477,7 +479,7 @@ ItemActions[0x05] = function Recv_StoreItemInCharacterPrivateStorage(client, inp
     var reminder = (!invItem.Amount ? 0 : invItem.Amount) - input.Amount;
     
     var amount;
-    if(reminder === 0){
+    if(reminder <= 0){
         amount = !invItem.Amount ? 0 : invItem.Amount;
         inventory[input.InventoryIndex] = null;
     }else{
@@ -861,13 +863,15 @@ ItemActions[0x0F] = function Recv_MoveItemFromStorage(client, input) {
 
     var reminder = (!invItem.Amount ? 0 : invItem.Amount) - input.Amount;
     
-    var amount;
-    if(reminder === 0){
+    var amount = null;
+    if(reminder <= 0){
+        console.log("No reminder");
         amount = !invItem.Amount ? 0 : invItem.Amount;
         storage[input.InventoryIndex] = null;
     }else{
         amount = input.Amount;
         storage[input.InventoryIndex].Amount = reminder;
+        console.log("Reminder : " + reminder);
     }
     
     if(itemInfo.isStackable() && input.Amount === 0){
@@ -918,6 +922,7 @@ ItemActions[0x0F] = function Recv_MoveItemFromStorage(client, input) {
     client.character.markModified('Storage');
     client.character.save();
     clientWriteItemActionSuccess(client, input);
+    console.log("Should be saved");
 };
 
 // Revision Date: 11:56 AM 5/31/2014
