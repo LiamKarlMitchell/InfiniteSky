@@ -127,7 +127,8 @@ CharacterState_Prototype.respawn = function() {
 };
 
 CharacterState_Prototype.setFromCharacter = function(character) {
-	character.updateInfos(true);
+	// character.updateInfos(true);
+	character.infos.updateAll();
 	// Set the varables from a character's data
 	this.Name = character.Name;
 
@@ -177,9 +178,9 @@ CharacterState_Prototype.setFromCharacter = function(character) {
 	this.FacingDirection = this.Direction;
 
 	this.CurrentHP = character.Health;
-	this.MaxHP = character.statInfo.HP;
+	this.MaxHP = character.infos.MaxHP;
 	this.CurrentChi = character.Chi;
-	this.MaxChi = character.statInfo.Chi;
+	this.MaxChi = character.infos.MaxChi;
 };
 
 

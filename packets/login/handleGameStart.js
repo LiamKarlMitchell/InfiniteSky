@@ -80,15 +80,16 @@ LoginPC.Set(0x09, {
 			}
 		}
 
+
 		// If map id is a faction map id and your not of that clan or map is not open, you should be reset to yaggnok
-		
 
 
 		// The Character State object for use in world for moving and health etc.
 		socket.character.state = new CharacterState();
+		socket.character.infos = new generic.characterStatsInfoObj(socket);
+		socket.character.infos.updateAll();
 
 		console.log("# getting guild infos for character");
-
 		var guildObj = world.findGuildByName(socket.character.GuildName);
 		if(guildObj && socket.character.GuildName){
 			console.log("# is guild object and character has guildname setted");
@@ -102,6 +103,8 @@ LoginPC.Set(0x09, {
 			socket.character.save();
 
 		}
+
+
 		// console.log(socket.character.GuildAccess);
 		// socket.character.GuildAccess = 2;
 

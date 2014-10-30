@@ -28,7 +28,8 @@ db.Character.find({
 				var s = client.character.state;
 				client.character = characters[0];
 				client.character.state = s;
-				client.character.updateInfos(true);
+				// client.character.updateInfos(true);
+				client.character.infos.updateAll();
 				client.character.state.setFromCharacter(client.character);
 
 				// Send packet to client

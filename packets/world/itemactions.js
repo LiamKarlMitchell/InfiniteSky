@@ -337,6 +337,8 @@ ItemActions[0x03] = function Recv_EquipItemOnCharacter(client, input) {
                 client.character[equipItem] = {ID: invItem.ID};
             else
                 client.character[equipItem] = {ID: invItem.ID, Enchant: invItem.Enchant, Combine: invItem.Combine};
+
+            client.character.infos.updateEquipment(equipItem);
         }else{
             console.log("Theres already equiped item");
             clientWriteItemActionFailed(client, input);
@@ -714,7 +716,9 @@ ItemActions[0xB] = function Recv_MoveFromPillBar(client, input) {
 ItemActions[0x0C] = function Recv_Use_item(client, input) {
     //console.log(input);
     //if(input.ItemID === 30){
-        client.character.state.CurrentChi = client.character.state.MaxChi;
+        client.character.state.CurrentChi = client.character.infos.MaxChi;
+        client.character.state.CurrentHP = client.character.infos.MaxHP;
+        console.log(client.character.infos.MaxHP);
         client.send2FUpdate();
     //}
     clientWriteItemActionFailed(client, input);

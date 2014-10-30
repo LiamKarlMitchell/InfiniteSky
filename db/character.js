@@ -149,8 +149,10 @@ characterSchema.methods.talk = function() {
 }
 // TODO: See why this is not working correctly with the vmscript...
 characterSchema.methods.updateInfos = function(reloadEXPInfo) {
-	generic.calculateCharacterStatInfo.call(this,reloadEXPInfo);
+	generic.calculateCharacterinfos(this,reloadEXPInfo);
 }
+
+// characterSchema.methods.infos = new generic.characterStatsInfoObj();
 
 characterSchema.methods.getHP = function() {
 	return this.state.CurrentHP;

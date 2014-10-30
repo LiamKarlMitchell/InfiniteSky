@@ -302,12 +302,39 @@ function Dependent(opts, code) {
   this.dir = global.__dirname;
   this.code = code;
   this.executed = false;
-  var _this = this;
-  this._onDependentLoaded = function(info) { _this.tryExecute(); };
-  vms.emit('dependent_init', { name: this.name, file: this.file, dir: this.dir });
-  vms.on('dependent_loaded', this._onDependentLoaded); // TODO: See about listening for events only for dependents we are interested in
-}
+  this.loadedDependencies = [];
 
+  this._onDependentLoaded = function(info) { _this.tryExecute(); };
+
+  var _this = this;
+  vms.emit('dependent_init', { name: this.name, file: this.file, dir: this.dir });
+
+  vms.on('dependent_loaded',  function(info){
+    var loaded = _this.loadedDependencies.length;
+    var need = _this.dependencies.length;
+
+    if(loaded === need){
+      return;
+    }
+
+    if(!info){
+      _this.executeCode();
+      return;
+    }
+
+    for(var i=0; i < need; i++){
+      var depName = _this.dependencies[i];
+      if(depName === info.name){
+        loaded++;
+        _this.loadedDependencies.push(info.name);
+      }
+    }
+
+    if(need === loaded && !_this.executed){
+      _this.executeCode();
+    }
+  }); // TODO: See about listening for events only for dependents we are interested in
+}
 Dependent.prototype = {
   checkDependencies: function(info) {
     // Assume this.dependencies is an array of strings for defined objects in global for now.

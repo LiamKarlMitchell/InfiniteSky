@@ -81,8 +81,8 @@ vms.depends({
             if(LevelUp > 0) {
                 console.log("Leveled up " + LevelUp);
                 // Send to the character it's new exp,hp,statpoint,skillpoint,etc...
-                this.character.Health = this.character.state.CurrentHP = this.character.state.MaxHP = this.character.statInfo.HP;
-                this.character.Chi = this.character.state.CurrentChi = this.character.state.MaxChi = this.character.statInfo.Chi;
+                this.character.Health = this.character.state.CurrentHP = this.character.state.MaxHP = this.character.infos.HP;
+                this.character.Chi = this.character.state.CurrentChi = this.character.state.MaxChi = this.character.infos.Chi;
                 // Send out new EXP packet
                 socket.character.state.Level = socket.character.Level;
                 // Need to find these
@@ -469,6 +469,8 @@ vms.depends({
             console.log('socket.LogoutUser ' + socket.Username);
             world.getSocketFromTransferQueue(this.account.Username);
         }
+
+
         socket.on('error', function(err) {
             console.log('Client #' + socket.clientID + ' error: ', err);
             socket.destroy();

@@ -87,8 +87,8 @@ WorldPC.Set(0x01, {
 		}
 
 		// Update the characters info
-		socket.character.updateInfos(true);
-		//eyes.inspect(socket.character.statInfo);
+		socket.character.infos.updateAll();
+		//eyes.inspect(socket.character.infos);
 		//eyes.inspect(socket.character.state);
 		socket.character.state.setFromCharacter(socket.character);
 		//eyes.inspect(socket.character.state);

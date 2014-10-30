@@ -38,7 +38,7 @@ Monster = function Monster(ID) {
 		return null;
 	}
 
-	this.statInfo = {
+	this.infos = {
 		Damage: this.info.Damage,
 		Defense: this.info.Defense,
 		LightDamage: 0,

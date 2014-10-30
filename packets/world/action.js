@@ -367,7 +367,7 @@ function handleActionPacket(socket, action, update) {
                         if (other===null) break; // If not found then skip this case.
 
                         other.sendInfoMessage('You are being attacked by '+socket.character.Name);
-                        console.log(other.character.statInfo);
+                        console.log(other.character.infos);
                         
                         AttackPacket = Generic.Battle.calculate(socket.character,other.character);
                         socket.sendInfoMessage('Dmg: '+AttackPacket.DamageHP);
@@ -407,7 +407,7 @@ function handleActionPacket(socket, action, update) {
                                 DefenderIndex: monster.UniqueID,
                                 Status: 1,
                                 // Depends on attacker or defender | hit or miss, block or not |
-                                TotalDamage: socket.character.statInfo.Damage,
+                                TotalDamage: socket.character.infos.Damage,
                                 Deadly: 0,
                                 Light: 0,
                                 Shadow: 0,
@@ -416,11 +416,11 @@ function handleActionPacket(socket, action, update) {
                             };
                             // Testing only
                             //AttackPacket.TotalDamage = 9999999999
-                            //console.log(socket.character.statInfo);
+                            //console.log(socket.character.infos);
 
-                            var dmg = socket.character.statInfo.Damage;
+                            var dmg = socket.character.infos.Damage;
                             var dmgPrecentBonus = 1.50;
-                            var maxDmg = socket.character.statInfo.Damage * dmgPrecentBonus;
+                            var maxDmg = socket.character.infos.Damage * dmgPrecentBonus;
 
                             AttackPacket.TotalDamage = Math.floor( (Math.random() * ( maxDmg - dmg )) + dmg );
 
@@ -433,15 +433,15 @@ function handleActionPacket(socket, action, update) {
                             monster.HP -= AttackPacket.TotalDamage;
 
 
-// Things we could use from character statInfo
-// statInfo.Luck
-// statInfo.Damage
-// statInfo.HitRate
-// statInfo.Dodge
-// statInfo.Defense
-// statInfo.LightDamage
-// statInfo.ShadowDamage
-// statInfo.DarkDamage
+// Things we could use from character infos
+// infos.Luck
+// infos.Damage
+// infos.HitRate
+// infos.Dodge
+// infos.Defense
+// infos.LightDamage
+// infos.ShadowDamage
+// infos.DarkDamage
 
                             monster.Attackers.regulate(socket.character._id, AttackPacket.TotalDamage);
                             //monster.HP -= AttackPacket.TotalDamage; // Commented out of now as we dont want to kill things just yet without an AI

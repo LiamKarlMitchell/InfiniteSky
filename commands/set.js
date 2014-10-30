@@ -327,7 +327,7 @@ GMCommands.AddCommand(new Command('set',60,function command_set(string,client){
 			// 				)
 			// 		)
 			// );
-			client.character.updateInfos();
+			client.character.infos.updateAll();
 
 			client.Zone.sendToAllArea(client,true,client.character.state.getPacket(),config.viewable_action_distance
 			);

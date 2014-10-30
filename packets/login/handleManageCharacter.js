@@ -83,7 +83,7 @@ LoginPC.Set(0x06, {
 		// Could get all the vars and pass them in here.
 		var newCharacter = new db.Character();
 
-		console.log('newCharacter.updateInfos: '+typeof(newCharacter.updateInfos));
+		// console.log('newCharacter.updateInfos: '+typeof(newCharacter.updateInfos));
 		newCharacter.Name = create.Name;
 		// Check create.Name for invalid characters here
 		console.log('TODO: Code in checking name for invalid characters/words');
@@ -140,7 +140,7 @@ LoginPC.Set(0x06, {
 			// Merge the newcharacter template info from json file into newCharacter
 			// TODO: Move new character config setting into Character.js
 			// Then we could do away with extend?
-			console.log('newCharacter.updateInfos: '+typeof(newCharacter.updateInfos));
+			// console.log('newCharacter.updateInfos: '+typeof(newCharacter.updateInfos));
 			//newCharacter = extend(newCharacter, util.newcharacterconfig[ClanName]);
 			
 			var newcharcfg = infos.NewCharacter[ClanName];
@@ -151,7 +151,7 @@ LoginPC.Set(0x06, {
 					newCharacter[thing] = newcharcfg[thing];
 				}
 			}
-			console.log('newCharacter.updateInfos: '+typeof(newCharacter.updateInfos));
+			// console.log('newCharacter.updateInfos: '+typeof(newCharacter.updateInfos));
 
 			// Set values that can not be overwritten here.
 			// Check Hair and Face for each clan
@@ -189,7 +189,7 @@ LoginPC.Set(0x06, {
 			}
 
 			// If weapon does not match
-			console.log('WeaponMin: ' + WeaponMin + ' WeaponMax: ' + WeaponMax + 'WeaponID: ' + create.WeaponID);
+			// console.log('WeaponMin: ' + WeaponMin + ' WeaponMax: ' + WeaponMax + 'WeaponID: ' + create.WeaponID);
 			if (create.WeaponID < WeaponMin || create.WeaponID > WeaponMax) {
 				//console.log('Invalid Weapon');
 				status = 5;
@@ -201,7 +201,7 @@ LoginPC.Set(0x06, {
 			newCharacter.Hair = create.Hair;
 			newCharacter.Face = create.Face;
 
-			console.log(newCharacter);
+			// console.log(newCharacter);
 
 			newCharacter.Weapon = {
 				ID: create.WeaponID,
@@ -217,9 +217,9 @@ LoginPC.Set(0x06, {
 				newCharacter.Gender = 1;
 			}
 
-			newCharacter.updateInfos(true);
-			newCharacter.Health = newCharacter.statInfo.HP;
-			newCharacter.Chi = newCharacter.statInfo.Chi;
+			// newCharacter.updateInfos(true);
+			// newCharacter.Health = newCharacter.infos.HP;
+			// newCharacter.Chi = newCharacter.infos.Chi;
 
 			db.getNextSequence('characterid', function(id) {
 				newCharacter._id = id;

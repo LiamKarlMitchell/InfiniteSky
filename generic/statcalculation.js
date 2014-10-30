@@ -84,170 +84,1131 @@ Modifiers.push(JinongModifiers);
 generic.Modifiers = Modifiers;
 
 
-generic.calculateCharacterStatInfo = function calculateCharacterStatInfo(reloadEXPInfo) {
+var characterStatsInfoObj = function(c){
+  // TODO : Include all the base stats and erease them from the methods below.
+  this.client = c;
+  this.clan = c.character.Clan;
+
+
+  this.Pet = {
+    HP: 0,
+    Chi: 0,
+    Damage: 0,
+    Defense: 0
+  };
+
+  this.Armor = {
+    Vitality: 0,
+    Defense: 0,
+    Dodge: 0,
+    Resists: {
+      Light: 0,
+      Shadow: 0,
+      Dark : 0
+    },
+    Luck: 0,
+    Skills: {},
+    AllSkills: 0
+  };
+
+  this.Modifiers = generic.Modifiers[c.character.Clan] || null;
+  this.Weapon = {
+    Damage: 0,
+    Mod: this.Modifiers.Damage[0],
+    HitRate: 0,
+    ElementalDamage: 0,
+    Skills: {},
+    AllSkills: 0
+  };
+
+  this.Boots = {
+    Defense: 0,
+    Dodge: 0,
+    Luck: 0,
+    Skills: {},
+    AllSkills: 0
+  };
+
+  this.Ring = {
+    Dexterity: 0,
+    ElementalDamage: 0,
+    DeadlyRate: 0,
+    Luck: 0,
+    Skills: {},
+    AllSkills: 0
+  };
+
+  this.Gloves = {
+    Defense: 0,
+    HitRate: 0,
+    Luck: 0,
+    Skills: {},
+    AllSkills: 0
+  };
+
+  this.Cape = {
+    Defense: 0,
+    Resists: {
+      Light: 0,
+      Shadow: 0,
+      Dark : 0
+    },
+    Skills: {},
+    AllSkills: 0
+  };
+  this.Amulet = {
+    Chi: 0,
+    Resists: {
+      Light: 0,
+      Shadow: 0,
+      Dark : 0
+    },
+    Luck: 0,
+    Skills: {},
+    AllSkills: 0
+  };
+
+  this.DexHitRate = 0;
+  this.DexDodge = 0;
+
+  this.Damage = 0;
+  this.Dodge = 0;
+  this.Defense = 0;
+  this.HitRate = 0;
+  this.MaxHP = 0;
+  this.MaxChi = 0;
+
+  this.ElementalDamage = 0;
+  this.Resists = {
+    Light: 0,
+    Shadow: 0,
+    Dark : 0
+  };
+
+  this.Luck = 0;
+  this.DeadlyRate = 0;
+
+  this.Skills = {};
+  this.AllSkills = 0;
+
+  return this;
+};
+
+var characterStatsInfo_Prototype = characterStatsInfoObj.prototype;
+
+characterStatsInfo_Prototype.updateEquipmentByDefault = function(equipment_name){
+  switch(equipment_name){
+    case 'Weapon':
+      this.Weapon.Damage = 0;
+      this.Weapon.Mod = this.Modifiers.Damage[0];
+
+      this.Weapon.ElementalDamage = 0;
+      this.Weapon.HitRate = 0;
+      this.updateStat('StatStrength');
+      this.updateStat('HitRate');
+      // TODO: When skills are ready, appropriate level increment. Only applies to the weapons that has the benefits for the skills
+    break;
+
+
+    case 'Pet':
+      // this.Pet.
+    break;
+
+
+    case 'Armor':
+    this.Armor.Defense = 0;
+    this.Armor.Vitality = 0;
+    this.Armor.Dodge = 0;
+
+    this.Armor.Resists.Light = 0;
+    this.Armor.Resists.Shadow = 0;
+    this.Armor.Resists.Dark = 0;
+
+
+    this.updateStat('Defense');
+    this.updateStat('Dodge');
+    break;
+
+    case 'Boot':
+      this.Boots.Defense = 0;
+      this.Boots.Dodge = 0;
+
+      this.updateStat('Defense');
+      this.updateStat('Dodge');
+    break;
+
+
+    case 'Glove':
+      this.Gloves.Defense = 0;
+      this.Gloves.HitRate = 0;
+
+      this.updateStat('Defense');
+      this.updateStat('HitRate');
+    break;
+
+    case 'Cape':
+      this.Cape.Defense = 0;
+
+      this.Cape.Resists.Light = 0;
+      this.Cape.Resists.Shadow = 0;
+      this.Cape.Resists.Dark = 0;
+
+
+      this.updateStat('Defense');
+      this.updateStat('Resists');
+    break;
+
+    case 'Amulet':
+      this.Amulet.Chi = 0;
+      this.Amulet.Resists.Light = 0;
+      this.Amulet.Resists.Shadow = 0;
+      this.Amulet.Resists.Dark = 0;
+
+      this.Amulet.Luck = 0;
+
+      this.updateStat('StatChi');
+      this.updateStat('Resists');
+    break;
+
+    case 'Ring':
+      this.Ring.Luck = 0;
+      this.Ring.Dexterity = 0;
+      this.Ring.ElementalDamage = 0;
+      this.Ring.DeadlyRate = 0;
+
+      this.updateStat('StatDexterity');
+      this.updateStat('Luck');
+      this.updateStat('ElementalDamage');
+      this.updateStat('DeadlyRate');
+    break;
+
+    default:
+    console.log("characterStatsInfo_Prototype.updateEquipmentByDefault("+equipment_name+") not found in Switch");
+    return false;
+    break;
+  }
+  return true;
+}
+
+characterStatsInfo_Prototype.updateEquipment = function(equipment_name){
+  // TODO: Callback once the calculation has finished so we can for example send an response for itemActions to wear an item.
+
+
+  // Check if we have supplied the function with item name we want to take a look at
+  if(!equipment_name){
+    console.log("The item was not specified.")
+    return;
+  }
+
+  // Check if the character has the item equiped
+  if(!this.client.character[equipment_name]){
+    //TODO: Handle the updates of stats if necessary, like weapons do.
+    if(!this.updateEquipmentByDefault(equipment_name)) console.log("Trying to update the ["+equipment_name+"] but character does not have it, or the client.character.infos.updateEquipmentByDefault method cannot initialize default settings for item.");
+    return;
+  }
+
+  // Get the item from character
+  var item = this.client.character[equipment_name];
+  if(!item.ID){
+    if(!this.updateEquipmentByDefault(equipment_name)) console.log("Trying to update the ["+equipment_name+"] but character does not have it, or the client.character.infos.updateEquipmentByDefault method cannot initialize default settings for item.");
+    return;
+  }
+
+
+  // Get the item info
+  var itemInfo = infos.Item[item.ID];
+  if(!itemInfo){
+    console.log("infos.Item["+item.ID+"] has not been found");
+    return;
+  }
+
+  // Get the defaults
+  var enchant = item.Enchant*3 || 0;
+  var combine = item.Combine || 0;
+  var growth = item.Growth || 0;
+
+  switch(equipment_name){
+    case 'Weapon':
+      var combineTick = (itemInfo.Level > 95 && itemInfo.Level <= 145) ? 35 : (itemInfo.Level > 85 && itemInfo.Level <= 95) ? 25 : 15;
+      var hitTick = (itemInfo.Level > 95 && itemInfo.Level <= 145) ? 5 : (itemInfo.Level > 85 && itemInfo.Level <= 95) ? 3 : 2;
+
+      this.Weapon.Damage = (combineTick*combine) + itemInfo.Damage;
+
+      this.Weapon.Damage += Math.floor(this.Weapon.Damage/100*enchant);
+      switch(this.clan){
+        case 0:
+        this.Weapon.Mod = itemInfo.ItemType === 13 ? this.Modifiers.Damage[1] : itemInfo.ItemType === 14 ? this.Modifiers.Damage[2] : itemInfo.ItemType === 15 ? this.Modifiers.Damage[3] : this.Modifiers.Damage[0];
+        break;
+
+        case 1:
+        this.Weapon.Mod = itemInfo.ItemType === 16 ? this.Modifiers.Damage[1] : itemInfo.ItemType === 17 ? this.Modifiers.Damage[2] : itemInfo.ItemType === 18 ? this.Modifiers.Damage[3] : this.Modifiers.Damage[0];
+        break;
+
+        case 2:
+        this.Weapon.Mod = itemInfo.ItemType === 19 ? this.Modifiers.Damage[1] : itemInfo.ItemType === 20 ? this.Modifiers.Damage[2] : itemInfo.ItemType === 21 ? this.Modifiers.Damage[3] : this.Modifiers.Damage[0];
+        break;
+      }
+
+      this.Weapon.ElementalDamage = this.clan === 0 ? itemInfo.LightDamage : this.clan === 1 ? itemInfo.ShadowDamage : itemInfo.DarkDamage;
+      this.Weapon.HitRate = (hitTick*combine) + itemInfo.ChancetoHit;
+
+      var deadlyRate = itemInfo.PercentToDeadlyBlow;
+
+      this.updateStat('StatStrength');
+      this.updateStat('HitRate');
+      // TODO: When skills are ready, appropriate level increment. Only applies to the weapons that has the benefits for the skills
+    break;
+
+
+    case 'Pet':
+      var MAX_GROWTH = 250000000;
+      //TODO: Pet stats
+    break;
+
+
+    case 'Armor':
+    var DefenseTick = (itemInfo.Level > 95 && itemInfo.Level <= 145) ? 22 : 14;
+    var dodgeTick = (itemInfo.Level > 95 && itemInfo.Level <= 145) ? 3 : 2;
+
+    this.Armor.Defense = (DefenseTick * combine) + itemInfo.Defense;
+    this.Armor.Defense += (this.Armor.Defense / 100 * enchant);
+    this.Armor.Vitality = itemInfo.Vitality;
+    this.Armor.Dodge = (dodgeTick * combine) + itemInfo.ChancetoDodge;
+
+    this.Armor.Resists.Light = itemInfo.LightResistance;
+    this.Armor.Resists.Shadow = itemInfo.ShawdowResistance;
+    this.Armor.Resists.Dark = itemInfo.DarkResistance;
+
+
+    this.updateStat('Defense');
+    this.updateStat('Dodge');
+    break;
+
+    case 'Boot':
+      var DefenseTick = (itemInfo.Level > 95 && itemInfo.Level <= 145) ? 3 : 2;
+      var dodgeTick = (itemInfo.Level > 95 && itemInfo.Level <= 145) ? 8 : 6;
+
+      this.Boots.Defense = (DefenseTick * combine) + itemInfo.Defense;
+      this.Boots.Dodge = (dodgeTick * combine) + itemInfo.ChancetoDodge;
+      this.Boots.Dodge += Math.floor(this.Boots.Dodge / 100 * enchant);
+
+      this.updateStat('Defense');
+      this.updateStat('Dodge');
+    break;
+
+
+    case 'Glove':
+      var DefenseTick = (itemInfo.Level > 95 && itemInfo.Level <= 145) ? 8 : 5;
+      // Todo: check values for this level ranges
+      var hitTick = (itemInfo.Level > 95 && itemInfo.Level <= 145) ? 13 : 8;
+
+      this.Gloves.Defense = (DefenseTick * combine) + itemInfo.Defense;
+
+
+      this.Gloves.HitRate = (hitTick * combine) + itemInfo.ChancetoHit;
+      this.Gloves.HitRate += (this.Gloves.HitRate / 100) * enchant;
+
+      this.updateStat('Defense');
+      this.updateStat('HitRate');
+    break;
+
+    case 'Cape':
+      this.Cape.Defense = itemInfo.Defense;
+
+      this.Cape.Resists.Light = itemInfo.LightResistance;
+      this.Cape.Resists.Shadow = itemInfo.ShawdowResistance;
+      this.Cape.Resists.Dark = itemInfo.DarkResistance;
+
+
+      this.updateStat('Defense');
+      this.updateStat('Resists');
+    break;
+
+    case 'Amulet':
+      this.Amulet.Chi = itemInfo.Chi;
+      this.Amulet.Resists.Light = itemInfo.LightResistance;
+      this.Amulet.Resists.Shadow = itemInfo.ShawdowResistance;
+      this.Amulet.Resists.Dark = itemInfo.DarkResistance;
+
+      this.Cape.Luck = itemInfo.Luck;
+
+      this.updateStat('StatChi');
+    break;
+
+    case 'Ring':
+      this.Ring.Luck = itemInfo.Luck;
+      this.Ring.Dexterity = itemInfo.Dexterity;
+      this.Ring.ElementalDamage = this.clan === 0 ? itemInfo.LightDamage : this.clan === 1 ? itemInfo.ShadowDamage : itemInfo.DarkDamage;
+      this.Ring.DeadlyRate = itemInfo.PercentToDeadlyBlow;
+
+      this.updateStat('StatDexterity');
+      this.updateStat('Luck');
+      this.updateStat('ElementalDamage');
+      this.updateStat('DeadlyRate');
+    break;
+  }
+
+
+  return this;
+}
+
+characterStatsInfo_Prototype.updateAll = function(){
+  this.updateEquipment('Weapon');
+  this.updateEquipment('Armor');
+  this.updateEquipment('Boot');
+  this.updateEquipment('Glove');
+  this.updateEquipment('Cape');
+  this.updateEquipment('Amulet');
+  this.updateEquipment('Ring');
+
+  this.updateStat('StatVitality');
+  this.updateStat('StatChi');
+  this.updateStat('StatDexterity');
+  this.updateStat('StatStrength');
+
+  this.updateStat('Defense');
+  this.updateStat('HitRate');
+  this.updateStat('Dodge');
+  this.updateStat('DeadlyRate');
+  this.updateStat('Luck');
+  this.updateStat('Resists');
+  this.updateStat('ElementalDamage');
+
+  this.updateSkills();
+}
+
+characterStatsInfo_Prototype.updateLevel = function(){
+  // TODO: On level updates
+  this.updateAll();
+}
+
+characterStatsInfo_Prototype.updateSkills = function(){
+  
+}
+
+characterStatsInfo_Prototype.updateStat = function(stat_name){
+  var Stat = this.client.character[stat_name];
+  if(
+    (
+      stat_name !== 'Defense' &&
+      stat_name !== 'HitRate' &&
+      stat_name !== 'Dodge' &&
+      stat_name !== 'Luck' &&
+      stat_name !== 'DeadlyRate' &&
+      stat_name !== 'Resists' &&
+      stat_name !== 'ElementalDamage'
+    ) && Stat === undefined
+  ){
+    console.log("Stat " + stat_name + " is undefined");
+    return;
+  }
+
+  if(!this.Modifiers){
+    console.log("No character modifiers");
+    return;
+  }
+
+  var ExpInfo = infos.Exp[this.client.character.Level];
+  if(!ExpInfo){
+    console.log("No exp info for level : ", this.client.character.Level);
+    return;
+  }
+
+  switch(stat_name){
+    case 'StatVitality':
+    var baseHP = this.clan === 0 ? ExpInfo.GuanyinHP : this.clan === 1 ? ExpInfo.FujinHP : ExpInfo.JinongHP;
+    var formula = baseHP + (this.Modifiers.HP * (Stat+this.Armor.Vitality)) + this.Pet.HP;
+    this.MaxHP = formula;
+
+    if(this.client.character.Health > this.MaxHP){
+      this.client.character.Health = this.MaxHP;
+      this.client.character.save();
+    }
+    break;
+
+    case 'StatChi':
+    var baseCHI = this.clan === 0 ? ExpInfo.GuanyinChi : this.clan === 1 ? ExpInfo.FujinChi : ExpInfo.JinongChi;
+    var formula = baseCHI + (this.Modifiers.Chi * (Stat + this.Amulet.Chi));
+    this.MaxChi = formula;
+
+    if(this.client.character.Chi > this.MaxChi){
+      this.client.character.Chi = this.MaxChi;
+      this.client.character.save();
+    }
+    break;
+
+    case 'StatDexterity':
+    var baseDodge = this.clan === 0 ? ExpInfo.GuanyinDodge : this.clan === 1 ? ExpInfo.FujinDodge : ExpInfo.JinongDodge;
+    Stat += this.Ring.Dexterity;
+
+    var dodgeFormula = baseDodge + (this.Modifiers.Dodge * Stat);
+
+    this.DexHitRate = (this.Modifiers.HitRate * Stat);
+    this.DexDodge = (this.Modifiers.Dodge * Stat);
+
+    this.updateStat('HitRate');
+    this.updateStat('Dodge');
+    break;
+
+    case 'StatStrength':
+    var baseDamage = this.clan === 0 ? ExpInfo.GuanyinDamage : this.clan === 1 ? ExpInfo.FujinDamage : ExpInfo.JinongDamage;
+    var damageFormula = (baseDamage + (this.Weapon.Mod * Stat)) + baseDamage + this.Weapon.Damage;
+    this.Damage = damageFormula;
+    break;
+
+    case 'Defense':
+    var baseDefense = this.clan === 0 ? ExpInfo.GuanyinDefense : this.clan === 1 ? ExpInfo.FujinDefense : ExpInfo.JinongDefense;
+    this.Defense = this.Armor.Defense + this.Boots.Defense + this.Gloves.Defense + this.Cape.Defense + baseDefense;
+    break;
+
+    case 'HitRate':
+    this.HitRate = this.Weapon.HitRate + this.Gloves.HitRate + this.DexHitRate;
+    break;
+
+    case 'Dodge':
+    var baseDefense = this.clan === 0 ? ExpInfo.GuanyinDefense : this.clan === 1 ? ExpInfo.FujinDefense : ExpInfo.JinongDefense;
+    this.Dodge = this.Boots.Dodge + this.Armor.Dodge + this.DexDodge;
+    break;
+
+    case 'Luck':
+    this.Luck = this.Boots.Luck + this.Armor.Luck + this.Gloves.Luck + this.Amulet.Luck + this.Ring.Luck;
+    break;
+
+    case 'Resists':
+    this.Resists.Light = this.Armor.Resists.Light + this.Amulet.Resists.Light + this.Cape.Resists.Light;
+    this.Resists.Shadow = this.Armor.Resists.Shadow + this.Amulet.Resists.Shadow + this.Cape.Resists.Shadow;
+    this.Resists.Dark = this.Armor.Resists.Dark + this.Amulet.Resists.Dark + this.Cape.Resists.Dark;
+    break;
+
+    case 'ElementalDamage':
+    var baseElementalDamage = this.clan === 0 ? ExpInfo.LightDamage : this.clan === 1 ? ExpInfo.ShadowDamage : ExpInfo.DarkDamage;
+    this.ElementalDamage = this.Weapon.ElementalDamage + this.Ring.ElementalDamage + baseElementalDamage;
+    break;
+
+    case 'DeadlyRate':
+    this.DeadlyRate = this.Ring.DeadlyRate;
+    break;
+  }
+}
+
+characterStatsInfo_Prototype.print = function(){
+  console.log();
+  console.log("Damage : " + this.Damage);
+  console.log("Defense : " + this.Defense);
+  console.log("Max HP : " + this.MaxHP);
+  console.log("Max Chi : " + this.MaxChi);
+  console.log("Hit Rate : " + this.HitRate);
+  console.log("Dodge : " + this.Dodge);
+  console.log("Luck : " + this.Luck);
+  console.log("Resits : ", this.Resists);
+  console.log("Deadly rate : ", this.DeadlyRate);
+  console.log("ElementalDamage : ", this.ElementalDamage);
+}
+
+generic.characterStatsInfoObj = characterStatsInfoObj;
+  // _this.infos = new characterStatsInfo(this);
+  // client.characterInfo.updateAll();
+  // client.characterInfo.print();
+
+
+generic.calculateCharacterinfos = function calculateCharacterinfos(_this, onLevel) {
+  console.log("generic.calculateCharacterinfos is depracted!");
+  // var characterStatsInfo = function(client){
+  //   // TODO : Include all the base stats and erease them from the methods below.
+  //   this.client = client;
+  //   this.clan = client.character.Clan;
+
+
+  //   this.Pet = {
+  //     HP: 0,
+  //     Chi: 0,
+  //     Damage: 0,
+  //     Defense: 0
+  //   };
+
+  //   this.Armor = {
+  //     Vitality: 0,
+  //     Defense: 0,
+  //     Dodge: 0,
+  //     Resists: {
+  //       Light: 0,
+  //       Shadow: 0,
+  //       Dark : 0
+  //     },
+  //     Luck: 0,
+  //     Skills: {},
+  //     AllSkills: 0
+  //   };
+
+  //   this.Modifiers = generic.Modifiers[client.character.Clan] || null;
+  //   this.Weapon = {
+  //     Damage: 0,
+  //     Mod: this.Modifiers.Damage[0],
+  //     HitRate: 0,
+  //     ElementalDamage: 0,
+  //     Skills: {},
+  //     AllSkills: 0
+  //   };
+
+  //   this.Boots = {
+  //     Defense: 0,
+  //     Dodge: 0,
+  //     Luck: 0,
+  //     Skills: {},
+  //     AllSkills: 0
+  //   };
+
+  //   this.Ring = {
+  //     Dexterity: 0,
+  //     ElementalDamage: 0,
+  //     DeadlyRate: 0,
+  //     Luck: 0,
+  //     Skills: {},
+  //     AllSkills: 0
+  //   };
+
+  //   this.Gloves = {
+  //     Defense: 0,
+  //     HitRate: 0,
+  //     Luck: 0,
+  //     Skills: {},
+  //     AllSkills: 0
+  //   };
+
+  //   this.Cape = {
+  //     Defense: 0,
+  //     Resists: {
+  //       Light: 0,
+  //       Shadow: 0,
+  //       Dark : 0
+  //     },
+  //     Skills: {},
+  //     AllSkills: 0
+  //   };
+  //   this.Amulet = {
+  //     Chi: 0,
+  //     Resists: {
+  //       Light: 0,
+  //       Shadow: 0,
+  //       Dark : 0
+  //     },
+  //     Luck: 0,
+  //     Skills: {},
+  //     AllSkills: 0
+  //   };
+
+  //   this.DexHitRate = 0;
+  //   this.DexDodge = 0;
+
+  //   this.Damage = 0;
+  //   this.Dodge = 0;
+  //   this.Defense = 0;
+  //   this.HitRate = 0;
+  //   this.MaxHP = 0;
+  //   this.MaxChi = 0;
+
+  //   this.ElementalDamage = 0;
+  //   this.Resists = {
+  //     Light: 0,
+  //     Shadow: 0,
+  //     Dark : 0
+  //   };
+
+  //   this.Luck = 0;
+  //   this.DeadlyRate = 0;
+
+  //   this.Skills = {};
+  //   this.AllSkills = 0;
+
+  //   return this;
+  // };
+
+  // var characterStatsInfo_Prototype = characterStatsInfo.prototype;
+
+  // characterStatsInfo_Prototype.updateEquipment = function(equipment_name){
+  //   // TODO: Callback once the calculation has finished so we can for example send an response for itemActions to wear an item.
+
+
+  //   // Check if we have supplied the function with item name we want to take a look at
+  //   if(!equipment_name){
+  //     console.log("The item was not specified.")
+  //     return;
+  //   }
+
+  //   // Check if the character has the item equiped
+  //   if(!this.client.character[equipment_name]){
+  //     //TODO: Handle the updates of stats if necessary, like weapons do.
+  //     console.log("Trying to update the ["+equipment_name+"] but character does not have it.");
+  //     return;
+  //   }
+
+  //   // Get the item from character
+  //   var item = this.client.character[equipment_name];
+  //   if(!item.ID){
+  //     console.log("Equiped item has got no ID!");
+  //     return;
+  //   }
+
+
+  //   // Get the item info
+  //   var itemInfo = infos.Item[item.ID];
+  //   if(!itemInfo){
+  //     console.log("infos.Item["+item.ID+"] has not been found");
+  //     return;
+  //   }
+
+  //   // Get the defaults
+  //   var enchant = item.Enchant*3 || 0;
+  //   var combine = item.Combine || 0;
+  //   var growth = item.Growth || 0;
+
+  //   switch(equipment_name){
+  //     case 'Weapon':
+  //       var combineTick = (itemInfo.Level > 95 && itemInfo.Level <= 145) ? 35 : (itemInfo.Level > 85 && itemInfo.Level <= 95) ? 25 : 15;
+  //       var hitTick = (itemInfo.Level > 95 && itemInfo.Level <= 145) ? 5 : (itemInfo.Level > 85 && itemInfo.Level <= 95) ? 3 : 2;
+
+  //       this.Weapon.Damage = (combineTick*combine) + itemInfo.Damage;
+
+  //       this.Weapon.Damage += Math.floor(this.Weapon.Damage/100*enchant);
+  //       switch(this.clan){
+  //         case 0:
+  //         this.Weapon.Mod = itemInfo.ItemType === 13 ? this.Modifiers.Damage[1] : itemInfo.ItemType === 14 ? this.Modifiers.Damage[2] : itemInfo.ItemType === 15 ? this.Modifiers.Damage[3] : this.Modifiers.Damage[0];
+  //         break;
+
+  //         case 1:
+  //         this.Weapon.Mod = itemInfo.ItemType === 16 ? this.Modifiers.Damage[1] : itemInfo.ItemType === 17 ? this.Modifiers.Damage[2] : itemInfo.ItemType === 18 ? this.Modifiers.Damage[3] : this.Modifiers.Damage[0];
+  //         break;
+
+  //         case 2:
+  //         this.Weapon.Mod = itemInfo.ItemType === 19 ? this.Modifiers.Damage[1] : itemInfo.ItemType === 20 ? this.Modifiers.Damage[2] : itemInfo.ItemType === 21 ? this.Modifiers.Damage[3] : this.Modifiers.Damage[0];
+  //         break;
+  //       }
+
+  //       this.Weapon.ElementalDamage = this.clan === 0 ? itemInfo.LightDamage : this.clan === 1 ? itemInfo.ShadowDamage : itemInfo.DarkDamage;
+  //       this.Weapon.HitRate = (hitTick*combine) + itemInfo.ChancetoHit;
+
+  //       var deadlyRate = itemInfo.PercentToDeadlyBlow;
+
+  //       this.updateStat('StatStrength');
+  //       this.updateStat('HitRate');
+  //       // TODO: When skills are ready, appropriate level increment. Only applies to the weapons that has the benefits for the skills
+  //     break;
+
+
+  //     case 'Pet':
+  //       var MAX_GROWTH = 250000000;
+  //       //TODO: Pet stats
+  //     break;
+
+
+  //     case 'Armor':
+  //     var DefenseTick = (itemInfo.Level > 95 && itemInfo.Level <= 145) ? 22 : 14;
+  //     var dodgeTick = (itemInfo.Level > 95 && itemInfo.Level <= 145) ? 3 : 2;
+
+  //     this.Armor.Defense = (DefenseTick * combine) + itemInfo.Defense;
+  //     this.Armor.Defense += (this.Armor.Defense / 100 * enchant);
+  //     this.Armor.Vitality = itemInfo.Vitality;
+  //     this.Armor.Dodge = (dodgeTick * combine) + itemInfo.ChancetoDodge;
+
+  //     this.Armor.Resists.Light = itemInfo.LightResistance;
+  //     this.Armor.Resists.Shadow = itemInfo.ShawdowResistance;
+  //     this.Armor.Resists.Dark = itemInfo.DarkResistance;
+
+
+  //     this.updateStat('Defense');
+  //     this.updateStat('Dodge');
+  //     break;
+
+  //     case 'Boot':
+  //       var DefenseTick = (itemInfo.Level > 95 && itemInfo.Level <= 145) ? 3 : 2;
+  //       var dodgeTick = (itemInfo.Level > 95 && itemInfo.Level <= 145) ? 8 : 6;
+
+  //       this.Boots.Defense = (DefenseTick * combine) + itemInfo.Defense;
+  //       this.Boots.Dodge = (dodgeTick * combine) + itemInfo.ChancetoDodge;
+  //       this.Boots.Dodge += Math.floor(this.Boots.Dodge / 100 * enchant);
+
+  //       this.updateStat('Defense');
+  //       this.updateStat('Dodge');
+  //     break;
+
+
+  //     case 'Glove':
+  //       var DefenseTick = (itemInfo.Level > 95 && itemInfo.Level <= 145) ? 8 : 5;
+  //       // Todo: check values for this level ranges
+  //       var hitTick = (itemInfo.Level > 95 && itemInfo.Level <= 145) ? 13 : 8;
+
+  //       this.Gloves.Defense = (DefenseTick * combine) + itemInfo.Defense;
+
+
+  //       this.Gloves.HitRate = (hitTick * combine) + itemInfo.ChancetoHit;
+  //       this.Gloves.HitRate += (this.Gloves.HitRate / 100) * enchant;
+
+  //       this.updateStat('Defense');
+  //       this.updateStat('HitRate');
+  //     break;
+
+  //     case 'Cape':
+  //       this.Cape.Defense = itemInfo.Defense;
+
+  //       this.Cape.Resists.Light = itemInfo.LightResistance;
+  //       this.Cape.Resists.Shadow = itemInfo.ShawdowResistance;
+  //       this.Cape.Resists.Dark = itemInfo.DarkResistance;
+
+
+  //       this.updateStat('Defense');
+  //       this.updateStat('Resists');
+  //     break;
+
+  //     case 'Amulet':
+  //       this.Amulet.Chi = itemInfo.Chi;
+  //       this.Amulet.Resists.Light = itemInfo.LightResistance;
+  //       this.Amulet.Resists.Shadow = itemInfo.ShawdowResistance;
+  //       this.Amulet.Resists.Dark = itemInfo.DarkResistance;
+
+  //       this.Cape.Luck = itemInfo.Luck;
+
+  //       this.updateStat('StatChi');
+  //     break;
+
+  //     case 'Ring':
+  //       this.Ring.Luck = itemInfo.Luck;
+  //       this.Ring.Dexterity = itemInfo.Dexterity;
+  //       this.Ring.ElementalDamage = this.clan === 0 ? itemInfo.LightDamage : this.clan === 1 ? itemInfo.ShadowDamage : itemInfo.DarkDamage;
+  //       this.Ring.DeadlyRate = itemInfo.PercentToDeadlyBlow;
+
+  //       this.updateStat('StatDexterity');
+  //       this.updateStat('Luck');
+  //       this.updateStat('ElementalDamage');
+  //       this.updateStat('DeadlyRate');
+  //     break;
+  //   }
+
+
+  //   return this;
+  // }
+
+  // characterStatsInfo_Prototype.updateAll = function(){
+  //   this.updateEquipment('Weapon');
+  //   this.updateEquipment('Armor');
+  //   this.updateEquipment('Boot');
+  //   this.updateEquipment('Glove');
+  //   this.updateEquipment('Cape');
+  //   this.updateEquipment('Amulet');
+  //   this.updateEquipment('Ring');
+
+  //   this.updateStat('StatVitality');
+  //   this.updateStat('StatChi');
+  //   this.updateStat('StatDexterity');
+  //   this.updateStat('StatStrength');
+
+  //   this.updateStat('Defense');
+  //   this.updateStat('HitRate');
+  //   this.updateStat('Dodge');
+  //   this.updateStat('DeadlyRate');
+  //   this.updateStat('Luck');
+  //   this.updateStat('Resists');
+  //   this.updateStat('ElementalDamage');
+
+  //   this.updateSkills();
+  // }
+
+  // characterStatsInfo_Prototype.updateLevel = function(){
+  //   // TODO: On level updates
+  //   this.updateAll();
+  // }
+
+  // characterStatsInfo_Prototype.updateSkills = function(){
+    
+  // }
+
+  // characterStatsInfo_Prototype.updateStat = function(stat_name){
+  //   var Stat = client.character[stat_name];
+  //   if(
+  //     (
+  //       stat_name !== 'Defense' &&
+  //       stat_name !== 'HitRate' &&
+  //       stat_name !== 'Dodge' &&
+  //       stat_name !== 'Luck' &&
+  //       stat_name !== 'DeadlyRate' &&
+  //       stat_name !== 'Resists' &&
+  //       stat_name !== 'ElementalDamage'
+  //     ) && Stat === undefined
+  //   ){
+  //     console.log("Stat " + stat_name + " is undefined");
+  //     return;
+  //   }
+
+  //   if(!this.Modifiers){
+  //     console.log("No character modifiers");
+  //     return;
+  //   }
+
+  //   var ExpInfo = infos.Exp[client.character.Level];
+  //   if(!ExpInfo){
+  //     console.log("No exp info for level : ", client.character.Level);
+  //     return;
+  //   }
+
+  //   switch(stat_name){
+  //     case 'StatVitality':
+  //     var baseHP = this.clan === 0 ? ExpInfo.GuanyinHP : this.clan === 1 ? ExpInfo.FujinHP : ExpInfo.JinongHP;
+  //     var formula = baseHP + (this.Modifiers.HP * (Stat+this.Armor.Vitality)) + this.Pet.HP;
+  //     this.MaxHP = formula;
+  //     break;
+
+  //     case 'StatChi':
+  //     var baseCHI = this.clan === 0 ? ExpInfo.GuanyinChi : this.clan === 1 ? ExpInfo.FujinChi : ExpInfo.JinongChi;
+  //     var formula = baseCHI + (this.Modifiers.Chi * (Stat + this.Amulet.Chi));
+  //     this.MaxChi = formula;
+  //     break;
+
+  //     case 'StatDexterity':
+  //     var baseDodge = this.clan === 0 ? ExpInfo.GuanyinDodge : this.clan === 1 ? ExpInfo.FujinDodge : ExpInfo.JinongDodge;
+  //     Stat += this.Ring.Dexterity;
+
+  //     var dodgeFormula = baseDodge + (this.Modifiers.Dodge * Stat);
+
+  //     this.DexHitRate = (this.Modifiers.HitRate * Stat);
+  //     this.DexDodge = (this.Modifiers.Dodge * Stat);
+
+  //     this.updateStat('HitRate');
+  //     this.updateStat('Dodge');
+  //     break;
+
+  //     case 'StatStrength':
+  //     var baseDamage = this.clan === 0 ? ExpInfo.GuanyinDamage : this.clan === 1 ? ExpInfo.FujinDamage : ExpInfo.JinongDamage;
+  //     var damageFormula = (baseDamage + (this.Weapon.Mod * Stat)) + baseDamage + this.Weapon.Damage;
+  //     this.Damage = damageFormula;
+  //     break;
+
+  //     case 'Defense':
+  //     var baseDefense = this.clan === 0 ? ExpInfo.GuanyinDefense : this.clan === 1 ? ExpInfo.FujinDefense : ExpInfo.JinongDefense;
+  //     this.Defense = this.Armor.Defense + this.Boots.Defense + this.Gloves.Defense + this.Cape.Defense + baseDefense;
+  //     break;
+
+  //     case 'HitRate':
+  //     this.HitRate = this.Weapon.HitRate + this.Gloves.HitRate + this.DexHitRate;
+  //     break;
+
+  //     case 'Dodge':
+  //     var baseDefense = this.clan === 0 ? ExpInfo.GuanyinDefense : this.clan === 1 ? ExpInfo.FujinDefense : ExpInfo.JinongDefense;
+  //     this.Dodge = this.Boots.Dodge + this.Armor.Dodge + this.DexDodge;
+  //     break;
+
+  //     case 'Luck':
+  //     this.Luck = this.Boots.Luck + this.Armor.Luck + this.Gloves.Luck + this.Amulet.Luck + this.Ring.Luck;
+  //     break;
+
+  //     case 'Resists':
+  //     this.Resists.Light = this.Armor.Resists.Light + this.Amulet.Resists.Light + this.Cape.Resists.Light;
+  //     this.Resists.Shadow = this.Armor.Resists.Shadow + this.Amulet.Resists.Shadow + this.Cape.Resists.Shadow;
+  //     this.Resists.Dark = this.Armor.Resists.Dark + this.Amulet.Resists.Dark + this.Cape.Resists.Dark;
+  //     break;
+
+  //     case 'ElementalDamage':
+  //     var baseElementalDamage = this.clan === 0 ? ExpInfo.LightDamage : this.clan === 1 ? ExpInfo.ShadowDamage : ExpInfo.DarkDamage;
+  //     this.ElementalDamage = this.Weapon.ElementalDamage + this.Ring.ElementalDamage + baseElementalDamage;
+  //     break;
+
+  //     case 'DeadlyRate':
+  //     this.DeadlyRate = this.Ring.DeadlyRate;
+  //     break;
+  //   }
+  // }
+
+  // characterStatsInfo_Prototype.print = function(){
+  //   console.log();
+  //   console.log("Damage : " + this.Damage);
+  //   console.log("Defense : " + this.Defense);
+  //   console.log("Max HP : " + this.MaxHP);
+  //   console.log("Max Chi : " + this.MaxChi);
+  //   console.log("Hit Rate : " + this.HitRate);
+  //   console.log("Dodge : " + this.Dodge);
+  //   console.log("Luck : " + this.Luck);
+  //   console.log("Resits : ", this.Resists);
+  //   console.log("Deadly rate : ", this.DeadlyRate);
+  //   console.log("ElementalDamage : ", this.ElementalDamage);
+
+  //   console.log('----');
+  //   console.log(client.character.infos);
+  // }
+
+
+  // _this.infos = new characterStatsInfo(this);
+  // client.characterInfo.updateAll();
+  // client.characterInfo.print();
+
+  // _this.do2FPacket=1;
     //console.log('updateInfos');
 
-  var level = this.Level;
-  if (level>106) level=106;
-  if (reloadEXPInfo || this.expinfo === undefined) this.expinfo = infos.Exp[level];
+  // var level = this.Level;
+  // if (level>106) level=106;
+  // if (reloadEXPInfo || this.expinfo === undefined) this.expinfo = infos.Exp[level];
 
-  // Setup base stats bassed on points, bonuses gear etc.
-  if (this.expinfo === undefined) {
-    throw new Error('Level is set to '+level+' for character '+this.Name+' which does not have exp info for it.');
-  }
+  // // Setup base stats bassed on points, bonuses gear etc.
+  // if (this.expinfo === undefined) {
+  //   throw new Error('Level is set to '+level+' for character '+this.Name+' which does not have exp info for it.');
+  // }
 
 
-  // Setup base stats bassed on points, bonuses gear etc.
+  // // Setup base stats bassed on points, bonuses gear etc.
 
-  var statInfo = {}; // Should make this a js object
+  // var infos = {}; // Should make this a js object
 
-  // Should seprate this out into another js object for using with monsters and npc too.
-  // Constructor shit
+  // // Should seprate this out into another js object for using with monsters and npc too.
+  // // Constructor shit
 
-  statInfo.HP = 0;
-  statInfo.Chi = 0;
+  // infos.HP = 0;
+  // infos.Chi = 0;
 
-  statInfo.BaseStatStrength = this.StatStrength;
-  statInfo.BaseStatDexterity = this.StatDexterity;
-  statInfo.BaseStatVitality = this.StatVitality;
-  statInfo.BaseStatChi = this.StatChi;
+  // infos.BaseStatStrength = this.StatStrength;
+  // infos.BaseStatDexterity = this.StatDexterity;
+  // infos.BaseStatVitality = this.StatVitality;
+  // infos.BaseStatChi = this.StatChi;
 
-  statInfo.StatStrength = this.StatStrength;
-  statInfo.StatDexterity = this.StatDexterity;
-  statInfo.StatVitality = this.StatVitality;
-  statInfo.StatChi = this.StatChi;
+  // infos.StatStrength = this.StatStrength;
+  // infos.StatDexterity = this.StatDexterity;
+  // infos.StatVitality = this.StatVitality;
+  // infos.StatChi = this.StatChi;
 
-  statInfo.Luck=0;
-  statInfo.Damage=0;
-  statInfo.DamageBonus=this.DamageBonus;
-  statInfo.Defense=0;
-  statInfo.LightDamage=0;
-  statInfo.ShadowDamage=0;
-  statInfo.DarkDamage=0;
-  statInfo.LightResistance=0;
-  statInfo.ShawdowResistance=0;
-  statInfo.DarkResistance=0;
-  statInfo.ChancetoHit=0;
-  statInfo.ChancetoDodge=0;
-  statInfo.PercentToDeadlyBlow=0; 
+  // infos.Luck=0;
+  // infos.Damage=0;
+  // infos.DamageBonus=this.DamageBonus;
+  // infos.Defense=0;
+  // infos.LightDamage=0;
+  // infos.ShadowDamage=0;
+  // infos.DarkDamage=0;
+  // infos.LightResistance=0;
+  // infos.ShawdowResistance=0;
+  // infos.DarkResistance=0;
+  // infos.ChancetoHit=0;
+  // infos.ChancetoDodge=0;
+  // infos.PercentToDeadlyBlow=0; 
 
-  statInfo.HitRate = 0;
-  statInfo.DodgeDeadlyBlow = 0;
-  statInfo.DecreaseChiConsumption = 0;
-  statInfo.Dodge = 0;
+  // infos.HitRate = 0;
+  // infos.DodgeDeadlyBlow = 0;
+  // infos.DecreaseChiConsumption = 0;
+  // infos.Dodge = 0;
 
-  function ApplyItemEffects(info)
-  {
-    if (info===null) return;
-    if (info.ID===0) return;
+  // function ApplyItemEffects(item)
+  // {
+  //   var info = infos.Item[item.ID];
+  //   if (info===null) return;
+  //   if (info.ID===0) return;
 
-    //if (info.Name.indexOf('Boots')>-1) eyes.inspect(info);
+  //   //if (info.Name.indexOf('Boots')>-1) eyes.inspect(info);
 
-    statInfo.StatStrength += info.Strength || 0;
-    statInfo.StatDexterity += info.Dexterity || 0;
-    statInfo.StatVitality += info.Vitality || 0;
-    statInfo.StatChi += info.Chi || 0;
-    statInfo.Luck += info.Luck || 0;
-    statInfo.DamageBonus += info.Damage || 0;
-    statInfo.Defense += info.Defense || 0;
-    statInfo.LightDamage += info.LightDamage || 0;
-    statInfo.ShadowDamage += info.ShadowDamage || 0;
-    statInfo.DarkDamage += info.DarkDamage || 0;
-    statInfo.LightResistance += info.LightResistance || 0;
-    statInfo.ShawdowResistance += info.ShawdowResistance || 0;
-    statInfo.DarkResistance += info.DarkResistance || 0;
-    statInfo.ChancetoHit += info.ChancetoHit || 0;
-    statInfo.ChancetoDodge += info.ChancetoDodge || 0;
-    statInfo.PercentToDeadlyBlow += info.PercentToDeadlyBlow || 0;
+  //   infos.StatStrength += info.Strength || 0;
+  //   infos.StatDexterity += info.Dexterity || 0;
+  //   infos.StatVitality += info.Vitality || 0;
+  //   infos.StatChi += info.Chi || 0;
+  //   infos.Luck += info.Luck || 0;
+  //   infos.DamageBonus += info.Damage || 0;
+  //   infos.Defense += info.Defense || 0;
+  //   infos.LightDamage += info.LightDamage || 0;
+  //   infos.ShadowDamage += info.ShadowDamage || 0;
+  //   infos.DarkDamage += info.DarkDamage || 0;
+  //   infos.LightResistance += info.LightResistance || 0;
+  //   infos.ShawdowResistance += info.ShawdowResistance || 0;
+  //   infos.DarkResistance += info.DarkResistance || 0;
+  //   infos.ChancetoHit += info.ChancetoHit || 0;
+  //   infos.ChancetoDodge += info.ChancetoDodge || 0;
+  //   infos.PercentToDeadlyBlow += info.PercentToDeadlyBlow || 0;
 
-    statInfo.DecreaseChiConsumption += info.DecreaseChiConsumption || 0;
-    statInfo.DodgeDeadlyBlow += info.DodgeDeadlyBlow || 0;
+  //   infos.DecreaseChiConsumption += info.DecreaseChiConsumption || 0;
+  //   infos.DodgeDeadlyBlow += info.DodgeDeadlyBlow || 0;
 
-  // Need to code in skill bonuses
-    // info.SkillBonusID1 || 0;
-    // info.SkillBonusID2 || 0;
-    // info.SkillBonusID3 || 0;
-    // info.SkillBonusAmount1 || 0;
-    // info.SkillBonusAmount2 || 0;
-    // info.SkillBonusAmount3 || 0;
-    // info.IncreaseAllSKillMastery || 0;
+  // // Need to code in skill bonuses
+  //   // info.SkillBonusID1 || 0;
+  //   // info.SkillBonusID2 || 0;
+  //   // info.SkillBonusID3 || 0;
+  //   // info.SkillBonusAmount1 || 0;
+  //   // info.SkillBonusAmount2 || 0;
+  //   // info.SkillBonusAmount3 || 0;
+  //   // info.IncreaseAllSKillMastery || 0;
 
-    // Apply equipment enchant bassed on item type
-    // http://www.aeriagames.com/wiki/index.php?title=Items&game=twelvesky2
-        // http://cebunogard.blogspot.com/
-        // Boots Dodge
-        // Armor Defense
-        // Weapon Damage
-        // Gloves Hit
-        // Ring Damage and Crit
-        // Amulet Luck
-        // Capes Defense
-  }
+  //   // Apply equipment enchant bassed on item type
+  //   // http://www.aeriagames.com/wiki/index.php?title=Items&game=twelvesky2
+  //       // http://cebunogard.blogspot.com/
+  //       // Boots Dodge
+  //       // Armor Defense
+  //       // Weapon Damage
+  //       // Gloves Hit
+  //       // Ring Damage and Crit
+  //       // Amulet Luck
+  //       // Capes Defense
+  //   switch (info.InventoryItemType()) {
+      
+  //   }
+  //   // Apply enchant bonuses
 
-  // Apply equip bonuses
-  if (this.Ring && this.Ring.ID) ApplyItemEffects(infos.Item[this.Ring.ID]);
-  if (this.Cape && this.Cape.ID) ApplyItemEffects(infos.Item[this.Cape.ID]);
-  if (this.Armor && this.Armor.ID) ApplyItemEffects(infos.Item[this.Armor.ID]);
-  if (this.Glove && this.Glove.ID) ApplyItemEffects(infos.Item[this.Glove.ID]);
-  if (this.Amulet && this.Amulet.ID) ApplyItemEffects(infos.Item[this.Amulet.ID]);
-  if (this.Boot && this.Boot.ID) ApplyItemEffects(infos.Item[this.Boot.ID]);
-  if (this.Weapon && this.Weapon.ID) ApplyItemEffects(infos.Item[this.Weapon.ID]);
-  if (this.Pet && this.Pet.ID) ApplyItemEffects(infos.Item[this.Pet.ID]);
-  if (this.CalbashBottle && this.CalbashBottle.ID) ApplyItemEffects(infos.Item[this.CalbashBottle.ID]);
+  //   // Apply combine bonuses
+  // }
 
-  // Ask world/zone for bonuses applied to faction
+  // // Apply equip bonuses
+  // if (this.Ring && this.Ring.ID)     ApplyItemEffects(this.Ring);
+  // if (this.Cape && this.Cape.ID)     ApplyItemEffects(this.Cape);
+  // if (this.Armor && this.Armor.ID)   ApplyItemEffects(this.Armor);
+  // if (this.Glove && this.Glove.ID)   ApplyItemEffects(this.Glove);
+  // if (this.Amulet && this.Amulet.ID) ApplyItemEffects(this.Amulet);
+  // if (this.Boot && this.Boot.ID)     ApplyItemEffects(this.Boot);
+  // if (this.Weapon && this.Weapon.ID) ApplyItemEffects(this.Weapon);
+  // if (this.Pet && this.Pet.ID)       ApplyItemEffects(this.Pet);
+  // if (this.CalbashBottle && this.CalbashBottle.ID) ApplyItemEffects(this.CalbashBottle);
 
-  // Apply item effects
+  // // Ask world/zone for bonuses applied to faction
 
-  // Apply skill effects
+  // // Apply item effects
 
-  // Not sure if these are right way to apply the bonuses
-  statInfo.StatStrength += this.StrBonus || 0;
-  statInfo.StatDexterity += this.DexBonus || 0;
-  statInfo.Luck += this.LuckBuff || 0;
-  statInfo.StatStrength += this.StrengthBuff || 0;
+  // // Apply skill effects
+
+  // // Not sure if these are right way to apply the bonuses
+  // infos.StatStrength += this.StrBonus || 0;
+  // infos.StatDexterity += this.DexBonus || 0;
+  // infos.Luck += this.LuckBuff || 0;
+  // infos.StatStrength += this.StrengthBuff || 0;
     
-  statInfo.DarkDamage += this.DarkDamage || 0;
+  // infos.DarkDamage += this.DarkDamage || 0;
 
-  statInfo.Defense += this.FactionDefenseBonus || 0;
+  // infos.Defense += this.FactionDefenseBonus || 0;
   
-  statInfo.HitRate += this.ChanceDodge_Hit || 0;
-  statInfo.Dodge += this.ChanceDodge_Hit || 0;
+  // infos.HitRate += this.ChanceDodge_Hit || 0;
+  // infos.Dodge += this.ChanceDodge_Hit || 0;
 
-  statInfo.HitRate += statInfo.ChancetoHit || 0;
-  statInfo.Dodge += statInfo.ChancetoDodge || 0;
+  // infos.HitRate += infos.ChancetoHit || 0;
+  // infos.Dodge += infos.ChancetoDodge || 0;
 
-  // Damage formular goes here...
+  // // Damage formular goes here...
 
-  var cvars = Modifiers[this.Clan];
-  var WeaponType = 0;
+  // var cvars = Modifiers[this.Clan];
+  // var WeaponType = 0;
 
-  statInfo.HP += cvars.HP;
-  statInfo.Chi += cvars.Chi;
+  // infos.HP += cvars.HP;
+  // infos.Chi += cvars.Chi;
 
-  // Calculate Damage
+  // // Calculate Damage
 
-  // Get Weapon TypeID
-    if (this.Weapon && this.Weapon.ID > 0) {
-    var ii = infos.Item[this.Weapon.ID];
-    if (ii!==null) {
-             if (ii.ItemType == 13) WeaponType = 1; // Sword
-        else if (ii.ItemType == 14) WeaponType = 2; // Blade
-        else if (ii.ItemType == 15) WeaponType = 3; // Marble
-        else if (ii.ItemType == 16) WeaponType = 1; // Katana
-        else if (ii.ItemType == 17) WeaponType = 2; // Double Blade
-        else if (ii.ItemType == 18) WeaponType = 3; // Lute
-        else if (ii.ItemType == 19) WeaponType = 1; // Light Blade
-        else if (ii.ItemType == 20) WeaponType = 2; // Long Spear
-        else if (ii.ItemType == 21) WeaponType = 3; // Scepter
-      }
-    }
-  statInfo.WeaponType = WeaponType;
+  // // Get Weapon TypeID
+  //   if (this.Weapon && this.Weapon.ID > 0) {
+  //   var ii = infos.Item[this.Weapon.ID];
+  //   if (ii!==null) {
+  //            if (ii.ItemType == 13) WeaponType = 1; // Sword
+  //       else if (ii.ItemType == 14) WeaponType = 2; // Blade
+  //       else if (ii.ItemType == 15) WeaponType = 3; // Marble
+  //       else if (ii.ItemType == 16) WeaponType = 1; // Katana
+  //       else if (ii.ItemType == 17) WeaponType = 2; // Double Blade
+  //       else if (ii.ItemType == 18) WeaponType = 3; // Lute
+  //       else if (ii.ItemType == 19) WeaponType = 1; // Light Blade
+  //       else if (ii.ItemType == 20) WeaponType = 2; // Long Spear
+  //       else if (ii.ItemType == 21) WeaponType = 3; // Scepter
+  //     }
+  //   }
+  // infos.WeaponType = WeaponType;
 
-  statInfo.Damage += ((cvars.Damage[WeaponType] * statInfo.StatStrength)+statInfo.DamageBonus) || 0;
+  // infos.Damage += ((cvars.Damage[WeaponType] * infos.StatStrength)+infos.DamageBonus) || 0;
 
-  statInfo.HitRate += cvars.HitRate*statInfo.StatDexterity;
-  statInfo.Dodge += cvars.Dodge*statInfo.StatDexterity;
+  // infos.HitRate += cvars.HitRate*infos.StatDexterity;
+  // infos.Dodge += cvars.Dodge*infos.StatDexterity;
   // Apply GM command effects
   // Caculate the final HP and CHI etc from stat info
 
@@ -263,84 +1224,82 @@ generic.calculateCharacterStatInfo = function calculateCharacterStatInfo(reloadE
 
 // BELOW HERE IS OLD CODE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // Im not 100% sure in any order of which to do these.
-  switch (this.Clan)
-  {
-    case 0: // Guanyin
-    statInfo.Damage += this.expinfo.GuanyinDamage;
-    statInfo.Defense += this.expinfo.GuanyinDefense;
-    statInfo.HitRate += this.expinfo.GuanyinHitrate;
-    statInfo.Dodge += this.expinfo.GuanyinDodge;
-    statInfo.LightDamage += this.expinfo.LightDamage;
+  // switch (this.Clan)
+  // {
+  //   case 0: // Guanyin
+  //   infos.Damage += this.expinfo.GuanyinDamage;
+  //   infos.Defense += this.expinfo.GuanyinDefense;
+  //   infos.HitRate += this.expinfo.GuanyinHitrate;
+  //   infos.Dodge += this.expinfo.GuanyinDodge;
+  //   infos.LightDamage += this.expinfo.LightDamage;
 
-    statInfo.HP += this.expinfo.GuanyinHP;
-    statInfo.Chi += this.expinfo.GuanyinChi;
+  //   infos.HP += this.expinfo.GuanyinHP;
+  //   infos.Chi += this.expinfo.GuanyinChi;
 
-    //statInfo.HP += statInfo.StatVitality*Stat_PointM['Guanyin'].VitMul//15.31; //-  1 Vitality Point -> 15.31 Hit Points
-    //statInfo.Chi += statInfo.StatChi*Stat_PointM['Guanyin'].ChiMul//20; //-  1 Chi Point -> 20 Chi
+  //   //infos.HP += infos.StatVitality*Stat_PointM['Guanyin'].VitMul//15.31; //-  1 Vitality Point -> 15.31 Hit Points
+  //   //infos.Chi += infos.StatChi*Stat_PointM['Guanyin'].ChiMul//20; //-  1 Chi Point -> 20 Chi
 
-    //statInfo.ChancetoHit += (statInfo.StatDexterity*Stat_PointM['Guanyin'].DexMul.Hit/*5.14*/) + statInfo.HitRate; //-  1 Dexterity -> 5.14 Chance to Hit
-    //statInfo.ChancetoDodge += (statInfo.StatDexterity*Stat_PointM['Guanyin'].DexMul.Dodge/*2.75*/) + statInfo.Dodge; //-  1 Dexterity -> 2.57 Chance to Dodge
+  //   //infos.ChancetoHit += (infos.StatDexterity*Stat_PointM['Guanyin'].DexMul.Hit/*5.14*/) + infos.HitRate; //-  1 Dexterity -> 5.14 Chance to Hit
+  //   //infos.ChancetoDodge += (infos.StatDexterity*Stat_PointM['Guanyin'].DexMul.Dodge/*2.75*/) + infos.Dodge; //-  1 Dexterity -> 2.57 Chance to Dodge
 
-    //if (this.Weapon.ID)
-    //-  1 Strength -> Using Sword : 3.86
-    //-  1 Strength -> Using  Blade : 4.3
-    //-  1 Strength -> Using Marble : 4.08    
-    break;
-    case 1: // Fujin
-    statInfo.Damage += this.expinfo.FujinDamage;
-    statInfo.Defense += this.expinfo.FujinDefense;
-    statInfo.HitRate += this.expinfo.FujinHitrate;
-    statInfo.Dodge += this.expinfo.FujinDodge;
-    statInfo.ShadowDamage += this.expinfo.ShadowDamage;
+  //   //if (this.Weapon.ID)
+  //   //-  1 Strength -> Using Sword : 3.86
+  //   //-  1 Strength -> Using  Blade : 4.3
+  //   //-  1 Strength -> Using Marble : 4.08    
+  //   break;
+  //   case 1: // Fujin
+  //   infos.Damage += this.expinfo.FujinDamage;
+  //   infos.Defense += this.expinfo.FujinDefense;
+  //   infos.HitRate += this.expinfo.FujinHitrate;
+  //   infos.Dodge += this.expinfo.FujinDodge;
+  //   infos.ShadowDamage += this.expinfo.ShadowDamage;
     
-    statInfo.HP += this.expinfo.FujinHP;
-    statInfo.Chi += this.expinfo.FujinChi;
+  //   infos.HP += this.expinfo.FujinHP;
+  //   infos.Chi += this.expinfo.FujinChi;
 
-    //statInfo.HP += statInfo.StatVitality*Stat_PointM['Fujin'].VitMul//14.29; //-  1 Vitality Point -> 14.29 Hit Points
-    //statInfo.Chi += statInfo.StatChi*Stat_PointM['Fujin'].ChiMul//17.14; //-  1 Chi Point -> 17.14 Chi
+  //   //infos.HP += infos.StatVitality*Stat_PointM['Fujin'].VitMul//14.29; //-  1 Vitality Point -> 14.29 Hit Points
+  //   //infos.Chi += infos.StatChi*Stat_PointM['Fujin'].ChiMul//17.14; //-  1 Chi Point -> 17.14 Chi
 
-    //statInfo.ChancetoHit += (statInfo.StatDexterity*Stat_PointM['Fujin'].DexMul.Hit/*4.57*/) + statInfo.HitRate; //-  1 Dexterity -> 4.57 Chance to Hit
-    //statInfo.ChancetoDodge += (statInfo.StatDexterity*Stat_PointM['Fujin'].DexMul.Dodge/*2.29*/) + statInfo.Dodge; //-  1 Dexterity -> 2.29 Chance to Dodge
-    //-  1 Strength -> Using Katana : 3.17
-    //-  1 Strength -> Using Double Blade : 2.71
-    //-  1 Strength -> Using Lute : 2.94
-    break;
-    case 2: // Jinong
-    statInfo.Damage += this.expinfo.JinongDamage;
-    statInfo.Defense += this.expinfo.JinongDefense;
-    statInfo.HitRate += this.expinfo.JinongHitrate;
-    statInfo.Dodge += this.expinfo.JinongDodge;
-    statInfo.DarkDamage += this.expinfo.DarkDamage;
+  //   //infos.ChancetoHit += (infos.StatDexterity*Stat_PointM['Fujin'].DexMul.Hit/*4.57*/) + infos.HitRate; //-  1 Dexterity -> 4.57 Chance to Hit
+  //   //infos.ChancetoDodge += (infos.StatDexterity*Stat_PointM['Fujin'].DexMul.Dodge/*2.29*/) + infos.Dodge; //-  1 Dexterity -> 2.29 Chance to Dodge
+  //   //-  1 Strength -> Using Katana : 3.17
+  //   //-  1 Strength -> Using Double Blade : 2.71
+  //   //-  1 Strength -> Using Lute : 2.94
+  //   break;
+  //   case 2: // Jinong
+  //   infos.Damage += this.expinfo.JinongDamage;
+  //   infos.Defense += this.expinfo.JinongDefense;
+  //   infos.HitRate += this.expinfo.JinongHitrate;
+  //   infos.Dodge += this.expinfo.JinongDodge;
+  //   infos.DarkDamage += this.expinfo.DarkDamage;
     
-    statInfo.HP += this.expinfo.JinongHP;
-    statInfo.Chi += this.expinfo.JinongChi;
+  //   infos.HP += this.expinfo.JinongHP;
+  //   infos.Chi += this.expinfo.JinongChi;
 
-    //statInfo.HP += statInfo.StatVitality*Stat_PointM['Jinong'].VitMul//16.33; //-  1 Vitality Point -> 16.33 Hit Points
-    //statInfo.Chi += statInfo.StatChi*Stat_PointM['Jinong'].ChiMul//22.29; //-  1 Chi Point -> 22.29 Chi
+  //   //infos.HP += infos.StatVitality*Stat_PointM['Jinong'].VitMul//16.33; //-  1 Vitality Point -> 16.33 Hit Points
+  //   //infos.Chi += infos.StatChi*Stat_PointM['Jinong'].ChiMul//22.29; //-  1 Chi Point -> 22.29 Chi
 
-    //statInfo.ChancetoHit += (statInfo.StatDexterity*Stat_PointM['Jinong'].DexMul/*5.71*/) + statInfo.HitRate; //-  1 Dexterity -> 5.71 Chance to Hit
-    //statInfo.ChancetoDodge += (statInfo.StatDexterity*Stat_PointM['Jinong'].DexMul/*2.86*/) + statInfo.Dodge; //-  1 Dexterity -> 2.86 Chance to Dodge
-    //-  1 Strength -> Using Light Blade : 5.39
-    //-  1 Strength -> Using Long Spear : 5.61
-    //-  1 Strength -> Using Scepter : 5.17
-    break;
-  }
+  //   //infos.ChancetoHit += (infos.StatDexterity*Stat_PointM['Jinong'].DexMul/*5.71*/) + infos.HitRate; //-  1 Dexterity -> 5.71 Chance to Hit
+  //   //infos.ChancetoDodge += (infos.StatDexterity*Stat_PointM['Jinong'].DexMul/*2.86*/) + infos.Dodge; //-  1 Dexterity -> 2.86 Chance to Dodge
+  //   //-  1 Strength -> Using Light Blade : 5.39
+  //   //-  1 Strength -> Using Long Spear : 5.61
+  //   //-  1 Strength -> Using Scepter : 5.17
+  //   break;
+  // }
 
   // Get rid of decimals on HP and Chi
-  statInfo.HP = Math.floor(statInfo.HP);
-  statInfo.Chi = Math.floor(statInfo.Chi);
+  // infos.HP = Math.floor(infos.HP);
+  // infos.Chi = Math.floor(infos.Chi);
 
   // Cap HP and Chi if they are higher than what is now max
-  // if (this.Health > statInfo.HP || this.state.CurrentHealth > statInfo.HP) {
-  //  this.Health = statInfo.HP;
-  //  this.state.CurrentHealth = statInfo.HP;
+  // if (this.Health > infos.HP || this.state.CurrentHealth > infos.HP) {
+  //  this.Health = infos.HP;
+  //  this.state.CurrentHealth = infos.HP;
   // }
-  // if (this.Chi > statInfo.HP || this.state.CurrentChi > statInfo.Chi) {
-  //  this.Chi = statInfo.Chi;
-  //  this.state.CurrentChi = statInfo.Chi;
+  // if (this.Chi > infos.HP || this.state.CurrentChi > infos.Chi) {
+  //  this.Chi = infos.Chi;
+  //  this.state.CurrentChi = infos.Chi;
   // }
-
-    this.do2FPacket=1;
-  //eyes.inspect(statInfo);
-  this.statInfo = statInfo;
+  //eyes.inspect(infos);
+  // this.infos = infos;
 };

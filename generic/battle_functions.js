@@ -8,7 +8,7 @@ generic.Battle = {
  // {
  // 	id: number,
  // 	Index: number,
- //    statInfo: {}
+ //    infos: {}
  // }
  // it will return attack packet information
 
@@ -17,7 +17,7 @@ generic.Battle = {
   },
 
   calculate: function calculate(a,b) {
-	var Hurt = this.damage(a.statInfo.Damage,b.statInfo.Defense);
+	var Hurt = this.damage(a.infos.Damage,b.infos.Defense);
 
 	var AttackPacket = {
 			Action: 0,
@@ -30,9 +30,9 @@ generic.Battle = {
 			// Depends on attacker or defender | hit or miss, block or not |
 			TotalDamage: Math.floor(Hurt),
 			Deadly: Math.floor(1),
-			Light: Math.floor(a.statInfo.LightDamage),
-			Shadow: Math.floor(a.statInfo.ShadowDamage),
-			Dark: Math.floor(a.statInfo.DarkDamage),
+			Light: Math.floor(a.infos.LightDamage),
+			Shadow: Math.floor(a.infos.ShadowDamage),
+			Dark: Math.floor(a.infos.DarkDamage),
 			DamageHP: Math.floor(Hurt) // Deadly bypasses defense
 		}
 
