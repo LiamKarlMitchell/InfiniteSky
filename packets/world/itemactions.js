@@ -181,7 +181,7 @@ ItemActions[0x00] = function Recv_PickupItem(client, input) {
         } else {
             console.log('Putting item in inventory.');
             // TODO: Check row and columns within bounds
-            invitem = { ID: item.ItemID, Amount: item.Amount, Enchant: item.Enchant, Combine: item.Combine, Column: input.PickupRow,Row: input.PickupColumn};
+            invitem = { ID: item.ItemID, Amount: item.Amount, Enchant: item.Enchant, Combine: item.Combine, Column: input.PickupColumn,Row: input.PickupRow};
             client.character.Inventory[input.InventoryIndex] = invitem;
         }
 
@@ -819,6 +819,8 @@ ItemActions[0x0E] = function Recv_UnequipItemFromCharacter(client, input) {
     else
         inventory[collision.InventoryIndex] = {ID: invItem.ID, Enchant: invItem.Enchant, Combine: invItem.Combine, Column: collision.MoveRow, Row: collision.MoveColumn};
     
+
+    client.character.infos.updateEquipment(equipItem);
     client.character[equipItem] = null;
     
     client.character.markModified('Inventory');
