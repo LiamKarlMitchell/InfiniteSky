@@ -50,18 +50,14 @@ var applyBuffRespond = restruct.
 	pad(96);
 
 
-var buffsList = [105, 30, 103, 104, 26, 84, 83, 82, 7, 6, 11, 19, 38, 34, 15, 44, 45, 60, 53, 57, 49];
+var buffsList = [105, 30, 103, 104, 26, 84, 83, 82, 7, 11, 19, 38, 34, 15, 45, 60, 53, 57, 49];
 
 var applyBuffFunctionTimeout = function(client, input){
-	// console.log(client.character.state.Buffs);
-
-	console.log("Applying function timeout bro");
-
-	for(var i=0; i<40; i++){
-		// client.character.state.Buffs[i] = {'Time': 200, 'Amount': 200};
-	}
-
+	// console.log(input.SkillID);
 	var buffID = null;
+	var amount = 200;
+	// var modStart = infos.Skill[input.SkillID].ModifiersStart;
+	// var modEnd = infos.Skill[input.SkillID].ModifiersEnd;
 	switch(input.SkillID){
 
 		case 25:
@@ -133,15 +129,35 @@ var applyBuffFunctionTimeout = function(client, input){
 	}
 
 	if(buffID !== null){
-		client.character.state.Buffs[buffID] = {'Time': 200, 'Amount': 200};
+		// console.log(infos.Skill[input.SkillID].ModifiersStart);
+		// console.log(input);
+		// console.log(modStart);
+		// console.log(modEnd);
+
+		// console.log(skillInfo);
+		// console.log(modStart.EffectiveDuration);
+		// console.log((modEnd.EffectiveDuration - modStart.EffectiveDuration));
+
+
+		// var time = (modStart.EffectiveDuration + ((modEnd.EffectiveDuration - modStart.EffectiveDuration) * input.SkillLevel)) * 100;
+		// var amount = modStart.EffectiveDuration + (difference * input.SkillLevel);
+		// console.log(time);
+
+		// var time = (modStart.EffectiveDuration*100);
+		// console.log(time);
+
+		if(buffID === 14)
+		client.character.state.BuffHS = {'Time': 100, 'Amount': 200, 'Stacks': 5};
+		else if(buffID >= 0 && buffID < 14)
+		client.character.state.Buffs[buffID] = {'Time': 100, 'Amount': 200};
+		else if(buffID > 14)
+		client.character.state.Buffs2[buffID] = {'Time': 100, 'Amount': 200};
 	}
 
     client.character.state.SkillID = 0;
 	client.character.state.SkillLevel = 0;
-	// console.log(client.character.state.FightingStance);
-	client.character.state.Skill = 3;
-	// client.character.state.Skill = client.character.state.FightingStance === undefined ? 4 : !client.character.state.FightingStance ? 4 : 3; // This applies the result character stance :)
-	client.character.state.DisplayBuffs = 1;
+	client.character.state.Skill = client.character.state.FightingStance === undefined ? 4 : !client.character.state.FightingStance ? 4 : 3; // This applies the result character stance :)
+	// client.character.state.DisplayBuffs = 1;
 	client.write(client.character.state.getPacket());
 }
 
@@ -154,8 +170,12 @@ WorldPC.Set(0x19, {
 			// TODO: Prevent spamming of a skill by some applying buff check
 			// console.log(input);
 			client.character.state.CurrentChi -= input.ChiUsage;
+			if(client.character.state.SkillInUse) return;
 
-			console.log("infos.Skill[ "+input.SkillID+" ]");
+			// console.log("infos.Skill[ "+input.SkillID+" ]");
+
+
+
 			var skillInfo = infos.Skill[input.SkillID];
 			if(!skillInfo){
 				console.log("Skill info not found");
@@ -173,10 +193,12 @@ WorldPC.Set(0x19, {
 			client.character.state.SkillLevel = input.SkillLevel;
 
 			if(buffsList.indexOf(input.SkillID) > -1){
-				console.log(client.character.state.Skill);
+				client.character.state.SkillInUse = true;
+				// console.log(client.character.state.Skill);
 				setTimeout(function(){
+					client.character.state.SkillInUse = false;
 					return applyBuffFunctionTimeout(client, input);
-				}, 1800);
+				}, 2000);
 			}
 
 
@@ -200,7 +222,7 @@ WorldPC.Set(0x7a, {
 WorldPC.Set(0x18, {
 	Restruct: applyBuff,
 	function: function(client, input){
-		if(input.SkillID === 25){
+		if(input.SkillID === 25 || input.SkillID === 6 || input.SkillID === 44){
 			applyBuffFunctionTimeout(client, input);
 		}
 		// console.log("infos.Skill["+input.SkillID+"] @ buff applied");

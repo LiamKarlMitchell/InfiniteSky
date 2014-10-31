@@ -71,6 +71,11 @@ var Buff = restruct.
 int16lu('Amount').
 int16lu('Time');
 
+var BuffHS = restruct.
+int8lu('Amount').
+int8lu('Stacks').
+int16lu('Time');
+
 WorldPC.ActionReplyPacket = restruct.
     int32lu('CharacterID').
     int32lu('UniqueID').
@@ -128,8 +133,10 @@ WorldPC.ActionReplyPacket = restruct.
     int32lu('CurrentHP').
     int32lu('MaxChi').
     int32lu('CurrentChi'). // === 372
-    struct('Buffs', Buff, 22).
-    
+    struct('Buffs', Buff, 14). //22
+    struct('BuffHS', BuffHS).
+    struct('Buffs2', Buff, 7).
+
 int32lu('MonsterDisguise'). // The ID of a monster to disguise as
 
 int32lu('').

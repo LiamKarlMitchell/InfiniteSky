@@ -1546,7 +1546,7 @@ ItemActions[0x1F] = function Recv_LearnSkill(client, input) {
         return;
     }
 
-    console.log(skill);
+    // console.log(skill);
 
     var npcInfo = infos.Npc[input.NodeID];
     
@@ -1565,11 +1565,11 @@ ItemActions[0x1F] = function Recv_LearnSkill(client, input) {
     var alreadyLearned;
     var freeIndex;
     var startIndexFrom;
-    console.log(skill.Category);
+    // console.log(skill.Category);
 
-    for(var i in skill){
-        console.log(skill[i]);
-    }
+    // for(var i in skill){
+    //     console.log(skill[i]);
+    // }
 
     switch(skill.Category){
         case 1:
@@ -1586,7 +1586,7 @@ ItemActions[0x1F] = function Recv_LearnSkill(client, input) {
         break;
     }
 
-    console.log(startIndexFrom);
+    // console.log(startIndexFrom);
     for(var i = startIndexFrom; i < (startIndexFrom+10); i++){
         if(client.character.SkillList[i] && client.character.SkillList[i].ID === input.ItemID){
             alreadyLearned = true;

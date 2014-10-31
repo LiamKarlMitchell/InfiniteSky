@@ -33,6 +33,31 @@ db.Character.find({
 				client.character.infos.updateAll();
 				client.character.state.setFromCharacter(client.character);
 
+				clearTimeout(client.character.statsInterval);
+				client.character.statsIntervalFunction = function(){
+					var needUpdate = false;
+					if(client.character.infos.MaxHP > client.character.state.CurrentHP){
+						var HPTick = Math.round(client.character.infos.MaxHP / 100);
+						client.character.state.CurrentHP = (client.character.state.CurrentHP+HPTick) > client.character.infos.MaxHP ? client.character.infos.MaxHP : (client.character.state.CurrentHP+HPTick);
+						needUpdate = true;
+					}
+
+					if(client.character.infos.MaxChi > client.character.state.CurrentChi){
+						var ChiTick = Math.round(client.character.infos.MaxChi / 100);
+						client.character.state.CurrentChi = (client.character.state.CurrentChi+ChiTick) > client.character.infos.MaxChi ? client.character.infos.MaxChi : (client.character.state.CurrentChi+ChiTick);
+						needUpdate = true;
+					}
+
+					if(needUpdate){
+						client.send2FUpdate();
+						client.character.save();
+					}
+
+					client.character.statsInterval = setTimeout(client.character.statsIntervalFunction, 5000);
+				};
+
+				client.character.statsInterval = setTimeout(client.character.statsIntervalFunction, 5000);
+
 				// Send packet to client
 				console.log('Sending WorldCharacterInfoPacket');
 
