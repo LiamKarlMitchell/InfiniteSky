@@ -84,10 +84,16 @@ Modifiers.push(JinongModifiers);
 generic.Modifiers = Modifiers;
 
 
-var characterStatsInfoObj = function(c){
+var characterStatsInfoObj = function(c, character){
   // TODO : Include all the base stats and erease them from the methods below.
-  this.client = c;
-  this.clan = c.character.Clan;
+  // this.client = c === null ? this.client.character ;
+  if(c === null){
+    this.client = {};
+    this.client.character = character;
+  }else{
+    this.client = c;
+  }
+  this.clan = this.client.character.Clan;
 
 
   this.Pet = {
@@ -111,7 +117,7 @@ var characterStatsInfoObj = function(c){
     AllSkills: 0
   };
 
-  this.Modifiers = generic.Modifiers[c.character.Clan] || null;
+  this.Modifiers = generic.Modifiers[this.client.character.Clan] || null;
   this.Weapon = {
     Damage: 0,
     Mod: this.Modifiers.Damage[0],

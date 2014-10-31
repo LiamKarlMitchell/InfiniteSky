@@ -1541,18 +1541,23 @@ ItemActions[0x1F] = function Recv_LearnSkill(client, input) {
     var skill = infos.Skill[input.ItemID];
     
     if(!skill){
+        console.log("No skill found");
         clientWriteItemActionFailed(client, input);
         return;
     }
 
+    console.log(skill);
+
     var npcInfo = infos.Npc[input.NodeID];
     
     if(!npcInfo){
+        console.log("No npc info");
         clientWriteItemActionFailed(client, input);
         return;
     }
 
     if(npcInfo.Items.indexOf(input.ItemID) < 0){
+        console.log("Npc info has got no skill of that id");
         clientWriteItemActionFailed(client, input);
         return;
     }
@@ -1560,6 +1565,12 @@ ItemActions[0x1F] = function Recv_LearnSkill(client, input) {
     var alreadyLearned;
     var freeIndex;
     var startIndexFrom;
+    console.log(skill.Category);
+
+    for(var i in skill){
+        console.log(skill[i]);
+    }
+
     switch(skill.Category){
         case 1:
         startIndexFrom = 0;
@@ -1574,6 +1585,8 @@ ItemActions[0x1F] = function Recv_LearnSkill(client, input) {
         startIndexFrom = 10;
         break;
     }
+
+    console.log(startIndexFrom);
     for(var i = startIndexFrom; i < (startIndexFrom+10); i++){
         if(client.character.SkillList[i] && client.character.SkillList[i].ID === input.ItemID){
             alreadyLearned = true;
@@ -1586,16 +1599,19 @@ ItemActions[0x1F] = function Recv_LearnSkill(client, input) {
     }
     
     if(alreadyLearned || freeIndex === undefined){
+        console.log("There is no free index or the skill is alreday learned");
         clientWriteItemActionFailed(client, input);
         return;
     }
 
     if(!skill.Clan || skill.Clan !== (client.character.Clan+2)){
+        console.log("skill has got no clan or the skill you want to learn does not match your clan");
         clientWriteItemActionFailed(client, input);
         return;
     }
     
     if(client.character.SkillPoints < skill.PointsToLearn){
+        console.log("Charactesr skillpoints are less than skillpoints required to learn");
         clientWriteItemActionFailed(client, input);
         return;
     }

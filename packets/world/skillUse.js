@@ -14,104 +14,6 @@ int32lu('Unk2').
 int32lu('Unk3').
 pad(60);
 
-WorldPC.Set(0x19, {
-	Restruct: ReadUsedItem,
-	function: function makeIt(client, input){
-		console.log("Skill: " + infos.Skill[input.SkillID]);
-
-		if(client.character.state.CurrentChi > 0 && client.character.state.CurrentChi >= input.ChiUsage && input.ChiUsage <= client.character.state.CurrentChi){
-			console.log("Skill consumed CHI");
-			var skillInfo = infos.Skill[input.SkillID];
-			if(!skillInfo){
-				console.log("Skill info not found");
-				return;
-			}
-			
-			var Modifiers = skillInfo.ModifiersStart;
-			
-			// console.log(Modifiers);
-			
-			client.character.state.DisplayBuffs = 1;
-			
-			//client.character.state.CurrentChi -= input.ChiUsage;
-            client.character.state.SkillID = input.SkillID;
-			client.character.state.SkillLevel = input.SkillLevel;
-
-			client.character.state.Stance = 0;
-			if (input.SkillID === 2) {
-				client.character.state.Skill = 32;
-			}
-			//client.character.state.Skill = input.SkillID;
-			client.character.state.Frame = 0;
-			// var amount;
-			// var BuffCode;
-			// var unk;
-			
-			// switch(input.SkillID){
-			// 	case 25:
-			// 	amount = Math.round(Modifiers.DamageIncreased*100);
-			// 	BuffCode = 11;
-			// 	break;
-				
-			// 	case 30:
-			// 	amount = Math.round(Modifiers.IncreasedDamage*100);
-			// 	BuffCode = 0;
-			// 	break;
-				
-			// 	case 26:
-			// 	amount = Math.round(Modifiers.IncreasedDamage*100);
-			// 	BuffCode = 23;
-			// 	break;
-				
-			// 	case 82:
-			// 	amount = Math.round(Modifiers.DegreeOfDefensiveSkill*100);
-			// 	BuffCode = 14;
-			// 	unk = 10;
-			// 	break;
-				
-			// 	case 83:
-			// 	amount = Math.round(Modifiers.EnchancedChanceToDeadlyBlow*100);
-			// 	BuffCode = 15;
-			// 	break;
-				
-			// 	case 84:
-			// 	amount = Math.round(Modifiers.IncreasedLuck*100);
-			// 	BuffCode = 16;
-			// 	break;
-				
-			// 	case 103:
-			// 	console.log("HRR");
-			// 	amount = Math.round(Modifiers.ChanceToReturnDamage*100);
-			// 	BuffCode = 21;
-			// 	break;
-				
-			// 	case 104:
-			// 	amount = Math.round(Modifiers.IncreasedAcupressureDefense*100);
-			// 	BuffCode = 22;
-			// 	break;
-			// }
-			
-			// var time = Modifiers.EffectiveDuration * 100;
-			
-			// console.log("Amount: " + amount + ", Time: " + time);
-
-			// console.log("Setting the buff into state");
-		
-			
-			//console.log(Modifiers);
-			// var buffer = new Buffer(applyBuffRespond.pack({
-			// 	PacketID: 0x2d,
-			// 	Unk: 0,
-			// 	Unk1: 0,
-			// 	Unk2: 0
-			// }));
-			// client.write(buffer);
-
-			client.sendInfoMessage('Using Skill '+input.SkillID);
-			client.write(client.character.state.getPacket());
-		}
-	}
-});
 
 var a7Restruct = restruct.
 int32lu('Unk1').
@@ -132,12 +34,6 @@ int32lu('Unk15').
 int8lu('Unk16').
 int8lu('Unk17');
 
-WorldPC.Set(0x7a, {
-	Restruct: a7Restruct,
-	function: function(client, input){
-		// console.log("Unknown Packet 0x7a: ", input);
-	}
-});
 
 var applyBuff = restruct.
 int32lu('SkillID').
@@ -154,10 +50,160 @@ var applyBuffRespond = restruct.
 	pad(96);
 
 
+var buffsList = [105, 30, 103, 104, 26, 84, 83, 82, 7, 6, 11, 19, 38, 34, 15, 44, 45, 60, 53, 57, 49];
+
+var applyBuffFunctionTimeout = function(client, input){
+	// console.log(client.character.state.Buffs);
+
+	console.log("Applying function timeout bro");
+
+	for(var i=0; i<40; i++){
+		// client.character.state.Buffs[i] = {'Time': 200, 'Amount': 200};
+	}
+
+	var buffID = null;
+	switch(input.SkillID){
+
+		case 25:
+		case 6:
+		case 44:
+		buffID = 11;
+		break;
+
+		case 26:
+		buffID = 3;
+		break;
+
+		case 7:
+		buffID = 5;
+		break;
+
+		case 45:
+		buffID = 13;
+		break;
+
+		case 30:
+		case 15:
+		case 53:
+		buffID = 0;
+		break;
+
+		case 103:
+		buffID = 19;
+		break;
+
+		case 104:
+		buffID = 20;
+		break;
+
+		case 105:
+		buffID = 21;
+		break;
+
+		case 84:
+		buffID = 16;
+		break;
+
+		case 83:
+		buffID = 15;
+		break;
+
+		case 82:
+		buffID = 14;
+		break;
+
+		case 11:
+		buffID = 1;
+		break;
+
+		case 19:
+		case 38:
+		case 57:
+		buffID = 9;
+		break;
+
+		case 34:
+		case 49:
+		buffID = 1;
+		break;
+
+		default:
+		console.log("Applying [ "+input.SkillID+" ] dont work yet, please report!");
+		break;
+	}
+
+	if(buffID !== null){
+		client.character.state.Buffs[buffID] = {'Time': 200, 'Amount': 200};
+	}
+
+    client.character.state.SkillID = 0;
+	client.character.state.SkillLevel = 0;
+	// console.log(client.character.state.FightingStance);
+	client.character.state.Skill = 3;
+	// client.character.state.Skill = client.character.state.FightingStance === undefined ? 4 : !client.character.state.FightingStance ? 4 : 3; // This applies the result character stance :)
+	client.character.state.DisplayBuffs = 1;
+	client.write(client.character.state.getPacket());
+}
+
+WorldPC.Set(0x19, {
+	Restruct: ReadUsedItem,
+	function: function makeIt(client, input){
+		if(client.character.state.CurrentChi > 0 && client.character.state.CurrentChi >= input.ChiUsage && input.ChiUsage <= client.character.state.CurrentChi){
+			if(!client.character.state.SkillTryI) client.character.state.SkillTryI = 1; else client.character.state.SkillTryI++;
+			// TODO: Make sure we got this skill and the level we want to use!
+			// TODO: Prevent spamming of a skill by some applying buff check
+			// console.log(input);
+			client.character.state.CurrentChi -= input.ChiUsage;
+
+			console.log("infos.Skill[ "+input.SkillID+" ]");
+			var skillInfo = infos.Skill[input.SkillID];
+			if(!skillInfo){
+				console.log("Skill info not found");
+				return;
+			}
+			
+			var Modifiers = skillInfo.ModifiersStart;
+
+			if(!Modifiers){
+				console.log("No skill modifiers");
+				return;
+			}
+
+            client.character.state.SkillID = input.SkillID;
+			client.character.state.SkillLevel = input.SkillLevel;
+
+			if(buffsList.indexOf(input.SkillID) > -1){
+				console.log(client.character.state.Skill);
+				setTimeout(function(){
+					return applyBuffFunctionTimeout(client, input);
+				}, 1800);
+			}
+
+
+			if(!client.character.state.Moving || client.character.state.Stands)
+			client.write(client.character.state.getPacket());
+
+            client.character.state.Moving = true;
+            client.character.state.Stands = false;
+		}
+	}
+});
+
+WorldPC.Set(0x7a, {
+	Restruct: a7Restruct,
+	function: function(client, input){
+		// console.log("Unknown Packet 0x7a: ", input);
+	}
+});
+
+
 WorldPC.Set(0x18, {
 	Restruct: applyBuff,
 	function: function(client, input){
-		console.log('After the buff is applied?');
+		if(input.SkillID === 25){
+			applyBuffFunctionTimeout(client, input);
+		}
+		// console.log("infos.Skill["+input.SkillID+"] @ buff applied");
 	
 		// 0 = Soaring Power
 		// 1 = Godly Firewall
@@ -182,61 +228,67 @@ WorldPC.Set(0x18, {
 		// 20
 		// 21
 		
-		var buffID;
-		switch(input.SkillID){
-			case 84:
-			buffID = 16;
-			break;
+		// var buffID;
+		// switch(input.SkillID){
+		// 	case 84:
+		// 	buffID = 16;
+		// 	break;
 			
-			case 83:
-			buffID = 15;
-			break;
+		// 	case 83:
+		// 	buffID = 15;
+		// 	break;
 			
-			case 82:
-			buffID = 14;
-			break;
+		// 	case 82:
+		// 	buffID = 14;
+		// 	break;
 			
-			case 105:
+		// 	case 105:
 			
-			break;
+		// 	break;
 			
-			case 34:
-			buffID = 1;
-			break;
+		// 	case 34:
+		// 	buffID = 1;
+		// 	break;
 			
-			case 30:
-			buffID = 0;
-			break;
+		// 	case 30:
+		// 	buffID = 0;
+		// 	break;
 			
-			case 38:
-			buffID = 9;
-			break;
+		// 	case 38:
+		// 	buffID = 9;
+		// 	break;
 			
-			case 25:
-			buffID = 11;
-			break;
+		// 	case 25:
+		// 	buffID = 11;
+		// 	break;
 			
-			case 82:
-			// We need to change restruct here to be able to apply the "stacks" of the HS
-			buffID = 14;
-			break;
+		// 	case 82:
+		// 	// We need to change restruct here to be able to apply the "stacks" of the HS
+		// 	buffID = 14;
+		// 	break;
 			
-			case 83:
-			buffID = 15;
-			break;
+		// 	case 83:
+		// 	buffID = 15;
+		// 	break;
 			
-			case 84:
-			buffID = 16;
-			break;
+		// 	case 84:
+		// 	buffID = 16;
+		// 	break;
 			
-			default:
-			console.log("This buff is not coded yet");
-			return;
-			break;
-		}
+		// 	default:
+		// 	console.log("This buff is not coded yet");
+		// 	return;
+		// 	break;
+		// }
+
+		// var ModifiersStart = infos.Skill[input.SkillID].ModifiersStart;
+		// var ModifiersEnd = infos.Skill[input.SkillID].ModifiersEnd;
 			
-		client.character.state.Buffs[buffID] = {'Time': 600, 'Amount': 600};
-		client.write(client.character.state.getPacket());
+		// console.log(ModifiersStart);
+		// console.log(ModifiersEnd);
+
+		// client.character.state.Buffs[0] = {'Time': 600, 'Amount': 600};
+		// client.write(client.character.state.getPacket());
 		
 		// console.log("Preparing the buff");			
 		

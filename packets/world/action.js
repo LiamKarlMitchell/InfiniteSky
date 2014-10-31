@@ -129,6 +129,7 @@ WorldPC.ActionReplyPacket = restruct.
     int32lu('MaxChi').
     int32lu('CurrentChi'). // === 372
     struct('Buffs', Buff, 22).
+    
 int32lu('MonsterDisguise'). // The ID of a monster to disguise as
 
 int32lu('').
@@ -203,8 +204,9 @@ int32ls('DamageHP');
 console.log(WorldPC.ActionReplyPacket.size);
 
 function handleActionPacket(socket, action, update) {
-    socket.character.state.GlowItems = 5136;
-    socket.character.state.Unk = [36, 36];
+
+    // socket.character.state.GlowItems = 5136;
+    // socket.character.state.Unk = [36, 36];
     // return;
     // socket.character.state.GuildName = "";
     // socket.character.state.LeaderFlag = 0;
@@ -261,9 +263,11 @@ function handleActionPacket(socket, action, update) {
         //console.log('LocationNew: ' + JSON.stringify(action.LocationNew));
     //}
     // socket.sendInfoMessage('Action '+action.Skill+' recv');
-    if(socket.character.state.Running === undefined) socket.character.state.Running = false;
-    if (socket.character.state.CurrentHP > 0) {
 
+
+    
+    if (socket.character.state.CurrentHP > 0) {
+        socket.character.state.OldSkill = socket.character.state.Skill;
         socket.character.state.Stance = action.Stance;
         socket.character.state.Skill = action.Skill;
         //console.log(update,socket.character.state.Stance,socket.character.state.Skill);
@@ -271,17 +275,31 @@ function handleActionPacket(socket, action, update) {
         case 0:
             //console.log("Spawn");
             socket.character.state.Moving = false;
+            socket.character.state.Stands = false;
             break;
         case 1:
             //console.log(action);
             //console.log("Standing");
-            //console.log("Standing");
+            // console.log("Standing");
+            socket.character.state.Stands = true;
             socket.character.state.Moving = false;
             break;
         case 2:
             // console.log("Walking");
             socket.character.state.Moving = true;
+            socket.character.state.Stands = false;
             break;
+
+
+        case 3:
+        socket.character.state.FightingStance = true;
+        // This one needs to be set everyime we use offensive skill
+        break;
+
+        case 4:
+        socket.character.state.FightingStance = false;
+        break;
+
         case 5:
             console.log('Attack 5');
             break;
@@ -294,14 +312,20 @@ function handleActionPacket(socket, action, update) {
         case 33: 
             console.log('Fly');
             socket.character.state.Moving = true;
+            socket.character.state.Stands = false;
             break;
         case 32:
             //console.log('Run');
-            socket.character.state.Moving = true;
+            // if(socket.character.state.Stands){
+            //     socket.write(socket.character.state.getPacket());
+            // }
+
+
             break;  
         case 37: 
             //console.log('Come Down');
             socket.character.state.Moving = true;
+            socket.character.state.Stands = false;
             break;
             
         case 44:
@@ -314,6 +338,8 @@ function handleActionPacket(socket, action, update) {
         break;
 
         default: 
+            socket.character.state.Stands = true;
+            socket.character.state.Moving = false;
             socket.sendInfoMessage("Skill:("+action.Skill+") is not registered");
             break;
         }

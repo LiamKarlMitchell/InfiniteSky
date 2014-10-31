@@ -310,3 +310,43 @@ GMCommands.AddCommand(new Command('hit', 0, function(string, client) {
 	client.send2FUpdate();
 	// client.character.save();
 }));
+
+GMCommands.AddCommand(new Command('level', 0, function(string, client) {
+	// console.log("Hitting character");
+	// client.character.state.CurrentHP = (client.character.state.CurrentHP - 5000) <= 0 ? 0 : client.character.state.CurrentHP - 5000;
+	// client.send2FUpdate();
+	// client.character.save();
+
+	var totalExp = 0;
+	for(var i=1; i<146; i++){
+		console.log(i);
+		var expInfo = infos.Exp[i];
+		totalExp += expInfo.EXPEnd - expInfo.EXPStart;
+	}
+
+	console.log(totalExp);
+}));
+
+GMCommands.AddCommand(new Command('buffs', 0, function(string, client) {
+	// console.log("Hitting character");
+	// client.character.state.CurrentHP = (client.character.state.CurrentHP - 5000) <= 0 ? 0 : client.character.state.CurrentHP - 5000;
+	// client.send2FUpdate();
+	// client.character.save();
+	client.character.state.Buffs = {};
+	client.write(client.character.state.getPacket());
+}));
+
+GMCommands.AddCommand(new Command('clearskills', 0, function(string, client) {
+	// console.log("Hitting character");
+	// client.character.state.CurrentHP = (client.character.state.CurrentHP - 5000) <= 0 ? 0 : client.character.state.CurrentHP - 5000;
+	// client.send2FUpdate();
+	// client.character.save();
+	for(var i = 0; i < 30; i++){
+		console.log(i);
+		client.character.SkillList[i] = null;
+	}
+	client.character.markModified('SkillList');
+	client.character.save();
+	// client.character.state.Buffs = {};
+	// client.write(client.character.state.getPacket());
+}));

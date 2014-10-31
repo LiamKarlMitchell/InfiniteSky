@@ -218,8 +218,10 @@ LoginPC.Set(0x06, {
 			}
 
 			// newCharacter.updateInfos(true);
-			// newCharacter.Health = newCharacter.infos.HP;
-			// newCharacter.Chi = newCharacter.infos.Chi;
+			newCharacter.infos = new generic.characterStatsInfoObj(null, newCharacter);
+			newCharacter.infos.updateAll();
+			newCharacter.Health = newCharacter.infos.MaxHP;
+			newCharacter.Chi = newCharacter.infos.MaxChi;
 
 			db.getNextSequence('characterid', function(id) {
 				newCharacter._id = id;

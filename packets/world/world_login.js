@@ -164,18 +164,28 @@ WorldPC.Set(0x02, {
 		clearTimeout(socket.character.statsInterval);
 		socket.character.statsIntervalFunction = function(){
 			// console.log("Update interval " + socket.character.infos.MaxHP);
-			if(socket.character.infos.MaxHP > socket.character.Health){
-				var tick = 400;
-				socket.character.state.CurrentChi = (socket.character.state.CurrentChi+tick) > socket.character.infos.MaxChi ? socket.character.infos.MaxChi : (socket.character.state.CurrentChi+tick);
-				socket.character.state.CurrentHP = (socket.character.state.CurrentHP+tick) > socket.character.infos.MaxHP ? socket.character.infos.MaxHP : (socket.character.state.CurrentHP+tick);
+			var needUpdate = false;
+			if(socket.character.infos.MaxHP > socket.character.state.CurrentHP){
+				var HPTick = Math.round(socket.character.infos.MaxHP / 100);
+				socket.character.state.CurrentHP = (socket.character.state.CurrentHP+HPTick) > socket.character.infos.MaxHP ? socket.character.infos.MaxHP : (socket.character.state.CurrentHP+HPTick);
+				needUpdate = true;
+			}
+
+			if(socket.character.infos.MaxChi > socket.character.state.CurrentChi){
+				var ChiTick = Math.round(socket.character.infos.MaxChi / 100);
+				socket.character.state.CurrentChi = (socket.character.state.CurrentChi+ChiTick) > socket.character.infos.MaxChi ? socket.character.infos.MaxChi : (socket.character.state.CurrentChi+ChiTick);
+				needUpdate = true;
+			}
+
+			if(needUpdate){
 				socket.send2FUpdate();
 				socket.character.save();
 			}
 
-			socket.character.statsInterval = setTimeout(socket.character.statsIntervalFunction, 2000);
+			socket.character.statsInterval = setTimeout(socket.character.statsIntervalFunction, 5000);
 		};
 
-		socket.character.statsInterval = setTimeout(socket.character.statsIntervalFunction, 2000);
+		socket.character.statsInterval = setTimeout(socket.character.statsIntervalFunction, 5000);
 
 		socket.Zone.addSocket(socket);
 		//socket.character.state.Skill = 1;
