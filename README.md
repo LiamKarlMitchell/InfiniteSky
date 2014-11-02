@@ -21,7 +21,7 @@ InfiniteSky uses a number of open source projects to work properly:
 * [hexy] - hexdump, binary pretty-printing
 * [async] - Higher-order functions and common patterns for asynchronous code
 * [jshint] - Static analysis tool for JavaScript
-* [socket] - Socket is a connect clone for simple socket based applications
+* [socket] - Socket is a connect clone for simple socket based applicationsad
 * [netmask] - Parse and lookup IP network blocks
 * [node.js] - evented I/O for the backend
 * [mongodb] - A NoSQL DB that is awesome
@@ -90,7 +90,7 @@ Then type in the following commands.
 ```
 use ts1
 db.createCollection("ts1")
-db.addUser({user: "ts1", pwd: "ts1", roles: ["readWrite"]})
+db.createUser({user: "ts1", pwd: "ts1", roles: ["readWrite"]})
 ```
 
 ## Copy game files to data directorys you made
