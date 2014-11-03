@@ -3,7 +3,18 @@
 // For more information, see LICENCE in the main folder
 vms.depends({
     name: 'World Server',
-    depends: ['infos.Exp.Loaded', 'infos.Item.Loaded', 'infos.Npc.Loaded', 'infos.Skill.Loaded', 'db.Account', 'db.Character', 'Zone', 'packets']
+    depends: [
+    'Info_Exp',
+    'Info_Item',
+    'Info_Npc',
+    'Info_Skill',
+    'Zone',
+    'Packets',
+    'Character',
+    'Account',
+    'CVec3'
+    ]
+    // depends: ['infos.Exp.Loaded', 'infos.Item.Loaded', 'infos.Npc.Loaded', 'infos.Skill.Loaded', 'db.Account', 'db.Character', 'Zone', 'packets']
 }, function() {
     if(typeof(world) === 'undefined') {
         console.log('World server code loaded');
@@ -760,6 +771,7 @@ vms.depends({
                 if (world.Loaded === false) {
                     world.Loaded = true;
                     console.log('Finished loading zones!\nYou can now login to the server.');
+                    main.events.emit('ready');
                 }
             }
         } else {

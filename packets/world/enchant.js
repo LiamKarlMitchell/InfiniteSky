@@ -34,7 +34,7 @@ int32lu('InventoryEnchantIndex').
 int32lu('Price').
 int32lu('EnchantValue'); // 1 = 3 so 4 = 12% add
 
-console.log("Respond size: " + EnchantRespond.size);
+// console.log("Respond size: " + EnchantRespond.size);
 
 // Results:
 // 0 : Success

@@ -20,6 +20,6 @@ cli.eval.help = function CLI_Eval_help(input) {
   return 'A proof of concept command which can eval JS code.';
 };
 
-scripts_cli.unload.eval = function CLI_Unload_Eval() {
-  delete cli.eval;
-}
+// scripts_cli.unload.eval = function CLI_Unload_Eval() {
+//   delete cli.eval;
+// }

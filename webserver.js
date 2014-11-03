@@ -3,7 +3,7 @@
 // For more information, see LICENCE in the main folder
 vms.depends({
     name: 'Web Server',
-    depends: ['login','world']
+    depends: ['World Server','Login Server']
 }, function() {
     if(typeof(web) === 'undefined') {
         console.log('Loading Express');

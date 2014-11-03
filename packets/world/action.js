@@ -208,7 +208,7 @@ int32ls('DamageHP');
         
 // }
 
-console.log(WorldPC.ActionReplyPacket.size);
+// console.log(WorldPC.ActionReplyPacket.size);
 
 function handleActionPacket(socket, action, update) {
 

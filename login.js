@@ -2,16 +2,17 @@
 // Copyright (c) InfiniteSky Dev Teams - Licensed under GNU GPL
 // For more information, see LICENCE in the main folder
 
-vms.depends({name: 'Login Server', depends: [
-    'infos.Exp.Loaded',
-    'infos.Item.Loaded',
-    'infos.Skill.Loaded',
-    'db.Account',
-    'db.Character',
-    'CharacterState',
-    'world',
-    'packets'
-]
+vms.depends({
+    name: 'Login Server',
+    depends: [
+        'Info_Exp',
+        'Info_Item',
+        'Info_Skill',
+        'Account',
+        'Character',
+        'World Server',
+        'Packets'
+    ]
 }, function(){
 if (typeof(login) === 'undefined') {
     console.log('Login Server code loaded.');

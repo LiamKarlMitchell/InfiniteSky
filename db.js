@@ -3,7 +3,6 @@
 // For more information, see LICENCE in the main folder
 
 mongoose = require('mongoose');
-var vmscript = require('./vmscript');
 
 //Constructor
 // Handles connecting to the database
@@ -19,7 +18,10 @@ function DB(connectString) {
 	// When successfully connected
 	mongoose.connection.on('connected', function () {
 	  console.log('Database Connected');
-	  db.scripts = new vmscript('db','db');
+	  db.scripts = new vmscript('db','db', function(){
+		console.log('Clearing all accounts that are logged in.');
+		db.Account.logoutAll();
+	  });
 	  main.events.emit('db_connected');
 
 	  //console.log('Mongoose default connection open to ' + dbURI);

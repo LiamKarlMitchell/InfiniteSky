@@ -1,27 +1,27 @@
-
-vms.depends({name: 'Zone.js', depends: [
-    'infos.Npc',
-    'infos.Item',
-    'infos.Skill',
-    'db.Character',
-    'packets',
-    'QuadTree',
-    'packets',
-    'Npc',
-    'Monster',
-    'Item'
-]
-}, function(){
+Zone = function Zone(ID) {
+    this.ID = ID;
+    this.Init();
+};
 
 if(typeof(Zone_Prototype) === 'undefined') {
     Zone_Prototype = {};
 }
 
-Zone = function Zone(ID) {
-    this.ID = ID;
-    this.Init();
-};
 Zone.prototype = Zone_Prototype;
+
+vms.depends({
+	name: 'Zone',
+	depends: [
+	    'Info_Npc',
+	    'Info_Item',
+	    'Info_Skill',
+	    'Character',
+	    'Packets',
+	    'Info_Monster'
+	    // 'AIModule'
+    ]
+}, function(){
+
 
 
 // END OF NPC Definition
@@ -295,6 +295,7 @@ Zone_Prototype.clearItems = function() {
 Zone_Prototype.createMonster = function(spawninfo) {
 	//console.log('creating monster with spawninfo: ',spawninfo);
 	var mi = infos.Monster[spawninfo.ID];
+
 	if (mi == null) return null;
 	var monster = new Monster(mi);
 	if (monster == null) return null;
@@ -530,7 +531,7 @@ this.NPC.forEach(function(npc, index) {
 Zone_Prototype.Load = function(callback) {
     if(this.Loaded) {
         callback('Already Loaded');
-        console.log('Zone ' + this.ID + ' is already loaded.');
+        // console.log('Zone ' + this.ID + ' is already loaded.');
         return;
     }    
     // Start Loading world mesh
@@ -686,5 +687,4 @@ if (typeof(zones) !== 'undefined') {
 		zone.__proto__ = Zone_Prototype;
 	}
 }
-
 });

@@ -218,7 +218,7 @@ WorldPC.Set(0x08, {
 			socket.sendInfoMessage('Zone not found');
 		}
 
-
+		console.log(theIP + ":" + thePort + " Status: " + status);
 		socket.write(
 		new Buffer(
 		MapLoadReply.pack({

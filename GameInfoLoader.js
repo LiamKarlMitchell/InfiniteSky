@@ -11,13 +11,53 @@
 // TODO: Rewrite to use buffer rather than restuct as native code will be faster.
 
 var path = require('path');
+var events = require('events');
+
+global.TotalGameInfos = 0;
+global.TotalLoadedGameInfo = 0;
+global.LoadGameInfoTimeout = null;
+global.GameInfos = {};
+global.GameInfoEmmiter = null;
+global.GameInfosLoaded = false;
 
 function GameInfoLoader(filename, structure, onRecordFunction) {
-	this.Load(filename,structure,onRecordFunction);
+	events.EventEmitter.call(this);
+	if(!filename || !structure || !onRecordFunction){ 
+		global.GameInfoEmmiter = this;
+		return;
+	}
+	global.GameInfos[filename] = {filename: filename, structure: structure, onRecordFunction: onRecordFunction, initialized: false, self: this};
 	var self = this;
 	this.Reload = function() {
 		console.log('Note that this is a soft reload nothing is removed only overwritten.');
 		self.Load(filename,structure,onRecordFunction);
+	}
+
+	this.Total = 0;
+	this.Loaded = 0;
+	this.on('loaded', function(filename){
+		if(global.GameInfos[filename] && !global.GameInfos[filename].initialized){
+			global.GameInfos[filename].initialized = true;
+			global.TotalLoadedGameInfo++;
+		}
+		if(global.TotalLoadedGameInfo === global.TotalGameInfos){
+			if(global.GameInfosLoaded) return;
+			global.GameInfosLoaded = true;
+			global.GameInfoEmmiter.emit('load');
+		}
+	});
+	global.TotalGameInfos++;
+	clearTimeout(global.LoadGameInfoTimeout);
+	global.LoadGameInfoTimeout = setTimeout(function(){
+		self.LoadAll();
+	}, 1000);
+}
+
+GameInfoLoader.prototype.__proto__ = events.EventEmitter.prototype;
+
+GameInfoLoader.prototype.LoadAll = function(){
+	for(var i in global.GameInfos){
+		global.GameInfos[i].self.Load(global.GameInfos[i].filename,global.GameInfos[i].structure,global.GameInfos[i].onRecordFunction);
 	}
 }
 
@@ -92,7 +132,6 @@ GameInfoLoader.prototype.Load = function(filename, structure, onRecordFunction) 
 					dumpError(err);
 					return;
 				}
-				console.log('All '+filename+' records have been processed.');
 
 				var csvFile = '';
 				var columns = [];
@@ -120,8 +159,9 @@ GameInfoLoader.prototype.Load = function(filename, structure, onRecordFunction) 
 					//csvFile = 'Quest.csv';
 					//break;					
 					default:
+					self.emit('loaded', filename);
 					self.Loaded = true;
-					main.events.emit('gameinfo_loaded',filename);
+					// main.events.emit('gameinfo_loaded',filename);
 					return;
 					break;
 				}
@@ -131,8 +171,10 @@ GameInfoLoader.prototype.Load = function(filename, structure, onRecordFunction) 
 				fs.exists(filepath, function(exists) {
 					if (!exists) {
 						dumpError('Server cannot load "'+filepath+'" skipping translation csv.');
+						console.log('All '+filename+' records have been processed.');
+						self.emit('loaded', filename);
 						self.Loaded = true;
-						main.events.emit('gameinfo_loaded',filename);
+						// main.events.emit('gameinfo_loaded',filename);
 						return;
 					}
 					csv
@@ -159,9 +201,10 @@ GameInfoLoader.prototype.Load = function(filename, structure, onRecordFunction) 
 					 })
 					 .on("end", function(){
 					    self.Loaded = true;
-						main.events.emit('gameinfo_loaded',filename);
+					    console.log('All '+filename+' records have been processed.');
+						// main.events.emit('gameinfo_loaded',filename);
+						self.emit('loaded', filename);
 					 });
-
 				});
 
 			};

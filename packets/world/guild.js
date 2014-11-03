@@ -95,7 +95,7 @@ int32lu('Unk9');
 
 // pad(33);\
 
-console.log(onUseAccessoryOrInsignia.size);
+// console.log(onUseAccessoryOrInsignia.size);
 var accessoryReply = restruct.
 int8lu('PacketID').
 int32lu('ItemID').
@@ -263,7 +263,7 @@ int8lu('PacketID').
 string('Name', 13).
 int8lu('Result');
 
-console.log(inviteGuildRespond.size);
+// console.log(inviteGuildRespond.size);
 
 var inviteClientRespond = restruct.
 int8lu('PacketID').
@@ -272,7 +272,7 @@ string('Inviter', 13).
 string('GuildName', 13).
 pad(74);
 
-console.log(inviteClientRespond.size);
+// console.log(inviteClientRespond.size);
 
 WorldPC.Set(0x41, {
 	Restruct: restruct.string('GuildName', 13).int8lu('Result').pad(8),

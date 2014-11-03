@@ -9,7 +9,6 @@ var repl = require('repl');
 var vm = require('vm');
 var sys = require('sys')
 var exec = require('child_process').exec;
-var vmscript = require('./vmscript/vmscript');
 
 function handleShellOutput(error, stdout, stderr) { sys.puts(stdout) }
 

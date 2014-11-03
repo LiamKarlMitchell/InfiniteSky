@@ -3,14 +3,16 @@
 // https://www.youtube.com/watch?v=QigNwFntPSY
 
 vms.depends({Name: 'Npc', depends: [
-	'structs',
-	'AIObject',
-	'AttackerCollection',
-	'infos.Npc.Loaded'
+	'Structs',
+	// 'AIObject',
+	// 'AttackerCollection',
+	'Info_Npc'
 	] }, function() {
 if (typeof(Npc_Prototype)==='undefined') {
 	Npc_Prototype = {};
 }
+
+// console.log("test");
 
 Npc_Prototype.StatePacket = restruct.
 	int32lu('UniqueID').

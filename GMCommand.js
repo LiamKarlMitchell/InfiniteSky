@@ -30,8 +30,7 @@ var GMCommands = function() {
         //  	// Remove it from the Commands by using splice trick.
         // }
         this.Start = function() {
-            gmscripts = new vmscript('commands', 'commands');
-            main.events.emit('GMCommands_Started');
+            if(typeof(gmscripts) === 'undefined') gmscripts = new vmscript('commands', 'commands');
         }
         this.GetCommandInfo = function() {
             // Get the command info from db for setting levels of commands dynamically?
