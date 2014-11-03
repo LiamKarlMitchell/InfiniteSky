@@ -186,7 +186,7 @@ WorldPC.Set(0x02, {
 		};
 
 		socket.character.statsInterval = setTimeout(socket.character.statsIntervalFunction, 5000);
-				socket.character.state.BuffHS = {'Time': 100, 'Amount': 200, 'Stacks': 5};
+				// socket.character.state.BuffHS = {'Time': 100, 'Amount': 200, 'Stacks': 5};
 		socket.Zone.addSocket(socket);
 		//socket.character.state.Skill = 1;
 		//Username

@@ -198,7 +198,7 @@ WorldPC.Set(0x19, {
 				setTimeout(function(){
 					client.character.state.SkillInUse = false;
 					return applyBuffFunctionTimeout(client, input);
-				}, 2000);
+				}, 1500);
 			}
 
 

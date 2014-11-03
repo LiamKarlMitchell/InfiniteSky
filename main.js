@@ -169,9 +169,17 @@ function clearLoggedInAccounts() {
   console.log("Function clearLoggedInAccounts() is depracted");
 }
 
+var GameStep = require('./GameStep');
+
 main.events.once('ready', function(){
   var timeTookToLoad = (new Date().getTime() - begin) / 1000;
   console.log("Total loading time: " + timeTookToLoad + "s");
+  // var GameStep = require('./GameStep');
+  var gs = new GameStep(function(delta){
+   main.events.emit('step',delta);
+  });
+
+  gs.start();
 });
 
 // generic = new vmscript('generic','generic');

@@ -29,7 +29,8 @@ WorldPC.Set(0x08, {
 		// // Hopefully unknown1 or unknown2 will contain some info if we are using NPC or portal.
 		// // Used for NPC or Item Zones.
 		var SpecialZones = [
-		0,
+		0,1,2,3,4,5,6,7,8,9,10,11,12,13,15,16,17,18,19,20,21,34,38,39,40,43,46,49,50,55,56,59,71,72,73,74,75,78,89,81,82,83,84,88,90,91,92,93,95,96,94,98,101,104,105,
+		110,112,115,116,120,124,125,126,138,140,141,142,143,195,196,201,202,206,222,234,235,236,237,241,267,270,275,287,291,302,303,304,310,
 		// All Faction/Clan from Town
 		119, // Nangi
 		// Jinong from Yellow Gate Master in Town and Yongu
@@ -176,7 +177,7 @@ WorldPC.Set(0x08, {
 					// If we can get socket dynamically it would be best, but if not we will have to code it into the config, im cool with that.
 					// Status: 
 					// 0 - Good to go
-					// 1 - No game server you can connect to
+					// 1 - You cannot use this
 					// 2 - An Unknown Error has occured
 					// The Character State object for use in world for moving and health etc.
 					//socket.character.state.setFromCharacter(socket.character);
@@ -218,7 +219,7 @@ WorldPC.Set(0x08, {
 			socket.sendInfoMessage('Zone not found');
 		}
 
-		console.log(theIP + ":" + thePort + " Status: " + status);
+
 		socket.write(
 		new Buffer(
 		MapLoadReply.pack({

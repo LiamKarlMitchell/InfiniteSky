@@ -1378,6 +1378,7 @@ function handleActionPacket(socket, action, update) {
     }
 
     //if (socket.character.state.Skill!=1) {
+        // console.log("test");
         socket.Zone.sendToAllArea(socket, true, socket.character.state.getPacket(), config.viewable_action_distance);
     //}
 }
