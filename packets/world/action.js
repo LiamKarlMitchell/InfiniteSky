@@ -407,8 +407,7 @@ function handleActionPacket(socket, action, update) {
                             eyes.inspect(AttackPacket);
                             
                             other.character.state.CurrentHP -= AttackPacket.DamageHP;
-                            socket.giveEXP(AttackPacket.DamageHP);
-                            console.log("Client attacking monster " + other.character.state.HP + "::" + AttackPacket.TotalDamage);
+                            console.log("Client attacking cllient " + other.character.state.HP + "::" + AttackPacket.TotalDamage);
                             //socket.giveEXP(AttackPacket.TotalDamage); // Give HP relative to the damage we have done
                             
                             socket.Zone.sendToAllAreaLocation( socket.character.state.Location,packets.makeCompressedPacket(0x2C,new Buffer(WorldPC.AttackPacketReply.pack(AttackPacket))),config.viewable_action_distance );
@@ -464,6 +463,7 @@ function handleActionPacket(socket, action, update) {
 
                             AttackPacket.DamageHP = AttackPacket.TotalDamage;
                             monster.HP -= AttackPacket.TotalDamage;
+                            socket.giveEXP(AttackPacket.TotalDamage);
 
 
 // Things we could use from character infos
