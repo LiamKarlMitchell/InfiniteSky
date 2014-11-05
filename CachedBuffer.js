@@ -163,6 +163,7 @@ var CachedBuffer = function(packet_collection, options) {
                 // Reset to beginning of buffer to store data at
                 this.bufferLength = 0;
             }
+
             if(this.afterPacketsHandled) this.afterPacketsHandled();
         };
         this.on('data', function(newData) {

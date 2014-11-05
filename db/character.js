@@ -184,42 +184,50 @@ vms.depends({
 		// After dead probably set stance to 1 or 2 respectfully so that other players who see you don't see you constantly dieing?
 	}	
 
-	characterSchema.methods.giveEXP = function(exp) {
-		if (this.expinfo==null) return;
+	// characterSchema.methods.giveEXP = function(exp) {
+	// 	if (this.expinfo==null) return;
+	// 	this.Experience += exp;
 
-		this.do2FPacket=1; // Say we need to send update for exp/level/hp/chi
+	// 	var reminder = this.expinfo.EXPEnd- this.Experience;
+	// 	var levelGained = 0;
+	// 	while(reminder < 0){
+	// 		levelGained++;
+	// 		if((this.Level + levelGained) > 145){
+	// 			this.Experience = infos.Exp[145].EXPEnd;
+	// 			this.Level = 145;
+	// 			console.log("Exceeding the range of infos.Exp");
+	// 			return;
+	// 		}
+	// 		this.expinfo = infos.Exp[this.Level + levelGained];
+	// 		if(!this.expinfo){
+	// 			// console.log("No exp info somehow");
+	// 			return;
+	// 		}
+	// 		this.Experience += 1;
+	// 		reminder = (this.expinfo.EXPEnd - this.expinfo.EXPStart) + reminder;
+	// 	}
 
-		this.Experience += exp; // Max check etc
-		var LevelsGained = 0;
+	// 	this.SkillPoints += this.expinfo.SkillPoint;
+	// 	this.StatPoints += 5;
 
-		console.log('Giving '+this.Name+' lots of exp points: '+exp);
+	// 	this.Level += levelGained;
+	// 	client.write(new Buffer(respond.pack({
+	// 	    PacketID: 0x2E,
+	// 	    LevelsGained: 145,
+	// 	    CharacterID: client.character._id,
+	// 	    NodeID: client.node.id
+	// 	})));
 
-		//console.log(this.Experience,this.expinfo.EXPEnd);
-		//eyes.inspect(this.expinfo);
-		while(this.Experience>this.expinfo.EXPEnd)
-		{
-			// If at max level break out.
-			//console.log(this.Experience,expinfo.EXPEnd);
-			// Gained a Level
-			if (this.Level>105) return;
-			this.Level++;
-			LevelsGained++;
+	//     client.Zone.sendToAllArea(client, true, new Buffer(respond.pack({
+	// 	    PacketID: 0x2E,
+	// 	    LevelsGained: 145,
+	// 	    CharacterID: client.character._id,
+	// 	    NodeID: client.node.id
+	//     })), config.viewable_action_distance);
 
-			this.SkillPoints+=this.expinfo.SkillPoint;
-			this.StatPoints+=5; // Do per level statpoint giving here etc.
-
-			// Give the character statpoints and exp points required
-			// Need to store skill and statpoints in db too...
-
-			// Update stats eg MaxHP, MaxCHI Damage etc.
-
-			//this.expinfo = infos.Exp.getByLevel(this.Level);
-			//eyes.inspect(this);
-			characterSchema.methods.updateInfos.call(this,true);
-			if (this.expinfo==null) break; // Should cap Experience to startEXP?
-		}
-		return LevelsGained;
-	}
+	    
+	// 	return levelGained;
+	// }
 
 	characterSchema.methods.checkItemSlotFree = function(Column,Row,SlotSize,ItemID) {
 		console.log('Checking Slots Free for Column: '+Column+' Row: '+Row+' SlotSize: '+SlotSize);

@@ -1037,10 +1037,10 @@ vms.depends({
 
     //2E For level up animation
     packets.LevelUpPacket = restruct.
-        int8lu('PacketID').
-        int32lu('ID1').
-        int32lu('ID2').
-        int8lu('Levels');
+int8lu('PacketID').
+int32lu('CharacterID').
+int32lu('NodeID').
+int8lu('LevelsGained');
 
     // Adding statpoint to Str
     // 1200 0000 3d00 0000 1603 0000 0001 0000
@@ -1070,5 +1070,9 @@ vms.depends({
     // 00000050: 0000 ffff ffff 0100 0000 0000 0000 0000  ..????..........
     // 00000060: 0000 0000 0000 0000 0000 0000 0000 0000  ................
     // 00000070: 0000 0300 3842 0000 0000 0000 0000       ....8B........
+
+    packets.WorldServerInfoPacket = restruct.
+    int8lu('packetID').
+    string('encdata',16);
 
 });

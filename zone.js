@@ -153,6 +153,8 @@ Zone_Prototype.sendToAll = function(buffer) {
 };
 
 Zone_Prototype.sendToAllArea = function(origional, sendtoself, buffer, distance) {
+	// console.log(origional);
+
     this.Clients.forEach(function(client) {
         if(client.authenticated == false || !client._handle) return;
         if(sendtoself == false && client == origional) return;

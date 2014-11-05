@@ -721,6 +721,7 @@ ItemActions[0x0C] = function Recv_Use_item(client, input) {
         client.character.state.CurrentChi = client.character.infos.MaxChi;
         client.character.state.CurrentHP = client.character.infos.MaxHP;
         console.log(client.character.infos.MaxHP);
+        console.log(client.send2FUpdate.toString());
         client.send2FUpdate();
     //}
     clientWriteItemActionFailed(client, input);
