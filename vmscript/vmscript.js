@@ -27,7 +27,7 @@ var fspath = require('path');
 // var hound = require('hound');
 
 var util = require('util');
-// var jshint = require('jshint').JSHINT;
+var jshint = require('jshint').JSHINT;
 var events = require('events');
 
 
@@ -378,6 +378,12 @@ vms_prototype.loadFile = function(file){
     }catch(e){
       // dumpError(e);
       console.log(e);
+      if (!jshint(data.toString())) {
+        for (var i=0;i<jshint.errors.length;i++) {
+          var e = jshint.errors[i];
+          console.log(colors.orange("[VMS] jshint error #"+(i+1)) + colors.info(" Line: "+e.line+" Col: "+e.character+" "+e.reason));
+        }
+      }
     }
 
     if(loaded_all_directories){

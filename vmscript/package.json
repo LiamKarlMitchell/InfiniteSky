@@ -23,7 +23,7 @@
   },
   "homepage": "http://liamkarlmitchell.github.io/VMScript/",
   "dependencies": {
-    "chokidar": "^0.8.2",
-    "jshint": "^2.5.0"
+    "jshint": "^2.5.0",
+    "cli-color": "*"
   }
 }
