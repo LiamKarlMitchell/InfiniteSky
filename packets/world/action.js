@@ -35,12 +35,13 @@ var size = restruct.
     string('Child',packets.CharName_Length+1).
     int8lu('UnknownI1').
     int32lu('FactionCapeThing').
-    int32lu('UnknownI2').
+    int32lu('t').
     int32lu('TraitorFlag').
-    int32lu('UnknownI3').
-    int32lu('UnknownI4').
+    int32lu('t').
+    int32lu('t').
     int32lu('GlowItems').
-    int32lu('UnknownI5',2).
+    int32lu('t').
+    int32lu('t').
     int32lu('Clan').
     int32lu('Gender').
     int32lu('Hair').
@@ -56,13 +57,13 @@ var size = restruct.
     struct('CalbashBottle', structs.Equipt).
     struct('Weapon', structs.Equipt).
     struct('Pet', structs.Pet).
-    int32lu('Unknown5').
+    int32lu('t').
     string('GuildName',packets.GuildName_Length+1). // 24
-    int32lu('test1'). // 20
-    int32lu('test2'). // 16
-    int32lu('test3'). // 12
-    int32lu('test4'). // 12
-    int32lu('test5'). // 8
+    int32lu('t').
+    int32lu('t').
+    int32lu('t').
+    int32lu('t').
+    int32lu('t').
     int8lu('test6').
     int8lu('test7').
     int8lu('test8');
@@ -84,11 +85,17 @@ WorldPC.ActionReplyPacket = restruct.
     string('Child',packets.CharName_Length+1).
     int8lu('Unk', 1).
     int32lu('FactionCapeThing').
-    int32lu('Unk', 1).
+    int32lu('t').
     int32lu('TraitorFlag').
-    int32lu('Unk', 2).
+    int32lu('t').
+
+    int32lu('decHead').
+
     int32lu('GlowItems').
-    int32lu('Unk',2).
+
+    int32lu('decBody').
+    int32lu('decShoulders').
+
     int32lu('Clan').
     int32lu('Gender').
     int32lu('Hair').
@@ -104,7 +111,7 @@ WorldPC.ActionReplyPacket = restruct.
     struct('CalbashBottle', structs.Equipt).
     struct('Weapon', structs.Equipt).
     struct('Pet', structs.Pet).
-    int32lu(''). 
+    int32lu('applyGlowItems').
     string('GuildName',packets.GuildName_Length+1).
     int8lu('', 3).
     int32lu('LeaderFlag').
@@ -123,8 +130,8 @@ WorldPC.ActionReplyPacket = restruct.
     float32l('Direction').
     int32lu('nodeID').
     int32lu('TargetID').
-    int32lu('').
-    int32lu('').
+    int8lu('t', 4).
+    int8lu('t', 4).
     int32lu('SkillID').
     int32lu('SkillLevel').
     struct('LocationNew',structs.CVec3).
@@ -139,8 +146,8 @@ WorldPC.ActionReplyPacket = restruct.
 
 int32lu('MonsterDisguise'). // The ID of a monster to disguise as
 
-int32lu('').
-int32lu('').
+int8lu('t', 4).
+int8lu('t', 4).
 
 int8lu('dueling').
 int8lu('duel_challenger'). // 0 blue 1 gold
@@ -211,6 +218,24 @@ int32ls('DamageHP');
 // console.log(WorldPC.ActionReplyPacket.size);
 
 function handleActionPacket(socket, action, update) {
+    socket.character.state.GlowItems = 0;
+
+    // socket.character.state.FactionCapeThing = 2;
+    // socket.character.state.t = [0,0,0,1];
+
+
+    socket.character.state.applyGlowItems = 1;
+
+    socket.character.state.decHead = 2;
+    // socket.character.state.decShoulders = 2;
+    // socket.character.state.decBody = 2;
+
+    // int32lu('decHead').
+
+    // int32lu('GlowItems').
+
+    // int32lu('decShoulders').
+    // int32lu('decBody').
 
     // socket.character.state.GlowItems = 5136;
     // socket.character.state.Unk = [36, 36];

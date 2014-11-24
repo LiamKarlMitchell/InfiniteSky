@@ -86,7 +86,7 @@ var onUseAccessoryOrInsignia = restruct.
 int32lu('Unk2').
 int8lu('Unk1').
 int32lu('Unk3').
-int32lu('Unk4').
+int32lu('LevelRequired').
 int32lu('Unk5').
 int32lu('Unk6').
 int32lu('Unk7').
@@ -119,10 +119,10 @@ WorldPC.Set(0x43, {
 	function: function(client, input){
 		console.log("Starting debug of Accessory use or Guild Insignia");
 		console.log(input);
-		client.write(new Buffer(accessoryReply.pack({
-			PacketID: 0x7E,
-			ItemID: 99180
-		})));
+		// client.write(new Buffer(accessoryReply.pack({
+		// 	PacketID: 0x7E,
+		// 	ItemID: 99180
+		// })));
 	}
 });
 
