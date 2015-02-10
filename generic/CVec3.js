@@ -64,6 +64,12 @@ vms.depends({
 				);
 		},
 
+		moveInDirection: function CVec3_moveInDirection( distance, angle )
+		{
+		   this.X += distance * cos(angle);
+           this.Y += distance * sin(angle);
+		}
+
 		getDistance: function CVec3_getDistance(other) {
 			return Math.abs(this.getDifference(other));
 		},

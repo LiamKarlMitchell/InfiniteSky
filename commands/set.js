@@ -149,136 +149,154 @@ GMCommands.AddCommand(new Command('set',60,function command_set(string,client){
 				sendCharUpdate = true;
 			break;
 			case 'ring':
-				var ii = infos.Item[Value];
-				if (!ii) {
-					client.sendInfoMessage(Value+' is not a valid Item.');
-					break;
-				}
-				if (ii.ItemType !== infos.Item.Type.Ring) {
-					client.sendInfoMessage('Item is not valid Type for this slot.');
-					break;
+				if (Value != 0) {
+					var ii = infos.Item[Value];
+					if (!ii) {
+						client.sendInfoMessage(Value+' is not a valid Item.');
+						break;
+					}
+					if (ii.ItemType !== infos.Item.Type.Ring) {
+						client.sendInfoMessage('Item is not valid Type for this slot.');
+						break;
+					}
 				}
 				client.character.Ring = { ID: Value, Enchant: Value2, Combine: Value3 };
 				client.character.save();
 				sendCharUpdate = true;
 			break;
 			case 'cape':
-				var ii = infos.Item[Value];
-				if (!ii) {
-					client.sendInfoMessage(Value+' is not a valid Item.');
-					break;
-				}
-				if (ii.ItemType !== infos.Item.Type.Cape) {
-					client.sendInfoMessage('Item is not valid Type for this slot.');
-					break;
+				if (Value != 0) {
+					var ii = infos.Item[Value];
+					if (!ii) {
+						client.sendInfoMessage(Value+' is not a valid Item.');
+						break;
+					}
+					if (ii.ItemType !== infos.Item.Type.Cape) {
+						client.sendInfoMessage('Item is not valid Type for this slot.');
+						break;
+					}
 				}
 				client.character.Cape = { ID: Value, Enchant: Value2, Combine: Value3 };
 				client.character.save();
 				sendCharUpdate = true;
 			break;
 			case 'armor':
-				var ii = infos.Item[Value];
-				if (!ii) {
-					client.sendInfoMessage(Value+' is not a valid Item.');
-					break;
-				}
-				if (ii.ItemType !== infos.Item.Type.Armor) {
-					client.sendInfoMessage('Item is not valid Type for this slot.');
-					break;
+				if (Value != 0) {
+					var ii = infos.Item[Value];
+					if (!ii) {
+						client.sendInfoMessage(Value+' is not a valid Item.');
+						break;
+					}
+					if (ii.ItemType !== infos.Item.Type.Armor) {
+						client.sendInfoMessage('Item is not valid Type for this slot.');
+						break;
+					}
 				}
 				client.character.Armor = { ID: Value, Enchant: Value2, Combine: Value3 };
 				client.character.save();
 				sendCharUpdate = true;
 			break;
 			case 'gloves':
-				var ii = infos.Item[Value];
-				if (!ii) {
-					client.sendInfoMessage(Value+' is not a valid Item.');
-					break;
-				}
-				if (ii.ItemType !== infos.Item.Type.Gloves) {
-					client.sendInfoMessage('Item is not valid Type for this slot.');
-					break;
+				if (Value != 0) {
+					var ii = infos.Item[Value];
+					if (!ii) {
+						client.sendInfoMessage(Value+' is not a valid Item.');
+						break;
+					}
+					if (ii.ItemType !== infos.Item.Type.Gloves) {
+						client.sendInfoMessage('Item is not valid Type for this slot.');
+						break;
+					}
 				}
 				client.character.Glove = { ID: Value, Enchant: Value2, Combine: Value3 };
 				client.character.save();
 				sendCharUpdate = true;
 			break;
 			case 'amulet':
-				var ii = infos.Item[Value].Necklace;
-				if (!ii) {
-					client.sendInfoMessage(Value+' is not a valid Item.');
-					break;
-				}
-				if (ii.ItemType !== infos.Item.Type) {
-					client.sendInfoMessage('Item is not valid Type for this slot.');
-					break;
+				if (Value != 0) {
+					var ii = infos.Item[Value].Necklace;
+					if (!ii) {
+						client.sendInfoMessage(Value+' is not a valid Item.');
+						break;
+					}
+					if (ii.ItemType !== infos.Item.Type) {
+						client.sendInfoMessage('Item is not valid Type for this slot.');
+						break;
+					}
 				}
 				client.character.Amulet = { ID: Value, Enchant: Value2, Combine: Value3 };
 				client.character.save();
 				sendCharUpdate = true;
 			break;
 			case 'boots':
-				var ii = infos.Item[Value];
-				if (!ii) {
-					client.sendInfoMessage(Value+' is not a valid Item.');
-					break;
-				}
-				if (ii.ItemType !== infos.Item.Type.Boots) {
-					client.sendInfoMessage('Item is not valid Type for this slot.');
-					break;
+				if (Value != 0) {
+					var ii = infos.Item[Value];
+					if (!ii) {
+						client.sendInfoMessage(Value+' is not a valid Item.');
+						break;
+					}
+					if (ii.ItemType !== infos.Item.Type.Boots) {
+						client.sendInfoMessage('Item is not valid Type for this slot.');
+						break;
+					}
 				}
 				client.character.Boot = { ID: Value, Enchant: Value2, Combine: Value3 };
 				client.character.save();
 				sendCharUpdate = true;
 			break;
 			case 'bottle':
-				var ii = infos.Item[Value];
-				if (!ii) {
-					client.sendInfoMessage(Value+' is not a valid Item.');
-					break;
-				}
-				if (ii.ItemType !== infos.Item.Type.Bottle) {
-					client.sendInfoMessage('Item is not valid Type for this slot.');
-					break;
+				if (Value != 0) {
+					var ii = infos.Item[Value];
+					if (!ii) {
+						client.sendInfoMessage(Value+' is not a valid Item.');
+						break;
+					}
+					if (ii.ItemType !== infos.Item.Type.Bottle) {
+						client.sendInfoMessage('Item is not valid Type for this slot.');
+						break;
+					}
 				}
 				client.character.CalbashBottle = { ID: Value, Enchant: Value2, Combine: Value3 };
 				client.character.save();
 				sendCharUpdate = true;
 			break;
 			case 'weapon':
-				var ii = infos.Item[Value];
-				if (!ii) {
-					client.sendInfoMessage(Value+' is not a valid Item.');
-					break;
-				}
+				if (Value != 0) {
+					var ii = infos.Item[Value];
+					if (!ii) {
+						client.sendInfoMessage(Value+' is not a valid Item.');
+						break;
+					}
 
-				if (!(
-					ii.ItemType === infos.Item.Type.Sword ||
-					ii.ItemType === infos.Item.Type.Blade ||
-					ii.ItemType === infos.Item.Type.Marble ||
-					ii.ItemType === infos.Item.Type.Katana ||
-					ii.ItemType === infos.Item.Type.DoubleBlade ||
-					ii.ItemType === infos.Item.Type.Lute ||
-					ii.ItemType === infos.Item.Type.LightBlade ||
-					ii.ItemType === infos.Item.Type.LongSpear ||
-					ii.ItemType === infos.Item.Type.Scepter)) {
-					client.sendInfoMessage('Item is not valid Type for this slot.');
-					break;
+					if (!(
+						ii.ItemType === infos.Item.Type.Sword ||
+						ii.ItemType === infos.Item.Type.Blade ||
+						ii.ItemType === infos.Item.Type.Marble ||
+						ii.ItemType === infos.Item.Type.Katana ||
+						ii.ItemType === infos.Item.Type.DoubleBlade ||
+						ii.ItemType === infos.Item.Type.Lute ||
+						ii.ItemType === infos.Item.Type.LightBlade ||
+						ii.ItemType === infos.Item.Type.LongSpear ||
+						ii.ItemType === infos.Item.Type.Scepter)) {
+						client.sendInfoMessage('Item is not valid Type for this slot.');
+						break;
+					}
 				}
 				client.character.Weapon = { ID: Value, Enchant: Value2, Combine: Value3 };
 				client.character.save();
 				sendCharUpdate = true;
 			break;
 			case 'pet':
-				var ii = infos.Item[Value];
-				if (!ii) {
-					client.sendInfoMessage(Value+' is not a valid Item.');
-					break;
-				}
-				if (ii.ItemType !== infos.Item.Type.Pet) {
-					client.sendInfoMessage('Item is not valid Type for this slot.');
-					break;
+				if (Value != 0) {
+					var ii = infos.Item[Value];
+					if (!ii) {
+						client.sendInfoMessage(Value+' is not a valid Item.');
+						break;
+					}
+					if (ii.ItemType !== infos.Item.Type.Pet) {
+						client.sendInfoMessage('Item is not valid Type for this slot.');
+						break;
+					}
 				}
 				client.character.Pet = { ID: Value, Enchant: Value2, Combine: Value3 };
 				client.character.save();
