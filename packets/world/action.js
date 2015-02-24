@@ -68,6 +68,8 @@ var size = restruct.
     int8lu('test7').
     int8lu('test8');
 
+    // console.log(size.size);
+
 var Buff = restruct.
 int16lu('Amount').
 int16lu('Time');
@@ -144,31 +146,31 @@ WorldPC.ActionReplyPacket = restruct.
     struct('BuffHS', BuffHS).
     struct('Buffs2', Buff, 7).
 
-int32lu('MonsterDisguise'). // The ID of a monster to disguise as
+    int32lu('MonsterDisguise'). // The ID of a monster to disguise as
 
-int8lu('t', 4).
-int8lu('t', 4).
+    int8lu('t', 4).
+    int8lu('t', 4).
 
-int8lu('dueling').
-int8lu('duel_challenger'). // 0 blue 1 gold
-int8lu('Unk1', 1).
-int8lu('Store'). // 0 none 1 open 2 open but empty
+    int8lu('dueling').
+    int8lu('duel_challenger'). // 0 blue 1 gold
+    int8lu('Unk1', 1).
+    int8lu('Store'). // 0 none 1 open 2 open but empty
 
 
-string('StoreName', 28).
-struct('StoreItems', WorldPC.personalShopItem, 25).
-int8lu('Unk1', 8).
-int32lu('DisplayBuffs').
-int32lu('Unk1', 1).
-int32lu('Unk1', 1). // 130
-int32lu('Unk1', 1).
-int32lu('Unk1', 1).
-int32lu('Unk1', 1).
-int32lu('Unk1', 1).
-int32lu('Unk1', 1). // 135
-int32lu('Unk1', 1).
-int32lu('Unk1', 1).
-int32lu('Unk1', 1);
+    string('StoreName', 28).
+    struct('StoreItems', WorldPC.personalShopItem, 25).
+    int8lu('Unk1', 8).
+    int32lu('DisplayBuffs').
+    int32lu('Unk1', 1).
+    int32lu('Unk1', 1). // 130
+    int32lu('Unk1', 1).
+    int32lu('Unk1', 1).
+    int32lu('Unk1', 1).
+    int32lu('Unk1', 1).
+    int32lu('Unk1', 1). // 135
+    int32lu('Unk1', 1).
+    int32lu('Unk1', 1).
+    int32lu('Unk1', 1);
 
 WorldPC.AttackPacket = restruct.
 int8lu('PacketID').
@@ -1368,6 +1370,17 @@ function handleActionPacket(socket, action, update) {
         socket.character.state.Location.X = action.Location.X;
         socket.character.state.Location.Y = action.Location.Y;
         socket.character.state.Location.Z = action.Location.Z;
+// console.log(action.Location.X);
+// console.log(action.Location.Y);
+// console.log(action.Location.Z);
+
+
+        // socket.character.RealX = action.Location.X;
+        // socket.character.RealY = action.Location.Y;
+        // socket.character.RealZ = action.Location.Z;
+
+
+
         //console.log(socket.character.state.Location.toString());
         //var y = socket.Zone.GetY(socket.character.state.Location.X, socket.character.state.Location.Z);
         //console.log(socket.character.state.Location.Y+' '+y);
@@ -1376,15 +1389,16 @@ function handleActionPacket(socket, action, update) {
         socket.character.state.LocationTo.Y = action.LocationTo.Y;
         socket.character.state.LocationTo.Z = action.LocationTo.Z;
 
+
         socket.character.state.Direction = action.Direction; //action.Direction;
         socket.character.state.FacingDirection = action.FacingDirection;
 
         socket.character.state.nodeID = action.nodeID;
         socket.character.state.TargetID = action.TargetID;
 
-        socket.character.state.LocationNew.X = action.LocationNew.X;
-        socket.character.state.LocationNew.Y = action.LocationNew.Y;
-        socket.character.state.LocationNew.Z = action.LocationNew.Z;
+        // socket.character.state.LocationNew.X = action.LocationNew.X;
+        // socket.character.state.LocationNew.Y = action.LocationNew.Y;
+        // socket.character.state.LocationNew.Z = action.LocationNew.Z;
 
     } else {
         socket.character.state.Frame = action.Frame;
@@ -1408,26 +1422,26 @@ function handleActionPacket(socket, action, update) {
     //}
 }
 
-WorldPC.Set(0x03, {
-    Restruct: WorldPC.ActionPacket,
+// WorldPC.Set(0x03, {
+//     Restruct: WorldPC.ActionPacket,
 
-    function: function HandleStartAction(socket, action) {
-        handleActionPacket(socket, action, 0);
-    }
-});
+//     function: function HandleStartAction(socket, action) {
+//         handleActionPacket(socket, action, 0);
+//     }
+// });
 
-WorldPC.Set(0x04, {
-    Restruct: WorldPC.ActionPacket,
+// WorldPC.Set(0x04, {
+//     Restruct: WorldPC.ActionPacket,
 
-    function: function HandleDuringAction(socket, action) {
-        handleActionPacket(socket, action, 1);
-    }
-});
+//     function: function HandleDuringAction(socket, action) {
+//         handleActionPacket(socket, action, 1);
+//     }
+// });
 
-WorldPC.Set(0x05, {
-    Restruct: WorldPC.ActionPacket,
+// WorldPC.Set(0x05, {
+//     Restruct: WorldPC.ActionPacket,
 
-    function: function HandleEndAction(socket, action) {
-        handleActionPacket(socket, action, 2);
-    }
-});
+//     function: function HandleEndAction(socket, action) {
+//         handleActionPacket(socket, action, 2);
+//     }
+// });

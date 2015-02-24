@@ -46,7 +46,7 @@ vms.depends({
     } else {
         console.log('World server code reloaded');
     }
-    // zones is an object which will contain references to each zone object by its id.
+    // zones is an object which will contain refeences to each zone object by its id.
     if(typeof(zones) === 'undefined') {
         zones = {};
     }    

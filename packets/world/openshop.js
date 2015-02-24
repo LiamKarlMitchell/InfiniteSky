@@ -346,6 +346,7 @@ WorldPC.Set(0x36, {
 		}
 
 		client.character.Silver -= soldInventoryObj.Price;
+    	seller.character.Silver += soldInventoryObj.Price;
 
 		seller.character.Shop.UpdateState();
 
@@ -377,9 +378,6 @@ WorldPC.Set(0x36, {
 	        Amount: 1,
 	        Result: 0
 	    })));
-
-	    console.log(soldInventoryObj);
-
 
 	    var priceReminder = soldInventoryObj.Price - 1;
 

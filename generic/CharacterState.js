@@ -188,6 +188,8 @@ vms.depends({
 
 	// Returns a compressed packet for us to send to whomever
 	CharacterState_Prototype.getPacket = function() {	
+		// console.log("test");
+		this.Frame += 0;
 		return packets.makeCompressedPacket(0x18,new Buffer(WorldPC.ActionReplyPacket.pack(this)));
 	};
 

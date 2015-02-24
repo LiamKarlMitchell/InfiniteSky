@@ -5,43 +5,100 @@
 /////////////////////////////////////////////////////////////
 // Command: test
 // Used to test
-GMCommands.AddCommand(new Command('test', 80, function(string, client) {
 
-function clientWriteItemActionSuccess(client, input){
-    client.write(new Buffer(packets.ItemActionReplyPacket2.pack({
-        PacketID: 0x2B,
-        ActionType: input.ActionType,
-        ItemUniqueID: input.ItemUniqueID,
-        ItemUniqueID2: input.ItemUniqueID2,
-        ItemID: input.ItemID,
-        Unknown3: input.Unknown3,
-        Unknown4: input.Unknown4,
-        Unknown5: input.Unknown5,
-        Amount: input.Amount,
-        InventoryIndex: input.InventoryIndex,
-        RowDrop: input.RowDrop,
-        ColumnPickup: input.ColumnPickup,
-        RowPickup: input.RowPickup,
-        ColumnMove: input.ColumnMove,
-        RowMove: input.RowMove,
-        Failed: 0
-    })));
-}
-// 11 - Move from bank too inventory ? - Uses move
-// 12 - Reply to using item
-// 14 - Cancled
-// 16 - Item has been obtained - Uses move
-clientWriteItemActionSuccess(client, { ActionType: 2, ItemID: 8, InventoryIndex: 5} );
-clientWriteItemActionSuccess(client, { ActionType: 0, ItemID: 8, InventoryIndex: 5,
+	var testResponse = restruct.
+	int8lu('PacketID').
+    int8lu('Result').
+	int32lu('NodeID').
+    int32lu('CharacterID').
+    int32lu('SkillID').
+    int32lu('SkillLevel').
+    int32lu('Unk', 21);
 
-ItemUniqueID: 1,
-ItemUniqueID2: 1,
-RowDrop: 5,
-ColumnPickup: 5,
-RowPickup: 5,
-ColumnMove: 3,
-RowMove: 5
- });
+
+    //     int32lu('Stance').
+    // int32lu('Skill').
+    // float32l('Frame').
+    // struct('Location',structs.CVec3).
+    // struct('LocationTo',structs.CVec3).
+    // float32l('Direction').
+    // int32lu('nodeID').
+    // int32lu('TargetID').
+    // int8lu('t', 4).
+    // int8lu('t', 4).
+    // int32lu('SkillID').
+    // int32lu('SkillLevel').
+    // struct('LocationNew',structs.CVec3).
+    // float32l('FacingDirection').
+    // int32lu('MaxHP').
+    // int32lu('CurrentHP').
+    // int32lu('MaxChi').
+    // int32lu('CurrentChi'). // === 372
+    // struct('Buffs', Buff, 14). //22
+    // struct('BuffHS', BuffHS).
+    // struct('Buffs2', Buff, 7).
+
+console.log(testResponse.size);
+
+GMCommands.AddCommand(new Command('test', 0, function(string, client) {
+
+
+	client.Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.viewable_action_distance);
+
+	// console.log(client.character);
+	// console.log(client.character.node.id);
+	// var unkFill = [];
+
+	// for(var i = 0; i < 102; i++){
+	// 	unkFill[i] = 1;
+	// }
+
+	// client.write(new Buffer(testResponse.pack({
+	// 	PacketID: 0x19,
+	// 	Result: 1,
+	//     NodeID: client.node.id,
+	//     CharacterID: client.character._id,
+	//     Frame: client.character.state.Frame,
+	//     Unk: unkFill
+	// })));
+
+
+
+// function clientWriteItemActionSuccess(client, input){
+//     client.write(new Buffer(packets.ItemActionReplyPacket2.pack({
+//         PacketID: 0x2B,
+//         ActionType: input.ActionType,
+//         ItemUniqueID: input.ItemUniqueID,
+//         ItemUniqueID2: input.ItemUniqueID2,
+//         ItemID: input.ItemID,
+//         Unknown3: input.Unknown3,
+//         Unknown4: input.Unknown4,
+//         Unknown5: input.Unknown5,
+//         Amount: input.Amount,
+//         InventoryIndex: input.InventoryIndex,
+//         RowDrop: input.RowDrop,
+//         ColumnPickup: input.ColumnPickup,
+//         RowPickup: input.RowPickup,
+//         ColumnMove: input.ColumnMove,
+//         RowMove: input.RowMove,
+//         Failed: 0
+//     })));
+// }
+// // 11 - Move from bank too inventory ? - Uses move
+// // 12 - Reply to using item
+// // 14 - Cancled
+// // 16 - Item has been obtained - Uses move
+// clientWriteItemActionSuccess(client, { ActionType: 2, ItemID: 8, InventoryIndex: 5} );
+// clientWriteItemActionSuccess(client, { ActionType: 0, ItemID: 8, InventoryIndex: 5,
+
+// ItemUniqueID: 1,
+// ItemUniqueID2: 1,
+// RowDrop: 5,
+// ColumnPickup: 5,
+// RowPickup: 5,
+// ColumnMove: 3,
+// RowMove: 5
+ // });
 
 	// client.sendInfoMessage(JSON.stringify(vmscript.getNamespace('generic')));
 	// var cvars = generic.Modifiers[client.character.Clan];

@@ -83,7 +83,7 @@ int32lu('Unk2').
 int32lu('Unk3');
 
 var onUseAccessoryOrInsignia = restruct.
-int32lu('Unk2').
+int16lu('Unk2', 2).
 int8lu('Unk1').
 int32lu('Unk3').
 int32lu('LevelRequired').
