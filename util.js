@@ -25,7 +25,7 @@ var util = {
 
   logHex: function(data) {
     console.log(hexy(data));
-    
+
     // console.log("\n");
     // var testSplit = data.toString("hex");
     // testSplit = testSplit.match(/../g);
@@ -43,6 +43,11 @@ var util = {
     // }
   },
 
+    // If for some reason an IPv6 address is given we want to strip off the
+    // junk and just get our IPv4 address
+    cleanIP: function(ip) {
+      return ip.substr(ip.lastIndexOf(':')+1);
+    },
 
   setupUncaughtExceptionHandler: function () {
     process.on('uncaughtException',function(exception) {

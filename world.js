@@ -49,13 +49,13 @@ vms.depends({
     // zones is an object which will contain refeences to each zone object by its id.
     if(typeof(zones) === 'undefined') {
         zones = {};
-    }    
+    }
     world.GameStep = function(delta) {
         // Do something with delta
         // console.log('Delta: '+delta);
     };
     world.connection = function(socket) {
-        console.log("Client #" + world.clientID + " connected from IP " + socket.remoteAddress);
+        console.log("Client #" + world.clientID + " connected from IP " + _util.cleanIP(socket.remoteAddress));
         socket.clientID = world.clientID;
         world.clientID++;
         socket.authenticated = false;
@@ -405,12 +405,12 @@ vms.depends({
                 // if so send it servers lan ip and port
                 // otherwise send it real world ip and port
                 theIP = config.externalIP;
-                if(this.remoteAddress.indexOf('127') == 0) {
+                if(_util.cleanIP(this.remoteAddress).indexOf('127') == 0) {
                     theIP = '127.0.0.1'
                 }
                 console.log('IP for client to connect too before translation: ' + theIP);
                 for(var i = 0; i < natTranslations.length; i++) {
-                    if(natTranslations[i].contains(this.remoteAddress)) {
+                    if(natTranslations[i].contains(_util.cleanIP(this.remoteAddress))) {
                         theIP = natTranslations[i].ip;
                         break;
                     }
@@ -510,7 +510,7 @@ vms.depends({
         socket.on('close', function() {
             console.log('Client #' + socket.clientID + ' closed connection');
             console.log('world.js needs to remove socket from zone it is in too. and tell all party/guild its offline etc');
-            
+
             if(socket.character.Party){
                 console.log("Was in party...");
                 if(socket.character.Party.leader.character.Name === socket.character.Name){
@@ -519,7 +519,7 @@ vms.depends({
                     socket.character.Party.logoutCharacter(socket.character.Name);
                 }
             }
-            
+
             removeDisconnectedCharacter.call(socket);
             //Let client know how many people are playing on server
             try {
@@ -540,10 +540,10 @@ vms.depends({
                 return;
             }
 
-            
+
             this.character.Health = this.character.state.CurrentHP;
             this.character.Chi = this.character.state.CurrentChi;
-            
+
             // Need to store zone transfer location different to current location.
             if(this.zoneTransfer) {
                 console.log('removeDisconnectedCharacter ' + this.acocunt.Username)
@@ -679,7 +679,7 @@ vms.depends({
     world.addSocketToTransferQueue = function(socket) {
         if(socket.authenticated == false) return;
         // set a timeout on the object for logging out the account if it is not removed from world list
-        socket.zoneTransferLogout = socket.setTimeout(socket.LogoutUser, config.zoneTransferLogoutTimer || 60000);
+        socket.zoneTransferLogout = setTimeout(socket.LogoutUser, config.zoneTransferLogoutTimer || 60000);
         world.socket_transfers.push(socket);
     }
     world.getSocketFromTransferQueue = function(Username) {
@@ -738,7 +738,7 @@ vms.depends({
             zones[zoneID].sendToAll(buffer);
         }
     }
-    // End of helper functions  
+    // End of helper functions
     // TODO: Implement server side game simulation so things really do move and are in correct spots.
     world.step = function(delta) {
         // Check if running
@@ -754,7 +754,7 @@ vms.depends({
     }
     world.addClient = function(socket) {
         // Can attach things here if we need to
-        // Call Attach Hooks 
+        // Call Attach Hooks
         // setupClient(socket);
         world.clients.push(socket);
     }
