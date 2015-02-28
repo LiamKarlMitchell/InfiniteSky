@@ -21,6 +21,17 @@ structs.Equipt= restruct.
 	int8lu('Enchant'). // 1 = 3%
 	int8lu('Combine').
 	int16lu('Unknown');
+
+structs.Bottle= restruct.
+	int32lu('ID').
+	int8lu('Capacity').
+	int8lu('Capacity').
+	int8lu('Capacity').
+	int8lu('Capacity').
+	int8lu('Capacity').
+	int8lu('Capacity').
+	int8lu('Capacity').
+	int8lu('Capacity');
 	
 structs.ItemEquip = restruct.
 	int32lu('ID').

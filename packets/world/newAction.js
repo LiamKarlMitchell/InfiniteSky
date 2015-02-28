@@ -5,8 +5,6 @@ WorldPC.Set(0x03, {
         client.character.RealX = input.Location.X;
         client.character.RealY = input.Location.Y;
         client.character.RealZ = input.Location.Z;
-
-        // console.log(input.Frame);
     }
 });
 
@@ -42,7 +40,7 @@ WorldPC.Set(0x05, {
         client.character.state.Frame = input.Frame;
         // client.character.state.OldStance = client.character.state.Stance;
         client.character.state.Stance = input.Stance;
-        // client.character.state.OldSkill = client.character.state.Skill;
+        client.character.state.OldSkill = client.character.state.Skill;
         client.character.state.Skill = input.Skill;
         client.character.state.FacingDirection = input.FacingDirection;
         client.character.state.Direction = input.Direction;

@@ -50,136 +50,123 @@ int32lu('Unk2').
 pad(96);
 
 
-var buffsList = [105, 30, 103, 104, 26, 84, 83, 82, 7, 11, 19, 38, 34, 15, 45, 60, 53, 57, 49];
+// var buffsList = [105, 30, 103, 104, 26, 84, 83, 82, 7, 11, 19, 38, 34, 15, 45, 60, 53, 57, 49];
 
-var applyBuffFunctionTimeout = function(client, input){
-	var buffID = null;
-	var amount = 200;
+// var applyBuffFunctionTimeout = function(client, input){
+// 	var buffID = null;
+// 	var amount = 200;
 
-	console.log("Applying buff: " + input.SkillID);
+// 	console.log("Applying buff: " + input.SkillID);
 
-	switch(input.SkillID){
+// 	switch(input.SkillID){
 
-		case 25:
-		case 6:
-		case 44:
-		buffID = 11;
-		break;
+// 		case 25:
+// 		case 6:
+// 		case 44:
+// 		buffID = 11;
+// 		break;
 
-		case 26:
-		buffID = 3;
-		break;
+// 		case 26:
+// 		buffID = 3;
+// 		break;
 
-		case 7:
-		buffID = 5;
-		break;
+// 		case 7:
+// 		buffID = 5;
+// 		break;
 
-		case 45:
-		buffID = 13;
-		break;
+// 		case 45:
+// 		buffID = 13;
+// 		break;
 
-		case 30:
-		case 15:
-		case 53:
-		buffID = 0;
-		break;
+// 		case 30:
+// 		case 15:
+// 		case 53:
+// 		buffID = 0;
+// 		break;
 
-		case 103:
-		buffID = 19;
-		break;
+// 		case 103:
+// 		buffID = 19;
+// 		break;
 
-		case 104:
-		buffID = 20;
-		break;
+// 		case 104:
+// 		buffID = 20;
+// 		break;
 
-		case 105:
-		buffID = 21;
-		break;
+// 		case 105:
+// 		buffID = 21;
+// 		break;
 
-		case 84:
-		buffID = 9;
-		break;
+// 		case 84:
+// 		buffID = 9;
+// 		break;
 
-		case 83:
-		buffID = 15;
-		break;
+// 		case 83:
+// 		buffID = 15;
+// 		break;
 
-		case 82:
-		buffID = 14;
-		break;
+// 		case 82:
+// 		buffID = 14;
+// 		break;
 
-		case 11:
-		buffID = 1;
-		break;
+// 		case 11:
+// 		buffID = 1;
+// 		break;
 
-		case 19:
-		case 38:
-		case 57:
-		buffID = 9;
-		break;
+// 		case 19:
+// 		case 38:
+// 		case 57:
+// 		buffID = 9;
+// 		break;
 
-		case 34:
-		case 49:
-		buffID = 1;
-		break;
+// 		case 34:
+// 		case 49:
+// 		buffID = 1;
+// 		break;
 
-		default:
-		console.log("Applying [ "+input.SkillID+" ] dont work yet, please report!");
-		break;
-	}
+// 		default:
+// 		console.log("Applying [ "+input.SkillID+" ] dont work yet, please report!");
+// 		break;
+// 	}
 
-	if(buffID !== null){
-		// console.log(infos.Skill[input.SkillID].ModifiersStart);
-		// console.log(input);
-		// console.log(modStart);
-		// console.log(modEnd);
+// 	if(buffID !== null){
+// 		// console.log(infos.Skill[input.SkillID].ModifiersStart);
+// 		// console.log(input);
+// 		// console.log(modStart);
+// 		// console.log(modEnd);
 
-		// console.log(skillInfo);
-		// console.log(modStart.EffectiveDuration);
-		// console.log((modEnd.EffectiveDuration - modStart.EffectiveDuration));
-
-
-		// var time = (modStart.EffectiveDuration + ((modEnd.EffectiveDuration - modStart.EffectiveDuration) * input.SkillLevel)) * 100;
-		// var amount = modStart.EffectiveDuration + (difference * input.SkillLevel);
-		// console.log(time);
-
-		// var time = (modStart.EffectiveDuration*100);
-		// console.log(time);
-
-		if(buffID === 14)
-		client.character.state.BuffHS = {'Time': 100, 'Amount': 200, 'Stacks': 5};
-		else if(buffID >= 0 && buffID < 14)
-		client.character.state.Buffs[buffID] = {'Time': 100, 'Amount': 22};
-		else if(buffID > 14)
-		client.character.state.Buffs2[buffID] = {'Time': 100, 'Amount': 22};
+// 		// console.log(skillInfo);
+// 		// console.log(modStart.EffectiveDuration);
+// 		// console.log((modEnd.EffectiveDuration - modStart.EffectiveDuration));
 
 
-	    client.character.state.SkillID = 0;
-		client.character.state.SkillLevel = 0;
-		client.character.state.Frame = 0;
-		client.character.state.Skill = client.character.state.OldSkill;
-		// client.character.state.Stance = client.character.state.OldStance;
-	}
+// 		// var time = (modStart.EffectiveDuration + ((modEnd.EffectiveDuration - modStart.EffectiveDuration) * input.SkillLevel)) * 100;
+// 		// var amount = modStart.EffectiveDuration + (difference * input.SkillLevel);
+// 		// console.log(time);
 
-	// client.character.state.Skill = client.character.state.FightingStance === undefined ? 4 : !client.character.state.FightingStance ? 4 : 3; // This applies the result character stance :)
+// 		// var time = (modStart.EffectiveDuration*100);
+// 		// console.log(time);
 
-}
+// 		if(buffID === 14)
+// 		client.character.state.BuffHS = {'Time': 100, 'Amount': 200, 'Stacks': 5};
+// 		else if(buffID >= 0 && buffID < 14)
+// 		client.character.state.Buffs[buffID] = {'Time': 100, 'Amount': 22};
+// 		else if(buffID > 14)
+// 		client.character.state.Buffs2[buffID] = {'Time': 100, 'Amount': 22};
+
+
+// 	    client.character.state.SkillID = 0;
+// 		client.character.state.SkillLevel = 0;
+// 		client.character.state.Frame = 0;
+// 		client.character.state.Skill = client.character.state.OldSkill;
+// 		// client.character.state.Stance = client.character.state.OldStance;
+// 	}
+
+// 	// client.character.state.Skill = client.character.state.FightingStance === undefined ? 4 : !client.character.state.FightingStance ? 4 : 3; // This applies the result character stance :)
+
+// }
 
 
 function newSkillUpdate(client, input){
-	console.log(input);
-	// console.log(client.character.state);
-
-	// for(var i=0; i<14; i++){
-		// client.character.state.Buffs[i] = {'Time': 100, 'Amount': 200};
-	// }
-
-	// for(var i=0; i<7; i++){
-		// client.character.state.Buffs[i] = {'Time': 100, 'Amount': 200};
-	// }
-
-	// client.character.state.DisplayBuffs = 0;
-
 	console.log("Applying Skill ID : " + input.SkillID);
 
 	switch(input.Slot){
@@ -221,15 +208,13 @@ function newSkillUpdate(client, input){
 		client.character.state.Buffs2[0] = {'Time': 100, 'Amount': 22};
 		break;
 
-
-
 		case 19:
 		client.character.state.Buffs2[1] = {'Time': 100, 'Amount': 22};
 		break;
 	}
 
 
-	client.character.state.SkillID = 2;
+	client.character.state.SkillID = client.character.state.OldSkill;
 	client.character.state.SkillLevel = 0;
 	client.character.state.Frame = 0;
 	client.character.state.Skill = 0;
@@ -239,7 +224,6 @@ WorldPC.Set(0x19, {
 	Restruct: ReadUsedItem,
 	function: function makeIt(client, input){
 		console.log('make it method');
-		// console.log(input);
 
 		if(client.character.state.onSkillStateUpdate){
 			client.character.state.onSkillStateUpdate = false;
@@ -248,13 +232,6 @@ WorldPC.Set(0x19, {
 			client.character.state.SkillLevel = input.SkillLevel;
 
 			client.Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.viewable_action_distance);
-			
-			// if(input.SkillID === 26){
-			// 	setTimeout(function(){
-					// newSkillUpdate(client, input);
-					// client.Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.viewable_action_distance);
-			// 	}, 2000);
-			// }
 		}
 	}
 });

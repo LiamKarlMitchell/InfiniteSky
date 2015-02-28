@@ -21,23 +21,23 @@ var ItemActionReplyPacket = restruct.
         int32lu('Result');
 
 WorldPC.ItemActionPacket = restruct.
-int32lu('ActionType').
-int32lu('NodeID').
-int32lu('Unk1').
-int32lu('ItemID').
-int32lu('LevelRequired').
-int32lu('ItemType').
-int32lu('ItemQuality').
-int32lu('Amount').
-int32lu('InventoryIndex').
-int32lu('PickupColumn').
-int32lu('PickupRow').
-int32lu('EquipIndex').
-int32lu('MoveColumn').
-int32lu('MoveRow').
-int32lu('Unk6').
-int32lu('Unk7').
-int32lu('Unk8');
+    int32lu('ActionType').
+    int32lu('NodeID').
+    int32lu('Unk1').
+    int32lu('ItemID').
+    int32lu('LevelRequired').
+    int32lu('ItemType').
+    int32lu('ItemQuality').
+    int32lu('Amount').
+    int32lu('InventoryIndex').
+    int32lu('PickupColumn').
+    int32lu('PickupRow').
+    int32lu('EquipIndex').
+    int32lu('MoveColumn').
+    int32lu('MoveRow').
+    int32lu('Unk6').
+    int32lu('Unk7').
+    int32lu('Unk8');
 
 var NotImplemented = function(client, name, input) {
     var msg = 'Item Action: ' + name + ' is not implemented.';
@@ -327,14 +327,17 @@ ItemActions[0x03] = function Recv_EquipItemOnCharacter(client, input) {
         return;
     }
     
-    var equipItem = itemInfo.InventoryItemType();    
+    var equipItem = itemInfo.InventoryItemType(); 
+
     if(equipItem){
         var characterEquipItem = client.character[equipItem];
         if(!characterEquipItem || !characterEquipItem.ID){
             if(itemInfo.ItemType === 22)
                 client.character[equipItem] = {ID: invItem.ID, Activity: invItem.Activity, Growth: invItem.Growth};
-            else if(itemInfo.ItemType === 11 || itemInfo.ItemType === 8 || itemInfo.ItemType === 7 || itemInfo.ItemType === 6)
+            else if(itemInfo.ItemType === 11 || itemInfo.ItemType === 8 || itemInfo.ItemType === 7)
                 client.character[equipItem] = {ID: invItem.ID};
+            else if(itemInfo.ItemType === 6)
+                client.character[equipItem] = {ID: invItem.ID, Capacity: invItem.Capacity};
             else
                 client.character[equipItem] = {ID: invItem.ID, Enchant: invItem.Enchant, Combine: invItem.Combine};
 
@@ -519,8 +522,10 @@ ItemActions[0x05] = function Recv_StoreItemInCharacterPrivateStorage(client, inp
             storage[input.EquipIndex] = {ID: invItem.ID, Amount: amount};
         else if(itemInfo.ItemType === 22)
             storage[input.EquipIndex] = {ID: invItem.ID, Activity: invItem.Activity, Growth: invItem.Growth};
-        else if(itemInfo.ItemType === 11 || itemInfo.ItemType === 8 || itemInfo.ItemType === 7 || itemInfo.ItemType === 6)
+        else if(itemInfo.ItemType === 11 || itemInfo.ItemType === 8 || itemInfo.ItemType === 7)
             storage[input.EquipIndex] = {ID: invItem.ID};
+        else if(itemInfo.ItemType === 6)
+            storage[input.EquipIndex] = {ID: invItem.ID, Capacity: invItem.Capacity};
         else
             storage[input.EquipIndex] = {ID: invItem.ID, Enchant: invItem.Enchant, Combine: invItem.Combine};
     }
@@ -589,8 +594,10 @@ ItemActions[0x06] = function Recv_StoreItemInGateMaster(client, input) {
         bank[input.EquipIndex] = {ID: invItem.ID, Amount: input.Amount};
     else if(itemInfo.ItemType === 22)
         bank[input.EquipIndex] = {ID: invItem.ID, Activity: invItem.Activity, Growth: invItem.Growth};
-    else if(itemInfo.ItemType === 11 || itemInfo.ItemType === 8 || itemInfo.ItemType === 7 || itemInfo.ItemType === 6)
+    else if(itemInfo.ItemType === 11 || itemInfo.ItemType === 8 || itemInfo.ItemType === 7)
         bank[input.EquipIndex] = {ID: invItem.ID};
+    else if(itemInfo.ItemType === 6)
+        bank[input.EquipIndex] = {ID: invItem.ID, Capacity: invItem.Capacity};
     else
         bank[input.EquipIndex] = {ID: invItem.ID, Enchant: invItem.Enchant, Combine: invItem.Combine};
     
@@ -817,8 +824,10 @@ ItemActions[0x0E] = function Recv_UnequipItemFromCharacter(client, input) {
     
     if(itemInfo.ItemType === 22)
         inventory[collision.InventoryIndex] = {ID: invItem.ID, Activity: invItem.Activity, Growth: invItem.Growth, Column: collision.MoveRow, Row: collision.MoveColumn};
-    else if(itemInfo.ItemType === 11 || itemInfo.ItemType === 8 || itemInfo.ItemType === 7 || itemInfo.ItemType === 6)
+    else if(itemInfo.ItemType === 11 || itemInfo.ItemType === 8 || itemInfo.ItemType === 7)
         inventory[collision.InventoryIndex] = {ID: invItem.ID, Column: collision.MoveRow, Row: collision.MoveColumn};
+    else if(itemInfo.ItemType === 6)
+        inventory[collision.InventoryIndex] = {ID: invItem.ID, Capacity: invItem.Capacity, Column: collision.MoveRow, Row: collision.MoveColumn};
     else
         inventory[collision.InventoryIndex] = {ID: invItem.ID, Enchant: invItem.Enchant, Combine: invItem.Combine, Column: collision.MoveRow, Row: collision.MoveColumn};
     
@@ -913,8 +922,10 @@ ItemActions[0x0F] = function Recv_MoveItemFromStorage(client, input) {
             inventory[collision.InventoryIndex] = {ID: invItem.ID, Column: collision.MoveRow, Row: collision.MoveColumn, Amount: amount};
         else if(itemInfo.ItemType === 22)
             inventory[collision.InventoryIndex] = {ID: invItem.ID, Activity: invItem.Activity, Growth: invItem.Growth, Column: collision.MoveRow, Row: collision.MoveColumn};
-        else if(itemInfo.ItemType === 11 || itemInfo.ItemType === 8 || itemInfo.ItemType === 7 || itemInfo.ItemType === 6)
+        else if(itemInfo.ItemType === 11 || itemInfo.ItemType === 8 || itemInfo.ItemType === 7)
             inventory[collision.InventoryIndex] = {ID: invItem.ID, Column: collision.MoveRow, Row: collision.MoveColumn};
+        else if(itemInfo.ItemType === 6)
+            inventory[collision.InventoryIndex] = {ID: invItem.ID, Capacity: invItem.Capacity, Column: collision.MoveRow, Row: collision.MoveColumn};
         else
             inventory[collision.InventoryIndex] = {ID: invItem.ID, Enchant: invItem.Enchant, Combine: invItem.Combine, Column: collision.MoveRow, Row: collision.MoveColumn};
     }
@@ -984,8 +995,10 @@ ItemActions[0x10] = function Recv_GetItemFromGateMasterStorage(client, input) {
         inventory[input.EquipIndex] = {ID: invItem.ID, Amount: input.Amount, Column: collision.MoveRow, Row: collision.MoveColumn};
     else if(itemInfo.ItemType === 22)
         inventory[input.EquipIndex] = {ID: invItem.ID, Activity: invItem.Activity, Growth: invItem.Growth, Column: collision.MoveRow, Row: collision.MoveColumn};
-    else if(itemInfo.ItemType === 11 || itemInfo.ItemType === 8 || itemInfo.ItemType === 7 || itemInfo.ItemType === 6)
+    else if(itemInfo.ItemType === 11 || itemInfo.ItemType === 8 || itemInfo.ItemType === 7)
         inventory[input.EquipIndex] = {ID: invItem.ID, Column: collision.MoveRow, Row: collision.MoveColumn};
+    else if(itemInfo.ItemType === 6)
+        inventory[collision.InventoryIndex] = {ID: invItem.ID, Capacity: invItem.Capacity, Column: collision.MoveRow, Row: collision.MoveColumn};
     else
         inventory[input.EquipIndex] = {ID: invItem.ID, Enchant: invItem.Enchant, Combine: invItem.Combine, Column: collision.MoveRow, Row: collision.MoveColumn};
     
