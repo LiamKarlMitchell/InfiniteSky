@@ -10,9 +10,8 @@ var vm = require('vm');
 var sys = require('sys')
 var exec = require('child_process').exec;
 
-function handleShellOutput(error, stdout, stderr) { sys.puts(stdout) }
+function handleShellOutput(error, stdout, stderr) { console.log(stdout); console.error(stderr); }
 
-//var command_args_regex = /^\(\/([\w\-]+)[ ]?(.*)\s\)$/;
 var command_args_regex = /^\/(\w+)\s?(.*)?$/;
 
 function CommandLineInterface() {
@@ -22,7 +21,7 @@ function CommandLineInterface() {
   function handleInput(code, context, file, callback) {
   var result
     , err;
-    
+
     // Allows executing shell commands for example on windows
     // #notepad test.txt
     // #ipconfig
@@ -38,7 +37,6 @@ function CommandLineInterface() {
     }
 
     var command_args = code.match(command_args_regex);
-    console.log(command_args);
     if (command_args) {
       if (cli[command_args[1]] instanceof Function) {
         cli[command_args[1]](command_args[2]);
@@ -55,7 +53,7 @@ function CommandLineInterface() {
     } catch (err) {
       console.error('\x1b[31;1m'+ err+'\x1b[0m');
     }
-  
+
     callback(err, result);
   }
 

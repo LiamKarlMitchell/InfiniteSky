@@ -1,8 +1,12 @@
+// TODO: onEnter onLeave sensors?
+// Size is considered Radius and origin point xy should be at center.
 // An implementation of a range based square QuadTree.
 // Which keeps leafs around if they have any nodes in them.
 // Child leafs are only removed when empty.
-// Querys do not check size or shape of nodes just that their origin point is inside the query radius.
-// See my code pen here for more detail: http://codepen.io/LiamKarlMitchell/pen/zImip
+// Querys check position and size nodes to see if they are inside the query radius.
+// See my code pen here for more detail: http://codepen.io/LiamKarlMitchell/pen/raxRKq
+// The old one.
+//http://codepen.io/LiamKarlMitchell/pen/zImip
 var QuadTreeConstants = {
     useLocal: 0,
     useObject: 1,
@@ -50,6 +54,7 @@ function QuadTreeNode(opts) {
     this._valueAccess = QuadTreeConstants.useLocal;
     this.object = opts.object || null;
     this.type = undefined;
+  // TODO: Switch to using bitflag? or multi option thing. For example if i want function update but then use object x and y or object.location.x etc
     if(this.object !== null) {
         if(this.object.x != undefined && this.object.y != undefined) {
             this._valueAccess = QuadTreeConstants.useObject;
@@ -58,7 +63,7 @@ function QuadTreeNode(opts) {
         } else if(this.object.position !== undefined) {
             this._valueAccess = QuadTreeConstants.useObjectPosition;
         }
-        this.type = this.object.constructor.name || this.object.__proto__.constructor.name;
+        this.type = this.object.type || this.object.constructor.name || this.object.__proto__.constructor.name;
     }
     this.type = opts.type || this.type;
     if(opts.getParam) {
@@ -69,6 +74,9 @@ function QuadTreeNode(opts) {
     if (typeof(opts.update) === 'function') {
         this.UpdateFunction = opts.update;
         this._valueAccess = QuadTreeConstants.useFunction;
+    } else if (opts.useObjectUpdate) {
+        this.UpdateFunction = this.object.update;
+        this._valueAccess = QuadTreeConstants.useFunction;
     }
     this.update();
 }
@@ -76,6 +84,14 @@ function QuadTreeNode(opts) {
 QuadTreeNode.prototype.update = function(delta) {
     if(delta !== undefined) this.lifetime += delta;
     switch(this._valueAccess) {
+    case QuadTreeConstants.useFunction:
+        var result = this.UpdateFunction.call(this.object,this,delta);
+        if (result===null) return;
+
+        this.x = result.x;
+        this.y = result.y;
+        this.size = result.size || this.size;
+        break;
     case QuadTreeConstants.useLocal:
         // Do Nothing
         break;
@@ -101,14 +117,6 @@ QuadTreeNode.prototype.update = function(delta) {
         this.y = this.object[this._getParam.y];
         this.size = this.object[this._getParam.size] || 1;
         break;
-    case QuadTreeConstants.useFunction:
-        var result = this.UpdateFunction.call(this.object,this,delta);
-        if (result===null) return;
-
-        this.x = result.x;
-        this.y = result.y;
-        this.size = result.size || this.size;
-        break;
     default:
         throw new Error('Unspecified QuadTreeConstant. (' + this._valueAccess + ')');
         break;
@@ -118,7 +126,7 @@ QuadTreeNode.prototype.update = function(delta) {
 // {x : 0, y: 0, size: 1000}
 
 function QuadTree(opts) {
-    this.leafs = [null, null, null, null];
+    this.leafs = [];
     this.nodes = [];
     this.nodesHash = {};
     this.topLevel = true;
@@ -128,6 +136,14 @@ function QuadTree(opts) {
     }
     this.nextNodeID = 1;
     QuadTreeNode.call(this, opts);
+
+    // For the root of a QuadTree we can check ignoring size constraint.
+    if (opts.rootSpansInfinite) {
+      this.inBounds = function(obj) {
+        return true;
+      }
+    }
+
     // Set when tree splits remove when unsplit
     this.hasChildrenAreas = false;
     this.halfSize = this.size / 2;
@@ -137,13 +153,40 @@ function QuadTree(opts) {
 QuadTree.prototype = Object.create(QuadTreeNode.prototype);
 QuadTree.prototype.clear = function() {
     for(var i = 0; i < this.nodes.length; i++) {
-        delete this.nodes[i].Leaf;
+        delete this.nodes[i].leaf;
     }
     this.nodes = [];
     this.nodesHash = {};
-    this.leafs = [null, null, null, null];
+    this.leafs = [];
     this.hasChildrenAreas = false;
     this.nextNodeID = 1;
+}
+QuadTree.prototype.getNodeByID = function(input) {
+  if (Array.isArray(input)) {
+    var result = [];
+    for (var i=0; i < input.length; i++) {
+      result[i] = this.getNodeByID(input[i]);
+    }
+    return result;
+  }
+
+  var node;
+  if (this.nodesHash[input]) {
+    return this.nodesHash[input];
+  }
+
+  if (this.hasChildrenAreas) {
+    node = this.leafs[0].getNodeByID(input);
+    if (node) return node;
+    node = this.leafs[1].getNodeByID(input);
+    if (node) return node;
+    node = this.leafs[2].getNodeByID(input);
+    if (node) return node;
+    node = this.leafs[3].getNodeByID(input);
+    if (node) return node;
+  }
+
+  return null;
 }
 QuadTree.prototype.query = function(query) {
     var results = [];
@@ -178,7 +221,7 @@ QuadTree.prototype.query = function(query) {
                 if (query.x !== undefined && query.y !== undefined) {
                     var dx = this.nodes[n].x - query.x;
                     var dy = this.nodes[n].y - query.y;
-                    distance = Math.sqrt(Math.abs((dx * dx) + (dy * dy)));
+                    distance = Math.sqrt(Math.abs((dx * dx) + (dy * dy))) - this.nodes[n].size;
                 }
 
                 results.push({
@@ -208,24 +251,25 @@ QuadTree.prototype.query = function(query) {
                 if(AABBCircleIntersect(circle, this.leafs[3].bounds)) {
                     results = results.concat(this.leafs[3].query(query));
                 }
-            } else {
-                // Check each of the nodes
-                for(var n = 0; n < this.nodes.length; n++) {
-                    if(this.nodes[n]) {
-                        // Get distance
-                        var dx = this.nodes[n].x - query.x;
-                        var dy = this.nodes[n].y - query.y;
-                        var distance = Math.sqrt(Math.abs((dx * dx) + (dy * dy)));
-                        if(distance <= query.radius) {
-                            results.push({
-                                distance: distance,
-                                node: this.nodes[n],
-                                object: this.nodes[n].object
-                            });
-                        }
+            }
+
+            // Check each of the nodes
+            for(var n = 0; n < this.nodes.length; n++) {
+                if(this.nodes[n]) {
+                    // Get distance
+                    var dx = this.nodes[n].x - query.x;
+                    var dy = this.nodes[n].y - query.y;
+                    var distance = Math.sqrt(Math.abs((dx * dx) + (dy * dy))) - this.nodes[n].size;
+                    if(distance <= query.radius) {
+                        results.push({
+                            distance: distance,
+                            node: this.nodes[n],
+                            object: this.nodes[n].object
+                        });
                     }
                 }
             }
+
         }
     }
 
@@ -237,13 +281,25 @@ QuadTree.prototype.query = function(query) {
         if(query.type) {
             if(typeof(query.type) === 'string') {
                 query.type = query.type.split(/[\s,]+/);
-            }
-            if(Array.isArray(query.type)) {
-                results = results.filter(function(r) {
+ 								results = results.filter(function(r) {
                     if(query.type.indexOf(r.node.type) >= 0) {
                         return true;
                     }
                     return false;
+                });
+            } else if(Array.isArray(query.type)) {
+                results = results.filter(function(r) {
+                  var type;
+                  var typeIsFunction = type instanceof Function;
+                  for (var i=0;i < query.type.length;i++) {
+                    type = query.type[i];
+                    if (typeIsFunction && r.node.object instanceof type){
+                    	return true;
+                    } else if (type instanceof String && type == r.node.type) {
+                      return true;
+                    }
+                  }
+                  return false;
                 });
             }
         }
@@ -262,7 +318,7 @@ QuadTree.prototype.query = function(query) {
 }
 QuadTree.prototype.update = function update(delta) {
     // I am not sure how to handle if quad tree moves? I suppose locaitons of nodes should be relative?
-    QuadTreeNode.prototype.update.call(this, delta);
+    //QuadTreeNode.prototype.update.call(this, delta);
     // Should cache old x,y and size compare if different if so recalculate? That would probably be more work than just calculating it.
     this.bounds = {
         top: this.y,
@@ -270,15 +326,19 @@ QuadTree.prototype.update = function update(delta) {
         bottom: this.y + this.size,
         right: this.x + this.size
     };
-    if(this.topLevel) {
+    //if(this.topLevel) {
         var i, node, leaf;
         for(i = 0; i < this.nodes.length; i++) {
             node = this.nodes[i];
+            var xold = node.x, yold = node.y, sizeold = node.size;
             node.update(delta);
-            leaf = node.Leaf;
+            if (node.x == xold && node.y == yold && node.size == sizeold) {
+              // Node has not moved
+              continue;
+            }
+            leaf = node.leaf;
             if(!leaf.inBounds(node)) {
                 // If node is no longer in parent leaf bounds
-                leaf = node.Leaf;
                 leaf.removeNode(node);
                 var placed = false;
                 while(leaf.Parent || leaf.topLevel) {
@@ -295,9 +355,36 @@ QuadTree.prototype.update = function update(delta) {
                 if(placed == false) {
                     console.error('node not in quad tree...');
                 }
+            } else {
+              // Check if node would fit inside a child leaf
+              if(this.hasChildrenAreas) {
+                  var placed = false;
+                  if(this.leafs[0].inBounds(node)) {
+                      this.leafs[0].addNode(node);
+                      placed = true;
+                  } else if(this.leafs[1].inBounds(node)) {
+                      this.leafs[1].addNode(node);
+                      placed = true;
+                  } else if(this.leafs[2].inBounds(node)) {
+                      this.leafs[2].addNode(node);
+                      placed = true;
+                  } else if(this.leafs[3].inBounds(node)) {
+                      this.leafs[3].addNode(node);
+                      placed = true;
+                  }
+
+                  if (placed) {
+                    var index = this.nodes.indexOf(node);
+                    if(index > -1) {
+                      delete this.nodesHash[node.id];
+                      this.nodes.splice(index, 1);
+                    }
+                  }
+              }
+
             }
         }
-    }
+    //}
     // If has children
     // Update Leafs
     if(this.hasChildrenAreas) {
@@ -306,14 +393,37 @@ QuadTree.prototype.update = function update(delta) {
         this.leafs[1].update(delta);
         this.leafs[2].update(delta);
         this.leafs[3].update(delta);
-        if(!this.leafs[0].hasChildrenAreas && this.leafs[0].nodes.length === 0 && !this.leafs[1].hasChildrenAreas && this.leafs[1].nodes.length === 0 && !this.leafs[2].hasChildrenAreas && this.leafs[2].nodes.length === 0 && !this.leafs[3].hasChildrenAreas && this.leafs[3].nodes.length === 0) {
-            this.hasChildrenAreas = false;
-            this.leafs = [null, null, null, null];
+
+        if (this.topLevel) {
+            function checkLeafsChildrenEmpty(quadTreeLeaf, maxDepth) {
+                if (quadTreeLeaf.nodes.length === 0 && (quadTreeLeaf.hasChildrenAreas == false || quadTreeLeaf.level == maxDepth) )  return true;
+
+                if (quadTreeLeaf.hasChildrenAreas) {
+                    var result1 = checkLeafsChildrenEmpty(quadTreeLeaf.leafs[0], maxDepth);
+                    var result2 = checkLeafsChildrenEmpty(quadTreeLeaf.leafs[1], maxDepth);
+                    var result3 = checkLeafsChildrenEmpty(quadTreeLeaf.leafs[2], maxDepth);
+                    var result4 = checkLeafsChildrenEmpty(quadTreeLeaf.leafs[3], maxDepth);
+
+                    if (result1 && result2 && result3 && result4) {
+                      quadTreeLeaf.leafs = [];
+                      quadTreeLeaf.hasChildrenAreas = false;
+                      if (quadTreeLeaf.nodes.length === 0) return true;
+                    }
+                } else {
+                  if (quadTreeLeaf.nodes.length === 0) return true;
+                }
+                return false;
+            }
+
+            checkLeafsChildrenEmpty(this, this.depth);
         }
     }
 }
-QuadTree.prototype.inBounds = function(obj) {
-    return(obj.x >= this.x && obj.x <= this.x + this.size && obj.y >= this.y && obj.y <= this.y + this.size);
+QuadTree.prototype.inBounds = function(node) {
+   return (this.x < node.x - node.size &&
+               this.x + this.size > node.x + node.size &&
+               this.y < node.y - node.size &&
+               this.y + this.size > node.y + node.size);
 }
 // Returns array of unplaced nodes although this should be empty
 QuadTree.prototype.putNodesInChildrenLeafs = function() {
@@ -323,23 +433,34 @@ QuadTree.prototype.putNodesInChildrenLeafs = function() {
     }
     var unplaced = [];
     // Place the nodes in the appropriate child leaf
-    for(var i = 0; i < this.nodes.length; i++) {
+    var removed = [], node, i;
+    for(i = 0; i < this.nodes.length; i++) {
         var node = this.nodes[i];
         if(this.leafs[0].inBounds(node)) {
             this.leafs[0].addNode(node);
+            removed.push(node);
         } else if(this.leafs[1].inBounds(node)) {
             this.leafs[1].addNode(node);
+            removed.push(node);
         } else if(this.leafs[2].inBounds(node)) {
             this.leafs[2].addNode(node);
+            removed.push(node);
         } else if(this.leafs[3].inBounds(node)) {
             this.leafs[3].addNode(node);
+            removed.push(node);
         } else {
             unplaced.push(node);
         }
+
     }
-    if(!this.topLevel) { // Keep top level's node and nodes hash
-        this.nodes = [];
-        this.nodesHash = {};
+    // If the node was placed in a child leaf then remove it from the parents nodes list.
+    for (i=0;i<removed.length;i++) {
+      node = removed[i];
+      var index = this.nodes.indexOf(node);
+      if(index > -1) {
+          delete this.nodesHash[node.id];
+          this.nodes.splice(index, 1);
+      }
     }
     return unplaced;
 }
@@ -357,29 +478,27 @@ QuadTree.prototype.removeNode = function(value) {
     if(node === undefined) {
         node = this.nodesHash[value];
     }
-    if(node.Leaf !== undefined && node.Leaf !== this) {
-        node.Leaf.removeNode(node);
+    if(node.leaf !== undefined && node.leaf !== this && this.topLevel) {
+        node.leaf.removeNode(node);
     }
     var index = this.nodes.indexOf(node);
     if(index > -1) {
         delete this.nodesHash[node.id];
         this.nodes.splice(index, 1);
-        delete node.Leaf;
+        delete node.leaf;
     }
 }
 QuadTree.prototype.addNode = function(node) {
-    node.Leaf = this;
     if(this.topLevel) {
         if(node instanceof QuadTreeNode === false) {
-            node = new QuadTreeNode({
-                object: node
-            });
+            node = new QuadTreeNode(node);
         }
         if(node.id === undefined) {
             node.id = this.nextNodeID;
             this.nextNodeID++;
         }
     }
+    node.leaf = this;
     // Check any children that exist if we can add it there
     if(this.hasChildrenAreas) {
         if(this.leafs[0].inBounds(node)) {
@@ -391,8 +510,8 @@ QuadTree.prototype.addNode = function(node) {
         } else if(this.leafs[3].inBounds(node)) {
             this.leafs[3].addNode(node);
         } else {
-            console.error('Node outside Quad Tree bounds ' + this.x + ',' + this.y + ' size ' + this.size);
-            return null;
+            this.nodes.push(node);
+            this.nodesHash[node.id] = node;
         }
         // Check if we need to create child areas
     } else if(this.depth > 0 && this.nodes.length + 1 > this.limit) {
@@ -437,31 +556,18 @@ QuadTree.prototype.addNode = function(node) {
         this.nodesHash[node.id] = node;
         // Reorganize Nodes
         this.putNodesInChildrenLeafs();
-    } else if(this.topLevel === false) {
+    }// else if(this.topLevel === false) {
+    else {
         if(this.inBounds(node)) {
             this.nodes.push(node);
             this.nodesHash[node.id] = node;
-            node.Leaf = this;
+            node.leaf = this;
         } else {
             console.error('Node outside Quad Tree bounds ' + this.x + ',' + this.y + ' size ' + this.size);
             return null;
         }
     }
-    // Overall we want this in the top node...
-    if(this.topLevel) {
-        if(this.inBounds(node)) {
-            if(this.nodesHash[node.id] !== node) {
-                this.nodes.push(node);
-                this.nodesHash[node.id] = node;
-                if(node.Leaf === undefined) {
-                    node.Leaf = this;
-                }
-            }
-        } else {
-            console.error('Node outside Quad Tree bounds ' + this.x + ',' + this.y + ' size ' + this.size);
-            return null;
-        }
-    }
+
     return node;
 }
 

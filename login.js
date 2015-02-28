@@ -31,7 +31,6 @@ if (typeof(login) === 'undefined') {
     console.log('Login Server code reloaded.');
 }
 
-// TODO: Detect client/server version if possible.
 login.connection = function(socket) {
     console.log("Client #" + this.clientID + " connected from IP "+_util.cleanIP(socket.remoteAddress));
 

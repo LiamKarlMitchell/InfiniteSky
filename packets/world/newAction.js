@@ -6,7 +6,7 @@ WorldPC.Set(0x03, {
         client.character.RealY = input.Location.Y;
         client.character.RealZ = input.Location.Z;
 
-        // console.log(input.Frame);
+        // TODO: Simulate serverside movement and compare.
     }
 });
 
@@ -54,7 +54,7 @@ WorldPC.Set(0x05, {
         client.character.state.Location.X = input.Location.X;
         client.character.state.Location.Y = input.Location.Y;
         client.character.state.Location.Z = input.Location.Z;
-        
+
         client.character.state.LocationTo.X = input.Location.X;
         client.character.state.LocationTo.Y = input.Location.Y;
         client.character.state.LocationTo.Z = input.Location.Z;
@@ -62,6 +62,25 @@ WorldPC.Set(0x05, {
         client.character.state.LocationNew.X = input.LocationNew.X;
         client.character.state.LocationNew.Y = input.LocationNew.Y;
         client.character.state.LocationNew.Z = input.LocationNew.Z;
+
+        // TODO: Refactor TargetObjectIndex and TargetObjectUniqueNumber to be TargetID and TargetNodeID
+        client.character.state.TargetObjectIndex = input.TargetID;
+        client.character.state.TargetObjectUniqueNumber = input.nodeID;
+
+        if (input.Skill == 5 || input.Skill == 6 || input.Skill == 7) {
+          console.log(input);
+        }
+
+        var otherNode = null;
+        // If the node id of target is not -1 or 0
+        if (client.character.state.TargetObjectUniqueNumber != 4294967295 && client.character.state.TargetObjectUniqueNumber != 0) {
+            otherNode = client.Zone.QuadTree.getNodeByID(client.character.state.TargetObjectUniqueNumber);
+        }
+
+        if (otherNode) {
+            // TODO: Use information to implement attacking.
+            client.sendInfoMessage('Selected Node ['+client.character.state.TargetObjectUniqueNumber+'] '+otherNode.type);
+        }
 
         switch(input.Skill){
             case 41:
