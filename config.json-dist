@@ -53,7 +53,7 @@
     }
   ],
   "externalIP": "PUT YOUR EXTERNAL IP HERE",
-  "viewable_action_distance": 5000,
+  "viewable_action_distance": 500,
   "ItemDropRate": 10,
 "Zones": {
   "1": { "Name": "Z001", "Load": true, "DisplayName": "Gungsong Fortress" },

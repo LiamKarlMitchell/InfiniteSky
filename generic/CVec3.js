@@ -58,7 +58,7 @@ vms.depends({
 
 		getDifference: function CVec3_getDifference(other) {
 			return Math.sqrt(
-				((other.X - this.X)*(other.X - this.X)) + 
+				((other.X - this.X)*(other.X - this.X)) +
 				((other.Y - this.Y)*(other.Y - this.Y)) +
 				((other.Z - this.Z)*(other.Z - this.Z))
 				);
@@ -68,7 +68,7 @@ vms.depends({
 		{
 		   this.X += distance * cos(angle);
            this.Y += distance * sin(angle);
-		}
+		},
 
 		getDistance: function CVec3_getDistance(other) {
 			return Math.abs(this.getDifference(other));
@@ -93,7 +93,7 @@ vms.depends({
 			//console.log(velocity.X+"MARK:");
 			//this.Y += velocity.Y*delta; // Because korean
 			this.Z += velocity.Z*delta;
-		},	
+		},
 
 		toString: function CVec3_toString() {
 			return this.X.toFixed(2)+', '+this.Y.toFixed(2)+', '+this.Z.toFixed(2);
