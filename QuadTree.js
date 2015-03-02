@@ -470,13 +470,13 @@ QuadTree.prototype.removeNode = function(value) {
         node = value;
         value = node.id;
     } else if(typeof(value) === 'number') {
-        // Do nothing
+        node = this.getNodeByID(value);
     } else {
         throw new Error('Invalid value passed to QuadTree::removeNode');
         return;
     }
     if(node === undefined) {
-        node = this.nodesHash[value];
+        node = this.getNodeByID(value);
     }
     if(node.leaf !== undefined && node.leaf !== this && this.topLevel) {
         node.leaf.removeNode(node);
