@@ -119,9 +119,161 @@ struct sItemInfo
 };
 #pragma pack(pop)
 
+
 #pragma pack(push, 1)
-struct sNPCInfo
-{
+struct SkillData {
+		int ChiCost;
+		int DegreeOfDefensiveSkill;
+		int ChiRecovery;
+		int ChanceToAcupressure;
+		int ChanceToUnstun;
+		int AirWalkDistance;
+		int EnergyBall;
+		int DamageIncreased;
+		int Unk1;
+		int AttackRangeApplied;
+		int DamageApplied;
+		int OnlyForLightDamage;
+		int OnlyForShadowDamage;
+		int OnlyForDarkDamage;
+		int ChanceToHitApplied;
+		int EffectiveDuration;
+		int IncreasedDamage;
+		int IncreasedDefense;
+		int Unk2;
+		int CastTime;
+		int IncreasedLightResistance;
+		int IncreasedShadowResistance;
+		int IncreasedDarkResistance;
+		int IncreasedChanceToHit;
+		int IncreasedChanceToDodge;
+		int IncreasedMovementSpeed;
+		int IncreasedAttackSpeed;
+		int IncreasedLuck;
+		int EnchancedChanceToDeadlyBlow;
+		int ChanceToReturnDamage;
+		int IncreasedAcupressureDefense;
+		int ChanceToRemoveIncreaseEffect;
+		int HPRegenerationPoints;
+		int ChiRegenerationPoints;
+};
+
+struct sSkillInfo {
+	DWORD ID;
+	char Name[28];
+	// Categories
+	// 1 = General
+	// 3 and 4 = Support
+	// 2 = Attack
+	DWORD Category;
+	DWORD Unknown36;
+	DWORD SpriteStartID;
+	DWORD Clan;
+	DWORD Weapon;
+	char Description1[51];
+	char Description2[51];
+	char Description3[50];
+	int Unknown204;
+	int Unknown208;
+	int Unknown212;
+	int Unknown216;
+	int Unknown220;
+	int Unknown224;
+	int Unknown228;
+	int Unknown232;
+	int Unknown236;
+	int Unknown240;
+	int Unknown244;
+	int Unknown248;
+	int Unknown252;
+	int Unknown256;
+	int Unknown260;
+	int Unknown264;
+	int Unknown268;
+	int Unknown272;
+	int Unknown276;
+	int Unknown280;
+	int Unknown284;
+	int Unknown288;
+	int Unknown292;
+	int Unknown296;
+	int Unknown300;
+	int Unknown304;
+	int Unknown308;
+	int Unknown312;
+	int Unknown316;
+	int Unknown320;
+	int Unknown324;
+	int Unknown328;
+	int Unknown332;
+	int ChiUsage;
+	int Unknown340;
+	int Unknown344;
+	int Unknown348;
+	int Unknown352;
+	int Unknown356;
+	int Unknown360;
+	int Unknown364;
+	int Unknown368;
+	int Unknown372;
+	int Unknown376;
+	int Unknown380;
+	int Unknown384;
+	int Unknown388;
+	int Unknown392;
+	int Unknown396;
+	int Unknown400;
+	int Unknown404;
+	int Unknown408;
+	int Unknown412;
+	int Unknown416;
+	int Unknown420;
+	int Unknown424;
+	int Unknown428;
+	int Unknown432;
+	int Unknown436;
+	int Unknown440;
+	int Unknown444;
+	int Unknown448;
+	int Unknown452;
+	int Unknown456;
+	int Unknown460;
+	int Unknown464;
+	int Unknown468;
+	int Unknown472;
+	int Unknown476;
+	int Unknown480;
+	int Unknown484;
+	int Unknown488;
+	int Unknown492;
+	int Unknown496;
+	int Unknown500;
+	int Unknown504;
+	int Unknown508;
+	int Unknown512;
+	int Unknown516;
+	int Unknown520;
+	int Unknown524;
+	int Unknown528;
+	int Unknown532;
+	int Unknown536;
+	int Unknown540;
+	int Unknown544;
+	int Unknown548;
+	int Unknown552;
+	int Unknown556;
+	int Unknown560;
+	int Unknown564;
+	DWORD PointsToLearn;
+	DWORD MaxSkillLevel;
+	int Unknown572;
+	SkillData ModifiersStart;
+	SkillData ModifiersEnd;
+};
+#pragma pack(pop)
+
+#pragma pack(push, 1)
+struct sNPCInfo {
   int ID;
   char Name[28];
   int Unknown1;
@@ -467,6 +619,231 @@ struct sNPCInfo
 };
 #pragma pack(pop)
 
+#pragma pack(push, 1)
+struct sMonsterInfo {
+	DWORD ID; // 0
+	char Name[24]; // 4
+	int Unknown1C; //2E
+	int Unknown32; // 32
+	DWORD SpecialModelID; // 36
+	DWORD ModelID; // 40
+	int clickwidth; // 44
+	int clickheight; // 48
+	int clickdepth; // 52
+	int Unknown56; // 56
+	int Unknown60; // 60
+	int Unknown64; // 64
+	int Unknown68; // 68
+	int Unknown72; // 72
+	int Unknown76; // 76
+	int Unknown80; // 80
+	int Unknown84; // 84
+	DWORD Level; // 88
+	int Unknown92; // 92
+	DWORD Health; // 96
+	int Unknown100; // 100
+	int Unknown104; // 104
+	int Unknown108; // 108
+	int Unknown112; // 112
+	int Unknown116; // 116
+	int Unknown120; // 120
+	int Unknown124; // 124
+	int Unknown128; // 128
+	int RadiusInfo1; // 132
+	int RadiusInfo2; // 136
+	int WalkSpeed; // 140
+	int RunSpeed; // 144
+	int DeathSpeed; // 148
+	int AttackPower; // 152
+	int DefensePower; // 156
+	int AttackSuccess; // 160
+	int AttackBlock; // 164
+	int ElementAttackPower; // 168
+	int ElementDefensePower; // 172
+	int Critical; // 176
+	int Unknown180; // 180
+	int Unknown184; // 184
+	int Unknown188; // 188
+	int Unknown192; // 192
+	int Unknown196; // 196
+	int Unknown200; // 200
+	int Unknown204; // 204
+	int Unknown208; // 208
+	int Unknown212; // 212
+	int Unknown216; // 216
+	int Unknown220; // 220
+	int Unknown224; // 224
+	int Unknown228; // 228
+	int Unknown232; // 232
+	int Unknown236; // 236
+	int Unknown240; // 240
+	int Unknown244; // 244
+	int Unknown248; // 248
+	int Unknown252; // 252
+	int Unknown256; // 256
+	int Unknown260; // 260
+	int Unknown264; // 264
+	int Unknown268; // 268
+	int Unknown272; // 272
+	int Unknown276; // 276
+	int Unknown280; // 280
+	int Unknown284; // 284
+	int Unknown288; // 288
+	int Unknown292; // 292
+	int Unknown296; // 296
+	int Unknown300; // 300
+	int Unknown304; // 304
+	int Unknown308; // 308
+	int Unknown312; // 312
+	int Unknown316; // 316
+	int Unknown320; // 320
+	int Unknown324; // 324
+	int LightATK; // 328
+	int ShadowATK; // 332
+	int DarkATK; // 336
+	int Unknown340; // 340
+	int Unknown344; // 344
+	int Unknown348; // 348
+	int Unknown352; // 352
+	int Unknown356; // 356
+	int Unknown360; // 360
+	int Unknown364; // 364
+	int Unknown368; // 368
+	int Unknown372; // 372
+	// Money Info
+	int Unknown376; // 376 // Min
+	int Unknown380; // 380 // Max
+	int Unknown384; // 384 // Chance
+	// Potion Info
+	int Unknown388; // 388
+	int Unknown392; // 392
+	int Unknown396; // 396
+	int Unknown400; // 400
+	int Unknown404; // 404
+	int Unknown408; // 408
+	int Unknown412; // 412
+	int Unknown416; // 416
+	int Unknown420; // 420
+	int Unknown424; // 424
+	// Item Info
+	int Unknown428; // 428
+	int Unknown432; // 432
+	int Unknown436; // 436
+	int Unknown440; // 440
+	int Unknown444; // 444
+	int Unknown448; // 448
+	int Unknown452; // 452
+	int Unknown456; // 456
+	int Unknown460; // 460
+	int Unknown464; // 464
+	int Unknown468; // 468
+	int Unknown472; // 472
+	// Quest Item Info
+	int Unknown476; // 476
+	int Unknown480; // 480
+	// Extra Item Info
+	int Unknown484; // 484
+	int Unknown488; // 488
+	int Unknown492; // 492
+	int Unknown496; // 496
+	int Unknown500; // 500
+	int Unknown504; // 504
+	int Unknown508; // 508
+	int Unknown512; // 512
+	int Unknown516; // 516
+	int Unknown520; // 520
+	int Unknown524; // 524
+	int Unknown528; // 528
+	int Unknown532; // 532
+	int Unknown536; // 536
+	int Unknown540; // 540
+	int Unknown544; // 544
+	int Unknown548; // 548
+	int Unknown552; // 552
+	int Unknown556; // 556
+	int Unknown560; // 560
+	int Unknown564; // 564
+	int Unknown568; // 568
+	int Unknown572; // 572
+	int Unknown576; // 576
+	int Unknown580; // 580
+	int Unknown584; // 584
+	int Unknown588; // 588
+	int Unknown592; // 592
+	int Unknown596; // 596
+	int Unknown600; // 600
+	int Unknown604; // 604
+	int Unknown608; // 608
+	int Unknown612; // 612
+	int Unknown616; // 616
+	int Unknown620; // 620
+	int Unknown624; // 624
+	int Unknown628; // 628
+	int Unknown632; // 632
+	int Unknown636; // 636
+	int Unknown640; // 640
+	int Unknown644; // 644
+	int Unknown648; // 648
+	int Unknown652; // 652
+	int Unknown656; // 656
+	int Unknown660; // 660
+	int Unknown664; // 664
+	int Unknown668; // 668
+	int Unknown672; // 672
+	int Unknown676; // 676
+	int Unknown680; // 680
+	int Unknown684; // 684
+	int Unknown688; // 688
+	int Unknown692; // 692
+	int Unknown696; // 696
+	int Unknown700; // 700
+	int Unknown704; // 704
+	int Unknown708; // 708
+	int Unknown712; // 712
+	int Unknown716; // 716
+	DWORD Unknown720; // 720
+	int ImproveStone1_Chance; // 724
+	int ImproveStone1_ID; // 728
+	int ImproveStone2_Chance; // 732
+	int ImproveStone2_ID; // 736
+	int Unknown740; // 740
+	int PetDropChance; // 744
+	int PetID1; // 748
+	int PetID2; // 752
+	int Unknown756; // 756
+	int Unknown760; // 760
+	int Unknown764; // 764
+	int Unknown768; // 768
+	int Unknown772; // 772
+	int Unknown776; // 776
+	int Unknown780; // 780
+	int Unknown784; // 784
+	int Unknown788; // 788
+	int Unknown792; // 792
+	int Unknown796; // 796
+	int Unknown800; // 800
+	int Unknown804; // 804
+	int Unknown808; // 808
+	int Unknown812; // 812
+	int Unknown816; // 816
+	int Unknown820; // 820
+	int Unknown824; // 824
+	int Unknown828; // 828
+	int Unknown832; // 832
+	int Unknown836; // 836
+	int Unknown840; // 840
+	int Unknown844; // 844
+	int Unknown848; // 848
+	int Unknown852; // 852
+	int Unknown856; // 856
+	int Unknown860; // 860
+	int Unknown864; // 864
+	int Unknown868; // 868
+	int Unknown872; // 872
+	int Unknown876; // 876
+	int Unknown880; // 880
+};
+#pragma pack(pop)
 
 class TSX_Client
 {
@@ -507,7 +884,7 @@ public:
 	//Character* character;
 
 	// Addresses and signitures here
-	
+
 	// Could define Game Function Pointers here
 	size_t* GameRecvPacketSize;
 	unsigned long GameNetworkInfo;
@@ -539,7 +916,7 @@ public:
 	void Stop();
 	DWORD Run();
 	void LoadTranslationCSVs();
-	
+
 	void ScreenChanged();
 	void ZoneChanged();
 
