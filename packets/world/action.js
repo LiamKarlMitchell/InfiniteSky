@@ -110,7 +110,7 @@ WorldPC.ActionReplyPacket = restruct.
     struct('Glove', structs.Equipt).
     struct('Ring', structs.Equipt).
     struct('Boot', structs.Equipt).
-    struct('CalbashBottle', structs.Equipt).
+    struct('CalbashBottle', structs.Bottle).
     struct('Weapon', structs.Equipt).
     struct('Pet', structs.Pet).
     int32lu('applyGlowItems').
@@ -160,7 +160,7 @@ WorldPC.ActionReplyPacket = restruct.
     string('StoreName', 28).
     struct('StoreItems', WorldPC.personalShopItem, 25).
     int8lu('Unk1', 8).
-    int32lu('DisplayBuffs').
+    int32lu('').
     int32lu('Unk1', 1).
     int32lu('Unk1', 1). // 130
     int32lu('Unk1', 1).
@@ -173,35 +173,34 @@ WorldPC.ActionReplyPacket = restruct.
     int32lu('Unk1', 1);
 
 WorldPC.AttackPacket = restruct.
-int8lu('PacketID').
-int8lu('Status').
-int32lu('Action').
-int32lu('CharID1').
-int32lu('CharID2').
-int32lu('TargetID').
-int32lu('nodeID').
-int32lu('skillID').
-int8lu('Unk', 40);
+    int8lu('PacketID').
+    int8lu('Status').
+    int32lu('Action').
+    int32lu('CharID1').
+    int32lu('CharID2').
+    int32lu('TargetID').
+    int32lu('nodeID').
+    int32lu('skillID').
+    int8lu('Unk', 40);
 
 //2C
 WorldPC.AttackPacketReply = restruct.
-int32lu('Action'). // 0 your attacking
-
-int32lu('AttackerID').
-int32lu('AttackerIndex').
-int32lu('DefenderID').
-int32lu('DefenderIndex').
-int32lu('A'). // Skill ID?
-int32lu('B').
-int32lu('C').
-int32lu('D').
-int32lu('Status'). // Depends on attacker or defender | hit or miss, block or not |
-int32lu('TotalDamage').
-int16lu('Deadly').
-int16lu('Light').
-int16lu('Shadow').
-int16lu('Dark').
-int32ls('DamageHP');
+    int32lu('Action'). // 0 your attacking
+    int32lu('AttackerID').
+    int32lu('AttackerIndex').
+    int32lu('DefenderID').
+    int32lu('DefenderIndex').
+    int32lu('A'). // Skill ID?
+    int32lu('B').
+    int32lu('C').
+    int32lu('D').
+    int32lu('Status'). // Depends on attacker or defender | hit or miss, block or not |
+    int32lu('TotalDamage').
+    int16lu('Deadly').
+    int16lu('Light').
+    int16lu('Shadow').
+    int16lu('Dark').
+    int32ls('DamageHP');
 
 // WorldPC.SpecialMovement = restruct.
 // int32lu('Action'). // 0 your attacking
