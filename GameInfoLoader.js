@@ -22,7 +22,7 @@ global.GameInfosLoaded = false;
 
 function GameInfoLoader(filename, structure, onRecordFunction) {
 	events.EventEmitter.call(this);
-	if(!filename || !structure || !onRecordFunction){ 
+	if(!filename || !structure || !onRecordFunction){
 		global.GameInfoEmmiter = this;
 		return;
 	}
@@ -81,7 +81,7 @@ GameInfoLoader.prototype.Load = function(filename, structure, onRecordFunction) 
 	// Work out the file path
 	this.infos = [];
 	this.InfoStruct  = structure;
-	
+
 
 	var filepath = path.join(config.data_dir || 'data','infos',filename);
 
@@ -98,7 +98,7 @@ GameInfoLoader.prototype.Load = function(filename, structure, onRecordFunction) 
 		} else {
 			throw new Error("Not enouth bytes in "+filepath+' to read RecordCount');
 		}
-		
+
 		if (data.length-4>=self.InfoStruct.size * RecordCount) {
 			// TODO: Use normal buffer rather than restruct? Or code restruct to use buffer implementation.
 			var tasks = [];
@@ -111,7 +111,7 @@ GameInfoLoader.prototype.Load = function(filename, structure, onRecordFunction) 
 				if (info !== undefined && info.ID) {
 					// Assign to self as a key on ID for quick reference.
 					// Example infos.Item[1] would be Silver
-					// But we only care if ID is not 0 and that the info was actually valid		
+					// But we only care if ID is not 0 and that the info was actually valid
 					self.infos[info.ID] = info; // Put in array too
 					self[info.ID] = info; // Store in hash
 				}
@@ -140,24 +140,24 @@ GameInfoLoader.prototype.Load = function(filename, structure, onRecordFunction) 
 					// csvFile = 'Exp.csv';
 					// break;
 					case '005_00002.IMG':
-					csvFile = 'Item.csv';
+					csvFile = 'Items.csv';
 					columns = ['ID','Name','Description1','Description2', 'Description3'];
 					break;
 					case '005_00003.IMG':
-					csvFile = 'Skill.csv';
+					csvFile = 'Skills.csv';
 					columns = ['ID','Name','Description1','Description2', 'Description3'];
 					break;
 					case '005_00004.IMG':
-					csvFile = 'Monster.csv';
+					csvFile = 'Monsters.csv';
 					columns = ['ID','Name'];
 					break;
 					case '005_00006.IMG':
-					csvFile = 'Npc.csv';
+					csvFile = 'Npcs.csv';
 					columns = ['ID','Name','Chat1','Chat2','Chat3','Chat4','Chat5'];
 					break;
 					//case '005_00007.IMG':
-					//csvFile = 'Quest.csv';
-					//break;					
+					//csvFile = 'Quests.csv';
+					//break;
 					default:
 					self.emit('loaded', filename);
 					self.Loaded = true;
@@ -190,7 +190,7 @@ GameInfoLoader.prototype.Load = function(filename, structure, onRecordFunction) 
 					 	 	for (var i=0;i<columns.length;i++) {
 					 	 		record[columns[i]] = data[columns[i]];
 					 	 	}
-					 	 	
+
 					 	 	record = onRecordFunction(record);
 					 	 	if (record !== undefined && record.ID) {
 					 	 		self.infos[record[columns[0]]] = record;
