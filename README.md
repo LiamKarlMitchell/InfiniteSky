@@ -1,6 +1,8 @@
 InfiniteSky
 =========
 
+[![Join the chat at https://gitter.im/LiamKarlMitchell/InfiniteSky](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/LiamKarlMitchell/InfiniteSky?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 InfiniteSky is an open-source project, emulating a Twelve Sky Server. It is written in Node.JS
 
   - We have reloadable code. This means less need to reset the server when developing.
