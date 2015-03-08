@@ -29,6 +29,11 @@ WorldPC.Set(0x04, {
         client.character.state.Location.Z = input.Location.Z;
 
         client.Zone.sendToAllArea(client, false, client.character.state.getPacket(), config.viewable_action_distance);
+
+
+        if(client.character.companion){
+            client.Zone.sendToAllArea(client, true, client.character.companion.getPacket(), config.viewable_action_distance);
+        }
     }
 });
 
@@ -59,9 +64,15 @@ WorldPC.Set(0x05, {
         client.character.state.LocationTo.Y = input.Location.Y;
         client.character.state.LocationTo.Z = input.Location.Z;
 
+
+
         client.character.state.LocationNew.X = input.LocationNew.X;
         client.character.state.LocationNew.Y = input.LocationNew.Y;
         client.character.state.LocationNew.Z = input.LocationNew.Z;
+
+        // console.log(client.character.state.Location);
+        // console.log(client.character.state.LocationNew);
+
 
         // TODO: Refactor TargetObjectIndex and TargetObjectUniqueNumber to be TargetID and TargetNodeID
         client.character.state.TargetObjectIndex = input.TargetID;
@@ -94,10 +105,15 @@ WorldPC.Set(0x05, {
             case 75:
             case 67:
             client.character.state.onSkillStateUpdate = true;
+            if(client.character.companion){
+                client.character.companion.move(client.character.state.Direction, client.character.state.FacingDirection, client.character.state.Location, input.LocationNew);
+                client.Zone.sendToAllArea(client, true, client.character.companion.getPacket(), config.viewable_action_distance);
+            }
             break;
 
             default:
             client.Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.viewable_action_distance);
+            client.Zone.sendToAllArea(client, true, client.character.companion.getPacket(), config.viewable_action_distance);
             break;
         }
     }

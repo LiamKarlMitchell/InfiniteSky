@@ -167,49 +167,90 @@ pad(96);
 
 
 function newSkillUpdate(client, input){
+	console.log(input);
 	console.log("Applying Skill ID : " + input.SkillID);
+	var skillInfo = infos.Skill[input.SkillID];
+
+	console.log(skillInfo);
+
+	var modStart = skillInfo.ModifiersStart;
+	var modEnd = skillInfo.ModifiersEnd;
+
+	console.log(modStart);
+	console.log(modEnd);
+
+	// console.log(client.character.SkillList);
+
+	var hasSkill = null;
+	for(var i=client.character.SkillList.length-1; i>0; i--){
+		var skill = client.character.SkillList[i];
+		if(!skill) continue;
+		if(skill.ID === input.SkillID){
+			hasSkill = skill;
+			break;
+		}
+	}
+
+	if(!hasSkill){
+		console.log("The player used skill that was not in his SkillList!");
+		return;
+	}
+
+	var cost = Math.round((modStart.ChiCost * 100) + ((((modEnd.ChiCost - modStart.ChiCost)*100)/skillInfo.MaxSkillLevel) * input.SkillLevel));
+	console.log("Skill Cost: "+cost);
+
+	var time = Math.round((modStart.EffectiveDuration * 100) + ((((modEnd.EffectiveDuration - modStart.EffectiveDuration)*100)/skillInfo.MaxSkillLevel) * input.SkillLevel));
 
 	switch(input.Slot){
 		case 4:
 		console.log("Applying Increse Damage Once");
-		client.character.state.Buffs[11] = {'Time': 100, 'Amount': 22};
+		var amount = Math.round((modStart.DamageIncreased * 100) + ((((modEnd.DamageIncreased - modStart.DamageIncreased)*100)/skillInfo.MaxSkillLevel) * input.SkillLevel));
+		client.character.state.Buffs[11] = {'Time': time, 'Amount': amount};
 		break;
 
 		case 6:
 		console.log("Applying Elemental Damage Increase");
-		client.character.state.Buffs[3] = {'Time': 100, 'Amount': 22};
+		var amount = (modStart.Unk2 * 100) + ((((modEnd.Unk2 - modStart.Unk2)*100)/skillInfo.MaxSkillLevel) * input.SkillLevel);
+		client.character.state.Buffs[3] = {'Time': time, 'Amount': amount};
 		break;
 
 		case 7:
-		client.character.state.Buffs[13] = {'Time': 100, 'Amount': 22};
+		client.character.state.Buffs[13] = {'Time': time, 'Amount': 22};
 		break;
 
 		case 8:
-		client.character.state.Buffs2[4] = {'Time': 100, 'Amount': 22};
+		console.log("Applying Reflect Damage")
+		// Reflect damage
+		var amount = Math.round((modStart.ChanceToReturnDamage * 100) + ((((modEnd.ChanceToReturnDamage - modStart.ChanceToReturnDamage)*100)/skillInfo.MaxSkillLevel) * input.SkillLevel));
+		console.log(amount);
+		client.character.state.Buffs2[4] = {'Time': time, 'Amount': amount};
 		break;
 
 		case 9:
-		client.character.state.Buffs2[5] = {'Time': 100, 'Amount': 22};
+		client.character.state.Buffs2[5] = {'Time': time, 'Amount': 22};
 		break;
 
 		case 10:
-		client.character.state.Buffs2[6] = {'Time': 100, 'Amount': 22};
+		client.character.state.Buffs2[6] = {'Time': time, 'Amount': 22};
 		break;
 
 		case 12:
-		client.character.state.Buffs[0] = {'Time': 100, 'Amount': 22};
+		console.log("Applying Damage Increase");
+
+		var amount = Math.round((modStart.IncreasedDamage * 100) + ((( (modEnd.IncreasedDamage - modStart.IncreasedDamage) * 100 ) / skillInfo.MaxSkillLevel) * input.SkillLevel));
+		client.character.state.Buffs[0] = {'Time': time, 'Amount': amount};
 		break;
 
 		case 17:
-		client.character.state.BuffHS = {'Time': 100, 'Amount': 200, 'Stacks': 5};
+		client.character.state.BuffHS = {'Time': time, 'Amount': 200, 'Stacks': 5};
 		break;
 
 		case 18:
-		client.character.state.Buffs2[0] = {'Time': 100, 'Amount': 22};
+		client.character.state.Buffs2[0] = {'Time': time, 'Amount': 22};
 		break;
 
 		case 19:
-		client.character.state.Buffs2[1] = {'Time': 100, 'Amount': 22};
+		client.character.state.Buffs2[1] = {'Time': time, 'Amount': 22};
 		break;
 	}
 
@@ -218,6 +259,8 @@ function newSkillUpdate(client, input){
 	client.character.state.SkillLevel = 0;
 	client.character.state.Frame = 0;
 	client.character.state.Skill = 0;
+
+	client.Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.viewable_action_distance);
 }
 
 WorldPC.Set(0x19, {
@@ -241,7 +284,6 @@ WorldPC.Set(0x18, {
 	function: function(client, input){
 		console.log('apply buff method');
 		newSkillUpdate(client, input);
-		client.Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.viewable_action_distance);
 	}
 });
 
