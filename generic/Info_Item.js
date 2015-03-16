@@ -268,6 +268,97 @@ vms.depends({
 	  	if (record.ID) {
 	  		// Change the prototype so that we have access to methods we want.
 	  		record.__proto__ = ItemInfo.prototype;
+
+	  		if(record.ItemType === 22){
+				record.PetStats = {
+					HP: 0,
+					Chi: 0,
+					Damage: 0,
+					Defense: 0,
+					Skills: {},
+					Dodge: 0,
+					HitRate: 0,
+					ElementalDamage: 0,
+					ElementalDefense: 0,
+					MaxGrowth: 40000000
+				};
+
+				switch(record.ID){
+					case 9800:
+					record.PetStats.Damage = 1000;
+					record.PetStats.HitRate = 1000;
+					record.PetStats.ElementalDamage = 600;
+					record.PetStats.MaxGrowth = 240000000;
+					break;
+
+					case 9801:
+					record.PetStats.HP = 2000;
+					record.PetStats.Dodge = 500;
+					record.PetStats.ElementalDefense = 500;
+					record.PetStats.MaxGrowth = 240000000;
+					break;
+
+					case 9802:
+					record.PetStats.Damage = 1000;
+					record.PetStats.Defense = 2000;
+					record.PetStats.HP = 2000;
+					record.PetStats.Dodge = 500;
+					record.PetStats.HitRate = 1000;
+					record.PetStats.MaxGrowth = 240000000;
+					break;
+
+					case 98999:
+					record.PetStats.HP = 2000;
+					break;
+
+					case 99000:
+					record.PetStats.Defense = 2000;
+					break;
+
+					case 99001:
+					record.PetStats.Damage = 1000;
+					break;
+
+					case 99226:
+					record.PetStats.Damage = 1000;
+					record.PetStats.HP = 2000;
+					record.PetStats.MaxGrowth = 120000000;
+					break;
+
+					case 99227:
+					record.PetStats.Damage = 1000;
+					record.PetStats.Defense = 2000;
+					record.PetStats.MaxGrowth = 120000000;
+					break;
+
+					case 99228:
+					record.PetStats.Damage = 1000;
+					record.PetStats.HP = 2000;
+					record.PetStats.MaxGrowth = 120000000;
+					break;
+
+					case 99229:
+					record.PetStats.Damage = 1000;
+					record.PetStats.Defense = 2000;
+					record.PetStats.HP = 2000;
+					record.PetStats.MaxGrowth = 240000000;
+					break;
+
+					case 99267:
+					case 99282:
+					record.PetStats.Defense = 2000;
+					record.PetStats.Skills[103] = 4;
+					break;
+
+					case 99268:
+					case 99283:
+					record.PetStats.Damage = 1000;
+					record.PetStats.Skills[82] = 4;
+					break;
+				}
+
+		  }
+
 	  	}
 	  	return record;
 	  });

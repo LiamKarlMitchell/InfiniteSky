@@ -100,7 +100,12 @@ var characterStatsInfoObj = function(c, character){
     HP: 0,
     Chi: 0,
     Damage: 0,
-    Defense: 0
+    Defense: 0,
+    Skills: {},
+    Dodge: 0,
+    HitRate: 0,
+    ElementalDamage: 0,
+    ElementalDefense: 0
   };
 
   this.Armor = {
@@ -218,6 +223,27 @@ characterStatsInfo_Prototype.updateEquipmentByDefault = function(equipment_name)
 
     case 'Pet':
       // this.Pet.
+      this.Pet = {
+        HP: 0,
+        Chi: 0,
+        Damage: 0,
+        Defense: 0,
+        Skills: {},
+        Dodge: 0,
+        HitRate: 0,
+        ElementalDamage: 0,
+        ElementalDefense: 0
+      };
+
+      this.updateStat('HP');
+      this.updateStat('Chi');
+      this.updateStat('Damage');
+      this.updateStat('Defense');
+      this.updateStat('Skills');
+      this.updateStat('Dodge');
+      this.updateStat('HitRate');
+      this.updateStat('ElementalDamage');
+      this.updateStat('Resists');
     break;
 
 
@@ -328,6 +354,8 @@ characterStatsInfo_Prototype.updateEquipment = function(equipment_name){
     return;
   }
 
+
+
   // Get the defaults
   var enchant = item.Enchant*3 || 0;
   var combine = item.Combine || 0;
@@ -367,8 +395,110 @@ characterStatsInfo_Prototype.updateEquipment = function(equipment_name){
 
 
     case 'Pet':
-      var MAX_GROWTH = 250000000;
-      //TODO: Pet stats
+      var MAX_GROWTH = itemInfo.PetStats.MaxGrowth;
+      var scale = item.Growth / MAX_GROWTH;
+
+      // console.log("Updating pet ["+item.ID+"]");
+      // console.log("Pet growth: " + item.Growth);
+      switch(item.ID){
+        case 9800:
+        this.Pet.Damage = (itemInfo.PetStats.Damage / 200) * (scale * 200) + (item.Growth >= MAX_GROWTH ? itemInfo.PetStats.Damage / 100 * 10 : 0);
+        this.Pet.HitRate = (itemInfo.PetStats.HitRate / 200) * (scale * 200);
+        this.Pet.ElementalDamage = (itemInfo.PetStats.ElementalDamage / 200) * (scale * 200);
+        this.updateStat('Damage');
+        this.updateStat('HitRate');
+        this.updateStat('ElementalDamage');
+        break;
+
+        case 9801:
+        this.Pet.HP = (itemInfo.PetStats.HP / 200) * (scale * 200) + (item.Growth >= MAX_GROWTH ? itemInfo.PetStats.HP / 100 * 10 : 0);
+        this.Pet.ElementalDefense = (itemInfo.PetStats.ElementalDefense / 200) * (scale * 200);
+        this.Pet.ElementalDefense = this.Pet.ElementalDefense > 136 ? 136 : this.Pet.ElementalDefense;
+        this.Pet.Dodge = (itemInfo.PetStats.Dodge / 200) * (scale * 200);
+
+        this.updateStat('Health');
+        this.updateStat('Resists');
+        this.updateStat('Dodge');
+        break;
+
+        case 9802:
+        this.Pet.Damage = (itemInfo.PetStats.Damage / 200) * (scale * 200) + (item.Growth >= MAX_GROWTH ? itemInfo.PetStats.Damage / 100 * 10 : 0);
+        this.Pet.Defense = (itemInfo.PetStats.Defense / 200) * (scale * 200) + (item.Growth >= MAX_GROWTH ? itemInfo.PetStats.Defense / 100 * 10 : 0);
+        this.Pet.HP = (itemInfo.PetStats.HP / 200) * (scale * 200) + (item.Growth >= MAX_GROWTH ? itemInfo.PetStats.HP / 100 * 10 : 0);
+        this.Pet.HitRate = (itemInfo.PetStats.HitRate / 200) * (scale * 200);
+        this.Pet.Dodge = (itemInfo.PetStats.Dodge / 200) * (scale * 200);
+        this.updateStat('Health');
+        this.updateStat('Defense');
+        this.updateStat('Damage');
+        this.updateStat('HitRate');
+        this.updateStat('Dodge');
+        break;
+
+        case 98999:
+        this.Pet.HP = (itemInfo.PetStats.HP / 200) * (scale * 200) + (item.Growth >= MAX_GROWTH ? itemInfo.PetStats.HP / 100 * 10 : 0);
+        this.updateStat('Health');
+        break;
+
+        case 99000:
+        this.Pet.Defense = (itemInfo.PetStats.Defense / 200) * (scale * 200) + (item.Growth >= MAX_GROWTH ? itemInfo.PetStats.Defense / 100 * 10 : 0);
+        this.updateStat('Defense');
+        break;
+
+        case 99001:
+        this.Pet.Damage = (itemInfo.PetStats.Damage / 200) * (scale * 200) + (item.Growth >= MAX_GROWTH ? itemInfo.PetStats.Damage / 100 * 10 : 0);
+        this.updateStat('Damage');
+        break;
+
+        case 99226:
+        this.Pet.Damage = (itemInfo.PetStats.Damage / 200) * (scale * 200) + (item.Growth >= MAX_GROWTH ? itemInfo.PetStats.Damage / 100 * 10 : 0);
+        this.Pet.HP = (itemInfo.PetStats.HP / 200) * (scale * 200) + (item.Growth >= MAX_GROWTH ? itemInfo.PetStats.HP / 100 * 10 : 0);
+        this.updateStat('Health');
+        this.updateStat('Damage');
+        break;
+
+        case 99227:
+        this.Pet.Damage = (itemInfo.PetStats.Damage / 200) * (scale * 200) + (item.Growth >= MAX_GROWTH ? itemInfo.PetStats.Damage / 100 * 10 : 0);
+        this.Pet.Defense = (itemInfo.PetStats.Defense / 200) * (scale * 200) + (item.Growth >= MAX_GROWTH ? itemInfo.PetStats.Defense / 100 * 10 : 0);
+        this.updateStat('Damage');
+        this.updateStat('Defense');
+        break;
+
+        case 99228:
+        this.Pet.Defense = (itemInfo.PetStats.Defense / 200) * (scale * 200) + (item.Growth >= MAX_GROWTH ? itemInfo.PetStats.Defense / 100 * 10 : 0);
+        this.Pet.HP = (itemInfo.PetStats.HP / 200) * (scale * 200) + (item.Growth >= MAX_GROWTH ? itemInfo.PetStats.HP / 100 * 10 : 0);
+        this.updateStat('Health');
+        this.updateStat('Defense');
+        break;
+
+        case 99229:
+        this.Pet.HP = (itemInfo.PetStats.HP / 200) * (scale * 200) + (item.Growth >= MAX_GROWTH ? itemInfo.PetStats.HP / 100 * 10 : 0);
+        this.Pet.Defense = (itemInfo.PetStats.Defense / 200) * (scale * 200) + (item.Growth >= MAX_GROWTH ? itemInfo.PetStats.Defense / 100 * 10 : 0);
+        this.Pet.Damage = (itemInfo.PetStats.Damage / 200) * (scale * 200) + (item.Growth >= MAX_GROWTH ? itemInfo.PetStats.Damage / 100 * 10 : 0);
+        this.updateStat('Health');
+        this.updateStat('Defense');
+        this.updateStat('Damage');
+        break;
+
+        case 99267:
+        case 99282:
+        this.Pet.Defense = (itemInfo.PetStats.Defense / 200) * (scale * 200) + (item.Growth >= MAX_GROWTH ? itemInfo.PetStats.Defense / 100 * 10 : 0);
+        this.Pet.Skills = itemInfo.PetStats.Skills;
+        this.updateStat('Defense');
+        this.updateSkills();
+        break;
+
+        case 99268:
+        case 99283:
+        this.Pet.Damage = (itemInfo.PetStats.Damage / 200) * (scale * 200) + (item.Growth >= MAX_GROWTH ? itemInfo.PetStats.Damage / 100 * 10 : 0);
+        this.Pet.Skills = itemInfo.PetStats.Skills;
+        this.updateStat('Damage');
+        this.updateSkills();
+        break;
+
+        default:
+        console.log("The ["+item.ID+"] item is not a PET!");
+        break;
+      }
     break;
 
 
@@ -466,6 +596,7 @@ characterStatsInfo_Prototype.updateAll = function(){
   this.updateEquipment('Cape');
   this.updateEquipment('Amulet');
   this.updateEquipment('Ring');
+  this.updateEquipment('Pet');
 
   this.updateStat('StatVitality');
   this.updateStat('StatChi');
@@ -494,20 +625,20 @@ characterStatsInfo_Prototype.updateSkills = function(){
 
 characterStatsInfo_Prototype.updateStat = function(stat_name){
   var Stat = this.client.character[stat_name];
-  if(
-    (
-      stat_name !== 'Defense' &&
-      stat_name !== 'HitRate' &&
-      stat_name !== 'Dodge' &&
-      stat_name !== 'Luck' &&
-      stat_name !== 'DeadlyRate' &&
-      stat_name !== 'Resists' &&
-      stat_name !== 'ElementalDamage'
-    ) && Stat === undefined
-  ){
-    console.log("Stat " + stat_name + " is undefined");
-    return;
-  }
+  // if(
+  //   (
+  //     stat_name !== 'Defense' &&
+  //     stat_name !== 'HitRate' &&
+  //     stat_name !== 'Dodge' &&
+  //     stat_name !== 'Luck' &&
+  //     stat_name !== 'DeadlyRate' &&
+  //     stat_name !== 'Resists' &&
+  //     stat_name !== 'ElementalDamage'
+  //   ) && Stat === undefined
+  // ){
+  //   console.log("Stat " + stat_name + " is undefined");
+  //   return;
+  // }
 
   if(!this.Modifiers){
     console.log("No character modifiers");
@@ -522,6 +653,9 @@ characterStatsInfo_Prototype.updateStat = function(stat_name){
 
   switch(stat_name){
     case 'StatVitality':
+    case 'Vitality':
+    case 'HP':
+    case 'Health':
     var baseHP = this.clan === 0 ? ExpInfo.GuanyinHP : this.clan === 1 ? ExpInfo.FujinHP : ExpInfo.JinongHP;
     var formula = baseHP + (this.Modifiers.HP * (Stat+this.Armor.Vitality)) + this.Pet.HP;
     this.MaxHP = formula;
@@ -557,23 +691,28 @@ characterStatsInfo_Prototype.updateStat = function(stat_name){
     break;
 
     case 'StatStrength':
+    case 'Damage':
     var baseDamage = this.clan === 0 ? ExpInfo.GuanyinDamage : this.clan === 1 ? ExpInfo.FujinDamage : ExpInfo.JinongDamage;
     var damageFormula = (baseDamage + (this.Weapon.Mod * Stat)) + baseDamage + this.Weapon.Damage;
     this.Damage = damageFormula;
+    this.Damage += this.Pet.Damage;
     break;
 
     case 'Defense':
     var baseDefense = this.clan === 0 ? ExpInfo.GuanyinDefense : this.clan === 1 ? ExpInfo.FujinDefense : ExpInfo.JinongDefense;
     this.Defense = this.Armor.Defense + this.Boots.Defense + this.Gloves.Defense + this.Cape.Defense + baseDefense;
+    this.Defense += this.Pet.Defense;
     break;
 
     case 'HitRate':
     this.HitRate = this.Weapon.HitRate + this.Gloves.HitRate + this.DexHitRate;
+    this.HitRate += this.Pet.HitRate;
     break;
 
     case 'Dodge':
     var baseDefense = this.clan === 0 ? ExpInfo.GuanyinDefense : this.clan === 1 ? ExpInfo.FujinDefense : ExpInfo.JinongDefense;
     this.Dodge = this.Boots.Dodge + this.Armor.Dodge + this.DexDodge;
+    this.Dodge += this.Pet.Dodge;
     break;
 
     case 'Luck':
@@ -584,6 +723,10 @@ characterStatsInfo_Prototype.updateStat = function(stat_name){
     this.Resists.Light = this.Armor.Resists.Light + this.Amulet.Resists.Light + this.Cape.Resists.Light;
     this.Resists.Shadow = this.Armor.Resists.Shadow + this.Amulet.Resists.Shadow + this.Cape.Resists.Shadow;
     this.Resists.Dark = this.Armor.Resists.Dark + this.Amulet.Resists.Dark + this.Cape.Resists.Dark;
+
+    this.Resists.Light += this.Resists.Light / 136 * this.Pet.ElementalDefense;
+    this.Resists.Shadow += this.Resists.Shadow / 136 * this.Pet.ElementalDefense;
+    this.Resists.Dark += this.Resists.Dark / 136 * this.Pet.ElementalDefense;
     break;
 
     case 'ElementalDamage':

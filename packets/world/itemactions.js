@@ -832,7 +832,7 @@ ItemActions[0x0E] = function Recv_UnequipItemFromCharacter(client, input) {
         inventory[collision.InventoryIndex] = {ID: invItem.ID, Enchant: invItem.Enchant, Combine: invItem.Combine, Column: collision.MoveRow, Row: collision.MoveColumn};
     
 
-    client.character.infos.updateEquipment(equipItem);
+    client.character.infos.updateEquipmentByDefault(equipItem);
     client.character[equipItem] = null;
     
     client.character.markModified('Inventory');

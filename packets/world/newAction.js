@@ -41,7 +41,7 @@ WorldPC.Set(0x05, {
     Restruct: WorldPC.ActionPacket,
 
     function: function ActionHandler(client, input) {
-        console.log("Action packet, uses skill: " + input.Skill);
+        // console.log("Action packet, uses skill: " + input.Skill);
         // console.log(input);
 
         client.character.state.Frame = input.Frame;
@@ -113,7 +113,6 @@ WorldPC.Set(0x05, {
 
             default:
             client.Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.viewable_action_distance);
-            client.Zone.sendToAllArea(client, true, client.character.companion.getPacket(), config.viewable_action_distance);
             break;
         }
     }

@@ -42,8 +42,18 @@ console.log(testResponse.size);
 
 GMCommands.AddCommand(new Command('test', 0, function(string, client) {
 
+	for(var i=1; i<121; i++){
+		console.log(infos.Skill[i]);
+		for(var j in infos.Skill[i]){
+			// console.log(j);
+			console.log(j + ": ");
+			var t = infos.Skill[i][j];
+			console.log(t);
+		}
+		// break;
+	}
 
-	client.Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.viewable_action_distance);
+	// client.Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.viewable_action_distance);
 
 	// console.log(client.character);
 	// console.log(client.character.node.id);

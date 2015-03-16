@@ -85,7 +85,7 @@ WorldPC.Set(0x01, {
 			console.log('Existing socket not found');
 			socket.destroy();
 		}
-
+		console.log("Handshake completed");
 		// Update the characters info
 		socket.character.infos.updateAll();
 		//eyes.inspect(socket.character.infos);
