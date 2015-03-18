@@ -622,6 +622,19 @@ void TSX_Client::Init()
 		rename(GGFileBackup,GGFile);
 	}
 
+	if (ini->GetInt("HookFileLoading",1))
+	{
+		Log.Write("Hooking File Loading");
+		oCreateFileW = (tCreateFileW) DetourCreate("kernel32.dll", "CreateFileW", hook_CreateFileW, DETOUR_TYPE_JMP);
+		if (oCreateFileW == NULL) {
+			oCreateFileW = (tCreateFileW) DetourCreate("kernelbase.dll", "CreateFileW", hook_CreateFileW, DETOUR_TYPE_JMP);
+		}
+
+		if (oCreateFileW == NULL) {
+			Log.Write("Error failed to hook file loading.");
+		}
+	}
+
 	if (ini->GetInt("MultiClient",1))
 	{
 		//00403AB6   > \6A 00         PUSH 0                                   ; /Title = NULL
@@ -1054,28 +1067,6 @@ void TSX_Client::Init()
 
 	if (ini->GetInt("LoadTranslations",1)) {
 		LoadTranslationCSVs();
-	}
-
-	if (ini->GetInt("HookFileLoading",1))
-	{
-		Log.Write("Hooking File Loading");
-		// Create a hook and hook any CreateFileW
-		// if the file path ends with .IMG or .img
-		// copy the pathname and prepend data\\ to it.
-		// check if file exists
-		// if so call orgional CreateFileW on that otherwise call origional function on the argument path.
-		// return
-		  //CreateFileW
-  //LPCTSTR lpFileName,
-  //DWORD dwDesiredAccess,
-  //DWORD dwShareMode,
-  //LPSECURITY_ATTRIBUTES lpSecurityAttributes,
-  //DWORD dwCreationDisposition,
-  //DWORD dwFlagsAndAttributes,
-  //HANDLE hTemplateFile
-
-		//detour_CreateFileW = (tCreateFileW) detour.Create("kernel32.dll", "CreateFileW", (BYTE*)hook_CreateFileW, DETOUR_TYPE_JMP);
-		oCreateFileW = (tCreateFileW) DetourCreate("kernel32.dll", "CreateFileW", hook_CreateFileW, DETOUR_TYPE_JMP);
 	}
 }
 
