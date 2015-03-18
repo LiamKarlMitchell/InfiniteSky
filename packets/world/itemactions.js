@@ -41,7 +41,7 @@ WorldPC.ItemActionPacket = restruct.
 
 var NotImplemented = function(client, name, input) {
     var msg = 'Item Action: ' + name + ' is not implemented.';
-    console.log(msg);
+    //console.log(msg);
     client.sendInfoMessage(msg);
     client.write(new Buffer(ItemActionReplyPacket.pack({
         PacketID: 0x2B,
@@ -115,11 +115,11 @@ function getSlotCount(itemType) {
 
 ItemActions = [];
 ItemActions[0x00] = function Recv_PickupItem(client, input) {
-    console.log(input);
+    //console.log(input);
 
     var item = client.Zone.getItem(input.NodeID);
     if (item) {
-        console.log(item.info.Name);
+        //console.log(item.info.Name);
 
         // TODO: Check Owner name if not our own name then we cannot pick up
         if (item.OwnerName !== '' && item.OwnerName !== client.character.Name) {
@@ -138,7 +138,7 @@ ItemActions[0x00] = function Recv_PickupItem(client, input) {
             clientWriteItemActionSuccess(client, input);
             return;
         }
-        
+
         if (input.InventoryIndex>32) {
             console.log('Inventory Index is outside bounds of array. '+input.InventoryIndex);
             clientWriteItemActionFailed(client, input);
@@ -191,7 +191,7 @@ ItemActions[0x00] = function Recv_PickupItem(client, input) {
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     client.character.markModified('Inventory');
     client.character.save();
 
@@ -242,30 +242,30 @@ ItemActions[0x02] = function Recv_MoveItemIntoQuickUseBar(client, input) {
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     var inventory = client.character.Inventory;
-    
+
     var qItem = client.character.QuickUseItems[input.EquipIndex];
     var invItem = inventory[input.InventoryIndex];
-    
+
     if(!invItem || !invItem.ID || input.ItemID !== invItem.ID){
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     //TODO: Make sure that the items that are moved onto bar are the items that should be moved.
-    
+
     var itemInfo = infos.Item[invItem.ID];
     if(!itemInfo){
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     if(input.Amount > 99 || input.Amount < 0 || input.Amount > invItem.Amount){
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     var reminder = invItem.Amount - input.Amount;
     var amount;
     if(reminder === 0){
@@ -275,7 +275,7 @@ ItemActions[0x02] = function Recv_MoveItemIntoQuickUseBar(client, input) {
         inventory[input.InventoryIndex].Amount = reminder;
         amount = input.Amount;
     }
-    
+
     if(!qItem){
         client.character.QuickUseItems[input.EquipIndex] = {ID: invItem.ID, Amount: amount};
     }else if(qItem && qItem.ID && qItem.ID === invItem.ID){
@@ -286,7 +286,7 @@ ItemActions[0x02] = function Recv_MoveItemIntoQuickUseBar(client, input) {
             client.character.QuickUseItems[input.EquipIndex].Amount += amount;
         }
     }
-    
+
     client.character.markModified('QuickUseItems');
     client.character.markModified('Inventory');
     client.character.save();
@@ -301,33 +301,33 @@ ItemActions[0x03] = function Recv_EquipItemOnCharacter(client, input) {
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     var inventory = client.character.Inventory;
     var invItem = inventory[input.InventoryIndex];
-    
+
     if(!invItem){
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     var itemInfo = infos.Item[invItem.ID];
-    
+
     if(!itemInfo){
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     if(client.character.Level < itemInfo.LevelRequirement || ! itemInfo.isAllowedByClan(client.character.Clan)){
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     if(itemInfo.ItemType !== input.ItemType){
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
-    var equipItem = itemInfo.InventoryItemType(); 
+
+    var equipItem = itemInfo.InventoryItemType();
 
     if(equipItem){
         var characterEquipItem = client.character[equipItem];
@@ -352,12 +352,12 @@ ItemActions[0x03] = function Recv_EquipItemOnCharacter(client, input) {
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     inventory[input.InventoryIndex] = null;
-    
+
     client.character.markModified('Inventory');
     client.character.save();
-    
+
     clientWriteItemActionSuccess(client, input);
 };
 
@@ -367,42 +367,42 @@ ItemActions[0x04] = function Recv_MoveStoredItem(client, input) {
         console.log("Incorrect Inventory Index or Equip Index");
         return;
     }
-    
+
     var storage = client.character.Storage;
-    
+
     if(input.Amount < 0 || input.Amount > 99){
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     var invItem = storage[input.InventoryIndex];
     if(!invItem){
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     var itemInfo = infos.Item[invItem.ID];
     if(!itemInfo){
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     var existingItem = storage[input.EquipIndex];
-    
+
     if(existingItem){
         var existingInfo = infos.Item[existingItem.ID];
         if(!existingInfo){
             clientWriteItemActionFailed(client, input);
             return;
         }
-        
+
         if(!existingInfo.isStackable() || !itemInfo.isStackable() || invItem.ID !== existingItem.ID){
             clientWriteItemActionFailed(client, input);
             return;
         }
-        
+
         var reminder = invItem.Amount - input.Amount;
-        
+
         var amount;
         if(reminder === 0){
             amount = invItem.Amount;
@@ -411,12 +411,12 @@ ItemActions[0x04] = function Recv_MoveStoredItem(client, input) {
             amount = input.Amount;
             storage[input.InventoryIndex].Amount = reminder;
         }
-        
+
         if((existingItem.Amount+amount) > 99 || (existingItem.Amount+amount) < 0){
             clientWriteItemActionFailed(client, input);
             return;
         }
-        
+
         storage[input.EquipIndex].Amount += input.Amount;
     }else{
         if(!itemInfo.isStackable()){
@@ -432,7 +432,7 @@ ItemActions[0x04] = function Recv_MoveStoredItem(client, input) {
                 amount = input.Amount;
                 storage[input.InventoryIndex].Amount = reminder;
             }
-            
+
             if((existingItem.Amount+amount) > 99 || (existingItem.Amount+amount) < 0){
                 clientWriteItemActionFailed(client, input);
                 return;
@@ -441,7 +441,7 @@ ItemActions[0x04] = function Recv_MoveStoredItem(client, input) {
             storage[input.EquipIndex] = invItem;
         }
     }
-    
+
     client.character.markModified('Storage');
     client.character.save();
     clientWriteItemActionSuccess(client, input);
@@ -455,32 +455,32 @@ ItemActions[0x05] = function Recv_StoreItemInCharacterPrivateStorage(client, inp
     }
 
     console.log("test");
-    
+
     var inventory = client.character.Inventory;
     var invItem = inventory[input.InventoryIndex];
-    
+
     if(!invItem){
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     if(invItem.ID !== input.ItemID){
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     var itemInfo = infos.Item[invItem.ID];
-    
+
     if(!itemInfo){
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     var storage = client.character.Storage;
     var eqItem = storage[input.EquipIndex];
-    
+
     var reminder = (!invItem.Amount ? 0 : invItem.Amount) - input.Amount;
-    
+
     var amount;
     if(reminder <= 0){
         amount = !invItem.Amount ? 0 : invItem.Amount;
@@ -489,18 +489,18 @@ ItemActions[0x05] = function Recv_StoreItemInCharacterPrivateStorage(client, inp
         amount = input.Amount;
         inventory[input.InventoryIndex].Amount = reminder;
     }
-    
+
     if(itemInfo.isStackable() && input.Amount === 0){
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
-    
+
+
     if(eqItem && eqItem.ID !== invItem.ID){
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     if(itemInfo.isStackable() && eqItem){
         if(!eqItem.Amount){
             clientWriteItemActionFailed(client, input);
@@ -510,12 +510,12 @@ ItemActions[0x05] = function Recv_StoreItemInCharacterPrivateStorage(client, inp
             clientWriteItemActionFailed(client, input);
             return;
         }
-        
+
         if(input.Amount > invItem.Amount){
             clientWriteItemActionFailed(client, input);
             return;
         }
-        
+
         storage[input.EquipIndex].Amount += amount;
     }else{
         if(itemInfo.isStackable())
@@ -529,7 +529,7 @@ ItemActions[0x05] = function Recv_StoreItemInCharacterPrivateStorage(client, inp
         else
             storage[input.EquipIndex] = {ID: invItem.ID, Enchant: invItem.Enchant, Combine: invItem.Combine};
     }
-    
+
     client.character.markModified('Inventory');
     client.character.markModified('Storage');
     client.character.save();
@@ -543,30 +543,30 @@ ItemActions[0x06] = function Recv_StoreItemInGateMaster(client, input) {
         console.log("Index is incorrect");
         return;
     }
-    
+
     if(input.Amount > 99 || input.Amount < 0){
         console.log("Amount is incorrect");
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     var inventory = client.character.Inventory;
     var invItem = inventory[input.InventoryIndex];
-    
+
     if(!invItem || invItem.ID !== input.ItemID){
         console.log("The input id does not match");
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     var itemInfo = infos.Item[invItem.ID];
     if(!itemInfo){
         console.log("Theres is no item info on that item ID");
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
-    var bank = client.character.Bank;    
+
+    var bank = client.character.Bank;
     if(bank[input.EquipIndex]){
         console.log("Theres an item in bank already");
         clientWriteItemActionFailed(client, input);
@@ -575,15 +575,15 @@ ItemActions[0x06] = function Recv_StoreItemInGateMaster(client, input) {
 
     input.Amount = itemInfo.isStackable() && input.Amount === 0 ? 1 : input.Amount;
     input.Amount = itemInfo.isStackable() ? input.Amount : 0;
-    
+
     var reminder = (!invItem.Amount || !itemInfo.isStackable() ? 0 : invItem.Amount) - input.Amount;
-    
+
     if(reminder){
         console.log("Reminder left behind");
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     if(itemInfo.isStackable() && invItem.Amount < input.Amount){
         console.log("Item is stackable and the item amount is less than input amount");
         clientWriteItemActionFailed(client, input);
@@ -600,14 +600,14 @@ ItemActions[0x06] = function Recv_StoreItemInGateMaster(client, input) {
         bank[input.EquipIndex] = {ID: invItem.ID, Capacity: invItem.Capacity};
     else
         bank[input.EquipIndex] = {ID: invItem.ID, Enchant: invItem.Enchant, Combine: invItem.Combine};
-    
+
     for(var i = 0; i < 56; i++){
         if(bank[i] === undefined)
             bank[i] = null;
     }
-    
+
     inventory[input.InventoryIndex] = null;
-    
+
     client.character.markModified('Inventory');
     client.character.save();
     client.character.saveBank();
@@ -659,32 +659,32 @@ ItemActions[0xB] = function Recv_MoveFromPillBar(client, input) {
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     var qItem = client.character.QuickUseItems[input.InventoryIndex];
     var inventory = client.character.Inventory;
-    
+
     if(!qItem || !qItem.ID || qItem.ID !== input.ItemID){
         console.log("The matching is not accepted");
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     var itemInfo = infos.Item[input.ItemID];
-    
+
     if(!itemInfo){
         console.log("No item info");
         return;
     }
-    
+
     var invItem = client.character.Inventory[input.EquipIndex];
-    
+
     var collision = client.character.checkInventoryItemCollision(input.MoveColumn, input.MoveRow, getSlotCount(itemInfo.ItemType));
 
     if(input.Amount > 99 || input.Amount < 0 || input.Amount > qItem.Amount){
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     var reminder = qItem.Amount - input.Amount;
 
     var amount;
@@ -695,7 +695,7 @@ ItemActions[0xB] = function Recv_MoveFromPillBar(client, input) {
         client.character.QuickUseItems[input.InventoryIndex].Amount = reminder;
         amount = input.Amount;
     }
-    
+
     if(!invItem && collision){
         inventory[collision.InventoryIndex] = {ID: qItem.ID, Amount: amount, Column: collision.MoveRow, Row: collision.MoveColumn};
     }else{
@@ -782,7 +782,7 @@ ItemActions[0x0E] = function Recv_UnequipItemFromCharacter(client, input) {
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     var equipItem;
     switch(input.InventoryIndex){
         case 0: equipItem = 'Amulet'; break; // Amulet
@@ -805,9 +805,9 @@ ItemActions[0x0E] = function Recv_UnequipItemFromCharacter(client, input) {
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     var itemInfo = infos.Item[invItem.ID];
-    
+
     if(!itemInfo){
         console.log("No item info");
         clientWriteItemActionFailed(client, input);
@@ -821,7 +821,7 @@ ItemActions[0x0E] = function Recv_UnequipItemFromCharacter(client, input) {
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     if(itemInfo.ItemType === 22)
         inventory[collision.InventoryIndex] = {ID: invItem.ID, Activity: invItem.Activity, Growth: invItem.Growth, Column: collision.MoveRow, Row: collision.MoveColumn};
     else if(itemInfo.ItemType === 11 || itemInfo.ItemType === 8 || itemInfo.ItemType === 7)
@@ -830,14 +830,14 @@ ItemActions[0x0E] = function Recv_UnequipItemFromCharacter(client, input) {
         inventory[collision.InventoryIndex] = {ID: invItem.ID, Capacity: invItem.Capacity, Column: collision.MoveRow, Row: collision.MoveColumn};
     else
         inventory[collision.InventoryIndex] = {ID: invItem.ID, Enchant: invItem.Enchant, Combine: invItem.Combine, Column: collision.MoveRow, Row: collision.MoveColumn};
-    
+
 
     client.character.infos.updateEquipmentByDefault(equipItem);
     client.character[equipItem] = null;
-    
+
     client.character.markModified('Inventory');
     client.character.save();
-    
+
     clientWriteItemActionSuccess(client, input);
 };
 
@@ -847,32 +847,32 @@ ItemActions[0x0F] = function Recv_MoveItemFromStorage(client, input) {
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     var storage = client.character.Storage;
     var invItem = storage[input.InventoryIndex];
-    
+
     if(!invItem){
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     if(invItem.ID !== input.ItemID){
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     var itemInfo = infos.Item[invItem.ID];
-    
+
     if(!itemInfo){
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     var inventory = client.character.Inventory;
     var eqItem = inventory[input.EquipIndex];
 
     var reminder = (!invItem.Amount ? 0 : invItem.Amount) - input.Amount;
-    
+
     var amount = null;
     if(reminder <= 0){
         console.log("No reminder");
@@ -883,13 +883,13 @@ ItemActions[0x0F] = function Recv_MoveItemFromStorage(client, input) {
         storage[input.InventoryIndex].Amount = reminder;
         console.log("Reminder : " + reminder);
     }
-    
+
     if(itemInfo.isStackable() && input.Amount === 0){
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
-    
+
+
     if(eqItem && eqItem.ID !== invItem.ID){
         clientWriteItemActionFailed(client, input);
         return;
@@ -900,7 +900,7 @@ ItemActions[0x0F] = function Recv_MoveItemFromStorage(client, input) {
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     if(itemInfo.isStackable() && eqItem){
         if(!eqItem.Amount){
             clientWriteItemActionFailed(client, input);
@@ -910,12 +910,12 @@ ItemActions[0x0F] = function Recv_MoveItemFromStorage(client, input) {
             clientWriteItemActionFailed(client, input);
             return;
         }
-        
+
         if(input.Amount > invItem.Amount){
             clientWriteItemActionFailed(client, input);
             return;
         }
-        
+
         inventory[input.EquipIndex].Amount += amount;
     }else{
         if(itemInfo.isStackable())
@@ -929,7 +929,7 @@ ItemActions[0x0F] = function Recv_MoveItemFromStorage(client, input) {
         else
             inventory[collision.InventoryIndex] = {ID: invItem.ID, Enchant: invItem.Enchant, Combine: invItem.Combine, Column: collision.MoveRow, Row: collision.MoveColumn};
     }
-    
+
     client.character.markModified('Inventory');
     client.character.markModified('Storage');
     client.character.save();
@@ -945,13 +945,13 @@ ItemActions[0x10] = function Recv_GetItemFromGateMasterStorage(client, input) {
     }
     var bank = client.character.Bank;
     var invItem = bank[input.InventoryIndex];
-    
+
     if(!invItem){
         console.log("Item does not exists");
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     var inventory = client.character.Inventory;
 
     if(input.Amount < 0 || input.Amount > 99){
@@ -959,37 +959,37 @@ ItemActions[0x10] = function Recv_GetItemFromGateMasterStorage(client, input) {
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     var itemInfo = infos.Item[invItem.ID];
     if(!itemInfo){
         console.log("Item info not founded");
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     var collision = client.character.checkInventoryItemCollision(input.MoveColumn, input.MoveRow, getSlotCount(itemInfo.ItemType));
 
     if(!collision){
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     input.Amount = itemInfo.isStackable() && input.Amount === 0 ? 1 : input.Amount;
     input.Amount = itemInfo.isStackable() ? input.Amount : 0;
-    
+
     var reminder = (!invItem.Amount || !itemInfo.isStackable() ? 0 : invItem.Amount) - input.Amount;
-    
+
     if(reminder){
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     if(itemInfo.isStackable() && invItem.Amount < input.Amount){
         console.log("Item is stackable and the item amount is less than input amount");
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
 
     if(itemInfo.isStackable())
         inventory[input.EquipIndex] = {ID: invItem.ID, Amount: input.Amount, Column: collision.MoveRow, Row: collision.MoveColumn};
@@ -1001,9 +1001,9 @@ ItemActions[0x10] = function Recv_GetItemFromGateMasterStorage(client, input) {
         inventory[collision.InventoryIndex] = {ID: invItem.ID, Capacity: invItem.Capacity, Column: collision.MoveRow, Row: collision.MoveColumn};
     else
         inventory[input.EquipIndex] = {ID: invItem.ID, Enchant: invItem.Enchant, Combine: invItem.Combine, Column: collision.MoveRow, Row: collision.MoveColumn};
-    
+
     bank[input.InventoryIndex] = null;
-    
+
     client.character.markModified('Inventory');
     client.character.save();
     client.character.saveBank();
@@ -1013,9 +1013,9 @@ ItemActions[0x10] = function Recv_GetItemFromGateMasterStorage(client, input) {
 // var checkInventoryItemCollision = function(x, y, size) {
 //     // "Paint" only those positions that we are interested in, if we are putting
 //         // Item 0,0 of size 4 we paint only 0,0 0,1 1,0 1,1
-        
+
 //         // Implement the deMorgan's law rectangler intersection
-        
+
 //         // if(x1 < 0 || y1 < 0) return false;
 //         // var inventory = this.Inventory;
 
@@ -1032,7 +1032,7 @@ ItemActions[0x10] = function Recv_GetItemFromGateMasterStorage(client, input) {
 //         // var freeInventoryIndex;
 //         // for (var i = 0; i < 64; i++) {
 //         //     var object = inventory[i];
-            
+
 //         //     if(freeInventoryIndex === undefined && !object){
 //         //         freeInventoryIndex = i;
 //         //     }
@@ -1044,7 +1044,7 @@ ItemActions[0x10] = function Recv_GetItemFromGateMasterStorage(client, input) {
 //         //      console.log("No item info of " + object.ID);
 //         //      return false;
 //         //  }
-            
+
 //         //  if(object.Column === undefined || object.Column === null || object.Row === null || object.Row === undefined || !object.ID){
 //         //      console.log("Inventory item has row or column or id as null");
 //         //      return false;
@@ -1073,7 +1073,7 @@ ItemActions[0x10] = function Recv_GetItemFromGateMasterStorage(client, input) {
 //         //  console.log("Intersection detected on checking size: 4 and fidning and undefined slot");
 //         //  return false;
 //         // }
-        
+
 //         // if(s1 === 4 && (reservedSlots[y1][x1] === 1 || reservedSlots[y1+1][x1] === 1 || reservedSlots[x1][x1+1] === 1 || reservedSlots[y1+1][x1+1] === 1)){
 //         //  console.log(reservedSlots[y1][x1]);
 //         //  console.log(reservedSlots[y1+1][x1]);
@@ -1084,12 +1084,12 @@ ItemActions[0x10] = function Recv_GetItemFromGateMasterStorage(client, input) {
 //         // }
 
 //         // return {InventoryIndex: freeInventoryIndex, MoveRow: x1, MoveColumn: y1};
-        
+
 //         // Row = x
 //         // Column = y
-        
+
 //     var inventory = this.Inventory;
-    
+
 //     if((x < 0 || y < 0) || (size === 4 && (y+1 > 7 || x+1 > 7))){
 //         console.log("Out of bonds");
 //         return;
@@ -1105,23 +1105,23 @@ ItemActions[0x10] = function Recv_GetItemFromGateMasterStorage(client, input) {
 //         reservedSlots.x.push(x);
 //         reservedSlots.y.push(y);
 //     }
-    
+
 //     for (var i = 0; i < 64; i++) {
 //         var object = inventory[i];
 //         if(object === null) continue;
-        
+
 //         if(!object) {
-            
+
 //             break;
 //         }
-        
+
 //         var itemInfo = infos.Item[object.ID];
-        
+
 //         if(!itemInfo){
-            
+
 //             break;
 //         }
-        
+
 //         if(reservedSlots.x.indexOf(object.Column) >= 0 && reservedSlots.y.indexOf(object.Row) >= 0){
 //             console.log("Intersection of item: " + itemInfo.Name);
 //             return false;
@@ -1141,29 +1141,29 @@ ItemActions[0x11] = function Recv_BuyItemFromNpc(client, input) {
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     var NpcInfo = infos.Npc[input.NodeID];
     if(!NpcInfo){
         console.log("No npc info");
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     var itemInfo = infos.Item[input.ItemID];
-    
+
     if(!itemInfo){
         console.log("No item info");
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     // Does the npc sell the required item
     if(NpcInfo.Items.indexOf(input.ItemID) < 0){
         console.log("Item isnt in the shop");
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     if(input.Amount > 99 || input.Amount < 0){
         console.log("Amount hack detected");
         clientWriteItemActionFailed(client, input);
@@ -1177,7 +1177,7 @@ ItemActions[0x11] = function Recv_BuyItemFromNpc(client, input) {
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     if(client.character.Inventory[input.EquipIndex]){
         console.log("Existing item");
         clientWriteItemActionFailed(client, input);
@@ -1185,22 +1185,22 @@ ItemActions[0x11] = function Recv_BuyItemFromNpc(client, input) {
     }
 
     var itemPrice = itemInfo.PurchasePrice*(input.Amount === 0 ? 1 : input.Amount);
-    
+
     if((client.character.Silver - itemPrice) < 0){
         console.log("Not enough silver");
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     client.character.Silver -= itemPrice;
-    
+
     client.character.Inventory[collision.InventoryIndex] = {
         ID: input.ItemID,
         Amount: input.Amount,
         Column: collision.MoveRow,
         Row: collision.MoveColumn
     };
-    
+
     client.character.markModified("Inventory");
     client.character.save();
     clientWriteItemActionSuccess(client, input);
@@ -1214,21 +1214,21 @@ ItemActions[0x07] = function Recv_SellItemToNpc(client, input) {
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     var itemInfo = infos.Item[input.ItemID];
-    
+
     if(!itemInfo){
         console.log("Item info does not exists");
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     if(input.Amount > 99 || input.Amount < 0){
         console.log("Input amount is incorrect");
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     var invItem = client.character.Inventory[input.InventoryIndex];
     console.log(invItem);
     if(!invItem || invItem.ID !== input.ItemID){
@@ -1238,23 +1238,23 @@ ItemActions[0x07] = function Recv_SellItemToNpc(client, input) {
     }
 
     var sellPrice = itemInfo.SalePrice * (input.Amount === 0 ? 1 : input.Amount);
-    
-    
+
+
     if((sellPrice+client.character.Silver) > packets.MAX_SILVER){
         console.log("This buy will exceed the maximum amount of clients silver");
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     client.character.Silver += sellPrice;
-    
+
     var reminder = invItem.Amount - input.Amount;
     if(reminder < 0 || reminder > 99){
         console.log("The reminder is incorrect");
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     if(reminder === 0){
         client.character.Inventory[input.InventoryIndex] = null;
     }else{
@@ -1262,8 +1262,8 @@ ItemActions[0x07] = function Recv_SellItemToNpc(client, input) {
     }
 
     console.log(input);
-    
-    
+
+
     client.character.markModified("Inventory");
     client.character.save();
     clientWriteItemActionSuccess(client, input);
@@ -1280,21 +1280,21 @@ ItemActions[0x13] = function Recv_MoveActionOnPillbar(client, input) {
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     var qItem = client.character.QuickUseItems[input.InventoryIndex];
-    
+
     if(!qItem){
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     var dItem = client.character.QuickUseItems[input.EquipIndex];
-    
+
     if(input.Amount > 99 || input.Amount < 0 || input.Amount > qItem.Amount){
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     var reminder = qItem.Amount - input.Amount;
 
     var amount;
@@ -1305,7 +1305,7 @@ ItemActions[0x13] = function Recv_MoveActionOnPillbar(client, input) {
         client.character.QuickUseItems[input.InventoryIndex].Amount = reminder;
         amount = input.Amount;
     }
-    
+
     if(!dItem){
         client.character.QuickUseItems[input.EquipIndex] = {ID: qItem.ID, Amount: amount};
     }else if(dItem && dItem.ID && qItem.ID === dItem.ID){
@@ -1316,7 +1316,7 @@ ItemActions[0x13] = function Recv_MoveActionOnPillbar(client, input) {
             client.character.QuickUseItems[input.EquipIndex].Amount += amount;
         }
     }
-    
+
     client.character.markModified('QuickUseItems');
     client.character.save();
     clientWriteItemActionSuccess(client, input);
@@ -1329,9 +1329,9 @@ ItemActions[0x14] = function MoveItem_InInventory(client, input) {
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     var invItem = client.character.Inventory[input.InventoryIndex];
-    
+
     if(!invItem){
         console.log("Item does not exists");
         clientWriteItemActionFailed(client, input);
@@ -1343,14 +1343,14 @@ ItemActions[0x14] = function MoveItem_InInventory(client, input) {
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     var itemInfo = infos.Item[invItem.ID];
     if(!itemInfo){
         console.log("Item info not founded");
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     var collision = client.character.checkInventoryItemCollision(input.MoveColumn, input.MoveRow, getSlotCount(itemInfo.ItemType));
     if(!collision){
         clientWriteItemActionFailed(client, input);
@@ -1366,17 +1366,17 @@ ItemActions[0x14] = function MoveItem_InInventory(client, input) {
                 clientWriteItemActionFailed(client, input);
                 return;
             }
-            
+
             if( (input.Amount + invItem.Amount) > 99){
                 console.log("The stack amount exceeds the limits");
                 clientWriteItemActionFailed(client, input);
                 return;
             }
-            
+
             if(reminder === 0){
                 stackingItem.Amount += invItem.Amount;
                 inventory[input.InventoryIndex] = null;
-            }else{            
+            }else{
                 stackingItem.Amount += input.Amount;
                 invItem.Amount -= input.Amount;
             }
@@ -1385,11 +1385,11 @@ ItemActions[0x14] = function MoveItem_InInventory(client, input) {
                 invItem.Column = collision.MoveRow;
                 invItem.Row = collision.MoveColumn;
                 inventory[collision.InventoryIndex] = invItem;
-                
+
                 inventory[input.InventoryIndex] = null;
-            }else{            
+            }else{
                 inventory[collision.InventoryIndex] = {ID: invItem.ID, Column: collision.MoveRow, Row: collision.MoveColumn, Amount: input.Amount};
-                
+
                 invItem.Amount = reminder;
             }
         }
@@ -1397,7 +1397,7 @@ ItemActions[0x14] = function MoveItem_InInventory(client, input) {
         invItem.Column = collision.MoveRow;
         invItem.Row = collision.MoveColumn;
         inventory[collision.InventoryIndex] = invItem;
-        
+
         inventory[input.InventoryIndex] = null;
     }
 
@@ -1485,13 +1485,13 @@ ItemActions[0x1B] = function Recv_SkillToBar(client, input) {
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     var skill = client.character.SkillList[input.InventoryIndex];
     if(!skill || !skill.ID || !skill.Level){
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     if(skill.Level < input.Amount){
         clientWriteItemActionFailed(client, input);
         return;
@@ -1509,14 +1509,14 @@ ItemActions[0x1C] = function Recv_RemoveSkillFromBar(client, input) {
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     var skill = client.character.SkillBar[input.InventoryIndex];
-    
+
     if(!skill || !skill.Level){
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     client.character.SkillBar[input.InventoryIndex] = null;
     client.character.markModified('SkillBar');
     client.character.save();
@@ -1530,19 +1530,19 @@ ItemActions[0x1D] = function Recv_SkillUp(client, input) {
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     var skillInfo = infos.Skill[skill.ID];
-    
+
     if(!skillInfo){
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     if(client.character.SkillPoints < 1 || skill.Level === skillInfo.MaxSkillLevel){
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     client.character.SkillPoints -= 1;
     client.character.SkillList[input.InventoryIndex].Level += 1;
     client.character.markModified('SkillList');
@@ -1553,7 +1553,7 @@ ItemActions[0x1D] = function Recv_SkillUp(client, input) {
 // Revision Date: 10:50 PM 5/30/2014
 ItemActions[0x1F] = function Recv_LearnSkill(client, input) {
     var skill = infos.Skill[input.ItemID];
-    
+
     if(!skill){
         console.log("No skill found");
         clientWriteItemActionFailed(client, input);
@@ -1563,7 +1563,7 @@ ItemActions[0x1F] = function Recv_LearnSkill(client, input) {
     // console.log(skill);
 
     var npcInfo = infos.Npc[input.NodeID];
-    
+
     if(!npcInfo){
         console.log("No npc info");
         clientWriteItemActionFailed(client, input);
@@ -1575,7 +1575,7 @@ ItemActions[0x1F] = function Recv_LearnSkill(client, input) {
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     var alreadyLearned;
     var freeIndex;
     var startIndexFrom;
@@ -1589,11 +1589,11 @@ ItemActions[0x1F] = function Recv_LearnSkill(client, input) {
         case 1:
         startIndexFrom = 0;
         break;
-        
+
         case 2:
         startIndexFrom = 20;
         break;
-        
+
         case 3:
         case 4:
         startIndexFrom = 10;
@@ -1611,7 +1611,7 @@ ItemActions[0x1F] = function Recv_LearnSkill(client, input) {
             freeIndex = i;
         }
     }
-    
+
     if(alreadyLearned || freeIndex === undefined){
         console.log("There is no free index or the skill is alreday learned");
         clientWriteItemActionFailed(client, input);
@@ -1623,7 +1623,7 @@ ItemActions[0x1F] = function Recv_LearnSkill(client, input) {
         clientWriteItemActionFailed(client, input);
         return;
     }
-    
+
     if(client.character.SkillPoints < skill.PointsToLearn){
         console.log("Charactesr skillpoints are less than skillpoints required to learn");
         clientWriteItemActionFailed(client, input);
@@ -1695,4 +1695,4 @@ WorldPC.Set(0x14, {
             client.sendInfoMessage('The inventory action ' + input.ActionType + ' has not been coded into the server. Please report this to a developer and tell them what you were doing at the time.');
         }
     }
-}); 
+});

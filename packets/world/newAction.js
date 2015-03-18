@@ -79,7 +79,7 @@ WorldPC.Set(0x05, {
         client.character.state.TargetObjectUniqueNumber = input.nodeID;
 
         if (input.Skill == 5 || input.Skill == 6 || input.Skill == 7) {
-          console.log(input);
+          //console.log(input);
         }
 
         var otherNode = null;

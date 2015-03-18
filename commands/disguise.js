@@ -5,19 +5,32 @@
 /////////////////////////////////////////////////////////////
 // Command: disguise
 // disguises you as a monster just give it an id, use 0 to undisguise
-GMCommands.AddCommand(new Command('disguise',60,function command_disguise(string,client){
-	var mi = infos.Monster[string];
-	if (!mi) {
-		mi = infos.Monster.getByNameLike(string);
-		if (mi.length) { 
-			mi = mi[0];
-		}
-	}
-
-	if (!mi) {
-		client.sendInfoMessage('Monster "'+string+'" was not found.');
+GMCommands.AddCommand(new Command('disguise',60,function command_disguise(input,client){
+	if (input == 0 || input = '') {
+		client.character.state.MonsterDisguise = 0;
+		client.sendInfoMessage('Undisguised.');
 	} else {
-		client.sendInfoMessage('Disguise is not yet implemented on this server.');
-	}
-}));
+	  var mi;
 
+		if (isNaN(input)) {
+			mi = infos.Monster.getByNameLike(input);
+			if (mi.length) {
+				mi = mi[0];
+			}
+		} else {
+			mi = infos.Monster[input];
+		}
+
+		if (!mi) {
+			client.sendInfoMessage('Monster "'+input+'" was not found.');
+			return;
+		} else {
+			client.character.state.MonsterDisguise = mi.ID;
+			client.sendInfoMessage('Disguised as monster '+mi.Name);
+		}
+  }
+
+	client.character.do2FPacket = 1;
+	client.character.infos.updateAll();
+	client.Zone.sendToAllArea(client,true,client.character.state.getPacket(),config.viewable_action_distance);
+}));

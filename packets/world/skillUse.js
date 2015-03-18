@@ -171,6 +171,11 @@ function newSkillUpdate(client, input){
 	console.log("Applying Skill ID : " + input.SkillID);
 	var skillInfo = infos.Skill[input.SkillID];
 
+	if (!skillInfo) {
+		client.sendInfoMessage('Skill '+input.SkillID+' not coded.');
+		console.log('Skill '+input.SkillID+' not coded.');
+		return;
+	}
 	console.log(skillInfo);
 
 	var modStart = skillInfo.ModifiersStart;

@@ -187,7 +187,7 @@ GMCommands.AddCommand(new Command('set',60,function command_set(string,client){
 						client.sendInfoMessage(Value+' is not a valid Item.');
 						break;
 					}
-					if (ii.ItemType !== infos.Item.Type.Armor) {
+					if (ii.ItemType !== infos.Item.Type.Outfit) {
 						client.sendInfoMessage('Item is not valid Type for this slot.');
 						break;
 					}
