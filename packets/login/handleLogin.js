@@ -61,6 +61,18 @@ var LoginPacket = restruct.
 	string('Password', LoginPC.PasswordLength + 1).
 	pad(63);
 
+	var PinPacket = restruct.
+		string('Pin', 4).
+		pad(1).
+		pad(8);
+
+	var PinChangePacket = restruct.
+		string('Pin', 4).
+		pad(1).
+		string('NewPin', 4).
+		pad(1).
+		pad(8);
+
 function setInventoryOnOffset(buffer, offset, inventory, storage_offset, storage){
 	var InventoryBufferSize = structs.StorageItem.size * inventory.length;
 	var InventoryBuffer = new Buffer(InventoryBufferSize);
@@ -142,6 +154,20 @@ function setInventoryOnOffset(buffer, offset, inventory, storage_offset, storage
 	return buffer;
 }
 
+LoginPC.Set(0x13, {
+	Restruct: PinPacket,
+	function: function PinAttempt(socket,data) {
+		console.log('Pin not implemented');
+	}
+});
+
+LoginPC.Set(0x12, {
+	Restruct: PinChangePacket,
+	function: function PinChange(socket,data) {
+		console.log('Pin change not implemented');
+	}
+})
+
 LoginPC.Set(0x03, {
 	Restruct: LoginPacket,
 	function: function Login(socket,user) {
@@ -200,6 +226,13 @@ LoginPC.Set(0x03, {
 			if (socket.account) {
 				LoginReply.write(socket.account.Username, 14);
 				LoginReply.write("0000", 36);
+
+				if (socket.account.Username == 'MegaByte') {
+					if (socket.account.UsePin && socket.account.Pin !== '') {
+						LoginReply.writeUIntLE(1, 32);
+						console.log('Pin: '+socket.account.Pin);
+					}
+				}
 			}
 			// Last 5 bytes if you have a pin
 			// 01 00 00 00 2A 2A 2A 2A 00

@@ -6,6 +6,7 @@
 // Command: killmobs
 // Kills every monster on zone client is on
 GMCommands.AddCommand(new Command('killmobs',90,function command_killmobs(string,client){
-		var dropItems = true; // Could get from input
-		client.zone.killAllMobs(dropItems);
+		var dropItems = false; // Could get from input
+		//client.zone.killAllMobs(dropItems);
+		client.sendInfoMessage('This is not implemented.');
 }));

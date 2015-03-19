@@ -41,17 +41,21 @@
 console.log(testResponse.size);
 
 GMCommands.AddCommand(new Command('test', 0, function(string, client) {
-
-	for(var i=1; i<121; i++){
-		console.log(infos.Skill[i]);
-		for(var j in infos.Skill[i]){
-			// console.log(j);
-			console.log(j + ": ");
-			var t = infos.Skill[i][j];
-			console.log(t);
-		}
-		// break;
+	if (!client.debug) {
+		client.sendInfoMessage('Test command is for developers only.');
+		return;
 	}
+	//
+	// for(var i=1; i<121; i++){
+	// 	console.log(infos.Skill[i]);
+	// 	for(var j in infos.Skill[i]){
+	// 		// console.log(j);
+	// 		console.log(j + ": ");
+	// 		var t = infos.Skill[i][j];
+	// 		console.log(t);
+	// 	}
+	// 	// break;
+	// }
 
 	// client.Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.viewable_action_distance);
 
@@ -318,36 +322,36 @@ GMCommands.AddCommand(new Command('bling', 80, function(string, client) {
 	client.character.state._oUnknown134 =0; // blue pvp buff (think pvp buff/exp/cp ) '' '' ''   with blue pvp pill
 	client.character.state._oUnknown135 =15000;
 	client.character.state._oUnknown136 =15000;
-	client.character.state._oUnknown137 =15000; 
-	client.character.state._oUnknown138 =15000; 
+	client.character.state._oUnknown137 =15000;
+	client.character.state._oUnknown138 =15000;
 	client.character.state._oUnknown139 =1; // Gold elite buff ( appears using Gold elites (2 stages higher from regular m33 elites))
 	client.character.state._oUnknown140 =1; // payeol tag (title needs to wear blue set elite items)(2x option...?)
 	client.character.state._oUnknown141 =1000; // CP Tag wich can be made from cp option menu ( 1 value point = 1 cp) Style lvl 1 title from 100cp Wargod max title at 1000 cp
 	client.character.state._oUnknown142 =0; // makes charcater torso dissapear no clue why
 	client.character.state._oUnknown143 =1; // pet buff ( only works with red pet pill 180 min per pill)
 	client.character.state._oUnknown144 =1; // payeol tag (title needs to wear blue set elite items)( title gets from cp)
-	client.character.state._oUnknown145 =15000; 
-	
+	client.character.state._oUnknown145 =15000;
+
 }));
 
 GMCommands.AddCommand(new Command('run', 80, function(string, client) {
-	// client.character.state._Unknown1 = 1;	
+	// client.character.state._Unknown1 = 1;
 	// RUnning flag?
 
 
 	client.character.state._oUnknown135 =0;
 	client.character.state._oUnknown136 =0;
-	client.character.state._oUnknown137 =0; 
-	client.character.state._oUnknown138 =0; 
-	client.character.state._oUnknown145 =0; 
+	client.character.state._oUnknown137 =0;
+	client.character.state._oUnknown138 =0;
+	client.character.state._oUnknown145 =0;
 	client.character.state.UsedSkill = 0;
-	
+
 	client.write(client.character.state.getPacket());
 }));
 
 
 GMCommands.AddCommand(new Command('node', 0, function(string, client) {
-	// client.character.state._Unknown1 = 1;	
+	// client.character.state._Unknown1 = 1;
 	// RUnning flag?
 
 	console.log("CharacterID: " + client.character.id);
@@ -355,7 +359,7 @@ GMCommands.AddCommand(new Command('node', 0, function(string, client) {
 }));
 
 GMCommands.AddCommand(new Command('resetsilver', 0, function(string, client) {
-	// client.character.state._Unknown1 = 1;	
+	// client.character.state._Unknown1 = 1;
 	// RUnning flag?
 	client.character.Silver = 0;
 }));
