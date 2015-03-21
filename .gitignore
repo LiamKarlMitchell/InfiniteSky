@@ -254,3 +254,5 @@ TSX_Client/TSX_Client.sln
 TSX_Client/TSX_Client.sln
 TSX_Client/TSX_Client/TSX_Client.vcxproj.filters
 /mongo
+TSX_Client/lib/diStorm_x86.lib
+*.lib
