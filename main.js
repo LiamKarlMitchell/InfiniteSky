@@ -74,9 +74,9 @@ infos = {};
 infos.__proto__ = safeguard_cli;
 
 Netmask = require('netmask').Netmask;
-net = net = require('net');
-io = io = require('socket.io');
-http = http = require('http');
+net = require('net');
+io = require('socket.io');
+http = require('http');
 fs = require('fs');
 Server = require('./server');
 GameInfoLoader = require('./GameInfoLoader');
@@ -159,10 +159,11 @@ new GameInfoLoader().on('load', function(){
 });
 
 cli = new (require('./cli'));
-console.timeEnd('init-server');
+
 main.events.once('db_accounts_schema_loaded', clearLoggedInAccounts);
 main.events.once('world_started', function() {
   GMCommands.Start();
+  console.timeEnd('init-server');
 });
 
 function clearLoggedInAccounts() {

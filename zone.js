@@ -259,7 +259,7 @@ Zone_Prototype.getItem = function(index) {
 	var item = null;
 	console.log('Get item ' + index);
 	//if (typeof(this.Items[index]) != 'undefined')
-	var node = this.QuadTree.nodesHash[index];
+	var node = this.QuadTree.getNodeByID(index);
 	if (node && node.type === 'item') {
 		console.log('Item Found');
 		item = node.object;
@@ -275,7 +275,7 @@ Zone_Prototype.removeItem = function(nodeID) {
 	// TODO: Find a way to tell client item has gone.
 		// Send packet to all saying it got picked up / destroyed
 		console.log('Removing item ' + nodeID);
-		var node = this.QuadTree.nodesHash[nodeID];
+		var node = this.QuadTree.getNodeByID(nodeID);
 		if (node && node.type === 'item') {
 			var item = node.object;
 			item.onDelete();
