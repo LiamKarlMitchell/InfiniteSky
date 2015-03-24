@@ -454,6 +454,19 @@ void TSX_Client::Init()
 
 	DevButtons = ini->GetInt("DevButtons",0);
 
+	if (ini->GetInt("HookFileLoading",1))
+	{
+		Log.Write("Hooking File Loading");
+		oCreateFileW = (tCreateFileW) DetourCreate("kernel32.dll", "CreateFileW", hook_CreateFileW, DETOUR_TYPE_JMP);
+		if (oCreateFileW == NULL) {
+			oCreateFileW = (tCreateFileW) DetourCreate("kernelbase.dll", "CreateFileW", hook_CreateFileW, DETOUR_TYPE_JMP);
+		}
+
+		if (oCreateFileW == NULL) {
+			Log.Write("Error failed to hook file loading.");
+		}
+	}
+
 	HMODULE rsaenh = NULL;
 	do
 	{
@@ -620,19 +633,6 @@ void TSX_Client::Init()
 	else
 	{
 		rename(GGFileBackup,GGFile);
-	}
-
-	if (ini->GetInt("HookFileLoading",1))
-	{
-		Log.Write("Hooking File Loading");
-		oCreateFileW = (tCreateFileW) DetourCreate("kernel32.dll", "CreateFileW", hook_CreateFileW, DETOUR_TYPE_JMP);
-		if (oCreateFileW == NULL) {
-			oCreateFileW = (tCreateFileW) DetourCreate("kernelbase.dll", "CreateFileW", hook_CreateFileW, DETOUR_TYPE_JMP);
-		}
-
-		if (oCreateFileW == NULL) {
-			Log.Write("Error failed to hook file loading.");
-		}
 	}
 
 	if (ini->GetInt("MultiClient",1))

@@ -16,20 +16,9 @@ LoginPC.LoginStatus = {
 	UnknownError: 10
 };
 
-LoginPC.PinStatus = {
-	Success: {
-		value: 0,
-		name: "PinStatus_Success"
-	},
-	Fail: {
-		value: 1,
-		name: "PinStatus_Fail"
-	},
-	Kick: {
-		value: 2,
-		name: "PinStatus_Kick"
-	}
-};
+PinStatus_Success = 0;
+PinStatus_Fail = 1 ;
+PinStatus_Kick = 2;
 
 LoginPC.UsernameLength = 13;
 LoginPC.PasswordLength = 13;
@@ -60,6 +49,22 @@ var LoginPacket = restruct.
 	string('Username', LoginPC.UsernameLength + 1).
 	string('Password', LoginPC.PasswordLength + 1).
 	pad(63);
+
+	var PinPacket = restruct.
+		string('Pin', 4).
+		pad(1).
+		pad(8);
+
+	var PinChangePacket = restruct.
+		string('Pin', 4).
+		pad(1).
+		string('NewPin', 4).
+		pad(1).
+		pad(8);
+
+	var PinReply = restruct.
+		int8lu('PacketID').
+		int8lu('Status');
 
 function setInventoryOnOffset(buffer, offset, inventory, storage_offset, storage){
 	var InventoryBufferSize = structs.StorageItem.size * inventory.length;
@@ -142,6 +147,43 @@ function setInventoryOnOffset(buffer, offset, inventory, storage_offset, storage
 	return buffer;
 }
 
+LoginPC.Set(0x13, {
+	Restruct: PinPacket,
+	function: function PinAttempt(socket,data) {
+		console.log('Pin not implemented');
+
+		var status = 1; // 1 Failed to receive account information
+		                // 3 An Unknown Error.
+		if (socket.PinFailedCount === undefined) {
+			socket.PinFailedCount = 0;
+		}
+
+		if (data.Pin == socket.account.Pin) {
+		  status = PinStatus_Success;
+		} else {
+			socket.PinFailedCount++;
+		}
+
+		if (socket.PinFailedCount >= 3) {
+			status = PinStatus_Kick;
+			socket.account.save();
+		}
+
+		socket.write(new Buffer(PinReply.pack({ PacketID: 0x04, Status: status })));
+
+		if (socket.PinFailedCount >= 3) {
+			socket.close();
+		}
+	}
+});
+
+LoginPC.Set(0x12, {
+	Restruct: PinChangePacket,
+	function: function PinChange(socket,data) {
+		console.log('Pin change not implemented');
+	}
+})
+
 LoginPC.Set(0x03, {
 	Restruct: LoginPacket,
 	function: function Login(socket,user) {
@@ -199,7 +241,14 @@ LoginPC.Set(0x03, {
 			LoginReply.writeUInt8(loginSuccess, 1);
 			if (socket.account) {
 				LoginReply.write(socket.account.Username, 14);
-				LoginReply.write("0000", 36);
+				LoginReply.write("****", 36);
+
+				// if (socket.account.Username == 'MegaByte') {
+				// 	if (socket.account.UsePin && socket.account.Pin !== '') {
+				// 		LoginReply.writeUIntLE(1, 32);
+				// 		console.log('Pin: '+socket.account.Pin);
+				// 	}
+				// }
 			}
 			// Last 5 bytes if you have a pin
 			// 01 00 00 00 2A 2A 2A 2A 00
@@ -233,11 +282,13 @@ LoginPC.Set(0x03, {
 			if (err) {
 				console.log(err);
 				sendLoginReply(LoginPC.LoginStatus.CannotAuthenticate);
+				socket.close();
 				return;
 			}
 
 			if (account == null) {
 				sendLoginReply(LoginPC.LoginStatus.AccountNotFound);
+				socket.close();
 				return;
 			}
 
@@ -257,6 +308,7 @@ LoginPC.Set(0x03, {
 					existingLoggedInClient.sendInfoMessage('Another client is trying to login to your account.');
 					// if it is online then
 					sendLoginReply(LoginPC.LoginStatus.AlreadyLoggedIn);
+					socket.close();
 					return;
 				}
 			}

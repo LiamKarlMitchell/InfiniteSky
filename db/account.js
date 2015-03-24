@@ -16,6 +16,7 @@ vms.depends({
 		active: {type: Number, default: 0},
 		Level: {type: Number, default: 0},
 		LastIP: String,
+		UsePin: { type: Boolean, default: false },
 		Pin: {type: String, default: '0000'},
 		LastLogin: { type: Date, default: Date.now },
 		CharacterIndividuals: {type: characterIndi, default: null},
@@ -95,9 +96,9 @@ vms.depends({
 				// 	console.log('Already Logged In - LoginServer');
 				// 	// if it is online then
 				// 	callback(null, 4);
-				// 	return;				
-				// }			
-				
+				// 	return;
+				// }
+
 				existingLoggedInClient = world.findAccountSocket(account.Username);
 				if (existingLoggedInClient)
 				{
@@ -105,7 +106,7 @@ vms.depends({
 					existingLoggedInClient.sendInfoMessage('Another client is trying to login to your account.');
 					// if it is online then
 					callback(null, 4);
-					return;				
+					return;
 				}
 			}
 
