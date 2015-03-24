@@ -102,7 +102,6 @@ vms.depends({
             }
 
 
-            this.send2FUpdate();
 
             if((this.character.Level + levelGained) > 145 || this.character.Experience > infos.Exp[145].EXPEnd){
                 levelGained = 145 - this.character.Level;
@@ -115,13 +114,13 @@ vms.depends({
             console.log(this.character.Name + "' gained "+value+" experience");
 
             if(levelGained > 0){
+                this.character.infos.updateAll();
                 this.character.state.CurrentHP = this.character.infos.MaxHP;
                 this.character.state.CurrentChi = this.character.infos.MaxChi;
                 this.character.Health = this.character.infos.MaxHP;
                 this.character.Chi = this.character.infos.MaxChi;
 
                 this.character.state.Level = this.character.Level;
-                this.character.infos.updateAll();
 
                 this.Zone.sendToAllArea(this, true, new Buffer(packets.LevelUpPacket.pack({
                     PacketID: 0x2E,
@@ -131,6 +130,7 @@ vms.depends({
                 })), config.viewable_action_distance);
             }
 
+            this.send2FUpdate();
             this.character.save();
         };
 
