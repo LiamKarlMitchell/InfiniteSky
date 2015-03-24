@@ -141,11 +141,6 @@ int32lu('unk');
 // int8lu('unk').
 // int8lu('unk2', 383);
 
-
-var WorldDataPacket = new Buffer(onLoginWorldPacket.pack({
-	PacketID: 0x17
-}));
-
 var WorldAuthPacket = restruct.
 	string('Username', 14).
 	string('CharacterName', 13).
@@ -282,7 +277,13 @@ WorldPC.Set(0x02, {
 		// Send Faction/Zone Packets
 		// Yeah I know sync is bad but its for testing purposes :P
 		// We MUST move this into a packet rather than using a file sometime soon.
+
+
+		var WorldDataPacket = new Buffer(onLoginWorldPacket.pack({
+			PacketID: 0x17
+		}));
 		socket.write(WorldDataPacket);
+		socket.Zone.addSocket(socket);
 		socket.Zone.sendToAllArea(socket, true, socket.character.state.getPacket(), config.viewable_action_distance);
 		//socket.write(fs.readFileSync('./data/WorldDataPacket/World1.pac'));
 		// socket.write(WorldDataPacket.ActionReplyPacket.pack({
@@ -327,7 +328,6 @@ WorldPC.Set(0x02, {
 
 		socket.character.statsInterval = setTimeout(socket.character.statsIntervalFunction, 5000);
 				// socket.character.state.BuffHS = {'Time': 100, 'Amount': 200, 'Stacks': 5};
-		socket.Zone.addSocket(socket);
 		//socket.character.state.Skill = 1;
 		//Username
 		//CharacterName
