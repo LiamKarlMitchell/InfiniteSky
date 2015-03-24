@@ -54,7 +54,7 @@ GMCommands.AddCommand(new Command('iteminfo2',0,function command_iteminfo(string
 				Row: column,
 				Column: row,
 				ID: infos.Item[item].ID,
-				Growth: Math.floor(infos.Item[item].PetStats.MaxGrowth/200),
+				Growth: Math.floor(infos.Item[item].PetStats.MaxGrowth),
 				Activity: 1
 			};
 			row += 2;
