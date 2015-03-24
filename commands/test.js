@@ -38,20 +38,17 @@
     // struct('BuffHS', BuffHS).
     // struct('Buffs2', Buff, 7).
 
-// console.log(testResponse.size);
+console.log(testResponse.size);
 
 GMCommands.AddCommand(new Command('test', 0, function(string, client) {
 
 	for(var i=1; i<121; i++){
-		console.log(infos.Item[i]);
-		for(var j in infos.Item[i]){
-			if(infos.Item[i].ItemType===5){
-				console.log(infos.Item[i].Name + " " + infos.Item[i].ID);
-			}
-			// // console.log(j);
-			// console.log(j + ": ");
-			// var t = infos.Item[i][j];
-			// console.log(t);
+		console.log(infos.Skill[i]);
+		for(var j in infos.Skill[i]){
+			// console.log(j);
+			console.log(j + ": ");
+			var t = infos.Skill[i][j];
+			console.log(t);
 		}
 		// break;
 	}
