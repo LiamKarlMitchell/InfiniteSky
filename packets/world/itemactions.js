@@ -359,6 +359,7 @@ ItemActions[0x03] = function Recv_EquipItemOnCharacter(client, input) {
     client.character.save();
 
     clientWriteItemActionSuccess(client, input);
+    client.Zone.sendToAllArea(client, false, client.character.state.getPacket(), config.viewable_action_distance);
 };
 
 // Revision Date: 1:27 AM 5/31/2014
@@ -839,6 +840,7 @@ ItemActions[0x0E] = function Recv_UnequipItemFromCharacter(client, input) {
     client.character.save();
 
     clientWriteItemActionSuccess(client, input);
+    client.Zone.sendToAllArea(client, false, client.character.state.getPacket(), config.viewable_action_distance);
 };
 
 // Revision Date: 10:07 AM 5/31/2014

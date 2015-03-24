@@ -50,7 +50,6 @@ Zone_Prototype.Init = function() {
     MonsterAICollection = new AICollection();
     NpcAICollection     = new AICollection();
 	ZoneAICollection    = new AICollection();
-
 };
 
 Zone_Prototype.clientNodeUpdate = function(node, delta) {
@@ -76,7 +75,7 @@ Zone_Prototype.addSocket = function(socket) {
     // Send character state object to all with it being compressed
     // Setup any timers needed and shit here
     //socket.character.Talk('Hello World!');
-    this.sendToAllAreaLocation(socket.character.state.Location, socket.character.state.getPacket(), config.viewable_action_distance);
+    // this.sendToAllAreaLocation(socket.character.state.Location, socket.character.state.getPacket(), config.viewable_action_distance);
 };
 
 Zone_Prototype.findCharacterSocket = function(Name) {
@@ -302,8 +301,8 @@ Zone_Prototype.createMonster = function(spawninfo) {
 	var monster = new Monster(mi);
 	if (monster == null) return null;
 	monster.spawninfo = spawninfo;
-	//monster.UniqueID = spawninfo.UniqueID;
-	monster.UniqueID = 2;
+	monster.UniqueID = spawninfo.UniqueID;
+	// monster.UniqueID = 2;
 	monster.ID = this.MonstersNextID;
 
 	this.MonstersNextID++;
@@ -320,29 +319,6 @@ Zone_Prototype.createMonster = function(spawninfo) {
 	//this.Monsters[monster.ID] = monster;
 	//Objects.CreateNode(monster);
 	//console.log(monster);
-	return monster;
-};
-
-Zone_Prototype.createMonster = function(spawninfo) {
-	var monster = new Monster(spawninfo.ID);
-	if (!monster) return null;
-
-	monster.spawninfo = spawninfo;
-
-	monster.ID = this.NPCNextID;
-
-	this.MonsterNextID++;
-
-	if (this.MonsterNextID > this.MonsterMaxLength) {
-		this.MonsterNextID = 0; // Could find next free slot and if none free overwrite older items?
-		// Quick sort ftw.
-	}
-
-	monster.Location.set(spawninfo.Location);
-	monster.FacingDirection = spawninfo.Direction;
-
-	//this.Monsters[monster.ID] = monster;
-
 	return monster;
 };
 
@@ -536,6 +512,7 @@ Zone_Prototype.Load = function(callback) {
         // console.log('Zone ' + this.ID + ' is already loaded.');
         return;
     }    
+
     // Start Loading world mesh
     // Get width and height and offset from world data
 
@@ -545,6 +522,8 @@ Zone_Prototype.Load = function(callback) {
 		depth: config.quadtree_depth || 6,
 		limit: config.quadtree_limit || 10
 	});
+
+
     var zone = this;
     // Monster Spawns
     // NPC Spawns
@@ -562,32 +541,33 @@ Zone_Prototype.Load = function(callback) {
 	// 	},
 
 		function LoadMonsterSpawns(callback) {
-			console.log('Loading Monster Spawns for ' + zone.ID);
-			fs.readFile('data/spawninfo/' + _util.padLeft(zone.ID,'0', 3) + '.MOB', function(err, data) {
-				if (err) {
-					// Meh
-				} else {
-					var RecordCount = data.readUInt32LE(0);
+			console.log("Loading monster spawns");
+			// console.log('Loading Monster Spawns for ' + zone.ID);
+			// fs.readFile('data/spawninfo/' + _util.padLeft(zone.ID,'0', 3) + '.MOB', function(err, data) {
+			// 	if (err) {
+			// 		// Meh
+			// 	} else {
+			// 		var RecordCount = data.readUInt32LE(0);
 
-					var spawndata = restruct.struct('info', structs.SpawnInfo, RecordCount).unpack(data.slice(4));
-					data = null;
-					var length = spawndata.info.length,
-						element = null;
-					for (var i = 0; i < length; i++) {
-						element = spawndata.info[i];
+			// 		var spawndata = restruct.struct('info', structs.SpawnInfo, RecordCount).unpack(data.slice(4));
+			// 		data = null;
+			// 		var length = spawndata.info.length,
+			// 			element = null;
+			// 		for (var i = 0; i < length; i++) {
+			// 			element = spawndata.info[i];
 
-						var monster = zone.createMonster(element);
-						if (monster) {
-							zone.addMonster(monster);
-						}
-						if (monster == null) {
-							console.log('Failed to load monster '+element.ID+' for zone '+zone.getID());
-						}
-					}
-				}
+			// 			var monster = zone.createMonster(element);
+			// 			if (monster) {
+			// 				zone.addMonster(monster);
+			// 			}
+			// 			if (monster == null) {
+			// 				console.log('Failed to load monster '+element.ID+' for zone '+zone.getID());
+			// 			}
+			// 		}
+			// 	}
 
 				callback(null, true);
-			});
+			// });
 		},
 		function LoadNpcspawns(callback) {
 			console.log('Loading NPC Spawns for zone ' + zone.ID);
@@ -668,8 +648,8 @@ Zone_Prototype.Load = function(callback) {
 			});
 		}
 		], function(err, results) {
-			//console.log('Outputing Anim8or File for '+zone.ID);
-			//zone.OutputAnim8orFile();
+			// console.log('Outputing Anim8or File for '+zone.ID);
+			// zone.OutputAnim8orFile();
 			zone.Loaded = true;
 			callback(null, {
 				ID: zone.ID,
@@ -678,7 +658,7 @@ Zone_Prototype.Load = function(callback) {
 		});
 
 
-	//}
+	// }
 
 	
     //callback(null, true);
