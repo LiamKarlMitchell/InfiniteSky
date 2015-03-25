@@ -561,34 +561,34 @@ Zone_Prototype.Load = function(callback) {
 	// 		});
 	// 	},
 
-		function LoadMonsterSpawns(callback) {
-			console.log('Loading Monster Spawns for ' + zone.ID);
-			fs.readFile('data/spawninfo/' + _util.padLeft(zone.ID,'0', 3) + '.MOB', function(err, data) {
-				if (err) {
-					// Meh
-				} else {
-					var RecordCount = data.readUInt32LE(0);
+		// function LoadMonsterSpawns(callback) {
+		// 	console.log('Loading Monster Spawns for ' + zone.ID);
+		// 	fs.readFile('data/spawninfo/' + _util.padLeft(zone.ID,'0', 3) + '.MOB', function(err, data) {
+		// 		if (err) {
+		// 			// Meh
+		// 		} else {
+		// 			var RecordCount = data.readUInt32LE(0);
 
-					var spawndata = restruct.struct('info', structs.SpawnInfo, RecordCount).unpack(data.slice(4));
-					data = null;
-					var length = spawndata.info.length,
-						element = null;
-					for (var i = 0; i < length; i++) {
-						element = spawndata.info[i];
+		// 			var spawndata = restruct.struct('info', structs.SpawnInfo, RecordCount).unpack(data.slice(4));
+		// 			data = null;
+		// 			var length = spawndata.info.length,
+		// 				element = null;
+		// 			for (var i = 0; i < length; i++) {
+		// 				element = spawndata.info[i];
 
-						var monster = zone.createMonster(element);
-						if (monster) {
-							zone.addMonster(monster);
-						}
-						if (monster == null) {
-							console.log('Failed to load monster '+element.ID+' for zone '+zone.getID());
-						}
-					}
-				}
+		// 				var monster = zone.createMonster(element);
+		// 				if (monster) {
+		// 					zone.addMonster(monster);
+		// 				}
+		// 				if (monster == null) {
+		// 					console.log('Failed to load monster '+element.ID+' for zone '+zone.getID());
+		// 				}
+		// 			}
+		// 		}
 
-				callback(null, true);
-			});
-		},
+		// 		callback(null, true);
+		// 	});
+		// },
 		function LoadNpcspawns(callback) {
 			console.log('Loading NPC Spawns for zone ' + zone.ID);
 			fs.readFile('data/spawninfo/' + _util.padLeft(zone.ID,'0', 3) + '.NPC', function(err, data) {
