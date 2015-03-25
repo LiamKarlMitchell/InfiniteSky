@@ -65,5 +65,5 @@ GMCommands.AddCommand(new Command('setskill', 60, function command_setskill(stri
 	client.character.markModified('SkillList');
     client.character.save();
 
-    client.sendInfoMessage('Please log out and back in for changes to apply.');
+    GMCommands.getCommand('load').Execute.call(this,'',client);
 }));
