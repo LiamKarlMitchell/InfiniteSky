@@ -146,5 +146,11 @@ db.Character.find({
 				client.write(
 					prepareInventoryBuffer
 				);
+
+				// TODO: Clean up this function, it should not need to define things like client.cahracter.saveBankSilver ?
+
+				client.character.infos.updateAll();
+				client.character.state.setFromCharacter(client.character);
+				client.Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.viewable_action_distance);
 			});
 }));
