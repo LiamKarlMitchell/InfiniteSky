@@ -225,7 +225,7 @@ WorldPC.Set(0x08, {
 		MapLoadReply.pack({
 			packetID: 0x0A,
 			Status: status,
-			IP: theIP,
+			IP: _util.cleanIP(theIP)
 			Port: thePort
 		})));
 
