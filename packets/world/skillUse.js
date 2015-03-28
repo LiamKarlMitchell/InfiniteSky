@@ -208,6 +208,12 @@ function newSkillUpdate(client, input){
 		client.character.state.Buffs[11] = {'Time': time, 'Amount': amount};
 		break;
 
+		case 5:
+		console.log("Applying Elemental Resistance for guans");
+		var amount = (modStart.Unk2 * 100) + ((((modEnd.Unk2 - modStart.Unk2)*100)/skillInfo.MaxSkillLevel) * input.SkillLevel);
+		client.character.state.Buffs[5] = {'Time': time, 'Amount': amount};
+		break;
+
 		case 6:
 		console.log("Applying Elemental Damage Increase");
 		var amount = (modStart.Unk2 * 100) + ((((modEnd.Unk2 - modStart.Unk2)*100)/skillInfo.MaxSkillLevel) * input.SkillLevel);
@@ -219,8 +225,7 @@ function newSkillUpdate(client, input){
 		break;
 
 		case 8:
-		console.log("Applying Reflect Damage")
-		// Reflect damage
+		console.log("Applying Reflect Damage");
 		var amount = Math.round((modStart.ChanceToReturnDamage * 100) + ((((modEnd.ChanceToReturnDamage - modStart.ChanceToReturnDamage)*100)/skillInfo.MaxSkillLevel) * input.SkillLevel));
 		console.log(amount);
 		client.character.state.Buffs2[4] = {'Time': time, 'Amount': amount};
@@ -234,11 +239,20 @@ function newSkillUpdate(client, input){
 		client.character.state.Buffs2[6] = {'Time': time, 'Amount': 22};
 		break;
 
+		case 11:
+		client.character.state.Buffs[1] = {'Time': time, 'Amount': 22};
+		break;
+
 		case 12:
 		console.log("Applying Damage Increase");
-
 		var amount = Math.round((modStart.IncreasedDamage * 100) + ((( (modEnd.IncreasedDamage - modStart.IncreasedDamage) * 100 ) / skillInfo.MaxSkillLevel) * input.SkillLevel));
 		client.character.state.Buffs[0] = {'Time': time, 'Amount': amount};
+		break;
+
+		case 13:
+		// console.log("asdsad as");
+		// var amount = Math.round((modStart.IncreasedDamage * 100) + ((( (modEnd.IncreasedDamage - modStart.IncreasedDamage) * 100 ) / skillInfo.MaxSkillLevel) * input.SkillLevel));
+		client.character.state.Buffs[9] = {'Time': time, 'Amount': 22};
 		break;
 
 		case 17:
