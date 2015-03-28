@@ -128,7 +128,7 @@ LoginPC.Set(0x09, {
 		LoginPC.MapLoadReply.pack({
 			packetID: 0x0A,
 			Status: status,
-			IP: theIP,
+			IP: _util.cleanIP(theIP),
 			Port: thePort
 		})));
 	}
