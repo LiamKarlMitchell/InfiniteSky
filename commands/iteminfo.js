@@ -36,3 +36,49 @@ GMCommands.AddCommand(new Command('iteminfo',0,function command_iteminfo(string,
 /////////////////////////////////////////////////////////////
 // Command: iteminfo alias
 GMCommands.AddCommand(GMCommands.getCommand('iteminfo').Alias('ii'));
+
+
+
+GMCommands.AddCommand(new Command('iteminfo2',0,function command_iteminfo(string,client){
+	var i = 0;
+	var row = 0;
+	var column = 0;
+	for(var item in infos.Item){
+		if(infos.Item[item] && infos.Item[item].ItemType === 22){
+			console.log(infos.Item[item].ID + " , ");
+			if(i >= 1 && i % 4 == 0){
+				row = 0;
+				column += 2;
+			}
+			client.character.Inventory[i] = {
+				Row: column,
+				Column: row,
+				ID: infos.Item[item].ID,
+				Growth: Math.floor(infos.Item[item].PetStats.MaxGrowth),
+				Activity: 1
+			};
+			row += 2;
+			i++;
+
+		}
+	}
+
+	client.character.markModified("Inventory");
+	client.character.save();
+}));
+
+
+GMCommands.AddCommand(new Command('iteminfo3',0,function command_iteminfo(string,client){
+	for(var item in infos.Item){
+		if(infos.Item[item] && infos.Item[item].ItemType === 22){
+			if(infos.Item[item].ID === client.character.Pet.ID){
+				for(var i in infos.Item[item]){
+					var val = parseInt(infos.Item[item][i]);
+					if(!isNaN(val)){
+						console.log(i + " : " + val);
+					} 
+				}
+			}
+		}
+	}
+}));

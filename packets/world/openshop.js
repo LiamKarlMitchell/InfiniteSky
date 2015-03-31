@@ -1,9 +1,74 @@
-// 528 in total : 528 - 1 = 527
-// 527 - title_zie = 503
-// 503 body
-// DWORD is 4 bytes
-// 1 page is 100 bytes
-// pad 3
+var shopBuyItem = restruct.
+int32lu('Unk1').
+int32lu('Unk2').
+int32lu('NodeID').
+int32lu('ShopPage').
+int32lu('ShopIndex').
+int32lu('ItemID').
+int32lu('Amount').
+int32lu('Price').
+int32lu('SellerInventoryIndex').
+int32lu('BuyerInventoryIndex').
+int32lu('Column_Y').
+int32lu('Row_X').
+int32lu('Unk13').
+int32lu('Unk14').
+int32lu('Unk15');
+
+var shopBuyItemRespond2 = restruct.
+int32lu('Unk1').
+int32lu('Unk2').
+int32lu('NodeID').
+int32lu('ShopPage').
+int32lu('ShopIndex').
+int32lu('ItemID').
+int32lu('Amount').
+int32lu('Price').
+int32lu('SellerInventoryIndex').
+int32lu('BuyerInventoryIndex').
+int32lu('Column_Y').
+int32lu('Row_X');
+
+var shopBuyItemRespond = restruct.
+int8lu('PacketID').
+struct('Input', shopBuyItemRespond2).
+int32lu("Action").
+string('Name', 13).
+string('Buyer', 13);
+
+var TradeShopReply4F = restruct.
+int8lu('PacketID').
+int32lu('Unk').
+int32lu('Unk1').
+int8lu('Unk3').
+string('Name',24).  
+struct('Items',packets.TradeShopItem,25).
+pad(4);
+
+var ItemActionReplyPacket = restruct.
+int8lu('PacketID').
+int32lu('ActionType').
+int32lu('NodeID').
+int32lu('Unk1').
+int32lu('ItemID').
+int32lu('LevelRequired').
+int32lu('ItemType').
+int32lu('ItemQuality').
+int32lu('Amount').
+int32lu('InventoryIndex').
+int32lu('PickupColumn').
+int32lu('PickupRow').
+int32lu('EquipIndex').
+int32lu('MoveColumn').
+int32lu('MoveRow').
+int32lu('Result');
+
+
+var packet84 = restruct.
+int8lu('PacketID').
+int32lu('Action').
+int32lu('Value');
+
 
 var shopObject = function(client){
 	var item_list = {};
@@ -40,7 +105,6 @@ var shopObject = function(client){
 				if(item && item.State.page === input.ShopPage && item.State.index === input.ShopIndex){
 					itemObj = item;
 				}else if(item){
-					console.log(item);
 					client_items[i] = {
 						ItemID: item.InvObj.ID,
 						InventoryIndex: item.InvIndex,
@@ -54,7 +118,7 @@ var shopObject = function(client){
 				return false;
 			}
 
-			if(input.InventoryIndex < 0 || input.InventoryIndex > 64){
+			if(input.BuyerInventoryIndex < 0 || input.BuyerInventoryIndex > 64){
 				return false;
 			}
 
@@ -66,35 +130,34 @@ var shopObject = function(client){
 			var collision = buyer.character.checkInventoryItemCollision(input.Column_Y, input.Row_X, itemInfo.getSlotCount());
 
 			if(!collision){
+				console.log("Collision detected");
 				return false;
 			}
 
-			client.character.Inventory[itemObj.InvIndex] = null;
+			// console.log('Setting character '+client.character.Name+' inventory['+itemObj.InvIndex+'] = null');
+			client.character.Inventory[parseInt(itemObj.InvIndex)] = null;
 
 			itemObj.InvObj.Column = input.Column_Y;
 			itemObj.InvObj.Row = input.Row_X;
 
-
-			buyer.character.Inventory[input.InventoryIndex] = itemObj.InvObj;
+			buyer.character.Inventory[parseInt(input.BuyerInventoryIndex)] = itemObj.InvObj;
 
 			buyer.character.markModified('Inventory');
 			buyer.character.save();
 
+			// console.log("Saved");
+
 			client.character.markModified('Inventory');
 			client.character.save();
 
+			if(client_items.length === 0){
+				console.log("test");
+				client.character.state.Store = 1;
+				client.character.Shop.UpdateState();
+			}
+
+
 			delete item_list[itemObj.Index];
-
-
-			// console.log(item_list);
-
-
-			// client.write(new Buffer(packets.TradeShopReply.pack({
-			// 	"PacketID": 0x4C,
-			// 	"Items": client_items,
-			// 	"Name": client.character.state.StoreName
-			// })));
-
 			return itemObj;
 		},
 
@@ -176,25 +239,23 @@ WorldPC.Set(0x34, {
     function: function handleItemOpenStore(client, input) {
     	if (!client.authenticated) return;
 
+		client.character.Shop = new shopObject(client);
+
+		for(var i = 0; i < input.Items.length; i++){
+			var item = input.Items[i];
+
+			var InventoryItem = client.character.Inventory[item.InventoryIndex];
+			if(!item || !InventoryItem || !item.ItemID || !item.Price)
+				continue;
+
+			client.character.Shop.PutItem(i, item.Price, InventoryItem, item.InventoryIndex);
+		}
+
 		client.write(new Buffer(packets.TradeShopReply.pack({
 			"PacketID": 0x4C,
 			"Items": input.Items,
 			"Name": input.Name
 		})));
-
-		client.character.Shop = new shopObject(client);
-
-		for(var i = 0; i < input.Items.length; i++){
-
-			var item = input.Items[i];
-			var InventoryItem = client.character.Inventory[item.InventoryIndex];
-			if(!item || !InventoryItem || !item.ItemID || !item.Price)
-				continue;
-
-			console.log(item);
-
-			client.character.Shop.PutItem(i, item.Price, InventoryItem, item.InventoryIndex);
-		}
 
 		client.character.Shop.UpdateState();
 
@@ -202,10 +263,6 @@ WorldPC.Set(0x34, {
 		client.character.state.StoreName = input.Name;
 	}
 });
-
-var ShopConfirm = restruct.
-string('Title', 24).
-int32lu('unk',20);
 
 WorldPC.Set(0x35, {
 	Size: 8,
@@ -224,61 +281,13 @@ WorldPC.Set(0x35, {
 	}
 });
 
-var shopBuyItem = restruct.
-int32lu('Unk1').
-int32lu('Unk2').
-int32lu('NodeID').
-int32lu('ShopPage').
-int32lu('ShopIndex').
-int32lu('ItemID').
-int32lu('Amount').
-int32lu('Price').
-int32lu('Unk9').
-int32lu('InventoryIndex').
-int32lu('Column_Y').
-int32lu('Row_X').
-int32lu('Unk13').
-int32lu('Unk14').
-int32lu('Unk15');
-
-var shopBuyItemRespond2 = restruct.
-int32lu('Unk1').
-int32lu('Unk2').
-int32lu('NodeID').
-int32lu('ShopPage').
-int32lu('ShopIndex').
-int32lu('ItemID').
-int32lu('Amount').
-int32lu('Price').
-int32lu('Unk9').
-int32lu('InventoryIndex').
-int32lu('Column_Y').
-int32lu('Row_X');
-
-var shopBuyItemRespond = restruct.
-int8lu('PacketID').
-struct('Input', shopBuyItemRespond2).
-int32lu("Action").
-string("Name", 13).
-string('Buyer', 13);
-
-var shopBuyItemRespond2 = restruct.
-int8lu('PacketID').
-struct('Input', shopBuyItemRespond2).
-int32lu("Action").
-int32lu('Unk').
-int32lu('Unk1').
-int32lu('Unk2').
-int8lu('Unk3').
-string('Buyer', 13);
-
 WorldPC.Set(0x36, {
 	Restruct: shopBuyItem,
 	function: function BuyItem(client, input){
 		console.log(input);
-		// Action = 2, when we do not find our NodeID and or we are not in range
 		var seller = client.Zone.findCharacterSocketNodeID(input.NodeID);
 		console.log("Seller: " + seller.character.Name);
+
 		if(!seller){
 			console.log("No seller!");
 			client.write(new Buffer(shopBuyItemRespond.pack({
@@ -289,8 +298,6 @@ WorldPC.Set(0x36, {
 			return;
 		}
 
-		// console.log("Seller: " + seller.character.Name);
-		// console.log(input);
 
 		var itemInfo = infos.Item[input.ItemID];
 
@@ -304,8 +311,6 @@ WorldPC.Set(0x36, {
 			return;
 		}
 
-		console.log(client.character.Inventory.length);
-
 		var buyerCollision = client.character.checkInventoryItemCollision(input.Column_Y, input.Row_X, itemInfo.getSlotCount());
 
 		if(!buyerCollision){
@@ -318,11 +323,9 @@ WorldPC.Set(0x36, {
 			return;
 		}
 
-
-
 		var soldInventoryObj = seller.character.Shop.SellItem(client, input);
 
-		if(soldInventoryObj === false){
+		if(!soldInventoryObj){
 			console.log("No sold info!");
 			client.write(new Buffer(shopBuyItemRespond.pack({
 				"PacketID": 0x4E,
@@ -332,7 +335,18 @@ WorldPC.Set(0x36, {
 			return;
 		}
 
-		console.log(soldInventoryObj);
+		if((client.character.Silver < soldInventoryObj.Price)){
+			console.log("The buyer has no enough money!");
+			client.write(new Buffer(shopBuyItemRespond.pack({
+				"PacketID": 0x4E,
+				"Input": input,
+				"Action": 6
+			})));
+			return;
+		}
+
+		client.character.Silver -= soldInventoryObj.Price;
+    	seller.character.Silver += soldInventoryObj.Price;
 
 		seller.character.Shop.UpdateState();
 
@@ -343,94 +357,64 @@ WorldPC.Set(0x36, {
 			"Action": 0
 		})));
 
-		// input.InventoryIndex = soldInventoryObj.InvIndex;
-		// input.Column_Y = soldInventoryObj.InvPosition.x;
-		// input.Row_X = soldInventoryObj.InvPosition.y;
-		// input.NodeID = seller.node.id;
-
-		// console.log(seller);
-
-		console.log(soldInventoryObj.InvPosition);
-
-		console.log(input);
-
-		// input.InventoryIndex = soldInventoryObj.InvIndex;
-		// input.Unk13 = soldInventoryObj.InvIndex;
-		// input.Unk14 = soldInventoryObj.InvIndex;
-		// // input.ShopPage = 0;
-		// // input.ShopIndex = 0;
-		// input.Unk9 = soldInventoryObj.InvIndex;
-		// // input.Column_Y = 20;
-		// // input.Column_X = 20;
-		// // input.Unk1 = 0;
-		// // input.Unk2 = 7;
-		// input.Unk15 = soldInventoryObj.InvIndex;
+		var Items = {};
+		for(var i=0; i < 25; i++){
+			if(seller.character.state.StoreItems[i].ID){
+				Items[i] = {};
+				Items[i].ItemID = seller.character.state.StoreItems[i].ID;
+				Items[i].InventoryIndex = i;
+				Items[i].Amount = seller.character.state.StoreItems[i].Amount;
+				Items[i].Price = seller.character.state.StoreItems[i].Price;
+			}
+		}
 
 
-		// input.Unk9 = 1;
+	    seller.write(new Buffer(ItemActionReplyPacket.pack({
+	        PacketID: 0x2B,
+	        ActionType: 7,
+	        NodeID: seller.node.id,
+	        ItemID: 99329,
+	        InventoryIndex: soldInventoryObj.InvIndex,
+	        Amount: 1,
+	        Result: 0
+	    })));
 
-		// input.NodeID = client.node.id;
+	    var priceReminder = soldInventoryObj.Price - 1;
 
-		console.log(input);
+	    if(priceReminder >= 1){
+	    	if((priceReminder+seller.character.Silver) > packets.MAX_SILVER){
+			    seller.write(new Buffer(ItemActionReplyPacket.pack({
+			        PacketID: 0x2B,
+			        ActionType: 8,
+			        Result: 0
+			    })));
+	    	}
 
-// var shopBuyItemRespond2 = restruct.
-// int32lu('Unk1').
-// int32lu('Unk2').
-// int32lu('NodeID').
-// int32lu('ShopPage').
-// int32lu('ShopIndex').
-// int32lu('ItemID').
-// int32lu('Amount').
-// int32lu('Price').
-// int32lu('Unk9').
-// int32lu('InventoryIndex').
-// int32lu('Column_Y').
-// int32lu('Row_X');
+		    seller.write(new Buffer(packet84.pack({
+		        PacketID: 0x8E,
+		        Action: 1,
+		        Value: priceReminder
+		    })));
+	    }else if((seller.character.Silver+1) > packets.MAX_SILVER){
+		    seller.write(new Buffer(ItemActionReplyPacket.pack({
+		        PacketID: 0x2B,
+		        ActionType: 8,
+		        Result: 0
+		    })));
+    	}
 
-
-		seller.write(new Buffer(shopBuyItemRespond.pack({
-			"PacketID": 0x4E,
-			"Input": {
-				Unk2: input.Unk2,
-				NodeID: input.NodeID,
-				ShopPage: 2,
-				ShopIndex: 4,
-				ItemID: input.ItemID,
-				Amount: input.Amount,
-				Price: input.Price,
-				Unk1: 2,
-				Unk9: 2,
-				InventoryIndex: 2,
-				Column_Y: 2,
-				Row_X: 2
-
-			},
-			"Buyer": client.character.Name,
-			"Action": 0,
-			Unk: 2,
-			Unk1: 2,
-			Unk2: 2,
-			Unk3: 2
+		seller.write(new Buffer(TradeShopReply4F.pack({
+			"PacketID": 0x4F,
+			Unk: input.Unk2,
+			Unk1: input.NodeID,
+			Unk2: 0,
+			Items: Items
 		})));
+
+		// seller.character.markModified('Inventory');
+		// seller.character.save();
+
+		// client.character.markModified('Inventory');
+		// client.character.save();
 	}
 });
-
-// // 4E 01 00 00 00 1B 00 00 00 A3 A3 C6 07 00 00 00 	N...............
-// // 00 00 00 00 00 24 43 01 00 00 00 00 00 01 00 00 	.....$C.........
-// // 00 00 00 00 00 02 00 00 00 02 00 00 00 00 00 00 	................
-// // 00 00 00 00 00 42 6F 62 00 BD C5 BD BA 00 00 00 	.....Bob........
-// // D4 00 C1 D7 C0 BD BB F3 C0 CE 00 58 00 49 00    	...........X.I. 
-
-// 4
-// 4
-// 4
-// 3
-
-// WorldPC.Set(0x11, {
-// 	Restruct: ShopConfirm,
-// 	function: function somTests(client, input){
-// 		console.log(input);
-// 	}
-// });
-
-

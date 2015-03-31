@@ -31,7 +31,8 @@
     "socket.io": "^1.0.0-pre",
     "xtend": "^3.0.0",
     "fast-csv": "^0.2.4",
-    "eyes": "^0.1.8"
+    "eyes": "^0.1.8",
+    "cli-color": "^0.3.2"
   },
   "optionalDependencies ": {
     "express": ""

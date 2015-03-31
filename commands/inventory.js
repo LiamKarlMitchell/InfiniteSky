@@ -45,6 +45,11 @@ GMCommands.AddCommand(new Command('inventory',0,function command_inventory(strin
 		client.character.markModified('Inventory');
 		client.character.save();
 		break;
+
+		default:
+
+		console.log(client.character.Inventory);
+		break;
 	}
 
 }));

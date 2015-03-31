@@ -9,11 +9,10 @@ var repl = require('repl');
 var vm = require('vm');
 var sys = require('sys')
 var exec = require('child_process').exec;
-var vmscript = require('./vmscript/vmscript');
 
-function handleShellOutput(error, stdout, stderr) { sys.puts(stdout) }
+function handleShellOutput(error, stdout, stderr) { console.log(stdout); console.error(stderr); }
 
-var command_args_regex = /^\(\/([\w\-]+)[ ]?(.*)\s\)$/;
+var command_args_regex = /^\/(\w+)\s?(.*)?$/;
 
 function CommandLineInterface() {
   global.cli = {};
@@ -23,14 +22,15 @@ function CommandLineInterface() {
   var result
     , err;
 
-    if (code.length===3) { return };
-    
     // Allows executing shell commands for example on windows
     // #notepad test.txt
     // #ipconfig
     // you shouldnt run anything with a terminal interface though.. that could get tricky
     // very experimental feature
-    if (code.charAt(1)==='#') {  // TODO: Do an execute and get return code as err?
+    if (code.charAt(code.length-1) === '\n') {
+      code = code.substr(0,code.length-1);
+    }
+    if (code.charAt(0)==='#') {  // TODO: Do an execute and get return code as err?
       exec(code.substr(2,code.length-4),handleShellOutput);
       callback(err, result);
       return;
@@ -38,7 +38,7 @@ function CommandLineInterface() {
 
     var command_args = code.match(command_args_regex);
     if (command_args) {
-      if (typeof (cli[command_args[1]]) === "function") {
+      if (cli[command_args[1]] instanceof Function) {
         cli[command_args[1]](command_args[2]);
       } else {
         console.log('\x1b[31;1m'+ 'Invalid command: `' + command_args[1] + '`' +'\x1b[0m');
@@ -53,7 +53,7 @@ function CommandLineInterface() {
     } catch (err) {
       console.error('\x1b[31;1m'+ err+'\x1b[0m');
     }
-  
+
     callback(err, result);
   }
 

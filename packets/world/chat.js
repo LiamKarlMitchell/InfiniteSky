@@ -36,6 +36,13 @@ int8lu('Status').
 int32ls('ZoneID').
 int32ls('Unknown2');
 
+WorldPC.MessagePacket = restruct.
+int8lu('PacketID').
+string('Message', 51);
+
+
+
+
 // Status:
 // 0 nothing
 // 1 disconnected
@@ -139,3 +146,12 @@ WorldPC.Set(0x09, {
 // 			Guild: socket.character.Clan,
 // 			Message: input.Message
 // 		})), socket.character.Clan);
+
+
+
+// On packet id 0x13 size 72
+// WorldPC.PossiblePartyChatMessage = restruct.
+// string('Name', 13).
+// string('Message', 51).
+// int32lu('Unknown0').
+// int32lu('Unknown1');

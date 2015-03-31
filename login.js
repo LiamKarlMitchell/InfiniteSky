@@ -2,16 +2,17 @@
 // Copyright (c) InfiniteSky Dev Teams - Licensed under GNU GPL
 // For more information, see LICENCE in the main folder
 
-vms.depends({name: 'Login Server', depends: [
-    'infos.Exp.Loaded',
-    'infos.Item.Loaded',
-    'infos.Skill.Loaded',
-    'db.Account',
-    'db.Character',
-    'CharacterState',
-    'world',
-    'packets'
-]
+vms.depends({
+    name: 'Login Server',
+    depends: [
+        'Info_Exp',
+        'Info_Item',
+        'Info_Skill',
+        'Account',
+        'Character',
+        'World Server',
+        'Packets'
+    ]
 }, function(){
 if (typeof(login) === 'undefined') {
     console.log('Login Server code loaded.');
@@ -30,9 +31,8 @@ if (typeof(login) === 'undefined') {
     console.log('Login Server code reloaded.');
 }
 
-// TODO: Detect client/server version if possible.
 login.connection = function(socket) {
-    console.log("Client #" + this.clientID + " connected from IP "+socket.remoteAddress);
+    console.log("Client #" + this.clientID + " connected from IP "+_util.cleanIP(socket.remoteAddress));
 
      socket.clientID = this.clientID;
      this.clientID++;
@@ -111,7 +111,7 @@ login.findAccountSocket = function(name) {
 var loadedInfos = {
     '005_00001.IMG': infos.Exp !== undefined && infos.Exp.Loaded,
     '005_00002.IMG': infos.Item !== undefined && infos.Item.Loaded,
-    '005_00003.IMG': infos.Skill !== undefined && infos.Skill.Loaded 
+    '005_00003.IMG': infos.Skill !== undefined && infos.Skill.Loaded
 };
 
 var AreAllInfosLoaded = function() {

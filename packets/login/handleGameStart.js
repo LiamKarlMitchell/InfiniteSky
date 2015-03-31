@@ -28,14 +28,14 @@ LoginPC.Set(0x09, {
 		// if so send it servers lan ip and port
 		// otherwise send it real world ip and port
 		var theIP = config.externalIP;
-		if (socket.remoteAddress.indexOf('127') == 0) {
+		if (_util.cleanIP(socket.remoteAddress).indexOf('127') == 0) {
 			theIP = '127.0.0.1'
 		}
 
 
 		//console.log('IP for client to connect too before translation: ' + theIP);
 		for (var i = 0; i < natTranslations.length; i++) {
-			if (natTranslations[i].contains(socket.remoteAddress)) {
+			if (natTranslations[i].contains(_util.cleanIP(socket.remoteAddress))) {
 				theIP = natTranslations[i].ip;
 				break;
 			}
@@ -49,7 +49,7 @@ LoginPC.Set(0x09, {
 		// Will do basic in config, if we can get our endpoint ip
 		// Then we can say use that. For external users we will want to point them to the wan ip.
 		// If we can get this dynamically it would be best, but if not we will have to code it into the config, im cool with that.
-		// Status: 
+		// Status:
 		// 0 - Good to go
 		// 1 - No game server you can connect to
 		// 2 - An Unknown Error has occured
@@ -80,15 +80,16 @@ LoginPC.Set(0x09, {
 			}
 		}
 
+
 		// If map id is a faction map id and your not of that clan or map is not open, you should be reset to yaggnok
-		
 
 
 		// The Character State object for use in world for moving and health etc.
 		socket.character.state = new CharacterState();
+		socket.character.infos = new generic.characterStatsInfoObj(socket);
+		socket.character.infos.updateAll();
 
 		console.log("# getting guild infos for character");
-
 		var guildObj = world.findGuildByName(socket.character.GuildName);
 		if(guildObj && socket.character.GuildName){
 			console.log("# is guild object and character has guildname setted");
@@ -102,6 +103,8 @@ LoginPC.Set(0x09, {
 			socket.character.save();
 
 		}
+
+
 		// console.log(socket.character.GuildAccess);
 		// socket.character.GuildAccess = 2;
 
@@ -125,7 +128,7 @@ LoginPC.Set(0x09, {
 		LoginPC.MapLoadReply.pack({
 			packetID: 0x0A,
 			Status: status,
-			IP: theIP,
+			IP: _util.cleanIP(theIP),
 			Port: thePort
 		})));
 	}

@@ -28,8 +28,35 @@ db.Character.find({
 				var s = client.character.state;
 				client.character = characters[0];
 				client.character.state = s;
-				client.character.updateInfos(true);
+				// client.character.updateInfos(true);
+				client.character.infos = new generic.characterStatsInfoObj(client);
+				client.character.infos.updateAll();
 				client.character.state.setFromCharacter(client.character);
+
+				clearTimeout(client.character.statsInterval);
+				client.character.statsIntervalFunction = function(){
+					var needUpdate = false;
+					if(client.character.infos.MaxHP > client.character.state.CurrentHP){
+						var HPTick = Math.round(client.character.infos.MaxHP / 100);
+						client.character.state.CurrentHP = (client.character.state.CurrentHP+HPTick) > client.character.infos.MaxHP ? client.character.infos.MaxHP : (client.character.state.CurrentHP+HPTick);
+						needUpdate = true;
+					}
+
+					if(client.character.infos.MaxChi > client.character.state.CurrentChi){
+						var ChiTick = Math.round(client.character.infos.MaxChi / 100);
+						client.character.state.CurrentChi = (client.character.state.CurrentChi+ChiTick) > client.character.infos.MaxChi ? client.character.infos.MaxChi : (client.character.state.CurrentChi+ChiTick);
+						needUpdate = true;
+					}
+
+					if(needUpdate){
+						client.send2FUpdate();
+						client.character.save();
+					}
+
+					client.character.statsInterval = setTimeout(client.character.statsIntervalFunction, 5000);
+				};
+
+				client.character.statsInterval = setTimeout(client.character.statsIntervalFunction, 5000);
 
 				// Send packet to client
 				console.log('Sending WorldCharacterInfoPacket');
@@ -119,5 +146,11 @@ db.Character.find({
 				client.write(
 					prepareInventoryBuffer
 				);
+
+				// TODO: Clean up this function, it should not need to define things like client.cahracter.saveBankSilver ?
+
+				client.character.infos.updateAll();
+				client.character.state.setFromCharacter(client.character);
+				client.Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.viewable_action_distance);
 			});
 }));

@@ -5,6 +5,14 @@
 /////////////////////////////////////////////////////////////
 // Command: giveexp
 // Gives you experience points
+var respond = restruct.
+int8lu('PacketID').
+int32lu('CharacterID').
+int32lu('NodeID').
+int8lu('LevelsGained');
+
+// console.log(respond.size);
+
 GMCommands.AddCommand(new Command('xp',0,function command_giveexp(string,client){
 	if (string.length==0) { client.sendInfoMessage("Example Usage: /giveexp 10");
 							return;}
@@ -14,56 +22,74 @@ GMCommands.AddCommand(new Command('xp',0,function command_giveexp(string,client)
 		client.sendInfoMessage("Example Usage: /giveexp 10");
 			return;
 	}
-	///console.log(Value);
+
+    // client.character.state.Skill = 0;
+    // client.character.state.Stance = 0;
+    // client.character.state.Frame = 0;
+    // client.write(client.character.state.getPacket());
+    // console.log("Sending respond", client.node.id);
+
+	// clietn.character.
+	// ///console.log(Value);
 	client.giveEXP(Value);
+	// client.character.save();
+	// client.send2FUpdate();
 
-	client.sendInfoMessage("You have "+client.character.Experience+" EXP");
-}));
+	// client.write(new Buffer(respond.pack({
+	//     PacketID: 0x2E,
+	//     LevelsGained: 145,
+	//     CharacterID: client.character._id,
+	//     NodeID: client.node.id
+	// })));
+
+ //    client.Zone.sendToAllArea(client, true, new Buffer(respond.pack({
+	//     PacketID: 0x2E,
+	//     LevelsGained: 145,
+	//     CharacterID: client.character._id,
+	//     NodeID: client.node.id
+ //    })), config.viewable_action_distance);
+
+	// // client.sendInfoMessage("You have "+client.character.Experience+" EXP");
 
 
-var xp_table = [];
-var base = 200;
+	// var expInfo = infos.Exp[client.character.Level];
+	// if(!expInfo){
 
-/*
-	lvl 1:
-		experience: 221 (221)
-		levelup: 222
-		1tick: 0.45%
-		
-	lvl 2:
-		experience: 510 (289) (68)
-		levelup: 511
-		1tick: 0.35%
-		
-	lvl 3:
-		experience: 855 (345) (56)
-		levelup: 856
-		1tick: 0.29%	
-		
-	lvl 4:
-		experience: 1244 (389) (44)
-		levelup: 1245
-		1tick: 0.26%
-		
-	lvl 5:
-		experience: 2020 (776) (44)
-		levelup: 2021
-		1tick: 0.26%	
-*/
+	// 	return;
+	// }
 
-for(var i=1; i<=4; i++){
-	if(!xp_table[i-2]){
-		var increment = base+(base/100*10)*i;
-	}else{
-		var increment = xp_table[i-2].experience+(base/100*10)*i;
-	}
-	
-	xp_table.push({
-		level: i,
-		experience: increment
-	});
-}
+	// var reminder = expInfo.EXPEnd - Value;
 
-GMCommands.AddCommand(new Command('xptable',0,function command_giveexp(string,client){
-	eyes.inspect(xp_table);
+	// var levelGained = 0;
+	// while(reminder <= 0){
+	// 	levelGained++;
+	// 	if((client.character.Level + levelGained) > 145){
+	// 		console.log("Exceeding the range of level info");
+	// 		return;
+	// 	}
+	// 	expInfo = infos.Exp[client.character.Level + levelGained];
+	// 	if(!expInfo){
+	// 		console.log("No exp info somehow");
+	// 		return;
+	// 	}
+	// 	reminder = expInfo.EXPEnd + reminder;
+	// }
+
+	// client.character.Level += levelGained;
+	// client.character.Experience += Value;
+
+	// // console.log("Giving "+ Value + " experience");
+	// client.character.save();
+
+ //    var update = {
+ //        'PacketID': 0x2F,
+ //        'Level': 145,
+ //        'Experience': 222222222222
+ //    };
+ //    //eyes.inspect(update);
+ //    client.write(new Buffer(packets.HealingReplyPacket.pack(update)));
+
+ 	// client.send2FUpdate();
+
+ 	// console.log(client.send2FUpdate.toString());
 }));

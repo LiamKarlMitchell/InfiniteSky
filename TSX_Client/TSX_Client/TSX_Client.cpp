@@ -9,6 +9,8 @@
 #include "TSX_Client.h"
 
 #include "detourxs.h"
+#include "csv-parser\csv_parser.hpp"
+
 
 TSX_Client DLL;
 
@@ -26,7 +28,7 @@ char* uncompressBuffer[1000];
 
 
 //__declspec(naked) void RecvPacketHook()
-//{			
+//{
 //	__asm
 //	{
 //		//PUSH EDX // Preserve EDX
@@ -35,19 +37,19 @@ char* uncompressBuffer[1000];
 //		PUSH EDI // PUSH BUFFER
 //		ADD EDI,EDX // Restore the address
 //		CALL OurRecvPacketFunction // EAX will contain function address to goto
-//		
+//
 //		POP EDX // Clean up stack
 //		POP EDX
 //
 //		//POP EDX // Restore EDX
 //
 //		JMP EAX
-//	}	
+//	}
 //}
 DWORD oldProtection;
 DWORD SetProtection(void* m_address, DWORD m_size, DWORD protection = PAGE_EXECUTE_READWRITE) {
 	DWORD dwOldProtect;
-	VirtualProtect((void*) m_address, m_size, PAGE_EXECUTE_READWRITE, &dwOldProtect);	
+	VirtualProtect((void*) m_address, m_size, PAGE_EXECUTE_READWRITE, &dwOldProtect);
 	return dwOldProtect;
 }
 
@@ -59,11 +61,13 @@ DWORD OurRecvPacketFunction(byte* Buffer,uint PacketSize)
 // Have the dll functions here
 void TSX_Client::Start()
 {
+	RunDLL=true;
+
 	if (GetAsyncKeyState(VK_F12))
 	{
 		MessageBox(0,"Paused","TSX Paused",MB_OK);
 	}
-	RunDLL=true;
+
 	thread.set(this, &TSX_Client::Run);
 	thread.start();
 }
@@ -76,8 +80,8 @@ void TSX_Client::Stop()
 }
 
 HANDLE WINAPI hook_CreateFileW(LPCWSTR lpFileName,DWORD dwDesiredAccess,DWORD dwShareMode,LPSECURITY_ATTRIBUTES lpSecurityAttributes,DWORD dwCreationDisposition,DWORD dwFlagsAndAttributes,HANDLE hTemplateFile) {
-	
-	
+
+
 	if (wcscmp(lpFileName,L"log.txt")!=0)
 	{
 	//	//Log.Write("CreateFileW: %s",lpFileName);
@@ -91,18 +95,18 @@ HANDLE WINAPI hook_CreateFileW(LPCWSTR lpFileName,DWORD dwDesiredAccess,DWORD dw
 
 		// See if custom file exists (By setting CreationDisposition to OPEN_EXISTING the API will only open the file if it exists)
 		if (oCreateFileW(CustomFile,dwDesiredAccess,dwShareMode,lpSecurityAttributes,OPEN_EXISTING,dwFlagsAndAttributes,hTemplateFile)!=INVALID_HANDLE_VALUE)
-		{		
+		{
 			// Our File Exists
 			Result = oCreateFileW(CustomFile,dwDesiredAccess,dwShareMode,lpSecurityAttributes,dwCreationDisposition,dwFlagsAndAttributes,hTemplateFile);
 		}
 		else
-		{		
+		{
 			// Use origional File
 			Result=oCreateFileW(lpFileName,dwDesiredAccess,dwShareMode,lpSecurityAttributes,dwCreationDisposition,dwFlagsAndAttributes,hTemplateFile);
-		}	
+		}
 		return Result;
 	}
-	
+
 	return oCreateFileW(lpFileName,dwDesiredAccess,dwShareMode,lpSecurityAttributes,dwCreationDisposition,dwFlagsAndAttributes,hTemplateFile);
 	//return detour_CreateFileW->GetOriginalFunction()(lpFileName,dwDesiredAccess,dwShareMode,lpSecurityAttributes,dwCreationDisposition,dwFlagsAndAttributes,hTemplateFile);
 
@@ -114,94 +118,185 @@ HANDLE WINAPI hook_CreateFileW(LPCWSTR lpFileName,DWORD dwDesiredAccess,DWORD dw
 
 	//// See if custom file exists (By setting CreationDisposition to OPEN_EXISTING the API will only open the file if it exists)
 	//if (detour_CreateFileW->GetOriginalFunction()(CustomFile,dwDesiredAccess,dwShareMode,lpSecurityAttributes,OPEN_EXISTING,dwFlagsAndAttributes,hTemplateFile)!=INVALID_HANDLE_VALUE)
-	//{		
+	//{
 	//	// Our File Exists
 	//	Result = detour_CreateFileW->GetOriginalFunction()(CustomFile,dwDesiredAccess,dwShareMode,lpSecurityAttributes,dwCreationDisposition,dwFlagsAndAttributes,hTemplateFile);
 	//}
 	//else
-	//{		
+	//{
 	//	// Use origional File
 	//	Result=detour_CreateFileW->GetOriginalFunction()(lpFileName,dwDesiredAccess,dwShareMode,lpSecurityAttributes,dwCreationDisposition,dwFlagsAndAttributes,hTemplateFile);
-	//}	
+	//}
 	//return Result;
 }
 
-void TSX_Client::LoadTranslationCSVs()
-{
-	Log.Write("Loading Translation CSV's");
-	char FileName[255] = {0};
-	const static char* Files[] = {"Items","Skills","Monsters","NPC","Quests"};
-	// Items.csv 005_00002.IMG
-	// Skills.csv 005_00004.IMG
-	// Monsters.csv 005_00004.IMG
-	// NPC.csv 005_00006.IMG
-	// Quests.csv 005_00007.IMG
+void TSX_Client::LoadTranslationCSVs() {
+	// Find spawninfos in game memory
+	vector_unsigned_long infoLocations;
+	infoLocations.clear();
+	int index;
+	char *infoKinds[] = { "Levels", "Items", "Skills", "Monsters", "NPCs", "Quests"};
 
-	for(int i=0;i<5;i++)
-	{
-		sprintf(FileName,"data\\translation\\%s.csv",Files[i]);
-		Log.Write("Trying to load Translation %s",FileName);
+	bool hadToWait = false;
+TryToFindAllInfoLocations:
+	Log.Write("Finding all info locations in game memory.");
+	sig->find_all(infoLocations, "68????????B9XXXXXXXXE8????????85C075??68????????68????????68????????55FF15????????5B5F5E33C05D81C4????????C3",4);
 
+	MEMORY_BASIC_INFORMATION meminfo;
+	DWORD dwPage_Protection;
 
-
-		strtk::token_grid::options options;
-		options.column_delimiters = ",\n";
-		options.support_dquotes = true;
-
-		strtk::token_grid translation_grid(FileName,options);
-		bool Error=false;
-		for (size_t r = 0; r < translation_grid.row_count(); ++r)
+	// Check if infos are loaded
+	index = 0;
+	for(vector_unsigned_long::iterator it = infoLocations.begin(); it != infoLocations.end(); ++it) {
+		if (index == 6) break;
+		switch (index)
 		{
-			strtk::token_grid::row_type row = translation_grid.row(r);
-			//Log.Write(row.as_string().c_str());
-			//strtk::token_grid::row_type row = translation_grid.row(r);
-			//size_t column_count = row.size();
-			if (r==0) continue; // Skip Header
-			//if (column_count<2) break; // Get out of this row looping as theres not enough columns
-			if (i==0)
+			// TODO Check infos have loaded correctly.
+			// This should probably check a flag somewhere... the game must set them right?
+			case 1:
+				Log.Write("Address of %s info is %08X which points too %08X",infoKinds[index],*it,(*(unsigned long*)*it));
+			if ((*(unsigned long*)*it) == 0x00000000) {
+					infoLocations.clear();
+					Log.Write("Problem finding address for %s info maybe it is not yet loaded.",infoKinds[index]);
+					hadToWait = true;
+					Sleep(100);
+					goto TryToFindAllInfoLocations;
+			}
+			break;
+		}
+		index++;
+	}
+
+	// Wait for 2 sec just to be sure I hope...
+	if (hadToWait) {
+		Sleep(2000);
+	}
+
+	index = 0;
+	for(vector_unsigned_long::iterator it = infoLocations.begin(); it != infoLocations.end(); ++it) {
+		if (index == 6) break;
+
+		Log.Write("Infos %i %s at address %08X",index,infoKinds[index],*it);
+
+		char FileName[255] = {0};
+
+		//// Items.csv 005_00002.IMG
+		//// Skills.csv 005_00004.IMG
+		//// Monsters.csv 005_00004.IMG
+		//// NPC.csv 005_00006.IMG
+		//// Quests.csv 005_00007.IMG
+
+		sprintf(FileName,"data\\translation\\%s.csv",infoKinds[index]);
+		Log.Write("Opening Translation %s",FileName);
+
+	    CSV_Parser csv_parser;
+		CSV_FIELDS header;
+		KEY_VAL_FIELDS output_map;
+		STR line;
+
+		// Open the CSV file
+		std::ifstream test_file(FileName);
+		if(test_file.is_open())
+		{
+			VirtualQuery((void*)(*(unsigned long*)*it), &meminfo, sizeof(MEMORY_BASIC_INFORMATION));
+			VirtualProtect( ( PVOID )meminfo.BaseAddress, meminfo.RegionSize, PAGE_EXECUTE_READWRITE, &dwPage_Protection );
+
+			unsigned int lineNumber = 1;
+			while(getline(test_file, line))
 			{
-				int ItemID = 0;
-				string ID,Name,Description1,Description2,Description3;
-				if (row.parse(ItemID,Name))
+				//Log.Write("CSV line - %s",line.c_str());
+				if (lineNumber == 1) {
+					if (!csv_parser.parse_line(line, header)) {
+						Log.Write("Error encountered while parsing the header input line: %u data: %s",line.c_str());
+						break;
+					}
+					lineNumber++;
+					continue;
+				}
+
+				if(csv_parser.parse_line(line, header, output_map))
 				{
-					Log.Write("Parse Success");
-					Log.Write("%i %s",ItemID,Name.c_str());
+					switch (index) {
+						case 1: { // Items
+							// TODO Make this dynamically read the header and store the column titiles.
+							// Then for each cell on rows if column title is name overwrite the item name and so on..
+							//string ID,Name,Description1,Description2,Description3;
+							unsigned int ItemID = atoi(output_map[header.front()].c_str());
+							//string Name,Description1,Description2,Description3;
+							//int Level,ItemType,Rareness,Clan,LevelRequirement,HonorPointReq,PurchasePrice,SalePrice,DisplayItem2D,Strength,Dexterity,Vitality,Chi,Luck,Damage,Defense,LightDamage,ShadowDamage,DarkDamage,LightResistance,ShawdowResistance,DarkResistance,ChancetoHit,ChancetoDodge,PercentToDeadlyBlow,ValueType,Value1,SkillBonusID1,SkillBonusID2,SkillBonusID3,SkillBonusAmount1,SkillBonusAmount2,SkillBonusAmount3;
+							unsigned long addy = (*(unsigned long*)*it) + (sizeof(sItemInfo)*(ItemID-1));
+							//// TODO optimize memory protection writing & reverting.
+							Log.Write("[%04u] %s at address %08X", ItemID, output_map["Name"].c_str(), addy);
+
+							sItemInfo* ii = (sItemInfo*)addy;
+							////strncpy((char*)addy+4,Name.c_str(),28);
+
+
+							//// TODO: iterate through header use it to get field from output_map and set it appropriately into the info in game memory
+							//CONST_MAP_ITR it = output_map.begin();
+							//   for (; it != output_map.end(); ++it) {
+							//	Log.Write("Key - %s, Value - %s",it->first.c_str(),it->second.c_str());
+							//}
+
+							strncpy(ii->Name,output_map["Name"].c_str(),28);
+							strncpy(ii->Description1,output_map["Description1"].c_str(),25);
+							strncpy(ii->Description2,output_map["Description2"].c_str(),25);
+							strncpy(ii->Description3,output_map["Description3"].c_str(),25);
+
+							}
+						break;
+						case 2: { // Skills
+							unsigned int SkillID = atoi(output_map[header.front()].c_str());
+							unsigned long addy = (*(unsigned long*)*it) + (sizeof(sSkillInfo)*(SkillID-1));
+							Log.Write("[%04u] %s at address %08X", SkillID, output_map["Name"].c_str(), addy);
+
+							sSkillInfo* si = (sSkillInfo*)addy;
+							strncpy(si->Name,output_map["Name"].c_str(),28);
+							strncpy(si->Description1,output_map["Description1"].c_str(),51);
+							strncpy(si->Description2,output_map["Description2"].c_str(),51);
+							strncpy(si->Description3,output_map["Description3"].c_str(),50);
+						}
+						break;
+						case 3: { // Monsters
+							unsigned int MonsterID = atoi(output_map[header.front()].c_str());
+							unsigned long addy = (*(unsigned long*)*it) + (sizeof(sMonsterInfo)*(MonsterID-1));
+							Log.Write("[%04u] %s at address %08X", MonsterID, output_map["Name"].c_str(), addy);
+
+							sMonsterInfo* mi = (sMonsterInfo*)addy;
+							strncpy(mi->Name,output_map["Name"].c_str(),24);
+						}
+						break;
+						case 4: {
+							unsigned int ItemID = atoi(output_map[header.front()].c_str());
+							unsigned long addy = (*(unsigned long*)*it) + (sizeof(sNPCInfo)*(ItemID-1));
+							sNPCInfo* ni = (sNPCInfo*)addy;
+							Log.Write("[%04u] %s at address %08X", ItemID, output_map["Name"].c_str(), addy);
+
+							strncpy(ni->Name,output_map["Name"].c_str(),28);
+							strncpy(ni->Chat1,output_map["Chat1"].c_str(),51);
+							strncpy(ni->Chat2,output_map["Chat2"].c_str(),51);
+							strncpy(ni->Chat3,output_map["Chat3"].c_str(),51);
+							strncpy(ni->Chat4,output_map["Chat4"].c_str(),51);
+							strncpy(ni->Chat5,output_map["Chat5"].c_str(),51);
+						}
+						break;
+					}
+
 				}
 				else
 				{
-					Log.Write("Parse Failed");
+					Log.Write("Error encountered while parsing the input line: %u data: %s",line.c_str());
 				}
-				
+				output_map.clear();
+				lineNumber++;
 			}
-			//if (ID==0) continue; // Skip the row if ID not set
+		}
 
-			//switch(i)
-			//{
-			//	case 0:// Items.csv 005_00002.IMG
-			//		if (column_count<5)
-			//		{
-			//			Error=true;
-			//			break;
-			//		}
-			//		else
-			//		{
-			//			// For each column do your thing.
-			//			Log.Write("ID %u Name %s",ID,row.get<string>(1).c_str());
-			//		}
-			//		break;
-			//	case 1:// Skills.csv 005_00004.IMG
-			//		break;
-			//	case 2:// Monsters.csv 005_00004.IMG
-			//		break;
-			//	case 3:// NPC.csv 005_00006.IMG
-			//		break;
-			//	case 4:// Quests.csv 005_00007.IMG
-			//		break;
-			//}
+		VirtualProtect( ( PVOID )meminfo.BaseAddress, meminfo.RegionSize, dwPage_Protection, NULL );
+
+		header.clear();
+		index++;
 	}
-}
-
-
 }
 
 DWORD TSX_Client::Run()
@@ -222,11 +317,15 @@ DWORD TSX_Client::Run()
 
 		if (DevButtons) {
 
+		if (GetAsyncKeyState(VK_F3)) {
+			LoadTranslationCSVs();
+		}
+
 		if (GetAsyncKeyState(VK_F12)!=0)
 		{
 			Log.Write("Force Quit");
 			RunDLL=false;
-			// Terminate process			
+			// Terminate process
 			TerminateProcess(ProcessHandle,1);
 		}
 
@@ -237,7 +336,7 @@ DWORD TSX_Client::Run()
 			if (MOBSpawns) delete MOBSpawns;
 			MOBSpawns = new SpawnInfoManager(ZoneID,"MOB");
 			if (NPCSpawns) delete NPCSpawns;
-			NPCSpawns = new SpawnInfoManager(ZoneID,"NPC");			
+			NPCSpawns = new SpawnInfoManager(ZoneID,"NPC");
 		}
 
 		/*if (GetAsyncKeyState(VK_F2)!=0)
@@ -264,7 +363,7 @@ DWORD TSX_Client::Run()
 		//	Sleep(100);
 		//	GameTimeAdjust-=0.0001f;
 		//}
-		
+
 
 		if (SpeedHackEnabled)
 		{
@@ -325,7 +424,7 @@ void TSX_Client::ZoneChanged()
 	MOBSpawns = new SpawnInfoManager(ZoneID,"MOB");
 	if (NPCSpawns) delete NPCSpawns;
 	NPCSpawns = new SpawnInfoManager(ZoneID,"NPC");
-	
+
 	PreviousZoneID = ZoneID;
 }
 
@@ -350,7 +449,23 @@ void TSX_Client::Init()
 	ProcessID = GetProcessId(ProcessHandle);
 	Log.Write("ProcessID: %u %04X",ProcessID,ProcessID);
 
+	Log.Write("Size of sSkillInfo is %u", sizeof(sSkillInfo));
+	Log.Write("Monster Object size is %u",sizeof(MonsterObject));
+
 	DevButtons = ini->GetInt("DevButtons",0);
+
+	if (ini->GetInt("HookFileLoading",1))
+	{
+		Log.Write("Hooking File Loading");
+		oCreateFileW = (tCreateFileW) DetourCreate("kernel32.dll", "CreateFileW", hook_CreateFileW, DETOUR_TYPE_JMP);
+		if (oCreateFileW == NULL) {
+			oCreateFileW = (tCreateFileW) DetourCreate("kernelbase.dll", "CreateFileW", hook_CreateFileW, DETOUR_TYPE_JMP);
+		}
+
+		if (oCreateFileW == NULL) {
+			Log.Write("Error failed to hook file loading.");
+		}
+	}
 
 	HMODULE rsaenh = NULL;
 	do
@@ -394,7 +509,7 @@ void TSX_Client::Init()
 		//005404F9   .  3919                              CMP DWORD PTR DS:[ECX],EBX
 		//005404FB   >  803B 00                           CMP BYTE PTR DS:[EBX],0x0
 		//005404FE      0F85 181F0000                     JNZ TwelveSk.0054241C  << Change to JMP as shown below
-		
+
 		// The patch
 		//005404FE     /E9 191F0000                       JMP TwelveSk.0054241C
 		//00540503     |90                                NOP
@@ -406,7 +521,7 @@ void TSX_Client::Init()
 			oldProtection = SetProtection(GGZero,10);
 			memcpy(GGZero,GGZeroBytes,sizeof(GGZeroBytes));
 			SetProtection(GGZero,10,oldProtection);
-			
+
 		}
 		else
 		{
@@ -527,9 +642,9 @@ void TSX_Client::Init()
 		//00403ABD   .  FF15 A0825500 CALL DWORD PTR DS:[5582A0]               ; \FindWindowA
 		//00403AC3   .  85C0          TEST EAX,EAX
 		//00403AC5   .  74 3F         JE SHORT 00403B06							; Patch me to JMP
-		//6A 00 68 A8 84 55 00 FF 15 A0 82 55 00 85 C0 74 3F 
+		//6A 00 68 A8 84 55 00 FF 15 A0 82 55 00 85 C0 74 3F
 		//x  x  x  ?  ?  ?  ?  x  x  ?  ?  ?  ?  x  x  x  x
-		//6A 00 68 ?? ?? ?? ?? FF 15 ?? ?? ?? ?? 85 C0 74 3F 
+		//6A 00 68 ?? ?? ?? ?? FF 15 ?? ?? ?? ?? 85 C0 74 3F
 		byte* MultiClientPatch = (byte*)sig->search("6A0068????????FF15????????85C0743F");
 
 		if (MultiClientPatch)
@@ -562,7 +677,7 @@ void TSX_Client::Init()
 		//004873D2   .  83C7 10       ADD EDI,10
 		//004873D5   .  3BF0          CMP ESI,EAX
 		//004873D7   .^ 7C D9         JL SHORT 004873B2
-		
+
 		IPAddress = (char*)sig->search_text(ini->GetString("OrigionalIP","110.45.184.130").c_str());
 		if (IPAddress)
 		{
@@ -611,21 +726,21 @@ void TSX_Client::Init()
 
 						// Initialize Winsock
 						iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
-						if (iResult != 0) 
+						if (iResult != 0)
 						{
 							Log.Write("WSAStartup failed: %d", iResult);
 						}
 						else
 						{
 
-						host_name = "extendedgames.com"; 
+						host_name = "extendedgames.com";
 
 
 						Log.Write("Calling gethostbyname with %s", host_name);
 						remoteHost = gethostbyname(host_name);
-					    
 
-						if (remoteHost == NULL) 
+
+						if (remoteHost == NULL)
 						{
 							dwError = WSAGetLastError();
 							if (dwError != 0) {
@@ -637,8 +752,8 @@ void TSX_Client::Init()
 									Log.Write("Function failed with error: %ld\n", dwError);
 								}
 							}
-						} 
-						else 
+						}
+						else
 						{
 							Log.Write("Function returned:");
 							Log.Write("\tOfficial name: %s", remoteHost->h_name);
@@ -722,7 +837,7 @@ void TSX_Client::Init()
 	{
 		Log.Write("Failed to find Zone Address");
 	}
-	
+
 
 	// Get packet recv location
 	// To be able to know the sizes and function addresses for all recv packets
@@ -762,10 +877,10 @@ void TSX_Client::Init()
 	//00407836 - 8B 3D 08335800        - mov edi,[00583308] : [07710048]
 	//0040783C - 8B D1                 - mov edx,ecx
 	//0040783E - C1 E9 02              - shr ecx,02
-	//00407841 - F3 A5                 - repe movsd 
+	//00407841 - F3 A5                 - repe movsd
 	//00407843 - 8B CA                 - mov ecx,edx
 	//00407845 - 83 E1 03              - and ecx,03
-	//00407848 - F3 A4                 - repe movsb 
+	//00407848 - F3 A4                 - repe movsb
 	//0040784A - FF 95 002F5800        - call dword ptr [ebp+00582F00]
 	//00407850 - 8B 43 04              - mov eax,[ebx+04]
 	//00407853 - 8B 8D 10335800        - mov ecx,[ebp+00583310]
@@ -801,11 +916,11 @@ void TSX_Client::Init()
 	//004078AE - 8B CD                 - mov ecx,ebp
 	//004078B0 - 8B D1                 - mov edx,ecx
 	//004078B2 - C1 E9 02              - shr ecx,02
-	//004078B5 - F3 A5                 - repe movsd 
+	//004078B5 - F3 A5                 - repe movsd
 	//004078B7 - 8B CA                 - mov ecx,edx
 	//004078B9 - 83 E1 03              - and ecx,03
 	//004078BC - 0FB6 C0               - movzx eax,al
-	//004078BF - F3 A4                 - repe movsb 
+	//004078BF - F3 A4                 - repe movsb
 	//004078C1 - FF 14 85 002F5800     - call dword ptr [eax*4+00582F00]    !Function Call
 	//004078C8 - 8B 43 04              - mov eax,[ebx+04]
 	//004078CB - 3B C5                 - cmp eax,ebp
@@ -843,20 +958,20 @@ void TSX_Client::Init()
 	}
 
 	unsigned long RecvPacketLoop = sig->search("8B2C8D????????EB068B4E028D69063BD57C4D8B3D????????8BCD8BD1C1E902F3A58BCA83E1030FB6C0F3A4FF1485????????");
-	
+
 	if (RecvPacketLoop)
 	{
 		Log.Write("Found RecvPacketLoop at %08X",RecvPacketLoop);
-		
+
 		GameRecvPacketSize = *(size_t**)(RecvPacketLoop+3);
 		Log.Write("Found GameRecvPacketSize at %08X",GameRecvPacketSize);
-		
+
 		GameNetworkInfo = RecvPacketLoop+21;
 		GameRecvBufferPointer = *(byte***)GameNetworkInfo;
 
 		Log.Write("Found GameNetworkInfo at %08X",GameNetworkInfo);
 		Log.Write("Found GameRecvBufferPointer at %08X",GameRecvBufferPointer);
-		
+
 		GameRecvPacketFunctor = *(PacketRecvFunctor**)(RecvPacketLoop+47);
 		Log.Write("Found GameRecvPacketFunctor at %08X",GameRecvPacketFunctor);
 
@@ -927,7 +1042,7 @@ void TSX_Client::Init()
 	//0040176F - C7 05 602D5800 022B073D - mov [00582D60],3D072B02
 	//00401779 - D9 1C 24              - fstp dword ptr [esp]
 	//0040177C - D9 05 542E5800        - fld dword ptr [00582E54] : <<< GameTime
-	//00401782 - D8 05 8CC45500        - fadd dword ptr [0055C48C] 
+	//00401782 - D8 05 8CC45500        - fadd dword ptr [0055C48C]
 	//00401788 - D9 1D 542E5800        - fstp dword ptr [00582E54] : [4713316F]
 	//0040178E - 74 11                 - je 004017A1
 	//00401790 - 83 E8 02              - sub eax,02
@@ -939,9 +1054,6 @@ void TSX_Client::Init()
 
 	Log.Write("GameTime found at %08X",GameTimeAddress);
 
-
-	Log.Write("Monster Object size is %u",sizeof(MonsterObject));
-
 	// Get Uncompress Function
 	HMODULE HandleGXDCompress = GetModuleHandle("GXDCompress");
 	uncompress = (uncompress_functor)GetProcAddress(HandleGXDCompress,"uncompress");
@@ -951,29 +1063,10 @@ void TSX_Client::Init()
 	if (MOBSpawns) delete MOBSpawns;
 	MOBSpawns = new SpawnInfoManager(ZoneID,"MOB");
 	if (NPCSpawns) delete NPCSpawns;
-	NPCSpawns = new SpawnInfoManager(ZoneID,"NPC");	
+	NPCSpawns = new SpawnInfoManager(ZoneID,"NPC");
 
-
-	if (ini->GetInt("HookFileLoading",1))
-	{
-		Log.Write("Hooking File Loading");
-		// Create a hook and hook any CreateFileW
-		// if the file path ends with .IMG or .img
-		// copy the pathname and prepend data\\ to it.
-		// check if file exists
-		// if so call orgional CreateFileW on that otherwise call origional function on the argument path.
-		// return
-		  //CreateFileW
-  //LPCTSTR lpFileName,
-  //DWORD dwDesiredAccess,
-  //DWORD dwShareMode,
-  //LPSECURITY_ATTRIBUTES lpSecurityAttributes,
-  //DWORD dwCreationDisposition,
-  //DWORD dwFlagsAndAttributes,
-  //HANDLE hTemplateFile
-		
-		//detour_CreateFileW = (tCreateFileW) detour.Create("kernel32.dll", "CreateFileW", (BYTE*)hook_CreateFileW, DETOUR_TYPE_JMP);
-		oCreateFileW = (tCreateFileW) DetourCreate("kernel32.dll", "CreateFileW", hook_CreateFileW, DETOUR_TYPE_JMP);
+	if (ini->GetInt("LoadTranslations",1)) {
+		LoadTranslationCSVs();
 	}
 }
 
@@ -987,12 +1080,12 @@ void TSX_Client::Uninit()
 // Helper Functions
 void TSX_Client::OutputToChatBox(const char* Message, unsigned int Color)
 {
-	
+
 }
 
 void TSX_Client::ShowNotice(const char* Message)
 {
-	
+
 }
 
 
@@ -1068,7 +1161,7 @@ uint MyChatPacket(uint length)
 	char* Name = (char*)RecvBuffer+1;
 	char* Message = Name+13;
 	Log.Write("Chat Packet Received: %s says %s",Name,Message);
-	return OrigionalPacketRecvFunctor[RecvBuffer[0]](length);	
+	return OrigionalPacketRecvFunctor[RecvBuffer[0]](length);
 }
 
 uint MyNPCPacket(uint length)
@@ -1079,7 +1172,7 @@ uint MyNPCPacket(uint length)
 	if (*(char*)RecvBuffer+1)
 	{
 		// Do ZLib uncompress
-		uint sizeDataUncompressed = sizeof(uncompressBuffer);	
+		uint sizeDataUncompressed = sizeof(uncompressBuffer);
 		uint sizeCompressedData = *(uint*)RecvBuffer+2;
 		//char * dataUncompressed = new char[sizeDataUncompressed];
 		Log.Write("uncompress function is at %08X",uncompress);
@@ -1107,7 +1200,7 @@ uint MyNPCPacket(uint length)
 
 	MonsterObject* mon = (MonsterObject*)uncompressBuffer;
 	if (mon->HP>0)
-	{		
+	{
 		DLL.onNPCPacket(mon);
 	}
 	//DLL.MOBSpawns->AddSpawnInfo(mon->UniqueID,mon->MonsterID,mon->Location.x,mon->Location.y,mon->Location.z,mon->FacingDirection);
@@ -1124,11 +1217,11 @@ uint MyMonsterPacket(uint length)
 	if (*(char*)RecvBuffer+1)
 	{
 		// Do ZLib uncompress
-		uint sizeDataUncompressed = sizeof(uncompressBuffer);	
+		uint sizeDataUncompressed = sizeof(uncompressBuffer);
 		uint sizeCompressedData = *(uint*)RecvBuffer+2;
 		//char * dataUncompressed = new char[sizeDataUncompressed];
-		
-		int z_result = uncompress(uncompressBuffer,&sizeDataUncompressed,RecvBuffer+6,sizeCompressedData);	
+
+		int z_result = uncompress(uncompressBuffer,&sizeDataUncompressed,RecvBuffer+6,sizeCompressedData);
 		switch (z_result)
 		{
 		case Z_OK:
@@ -1152,7 +1245,7 @@ uint MyMonsterPacket(uint length)
 
 	MonsterObject* mon = (MonsterObject*)uncompressBuffer;
 	if (mon->HP>0)
-	{		
+	{
 		DLL.onMOBPacket(mon);
 	}
 	//DLL.MOBSpawns->AddSpawnInfo(mon->UniqueID,mon->MonsterID,mon->Location.x,mon->Location.y,mon->Location.z,mon->FacingDirection);

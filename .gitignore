@@ -221,3 +221,36 @@ pip-log.txt
 /npm-cache/
 /TSX_Client/lib/NtHookEngine_d.lib
 /TSX_Client/lib/diStorm_x86_d.lib
+.idea/workspace.xml
+.idea/.name
+.idea/encodings.xml
+.idea/InfiniteSky.iml
+.idea/jsLibraryMappings.xml
+.idea/libraries/InfiniteSky_node_modules.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/scopes/scope_settings.xml
+.idea/vcs.xml
+run.bat
+run.bat - Shortcut.lnk
+TSX_Client/TSX_Client.sln
+public/html/log_editor.html
+public/log.txt
+Project.sublime-workspace
+Project.sublime-project
+old files/itemactions-old.js
+itemactions-old.js
+install.bat
+generic/SkillInfo.js.REMOTE.js
+generic/SkillInfo.js.LOCAL.js
+generic/SkillInfo.js.BASE.js
+data/packets/t.pac
+TSX_Client/TSX_Client.sln
+TSX_Client/TSX_Client/TSX_Client.vcxproj.filters
+TSX_Client/TSX_Client.sln
+*.filters
+InfiniteSky.rar
+TSX_Client/TSX_Client.sln
+TSX_Client/TSX_Client.sln
+TSX_Client/TSX_Client/TSX_Client.vcxproj.filters
+/mongo

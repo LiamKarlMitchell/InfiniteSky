@@ -75,7 +75,6 @@ int32lu('Unk9').
 int32lu('Unk10').
 int8lu('Unk11');
 
-console.log(RestructTheItemMoveToTradeWindow.size);
 
 WorldPC.Set(0x26,{
 	Restruct: requestTrade,
@@ -134,8 +133,6 @@ int32lu('Unk2', 2);
 
 // Packet 44 Functor 0040DBC0 PacketSize 1394
 
-console.log(acceptItem.size)
-
 WorldPC.Set(0x2B, {
 	Restruct: RestructTheItemMoveToTradeWindow,
 	function: function(client, input){
@@ -162,7 +159,7 @@ var finishTrade = restruct.
 int8lu('PacketID').
 int8lu('Result').
 int8lu('Unk1', 1288);
-console.log(finishTrade.size);
+
 // Packet 46 Functor 0040DCF0 PacketSize 1290
 
 WorldPC.Set(0x2C, {

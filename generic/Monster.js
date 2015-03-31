@@ -2,11 +2,13 @@
 // They were not overwriting old objects prototypes.
 // https://www.youtube.com/watch?v=QigNwFntPSY
 
-vms.depends({Name: 'Monster', depends: [
-	'structs',
-	'AIObject',
-	'AttackerCollection',
-	'infos.Monster.Loaded'
+vms.depends({
+	Name: 'Monster',
+	depends: [
+	'Structs',
+	'AIModule',
+	// 'AttackerCollection',
+	'Info_Monster'
 	] }, function() {
 if (typeof(Monster_Prototype)==='undefined') {
 	Monster_Prototype = {};
@@ -38,7 +40,7 @@ Monster = function Monster(ID) {
 		return null;
 	}
 
-	this.statInfo = {
+	this.infos = {
 		Damage: this.info.Damage,
 		Defense: this.info.Defense,
 		LightDamage: 0,

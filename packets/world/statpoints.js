@@ -1,7 +1,6 @@
 // This file is part of InfiniteSky.
 // Copyright (c) InfiniteSky Dev Teams - Licensed under GNU GPL
 // For more information, see LICENCE in the main folder
-
 WorldPC.KeyValueUnsigned = restruct.
 int8lu('PacketID').
 int32lu('Key').
@@ -43,41 +42,49 @@ WorldPC.Set(0x16, {
 			// Str
 			socket.character.StatStrength += pac.Value;
 			socket.sendInfoMessage('Increment Str by ' + pac.Value);
+			socket.character.infos.updateStat('StatStrength');
 			break;
 		case 1:
 			// Chi
 			socket.character.StatChi += pac.Value;
 			socket.sendInfoMessage('Increment Chi by ' + pac.Value);
+			socket.character.infos.updateStat('StatChi');
 			break;
 		case 2:
 			// Dex
 			socket.character.StatDexterity += pac.Value;
 			socket.sendInfoMessage('Increment Dex by ' + pac.Value);
+			socket.character.infos.updateStat('StatDexterity');
 			break;
 		case 3:
 			// Vit
 			socket.character.StatVitality += pac.Value;
 			socket.sendInfoMessage('Increment Vit by ' + pac.Value);
+			socket.character.infos.updateStat('StatVitality');
 			break;
 		case 4:
 			// Str 5
 			socket.character.StatStrength += pac.Value;
 			socket.sendInfoMessage('Increment Str by ' + pac.Value);
+			socket.character.infos.updateStat('StatStrength');
 			break;
 		case 5:
 			// Chi 5
 			socket.character.StatChi += pac.Value;
 			socket.sendInfoMessage('Increment Chi by ' + pac.Value);
+			socket.character.infos.updateStat('StatChi');
 			break;
 		case 6:
 			// Dex 5
 			socket.character.StatDexterity += pac.Value;
 			socket.sendInfoMessage('Increment Dex by ' + pac.Value);
+			socket.character.infos.updateStat('StatDexterity');
 			break;
 		case 7:
 			// Vit 5
 			socket.character.StatVitality += pac.Value;
 			socket.sendInfoMessage('Increment Vit by ' + pac.Value);
+			socket.character.infos.updateStat('StatVitality');
 			break;
 
 		default:
@@ -87,7 +94,6 @@ WorldPC.Set(0x16, {
 		}
 
 		socket.character.StatPoints -= pac.Value;
-		socket.sendInfoMessage('StatPoints is now: '+socket.character.StatPoints);
 
 		socket.write(new Buffer(WorldPC.KeyValueUnsigned.pack({
 			PacketID: 0x84,
@@ -96,7 +102,8 @@ WorldPC.Set(0x16, {
 			Value: pac.Key
 		})));
 
-		socket.character.updateInfos(false);
+
+		// socket.character.updateInfos(false);
 		// Update character state
 		socket.character.state.setFromCharacter(socket.character);
 

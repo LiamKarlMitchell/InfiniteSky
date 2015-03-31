@@ -3,7 +3,18 @@
 // For more information, see LICENCE in the main folder
 vms.depends({
     name: 'World Server',
-    depends: ['infos.Exp.Loaded', 'infos.Item.Loaded', 'infos.Npc.Loaded', 'infos.Skill.Loaded', 'db.Account', 'db.Character', 'Zone', 'packets']
+    depends: [
+    'Info_Exp',
+    'Info_Item',
+    'Info_Npc',
+    'Info_Skill',
+    'Zone',
+    'Packets',
+    'Character',
+    'Account',
+    'CVec3'
+    ]
+    // depends: ['infos.Exp.Loaded', 'infos.Item.Loaded', 'infos.Npc.Loaded', 'infos.Skill.Loaded', 'db.Account', 'db.Character', 'Zone', 'packets']
 }, function() {
     if(typeof(world) === 'undefined') {
         console.log('World server code loaded');
@@ -35,16 +46,16 @@ vms.depends({
     } else {
         console.log('World server code reloaded');
     }
-    // zones is an object which will contain references to each zone object by its id.
+    // zones is an object which will contain refeences to each zone object by its id.
     if(typeof(zones) === 'undefined') {
         zones = {};
-    }    
+    }
     world.GameStep = function(delta) {
         // Do something with delta
         // console.log('Delta: '+delta);
     };
     world.connection = function(socket) {
-        console.log("Client #" + world.clientID + " connected from IP " + socket.remoteAddress);
+        console.log("Client #" + world.clientID + " connected from IP " + _util.cleanIP(socket.remoteAddress));
         socket.clientID = world.clientID;
         world.clientID++;
         socket.authenticated = false;
@@ -66,50 +77,63 @@ vms.depends({
             //CharacterTypeIdentifier
         };
         // Gives the character exp and handles sending out the level up packets
-        socket.giveEXP = function(Value) {
-            if(Value <= 0) return; // If no exp given or - amount
-            // Give the character the EXP, returns # of levels if level up
-            // Apply any EXP Buffs here
-            var EXPBuff = 0;
-            EXPBuff += this.character.ExperienceBuff;
-            // Add in Faction, Item, Zone, World EXP buffs here
-            if(EXPBuff !== 0) value += value * EXPBuff;
-            // End of EXP Buffing
-            console.log("Giving " + this.character.Name + ' ' + Value + ' EXP ' + this.character.Experience);
-            var LevelUp = this.character.giveEXP(Value);
-            // If level up set level up data
-            if(LevelUp > 0) {
-                console.log("Leveled up " + LevelUp);
-                // Send to the character it's new exp,hp,statpoint,skillpoint,etc...
-                this.character.Health = this.character.state.CurrentHP = this.character.state.MaxHP = this.character.statInfo.HP;
-                this.character.Chi = this.character.state.CurrentChi = this.character.state.MaxChi = this.character.statInfo.Chi;
-                // Send out new EXP packet
-                socket.character.state.Level = socket.character.Level;
-                // Need to find these
-                socket.character.state.LevelUpAnimation = 1;
-                socket.character.state.LevelUpAnimationFrame = 0;
-                console.log("Level Up");
-                if(LevelUp == 1) {
-                    socket.sendInfoMessage("You Leveled up");
-                } else {
-                    socket.sendInfoMessage("You Leveled up " + LevelUp + " times");
-                }
+        socket.giveEXP = function(value) {
+            if(value <= 0) return; // If no exp given or - amount
+
+            var expinfo = infos.Exp[this.character.Level];
+            if (expinfo==null || infos.Exp[145].EXPEnd === this.character.Experience) return;
+
+            this.character.Experience += value;
+            if(this.character.Experience > infos.Exp[145].EXPEnd) this.character.Experience = infos.Exp[145].EXPEnd;
+
+            var reminder = expinfo.EXPEnd - this.character.Experience;
+            var levelGained = 0;
+
+            while(reminder < 0){
+                levelGained++;
+
+                expinfo = infos.Exp[this.character.Level + levelGained];
+                if(!expinfo) break;
+
+                this.character.Experience += 1;
+                this.character.SkillPoints += expinfo.SkillPoint;
+                this.character.StatPoints += (this.character.Level + levelGained) > 99 && (this.character.Level + levelGained) <= 112 ? 0 : (this.character.Level + levelGained) > 112 ? 30 : 5;
+                reminder = (expinfo.EXPEnd - expinfo.EXPStart) + reminder;
+            }
+
+
+            this.send2FUpdate();
+
+            if((this.character.Level + levelGained) > 145 || this.character.Experience > infos.Exp[145].EXPEnd){
+                levelGained = 145 - this.character.Level;
+                this.character.Experience = infos.Exp[145].EXPEnd;
+                this.character.Level = 145;
+            }else{
+                this.character.Level += levelGained;
+            }
+
+            console.log(this.character.Name + "' gained "+value+" experience");
+
+            if(levelGained > 0){
+                this.character.state.CurrentHP = this.character.infos.MaxHP;
+                this.character.state.CurrentChi = this.character.infos.MaxChi;
+                this.character.Health = this.character.infos.MaxHP;
+                this.character.Chi = this.character.infos.MaxChi;
+
+                this.character.state.Level = this.character.Level;
+                this.character.infos.updateAll();
+
                 this.Zone.sendToAllArea(this, true, new Buffer(packets.LevelUpPacket.pack({
                     PacketID: 0x2E,
-                    ID1: this.character._id,
-                    ID2: 0,
-                    //this.character.CharacterTypeIdentifier,
-                    Levels: LevelUp
+                    LevelsGained: levelGained,
+                    CharacterID: this.character._id,
+                    NodeID: this.node.id
                 })), config.viewable_action_distance);
-                // Save character
-                // Must write a character.save function that does the XYZ and shit.
-                socket.character.RealX = parseInt(socket.character.state.Location.X, 10);
-                socket.character.RealY = parseInt(socket.character.state.Location.Y, 10);
-                socket.character.RealZ = parseInt(socket.character.state.Location.Z, 10);
-                socket.character.save();
             }
-            // Send out its character action update packet
+
+            this.character.save();
         };
+
         socket.giveItemInStorage = function(item, action) {
             console.log('giveItemInInventory not yet implemented');
             var ItemID = item.ItemID || 0;
@@ -298,9 +322,7 @@ vms.depends({
             // Save inventory data
         }
         socket.send2FUpdate = function() {
-            if(this.character.do2FPacket == 0) return;
-            this.character.do2FPacket = 0;
-            //console.log('sending 2F Update');
+            // console.log(this.character.Level);
             var update = {
                 'PacketID': 0x2F,
                 'Level': this.character.Level,
@@ -311,7 +333,6 @@ vms.depends({
                 'PetActivity': this.character.Pet === null ? 0 : this.character.Pet.Activity,
                 'PetGrowth': this.character.Pet === null ? 0 : this.character.Pet.Growth
             };
-            //eyes.inspect(update);
             this.write(new Buffer(packets.HealingReplyPacket.pack(update)));
         }
         // Returns false if it failed, true if success
@@ -384,12 +405,12 @@ vms.depends({
                 // if so send it servers lan ip and port
                 // otherwise send it real world ip and port
                 theIP = config.externalIP;
-                if(this.remoteAddress.indexOf('127') == 0) {
+                if(_util.cleanIP(this.remoteAddress).indexOf('127') == 0) {
                     theIP = '127.0.0.1'
                 }
                 console.log('IP for client to connect too before translation: ' + theIP);
                 for(var i = 0; i < natTranslations.length; i++) {
-                    if(natTranslations[i].contains(this.remoteAddress)) {
+                    if(natTranslations[i].contains(_util.cleanIP(this.remoteAddress))) {
                         theIP = natTranslations[i].ip;
                         break;
                     }
@@ -469,6 +490,8 @@ vms.depends({
             console.log('socket.LogoutUser ' + socket.Username);
             world.getSocketFromTransferQueue(this.account.Username);
         }
+
+
         socket.on('error', function(err) {
             console.log('Client #' + socket.clientID + ' error: ', err);
             socket.destroy();
@@ -487,7 +510,7 @@ vms.depends({
         socket.on('close', function() {
             console.log('Client #' + socket.clientID + ' closed connection');
             console.log('world.js needs to remove socket from zone it is in too. and tell all party/guild its offline etc');
-            
+
             if(socket.character.Party){
                 console.log("Was in party...");
                 if(socket.character.Party.leader.character.Name === socket.character.Name){
@@ -496,7 +519,7 @@ vms.depends({
                     socket.character.Party.logoutCharacter(socket.character.Name);
                 }
             }
-            
+
             removeDisconnectedCharacter.call(socket);
             //Let client know how many people are playing on server
             try {
@@ -517,10 +540,10 @@ vms.depends({
                 return;
             }
 
-            
+
             this.character.Health = this.character.state.CurrentHP;
             this.character.Chi = this.character.state.CurrentChi;
-            
+
             // Need to store zone transfer location different to current location.
             if(this.zoneTransfer) {
                 console.log('removeDisconnectedCharacter ' + this.acocunt.Username)
@@ -603,13 +626,26 @@ vms.depends({
                 dumpError(e);
             }
         });
+
+        socket.write(new Buffer(packets.WorldServerInfoPacket.pack({
+            packetID: 0x00
+        })));
+
+        socket.afterPacketsHandled = function(){
+            socket.send2FUpdate();
+
+            delete this.afterPacketsHandled;
+        }
+
         CachedBuffer.call(socket, world.packets);
         //Let client know how many people are playing on server
+
         try {
             world.packets.onConnected(socket);
         } catch(e) {
             dumpError(e);
         }
+
         world.addClient(socket);
         world[socket.ID] = socket;
     };
@@ -643,7 +679,7 @@ vms.depends({
     world.addSocketToTransferQueue = function(socket) {
         if(socket.authenticated == false) return;
         // set a timeout on the object for logging out the account if it is not removed from world list
-        socket.zoneTransferLogout = socket.setTimeout(socket.LogoutUser, config.zoneTransferLogoutTimer || 60000);
+        socket.zoneTransferLogout = setTimeout(socket.LogoutUser, config.zoneTransferLogoutTimer || 60000);
         world.socket_transfers.push(socket);
     }
     world.getSocketFromTransferQueue = function(Username) {
@@ -702,7 +738,7 @@ vms.depends({
             zones[zoneID].sendToAll(buffer);
         }
     }
-    // End of helper functions  
+    // End of helper functions
     // TODO: Implement server side game simulation so things really do move and are in correct spots.
     world.step = function(delta) {
         // Check if running
@@ -718,7 +754,7 @@ vms.depends({
     }
     world.addClient = function(socket) {
         // Can attach things here if we need to
-        // Call Attach Hooks 
+        // Call Attach Hooks
         // setupClient(socket);
         world.clients.push(socket);
     }
@@ -758,6 +794,7 @@ vms.depends({
                 if (world.Loaded === false) {
                     world.Loaded = true;
                     console.log('Finished loading zones!\nYou can now login to the server.');
+                    main.events.emit('ready');
                 }
             }
         } else {

@@ -1,6 +1,8 @@
 InfiniteSky
 =========
 
+[![Join the chat at https://gitter.im/LiamKarlMitchell/InfiniteSky](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/LiamKarlMitchell/InfiniteSky?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 InfiniteSky is an open-source project, emulating a Twelve Sky Server. It is written in Node.JS
 
   - We have reloadable code. This means less need to reset the server when developing.
@@ -21,7 +23,7 @@ InfiniteSky uses a number of open source projects to work properly:
 * [hexy] - hexdump, binary pretty-printing
 * [async] - Higher-order functions and common patterns for asynchronous code
 * [jshint] - Static analysis tool for JavaScript
-* [socket] - Socket is a connect clone for simple socket based applications
+* [socket] - Socket is a connect clone for simple socket based applicationsad
 * [netmask] - Parse and lookup IP network blocks
 * [node.js] - evented I/O for the backend
 * [mongodb] - A NoSQL DB that is awesome
@@ -90,7 +92,7 @@ Then type in the following commands.
 ```
 use ts1
 db.createCollection("ts1")
-db.addUser({user: "ts1", pwd: "ts1", roles: ["readWrite"]})
+db.createUser({user: "ts1", pwd: "ts1", roles: ["readWrite"]})
 ```
 
 ## Copy game files to data directorys you made
@@ -144,6 +146,18 @@ ServerIP = 127.0.0.1
 HookFileLoading = 1
 DevButtons = 1
 ```
+
+## Create Game Accounts
+You will want to create some game accounts too use.
+To make a GM account use
+````
+/createaccount Name Password 100
+````
+
+The 100 us the level.
+
+Try also /help for other commands.
+If you want information on game info try infos.Item[1].Name or other attributes.
 
 ## Notes
 

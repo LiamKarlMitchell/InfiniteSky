@@ -14,104 +14,6 @@ int32lu('Unk2').
 int32lu('Unk3').
 pad(60);
 
-WorldPC.Set(0x19, {
-	Restruct: ReadUsedItem,
-	function: function makeIt(client, input){
-		console.log("Skill: " + infos.Skill[input.SkillID]);
-
-		if(client.character.state.CurrentChi > 0 && client.character.state.CurrentChi >= input.ChiUsage && input.ChiUsage <= client.character.state.CurrentChi){
-			console.log("Skill consumed CHI");
-			var skillInfo = infos.Skill[input.SkillID];
-			if(!skillInfo){
-				console.log("Skill info not found");
-				return;
-			}
-			
-			var Modifiers = skillInfo.ModifiersStart;
-			
-			// console.log(Modifiers);
-			
-			client.character.state.DisplayBuffs = 1;
-			
-			//client.character.state.CurrentChi -= input.ChiUsage;
-            client.character.state.SkillID = input.SkillID;
-			client.character.state.SkillLevel = input.SkillLevel;
-
-			client.character.state.Stance = 0;
-			if (input.SkillID === 2) {
-				client.character.state.Skill = 32;
-			}
-			//client.character.state.Skill = input.SkillID;
-			client.character.state.Frame = 0;
-			// var amount;
-			// var BuffCode;
-			// var unk;
-			
-			// switch(input.SkillID){
-			// 	case 25:
-			// 	amount = Math.round(Modifiers.DamageIncreased*100);
-			// 	BuffCode = 11;
-			// 	break;
-				
-			// 	case 30:
-			// 	amount = Math.round(Modifiers.IncreasedDamage*100);
-			// 	BuffCode = 0;
-			// 	break;
-				
-			// 	case 26:
-			// 	amount = Math.round(Modifiers.IncreasedDamage*100);
-			// 	BuffCode = 23;
-			// 	break;
-				
-			// 	case 82:
-			// 	amount = Math.round(Modifiers.DegreeOfDefensiveSkill*100);
-			// 	BuffCode = 14;
-			// 	unk = 10;
-			// 	break;
-				
-			// 	case 83:
-			// 	amount = Math.round(Modifiers.EnchancedChanceToDeadlyBlow*100);
-			// 	BuffCode = 15;
-			// 	break;
-				
-			// 	case 84:
-			// 	amount = Math.round(Modifiers.IncreasedLuck*100);
-			// 	BuffCode = 16;
-			// 	break;
-				
-			// 	case 103:
-			// 	console.log("HRR");
-			// 	amount = Math.round(Modifiers.ChanceToReturnDamage*100);
-			// 	BuffCode = 21;
-			// 	break;
-				
-			// 	case 104:
-			// 	amount = Math.round(Modifiers.IncreasedAcupressureDefense*100);
-			// 	BuffCode = 22;
-			// 	break;
-			// }
-			
-			// var time = Modifiers.EffectiveDuration * 100;
-			
-			// console.log("Amount: " + amount + ", Time: " + time);
-
-			// console.log("Setting the buff into state");
-		
-			
-			//console.log(Modifiers);
-			// var buffer = new Buffer(applyBuffRespond.pack({
-			// 	PacketID: 0x2d,
-			// 	Unk: 0,
-			// 	Unk1: 0,
-			// 	Unk2: 0
-			// }));
-			// client.write(buffer);
-
-			client.sendInfoMessage('Using Skill '+input.SkillID);
-			client.write(client.character.state.getPacket());
-		}
-	}
-});
 
 var a7Restruct = restruct.
 int32lu('Unk1').
@@ -132,244 +34,277 @@ int32lu('Unk15').
 int8lu('Unk16').
 int8lu('Unk17');
 
-WorldPC.Set(0x7a, {
-	Restruct: a7Restruct,
-	function: function(client, input){
-		// console.log("Unknown Packet 0x7a: ", input);
-	}
-});
 
 var applyBuff = restruct.
 int32lu('SkillID').
 int32lu('SkillLevel').
-int32lu('Unk3').
+int32lu('Slot').
 int32lu('Unk4').
 int32lu('Unk5');
 
 var applyBuffRespond = restruct.
-	int8lu('PacketID').
-	int32lu('Unk').
-	int32lu('Unk1').
-	int32lu('Unk2').
-	pad(96);
+int8lu('PacketID').
+int32lu('Unk').
+int32lu('Unk1').
+int32lu('Unk2').
+pad(96);
 
+
+// var buffsList = [105, 30, 103, 104, 26, 84, 83, 82, 7, 11, 19, 38, 34, 15, 45, 60, 53, 57, 49];
+
+// var applyBuffFunctionTimeout = function(client, input){
+// 	var buffID = null;
+// 	var amount = 200;
+
+// 	console.log("Applying buff: " + input.SkillID);
+
+// 	switch(input.SkillID){
+
+// 		case 25:
+// 		case 6:
+// 		case 44:
+// 		buffID = 11;
+// 		break;
+
+// 		case 26:
+// 		buffID = 3;
+// 		break;
+
+// 		case 7:
+// 		buffID = 5;
+// 		break;
+
+// 		case 45:
+// 		buffID = 13;
+// 		break;
+
+// 		case 30:
+// 		case 15:
+// 		case 53:
+// 		buffID = 0;
+// 		break;
+
+// 		case 103:
+// 		buffID = 19;
+// 		break;
+
+// 		case 104:
+// 		buffID = 20;
+// 		break;
+
+// 		case 105:
+// 		buffID = 21;
+// 		break;
+
+// 		case 84:
+// 		buffID = 9;
+// 		break;
+
+// 		case 83:
+// 		buffID = 15;
+// 		break;
+
+// 		case 82:
+// 		buffID = 14;
+// 		break;
+
+// 		case 11:
+// 		buffID = 1;
+// 		break;
+
+// 		case 19:
+// 		case 38:
+// 		case 57:
+// 		buffID = 9;
+// 		break;
+
+// 		case 34:
+// 		case 49:
+// 		buffID = 1;
+// 		break;
+
+// 		default:
+// 		console.log("Applying [ "+input.SkillID+" ] dont work yet, please report!");
+// 		break;
+// 	}
+
+// 	if(buffID !== null){
+// 		// console.log(infos.Skill[input.SkillID].ModifiersStart);
+// 		// console.log(input);
+// 		// console.log(modStart);
+// 		// console.log(modEnd);
+
+// 		// console.log(skillInfo);
+// 		// console.log(modStart.EffectiveDuration);
+// 		// console.log((modEnd.EffectiveDuration - modStart.EffectiveDuration));
+
+
+// 		// var time = (modStart.EffectiveDuration + ((modEnd.EffectiveDuration - modStart.EffectiveDuration) * input.SkillLevel)) * 100;
+// 		// var amount = modStart.EffectiveDuration + (difference * input.SkillLevel);
+// 		// console.log(time);
+
+// 		// var time = (modStart.EffectiveDuration*100);
+// 		// console.log(time);
+
+// 		if(buffID === 14)
+// 		client.character.state.BuffHS = {'Time': 100, 'Amount': 200, 'Stacks': 5};
+// 		else if(buffID >= 0 && buffID < 14)
+// 		client.character.state.Buffs[buffID] = {'Time': 100, 'Amount': 22};
+// 		else if(buffID > 14)
+// 		client.character.state.Buffs2[buffID] = {'Time': 100, 'Amount': 22};
+
+
+// 	    client.character.state.SkillID = 0;
+// 		client.character.state.SkillLevel = 0;
+// 		client.character.state.Frame = 0;
+// 		client.character.state.Skill = client.character.state.OldSkill;
+// 		// client.character.state.Stance = client.character.state.OldStance;
+// 	}
+
+// 	// client.character.state.Skill = client.character.state.FightingStance === undefined ? 4 : !client.character.state.FightingStance ? 4 : 3; // This applies the result character stance :)
+
+// }
+
+
+function newSkillUpdate(client, input){
+	console.log(input);
+	console.log("Applying Skill ID : " + input.SkillID);
+	var skillInfo = infos.Skill[input.SkillID];
+
+	console.log(skillInfo);
+
+	var modStart = skillInfo.ModifiersStart;
+	var modEnd = skillInfo.ModifiersEnd;
+
+	console.log(modStart);
+	console.log(modEnd);
+
+	// console.log(client.character.SkillList);
+
+	var hasSkill = null;
+	for(var i=client.character.SkillList.length-1; i>0; i--){
+		var skill = client.character.SkillList[i];
+		if(!skill) continue;
+		if(skill.ID === input.SkillID){
+			hasSkill = skill;
+			break;
+		}
+	}
+
+	if(!hasSkill){
+		console.log("The player used skill that was not in his SkillList!");
+		return;
+	}
+
+	var cost = Math.round((modStart.ChiCost * 100) + ((((modEnd.ChiCost - modStart.ChiCost)*100)/skillInfo.MaxSkillLevel) * input.SkillLevel));
+	console.log("Skill Cost: "+cost);
+
+	var time = Math.round((modStart.EffectiveDuration * 100) + ((((modEnd.EffectiveDuration - modStart.EffectiveDuration)*100)/skillInfo.MaxSkillLevel) * input.SkillLevel));
+
+	switch(input.Slot){
+		case 4:
+		console.log("Applying Increse Damage Once");
+		var amount = Math.round((modStart.DamageIncreased * 100) + ((((modEnd.DamageIncreased - modStart.DamageIncreased)*100)/skillInfo.MaxSkillLevel) * input.SkillLevel));
+		client.character.state.Buffs[11] = {'Time': time, 'Amount': amount};
+		break;
+
+		case 5:
+		console.log("Applying Elemental Resistance for guans");
+		var amount = (modStart.Unk2 * 100) + ((((modEnd.Unk2 - modStart.Unk2)*100)/skillInfo.MaxSkillLevel) * input.SkillLevel);
+		client.character.state.Buffs[5] = {'Time': time, 'Amount': amount};
+		break;
+
+		case 6:
+		console.log("Applying Elemental Damage Increase");
+		var amount = (modStart.Unk2 * 100) + ((((modEnd.Unk2 - modStart.Unk2)*100)/skillInfo.MaxSkillLevel) * input.SkillLevel);
+		client.character.state.Buffs[3] = {'Time': time, 'Amount': amount};
+		break;
+
+		case 7:
+		client.character.state.Buffs[13] = {'Time': time, 'Amount': 22};
+		break;
+
+		case 8:
+		console.log("Applying Reflect Damage");
+		var amount = Math.round((modStart.ChanceToReturnDamage * 100) + ((((modEnd.ChanceToReturnDamage - modStart.ChanceToReturnDamage)*100)/skillInfo.MaxSkillLevel) * input.SkillLevel));
+		console.log(amount);
+		client.character.state.Buffs2[4] = {'Time': time, 'Amount': amount};
+		break;
+
+		case 9:
+		client.character.state.Buffs2[5] = {'Time': time, 'Amount': 22};
+		break;
+
+		case 10:
+		client.character.state.Buffs2[6] = {'Time': time, 'Amount': 22};
+		break;
+
+		case 11:
+		client.character.state.Buffs[1] = {'Time': time, 'Amount': 22};
+		break;
+
+		case 12:
+		console.log("Applying Damage Increase");
+		var amount = Math.round((modStart.IncreasedDamage * 100) + ((( (modEnd.IncreasedDamage - modStart.IncreasedDamage) * 100 ) / skillInfo.MaxSkillLevel) * input.SkillLevel));
+		client.character.state.Buffs[0] = {'Time': time, 'Amount': amount};
+		break;
+
+		case 13:
+		// console.log("asdsad as");
+		// var amount = Math.round((modStart.IncreasedDamage * 100) + ((( (modEnd.IncreasedDamage - modStart.IncreasedDamage) * 100 ) / skillInfo.MaxSkillLevel) * input.SkillLevel));
+		client.character.state.Buffs[9] = {'Time': time, 'Amount': 22};
+		break;
+
+		case 17:
+		client.character.state.BuffHS = {'Time': time, 'Amount': 200, 'Stacks': 5};
+		break;
+
+		case 18:
+		client.character.state.Buffs2[0] = {'Time': time, 'Amount': 22};
+		break;
+
+		case 19:
+		client.character.state.Buffs2[1] = {'Time': time, 'Amount': 22};
+		break;
+	}
+
+
+	client.character.state.SkillID = client.character.state.OldSkill;
+	client.character.state.SkillLevel = 0;
+	client.character.state.Frame = 0;
+	client.character.state.Skill = 0;
+
+	client.Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.viewable_action_distance);
+}
+
+WorldPC.Set(0x19, {
+	Restruct: ReadUsedItem,
+	function: function makeIt(client, input){
+		console.log('make it method');
+
+		if(client.character.state.onSkillStateUpdate){
+			client.character.state.onSkillStateUpdate = false;
+
+	        client.character.state.SkillID = input.SkillID;
+			client.character.state.SkillLevel = input.SkillLevel;
+
+			client.Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.viewable_action_distance);
+		}
+	}
+});
 
 WorldPC.Set(0x18, {
 	Restruct: applyBuff,
 	function: function(client, input){
-		console.log('After the buff is applied?');
-	
-		// 0 = Soaring Power
-		// 1 = Godly Firewall
-		// 2
-		// 3 = Huricane Winds?
-		// 4
-		// 5
-		// 6
-		// 7
-		// 8
-		// 9 = Music of the Wind
-		// 10
-		// 11 = Invisible Arrows
-		// 12 = Drunk Buff
-		// 13
-		// 14 = Heavenely Shield
-		// 15 = Heavenely Blow
-		// 16 = Gurda Song
-		// 17
-		// 18
-		// 19
-		// 20
-		// 21
-		
-		var buffID;
-		switch(input.SkillID){
-			case 84:
-			buffID = 16;
-			break;
-			
-			case 83:
-			buffID = 15;
-			break;
-			
-			case 82:
-			buffID = 14;
-			break;
-			
-			case 105:
-			
-			break;
-			
-			case 34:
-			buffID = 1;
-			break;
-			
-			case 30:
-			buffID = 0;
-			break;
-			
-			case 38:
-			buffID = 9;
-			break;
-			
-			case 25:
-			buffID = 11;
-			break;
-			
-			case 82:
-			// We need to change restruct here to be able to apply the "stacks" of the HS
-			buffID = 14;
-			break;
-			
-			case 83:
-			buffID = 15;
-			break;
-			
-			case 84:
-			buffID = 16;
-			break;
-			
-			default:
-			console.log("This buff is not coded yet");
-			return;
-			break;
-		}
-			
-		client.character.state.Buffs[buffID] = {'Time': 600, 'Amount': 600};
-		client.write(client.character.state.getPacket());
-		
-		// console.log("Preparing the buff");			
-		
-		// if(input.SkillID !== client.character.state.SkillID){
-		// 	console.log("ID Does not match");
-		// 	return;
-		// }
-		// // Maybe loop it every 200 ms to check if applied, after 3 tires return error or disconnect the player
-		
-		// var skillInfo = infos.Skill[input.SkillID];
-		// if(!skillInfo){
-		// 	console.log("Skill info not found");
-		// 	return;
-		// }
-		
-		// var Modifiers = skillInfo.ModifiersStart;
-		
-		// if(!Modifiers){
-		// 	console.log("No modifiers");
-		// 	return;
-		// }
-		
-		
-		// console.log(Modifiers);
-		
-		// var amount;
-		// var BuffCode;
-		// var Unk;
-		// switch(input.SkillID){
-		// 	case 25:
-		// 	amount = Math.round(Modifiers.DamageIncreased*100);
-		// 	BuffCode = 11;
-		// 	break;
-			
-		// 	case 30:
-		// 	amount = Math.round(Modifiers.IncreasedDamage*100);
-		// 	BuffCode = 0;
-		// 	break;
-			
-		// 	case 26:
-		// 	amount = Math.round(Modifiers.IncreasedDamage*100);
-		// 	BuffCode = 1;
-		// 	break;
-			
-		// 	case 82:
-		// 	amount = Math.round(Modifiers.DegreeOfDefensiveSkill*100);
-		// 	BuffCode = 14;
-		// 	Unk = 8;
-		// 	break;
-			
-		// 	case 83:
-		// 	amount = Math.round(Modifiers.DegreeOfDefensiveSkill*100);
-		// 	BuffCode = 14;
-		// 	break;
-		// }
-	
-		
-		// if(amount === undefined || BuffCode === undefined){
-		// 	console.log("No amount or buff code");
-		// 	return;
-		// }
-	
-		// var time = Modifiers.EffectiveDuration*100;
-		
-		// console.log("Amount: " + amount + ", Time: " + time);
-
-		// console.log("Setting the buff into state");
-		
-		// if(Unk)
-		// client.character.state.Buffs[BuffCode] = {'Time': time, 'Unk': Unk};
-		// else client.character.state.Buffs[BuffCode] = {'Time': time, 'Amount': amount};
-
-		// client.write(client.character.state.getPacket());
-
-		
-		// if(client.character.state.applyingBuffTime) return;
-		// setTimeout(function(){
-		// 	client.character.state.applyingBuffTime = false;
-		// 	console.log("Global cooldown reseted");
-		// }, 2000);
-			
-		// client.character.state.applyingBuffTime = true;
-		// console.log(input);
-		// var buffer = new Buffer(applyBuffRespond.pack({
-		// 	PacketID: 0x2d,
-		// 	Unk: input.Unk1,
-		// 	Unk1: input.Unk2,
-		// 	Unk2: input.Unk3
-		// }));
-		
-		// console.log(hexy(buffer));
-		
-		// client.write(buffer);
-		
-		// client.character.state._Unknown4 = [3000, 102];
-		// client.character.state._Unknown1 = [3000, 102]; // Time, Percentage 100 = 0
-		// client.character.state._Unknown4 = [3000, 102]; // Time, Percentage 100 = 0
-		// client.character.state._Unknown13 = [3000, 102]; // Drunk	
-		// client.character.state._Unknown15 = [3000, 102]; // HS
-		
-		// Gurda song test on using skill
-		// client.character.state.Buffs[16].Time = 3000;
-		// client.character.state.Buffs[16].Amount = 3000;
-
-		// client.character.state._Unknown22 = [3000, 102]; // HR?
-		//  client.character.state._Unknown23 = [3000, 102];
-		// client.write(client.character.state.getPacket());
+		console.log('apply buff method');
+		newSkillUpdate(client, input);
 	}
 });
 
-// 2F    66 00 00 00   5B 46 F8 05   00 00 00 00   6F 10 00 00   8E 08 00 00   4A 00 00 00   E0 AB 09 00 
-// 2F    66 00 00 00   5B 46 F8 05   00 00 00 00   6F 10 00 00   93 08 00 00   4A 00 00 00   E0 AB 09 00         
-// 2F    66 00 00 00   5B 46 F8 05   00 00 00 00   6F 10 00 00   93 08 00 00   47 00 00 00   E0 AB 09 00  
-// 2F    66 00 00 00   5B 46 F8 05   00 00 00 00   6F 10 00 00   8D 08 00 00   47 00 00 00   E0 AB 09 00        
-// 2F    66 00 00 00   5B 46 F8 05   00 00 00 00   6F 10 00 00   8C 08 00 00   46 00 00 00   E0 AB 09 00
-// 2F    66 00 00 00   D0 EB F7 05   00 00 00 00   6F 10 00 00   76 08 00 00   40 00 00 00   E0 AB 09 00 
-// 2F    66 00 00 00   D0 EB F7 05   00 00 00 00   6F 10 00 00   81 08 00 00   40 00 00 00   E0 AB 09 00     
-// 2F    66 00 00 00   D0 EB F7 05   00 00 00 00   6F 10 00 00   64 08 00 00   40 00 00 00   E0 AB 09 00         
-// 2F    66 00 00 00   D0 EB F7 05   00 00 00 00   6F 10 00 00   6F 08 00 00   40 00 00 00   E0 AB 09 00
-// 2F    66 00 00 00   D0 EB F7 05   00 00 00 00   6F 10 00 00   7A 08 00 00   40 00 00 00   E0 AB 09 00          
-// 2F    66 00 00 00   D0 EB F7 05   00 00 00 00   6F 10 00 00   85 08 00 00   40 00 00 00   E0 AB 09 00     
-// 2F    66 00 00 00   D0 EB F7 05   00 00 00 00   6F 10 00 00   90 08 00 00   40 00 00 00   E0 AB 09 00     
-// 2F    66 00 00 00   D0 EB F7 05   00 00 00 00   6F 10 00 00   93 08 00 00   40 00 00 00   E0 AB 09 00     
 
-// Jumping
-// 2F    66 00 00 00   D0 EB F7 05   00 00 00 00   6F 10 00 00   1E 08 00 00   40 00 00 00   E0 AB 09 00    
-// 2F    66 00 00 00   D0 EB F7 05   00 00 00 00   6F 10 00 00   29 08 00 00   40 00 00 00   E0 AB 09 00  
-
-// Wpe pro fujin     
-// 2F    91 00 00 00   94 D3 F2 48   00 00 00 00   44 29 00 00   CA 13 00 00   00 00 00 00   00 00 00 00 
-// 2F    91 00 00 00   94 D3 F2 48   00 00 00 00   44 29 00 00   5F 12 00 00   00 00 00 00   00 00 00 00 
-// 2F    91 00 00 00   94 D3 F2 48   00 00 00 00   44 29 00 00   88 12 00 00   00 00 00 00   00 00 00 00 
-// 2F    91 00 00 00   94 D3 F2 48   00 00 00 00   44 29 00 00   49 14 00 00   00 00 00 00   00 00 00 00 
-// 2F    66 00 00 00   5B 46 F8 05   00 00 00 00   6F 10 00 00   E6 07 00 00   5E 00 00 00   E0 AB 09 00  
-
-// Seems like wrong packet... too random!
+WorldPC.Set(0x7a, {
+	Restruct: a7Restruct,
+	function: function(client, input){
+		// console.log('Client indicates that one of the buffs has runned out of the time, need to clear the state.'); // Used when the state of character buffs on client doesnt match with state sended by the server
+	}
+});

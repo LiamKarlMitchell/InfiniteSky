@@ -1,27 +1,27 @@
-
-vms.depends({name: 'Zone.js', depends: [
-    'infos.Npc',
-    'infos.Item',
-    'infos.Skill',
-    'db.Character',
-    'packets',
-    'QuadTree',
-    'packets',
-    'Npc',
-    'Monster',
-    'Item'
-]
-}, function(){
+Zone = function Zone(ID) {
+    this.ID = ID;
+    this.Init();
+};
 
 if(typeof(Zone_Prototype) === 'undefined') {
     Zone_Prototype = {};
 }
 
-Zone = function Zone(ID) {
-    this.ID = ID;
-    this.Init();
-};
 Zone.prototype = Zone_Prototype;
+
+vms.depends({
+	name: 'Zone',
+	depends: [
+	    'Info_Npc',
+	    'Info_Item',
+	    'Info_Skill',
+	    'Character',
+	    'Packets',
+	    'Info_Monster'
+	    // 'AIModule'
+    ]
+}, function(){
+
 
 
 // END OF NPC Definition
@@ -153,6 +153,8 @@ Zone_Prototype.sendToAll = function(buffer) {
 };
 
 Zone_Prototype.sendToAllArea = function(origional, sendtoself, buffer, distance) {
+	// console.log(origional);
+
     this.Clients.forEach(function(client) {
         if(client.authenticated == false || !client._handle) return;
         if(sendtoself == false && client == origional) return;
@@ -257,7 +259,7 @@ Zone_Prototype.getItem = function(index) {
 	var item = null;
 	console.log('Get item ' + index);
 	//if (typeof(this.Items[index]) != 'undefined')
-	var node = this.QuadTree.nodesHash[index];
+	var node = this.QuadTree.getNodeByID(index);
 	if (node && node.type === 'item') {
 		console.log('Item Found');
 		item = node.object;
@@ -273,7 +275,7 @@ Zone_Prototype.removeItem = function(nodeID) {
 	// TODO: Find a way to tell client item has gone.
 		// Send packet to all saying it got picked up / destroyed
 		console.log('Removing item ' + nodeID);
-		var node = this.QuadTree.nodesHash[nodeID];
+		var node = this.QuadTree.getNodeByID(nodeID);
 		if (node && node.type === 'item') {
 			var item = node.object;
 			item.onDelete();
@@ -295,6 +297,7 @@ Zone_Prototype.clearItems = function() {
 Zone_Prototype.createMonster = function(spawninfo) {
 	//console.log('creating monster with spawninfo: ',spawninfo);
 	var mi = infos.Monster[spawninfo.ID];
+
 	if (mi == null) return null;
 	var monster = new Monster(mi);
 	if (monster == null) return null;
@@ -530,7 +533,7 @@ this.NPC.forEach(function(npc, index) {
 Zone_Prototype.Load = function(callback) {
     if(this.Loaded) {
         callback('Already Loaded');
-        console.log('Zone ' + this.ID + ' is already loaded.');
+        // console.log('Zone ' + this.ID + ' is already loaded.');
         return;
     }    
     // Start Loading world mesh
@@ -558,34 +561,34 @@ Zone_Prototype.Load = function(callback) {
 	// 		});
 	// 	},
 
-		function LoadMonsterSpawns(callback) {
-			console.log('Loading Monster Spawns for ' + zone.ID);
-			fs.readFile('data/spawninfo/' + _util.padLeft(zone.ID,'0', 3) + '.MOB', function(err, data) {
-				if (err) {
-					// Meh
-				} else {
-					var RecordCount = data.readUInt32LE(0);
+		// function LoadMonsterSpawns(callback) {
+		// 	console.log('Loading Monster Spawns for ' + zone.ID);
+		// 	fs.readFile('data/spawninfo/' + _util.padLeft(zone.ID,'0', 3) + '.MOB', function(err, data) {
+		// 		if (err) {
+		// 			// Meh
+		// 		} else {
+		// 			var RecordCount = data.readUInt32LE(0);
 
-					var spawndata = restruct.struct('info', structs.SpawnInfo, RecordCount).unpack(data.slice(4));
-					data = null;
-					var length = spawndata.info.length,
-						element = null;
-					for (var i = 0; i < length; i++) {
-						element = spawndata.info[i];
+		// 			var spawndata = restruct.struct('info', structs.SpawnInfo, RecordCount).unpack(data.slice(4));
+		// 			data = null;
+		// 			var length = spawndata.info.length,
+		// 				element = null;
+		// 			for (var i = 0; i < length; i++) {
+		// 				element = spawndata.info[i];
 
-						var monster = zone.createMonster(element);
-						if (monster) {
-							zone.addMonster(monster);
-						}
-						if (monster == null) {
-							console.log('Failed to load monster '+element.ID+' for zone '+zone.getID());
-						}
-					}
-				}
+		// 				var monster = zone.createMonster(element);
+		// 				if (monster) {
+		// 					zone.addMonster(monster);
+		// 				}
+		// 				if (monster == null) {
+		// 					console.log('Failed to load monster '+element.ID+' for zone '+zone.getID());
+		// 				}
+		// 			}
+		// 		}
 
-				callback(null, true);
-			});
-		},
+		// 		callback(null, true);
+		// 	});
+		// },
 		function LoadNpcspawns(callback) {
 			console.log('Loading NPC Spawns for zone ' + zone.ID);
 			fs.readFile('data/spawninfo/' + _util.padLeft(zone.ID,'0', 3) + '.NPC', function(err, data) {
@@ -686,5 +689,4 @@ if (typeof(zones) !== 'undefined') {
 		zone.__proto__ = Zone_Prototype;
 	}
 }
-
 });

@@ -44,7 +44,7 @@ int8lu('PacketID').
 string('Name',13).
 int8lu("Result");
 
-console.log(WorldPC.DuelAcceptDeny.size);
+// console.log(WorldPC.DuelAcceptDeny.size);
 
 function handleDuelInvitePacket(socket, data) {
 	socket.sendInfoMessage('Duel Invite too ' + data.Name);
@@ -95,7 +95,7 @@ string('Name', 13).
 int8lu('Respond').
 int8lu('Respond2');
 
-console.log(requestRespondToInviter.size);
+// console.log(requestRespondToInviter.size);
 
 var startDuel = restruct.
 int8lu('PacketID').

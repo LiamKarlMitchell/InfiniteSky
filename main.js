@@ -30,7 +30,7 @@
 
 // TODO: Make an install script which could ask for the game directory to copy required information files
 console.time('init-server');
-
+var begin = new Date().getTime();
 // Require anything that should be global here.
 vmscript = require('./vmscript/vmscript');
 csv = require('fast-csv');
@@ -74,9 +74,9 @@ infos = {};
 infos.__proto__ = safeguard_cli;
 
 Netmask = require('netmask').Netmask;
-net = net = require('net');
-io = io = require('socket.io');
-http = http = require('http');
+net = require('net');
+io = require('socket.io');
+http = require('http');
 fs = require('fs');
 Server = require('./server');
 GameInfoLoader = require('./GameInfoLoader');
@@ -139,66 +139,114 @@ config.natTranslations.forEach(function(natTranslation,index) {
   natTranslations[index].ip = natTranslation.ip;
 });
 
-// Get external ip address from external source and warn if config external ip is incorrect
-try {
-  generic = new vmscript('generic','generic');
-  plugins = new vmscript('plugins',null);
+db = new (require('./db'))(config.mongodb.connectString);
+generic = new vmscript('Generic','generic');
 
-  plugins.Load('login.js');
-  plugins.Load('zone.js');
-  plugins.Load('world.js');
+var plugin_scripts = [];
+plugin_scripts.push('login.js');
+plugin_scripts.push('zone.js');
+plugin_scripts.push('world.js');
 
-  // TEMP SOLUTION TO GET VMSCRIPT TRIGGER LOADING...
-  setInterval(function(){
-    plugins.emit('dependent_loaded');
-    generic.emit('dependent_loaded');
-    if (typeof(login) !== 'undefined') {
-      login.packets.scripts.emit('dependent_loaded');
-    }
-    if (typeof(world) !== 'undefined') {
-      world.packets.scripts.emit('dependent_loaded');
-    }
-  },5000);
-
-  console.log('Plugins to Load: ',config.plugins);
-  for (var i=0;i<config.plugins.length;i++) {
-    plugins.Load(config.plugins[i]);
-  }
-}
-catch (ex) {
-  console.error('Problem loading up basic scripts');
-  dumpError(ex);
+console.log('Plugins to Load: ',config.plugins);
+for (var i=0;i<config.plugins.length;i++) {
+  plugin_scripts.push(config.plugins[i]);
 }
 
-function clearLoggedInAccounts() {
-  console.log('Clearing all accounts that are logged in.');
-  db.Account.logoutAll();
+plugins = {};
 
-  db.scripts.on('dependent_loaded',function(info){ plugins.emit('dependent_loaded',info); });
-  plugins.emit('dependent_loaded','db.js');
-}
+new GameInfoLoader().on('load', function(){
+    plugins = new vmscript('plugins', plugin_scripts);
+});
+
+cli = new (require('./cli'));
 
 main.events.once('db_accounts_schema_loaded', clearLoggedInAccounts);
 main.events.once('world_started', function() {
   GMCommands.Start();
+  console.timeEnd('init-server');
 });
-main.events.on('gameinfo_loaded',function(info){
-  console.log('GameInfo LOADED: '+info);
-  plugins.emit('dependent_loaded',info);
-});
-var db = new (require('./db'))(config.mongodb.connectString);
 
-// Start up Command Line Interface
-cli = new (require('./cli'));
-
-console.timeEnd('init-server');
+function clearLoggedInAccounts() {
+  console.log("Function clearLoggedInAccounts() is depracted");
+}
 
 var GameStep = require('./GameStep');
-var gs = new GameStep(function(delta){
- main.events.emit('step',delta);
+
+main.events.once('ready', function(){
+  var timeTookToLoad = (new Date().getTime() - begin) / 1000;
+  console.log("Total loading time: " + timeTookToLoad + "s");
+  // var GameStep = require('./GameStep');
+  var gs = new GameStep(function(delta){
+   main.events.emit('step',delta);
+  });
+
+  gs.start();
 });
 
-gs.start();
+// generic = new vmscript('generic','generic');
+
+
+
+
+// // Get external ip address from external source and warn if config external ip is incorrect
+// try {
+//   generic = new vmscript('generic','generic');
+//   plugins = new vmscript('plugins',null);
+
+//   plugins.Load('login.js');
+//   plugins.Load('zone.js');
+//   plugins.Load('world.js');
+
+//   // TEMP SOLUTION TO GET VMSCRIPT TRIGGER LOADING...
+//   setInterval(function(){
+//     plugins.emit('dependent_loaded');
+//     generic.emit('dependent_loaded');
+//     if (typeof(login) !== 'undefined') {
+//       login.packets.scripts.emit('dependent_loaded');
+//     }
+//     if (typeof(world) !== 'undefined') {
+//       world.packets.scripts.emit('dependent_loaded');
+//     }
+//   },5000);
+
+//   console.log('Plugins to Load: ',config.plugins);
+//   for (var i=0;i<config.plugins.length;i++) {
+//     plugins.Load(config.plugins[i]);
+//   }
+// }
+// catch (ex) {
+//   console.error('Problem loading up basic scripts');
+//   dumpError(ex);
+// }
+
+// function clearLoggedInAccounts() {
+//   console.log('Clearing all accounts that are logged in.');
+//   db.Account.logoutAll();
+
+//   db.scripts.on('dependent_loaded',function(info){ plugins.emit('dependent_loaded',info); });
+//   plugins.emit('dependent_loaded','db.js');
+// }
+
+// main.events.once('db_accounts_schema_loaded', clearLoggedInAccounts);
+// main.events.once('world_started', function() {
+//   GMCommands.Start();
+// });
+// main.events.on('gameinfo_loaded',function(info){
+//   console.log('GameInfo LOADED: '+info);
+//   plugins.emit('dependent_loaded',info);
+// });
+// var db = new (require('./db'))(config.mongodb.connectString);
+
+// // Start up Command Line Interface
+
+// console.timeEnd('init-server');
+
+// var GameStep = require('./GameStep');
+// var gs = new GameStep(function(delta){
+//  main.events.emit('step',delta);
+// });
+
+// gs.start();
 
 // TODO: Handle exiting server gracefully when signal received to close
 process.on('SIGINT', function() {

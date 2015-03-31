@@ -83,10 +83,10 @@ int32lu('Unk2').
 int32lu('Unk3');
 
 var onUseAccessoryOrInsignia = restruct.
-int32lu('Unk2').
+int16lu('Unk2', 2).
 int8lu('Unk1').
 int32lu('Unk3').
-int32lu('Unk4').
+int32lu('LevelRequired').
 int32lu('Unk5').
 int32lu('Unk6').
 int32lu('Unk7').
@@ -95,7 +95,7 @@ int32lu('Unk9');
 
 // pad(33);\
 
-console.log(onUseAccessoryOrInsignia.size);
+// console.log(onUseAccessoryOrInsignia.size);
 var accessoryReply = restruct.
 int8lu('PacketID').
 int32lu('ItemID').
@@ -119,10 +119,10 @@ WorldPC.Set(0x43, {
 	function: function(client, input){
 		console.log("Starting debug of Accessory use or Guild Insignia");
 		console.log(input);
-		client.write(new Buffer(accessoryReply.pack({
-			PacketID: 0x7E,
-			ItemID: 99180
-		})));
+		// client.write(new Buffer(accessoryReply.pack({
+		// 	PacketID: 0x7E,
+		// 	ItemID: 99180
+		// })));
 	}
 });
 
@@ -263,7 +263,7 @@ int8lu('PacketID').
 string('Name', 13).
 int8lu('Result');
 
-console.log(inviteGuildRespond.size);
+// console.log(inviteGuildRespond.size);
 
 var inviteClientRespond = restruct.
 int8lu('PacketID').
@@ -272,7 +272,7 @@ string('Inviter', 13).
 string('GuildName', 13).
 pad(74);
 
-console.log(inviteClientRespond.size);
+// console.log(inviteClientRespond.size);
 
 WorldPC.Set(0x41, {
 	Restruct: restruct.string('GuildName', 13).int8lu('Result').pad(8),

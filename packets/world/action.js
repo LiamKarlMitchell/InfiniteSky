@@ -35,12 +35,13 @@ var size = restruct.
     string('Child',packets.CharName_Length+1).
     int8lu('UnknownI1').
     int32lu('FactionCapeThing').
-    int32lu('UnknownI2').
+    int32lu('t').
     int32lu('TraitorFlag').
-    int32lu('UnknownI3').
-    int32lu('UnknownI4').
+    int32lu('t').
+    int32lu('t').
     int32lu('GlowItems').
-    int32lu('UnknownI5',2).
+    int32lu('t').
+    int32lu('t').
     int32lu('Clan').
     int32lu('Gender').
     int32lu('Hair').
@@ -56,19 +57,26 @@ var size = restruct.
     struct('CalbashBottle', structs.Equipt).
     struct('Weapon', structs.Equipt).
     struct('Pet', structs.Pet).
-    int32lu('Unknown5').
+    int32lu('t').
     string('GuildName',packets.GuildName_Length+1). // 24
-    int32lu('test1'). // 20
-    int32lu('test2'). // 16
-    int32lu('test3'). // 12
-    int32lu('test4'). // 12
-    int32lu('test5'). // 8
+    int32lu('t').
+    int32lu('t').
+    int32lu('t').
+    int32lu('t').
+    int32lu('t').
     int8lu('test6').
     int8lu('test7').
     int8lu('test8');
 
+    // console.log(size.size);
+
 var Buff = restruct.
 int16lu('Amount').
+int16lu('Time');
+
+var BuffHS = restruct.
+int8lu('Amount').
+int8lu('Stacks').
 int16lu('Time');
 
 WorldPC.ActionReplyPacket = restruct.
@@ -79,11 +87,17 @@ WorldPC.ActionReplyPacket = restruct.
     string('Child',packets.CharName_Length+1).
     int8lu('Unk', 1).
     int32lu('FactionCapeThing').
-    int32lu('Unk', 1).
+    int32lu('t').
     int32lu('TraitorFlag').
-    int32lu('Unk', 2).
+    int32lu('t').
+
+    int32lu('decHead').
+
     int32lu('GlowItems').
-    int32lu('Unk',2).
+
+    int32lu('decBody').
+    int32lu('decShoulders').
+
     int32lu('Clan').
     int32lu('Gender').
     int32lu('Hair').
@@ -96,10 +110,10 @@ WorldPC.ActionReplyPacket = restruct.
     struct('Glove', structs.Equipt).
     struct('Ring', structs.Equipt).
     struct('Boot', structs.Equipt).
-    struct('CalbashBottle', structs.Equipt).
+    struct('CalbashBottle', structs.Bottle).
     struct('Weapon', structs.Equipt).
     struct('Pet', structs.Pet).
-    int32lu(''). 
+    int32lu('applyGlowItems').
     string('GuildName',packets.GuildName_Length+1).
     int8lu('', 3).
     int32lu('LeaderFlag').
@@ -118,8 +132,8 @@ WorldPC.ActionReplyPacket = restruct.
     float32l('Direction').
     int32lu('nodeID').
     int32lu('TargetID').
-    int32lu('').
-    int32lu('').
+    int8lu('t', 4).
+    int8lu('t', 4).
     int32lu('SkillID').
     int32lu('SkillLevel').
     struct('LocationNew',structs.CVec3).
@@ -128,63 +142,65 @@ WorldPC.ActionReplyPacket = restruct.
     int32lu('CurrentHP').
     int32lu('MaxChi').
     int32lu('CurrentChi'). // === 372
-    struct('Buffs', Buff, 22).
-int32lu('MonsterDisguise'). // The ID of a monster to disguise as
+    struct('Buffs', Buff, 14). //22
+    struct('BuffHS', BuffHS).
+    struct('Buffs2', Buff, 7).
 
-int32lu('').
-int32lu('').
+    int32lu('MonsterDisguise'). // The ID of a monster to disguise as
 
-int8lu('dueling').
-int8lu('duel_challenger'). // 0 blue 1 gold
-int8lu('Unk1', 1).
-int8lu('Store'). // 0 none 1 open 2 open but empty
+    int8lu('t', 4).
+    int8lu('t', 4).
+
+    int8lu('dueling').
+    int8lu('duel_challenger'). // 0 blue 1 gold
+    int8lu('Unk1', 1).
+    int8lu('Store'). // 0 none 1 open 2 open but empty
 
 
-string('StoreName', 28).
-struct('StoreItems', WorldPC.personalShopItem, 25).
-int8lu('Unk1', 8).
-int32lu('DisplayBuffs').
-int32lu('Unk1', 1).
-int32lu('Unk1', 1). // 130
-int32lu('Unk1', 1).
-int32lu('Unk1', 1).
-int32lu('Unk1', 1).
-int32lu('Unk1', 1).
-int32lu('Unk1', 1). // 135
-int32lu('Unk1', 1).
-int32lu('Unk1', 1).
-int32lu('Unk1', 1);
+    string('StoreName', 28).
+    struct('StoreItems', WorldPC.personalShopItem, 25).
+    int8lu('Unk1', 8).
+    int32lu('').
+    int32lu('Unk1', 1).
+    int32lu('Unk1', 1). // 130
+    int32lu('Unk1', 1).
+    int32lu('Unk1', 1).
+    int32lu('Unk1', 1).
+    int32lu('Unk1', 1).
+    int32lu('Unk1', 1). // 135
+    int32lu('Unk1', 1).
+    int32lu('Unk1', 1).
+    int32lu('Unk1', 1);
 
 WorldPC.AttackPacket = restruct.
-int8lu('PacketID').
-int8lu('Status').
-int32lu('Action').
-int32lu('CharID1').
-int32lu('CharID2').
-int32lu('TargetID').
-int32lu('nodeID').
-int32lu('skillID').
-int8lu('Unk', 40);
+    int8lu('PacketID').
+    int8lu('Status').
+    int32lu('Action').
+    int32lu('CharID1').
+    int32lu('CharID2').
+    int32lu('TargetID').
+    int32lu('nodeID').
+    int32lu('skillID').
+    int8lu('Unk', 40);
 
 //2C
 WorldPC.AttackPacketReply = restruct.
-int32lu('Action'). // 0 your attacking
-
-int32lu('AttackerID').
-int32lu('AttackerIndex').
-int32lu('DefenderID').
-int32lu('DefenderIndex').
-int32lu('A'). // Skill ID?
-int32lu('B').
-int32lu('C').
-int32lu('D').
-int32lu('Status'). // Depends on attacker or defender | hit or miss, block or not |
-int32lu('TotalDamage').
-int16lu('Deadly').
-int16lu('Light').
-int16lu('Shadow').
-int16lu('Dark').
-int32ls('DamageHP');
+    int32lu('Action'). // 0 your attacking
+    int32lu('AttackerID').
+    int32lu('AttackerIndex').
+    int32lu('DefenderID').
+    int32lu('DefenderIndex').
+    int32lu('A'). // Skill ID?
+    int32lu('B').
+    int32lu('C').
+    int32lu('D').
+    int32lu('Status'). // Depends on attacker or defender | hit or miss, block or not |
+    int32lu('TotalDamage').
+    int16lu('Deadly').
+    int16lu('Light').
+    int16lu('Shadow').
+    int16lu('Dark').
+    int32ls('DamageHP');
 
 // WorldPC.SpecialMovement = restruct.
 // int32lu('Action'). // 0 your attacking
@@ -200,11 +216,30 @@ int32ls('DamageHP');
         
 // }
 
-console.log(WorldPC.ActionReplyPacket.size);
+// console.log(WorldPC.ActionReplyPacket.size);
 
 function handleActionPacket(socket, action, update) {
-    socket.character.state.GlowItems = 5136;
-    socket.character.state.Unk = [36, 36];
+    socket.character.state.GlowItems = 0;
+
+    // socket.character.state.FactionCapeThing = 2;
+    // socket.character.state.t = [0,0,0,1];
+
+
+    socket.character.state.applyGlowItems = 1;
+
+    socket.character.state.decHead = 2;
+    // socket.character.state.decShoulders = 2;
+    // socket.character.state.decBody = 2;
+
+    // int32lu('decHead').
+
+    // int32lu('GlowItems').
+
+    // int32lu('decShoulders').
+    // int32lu('decBody').
+
+    // socket.character.state.GlowItems = 5136;
+    // socket.character.state.Unk = [36, 36];
     // return;
     // socket.character.state.GuildName = "";
     // socket.character.state.LeaderFlag = 0;
@@ -260,10 +295,12 @@ function handleActionPacket(socket, action, update) {
         //console.log('LocationTo: ' + JSON.stringify(action.LocationTo));
         //console.log('LocationNew: ' + JSON.stringify(action.LocationNew));
     //}
-    socket.sendInfoMessage('Action '+action.Skill+' recv');
-    if(socket.character.state.Running === undefined) socket.character.state.Running = false;
-    if (socket.character.state.CurrentHP > 0) {
+    // socket.sendInfoMessage('Action '+action.Skill+' recv');
 
+
+    
+    if (socket.character.state.CurrentHP > 0) {
+        socket.character.state.OldSkill = socket.character.state.Skill;
         socket.character.state.Stance = action.Stance;
         socket.character.state.Skill = action.Skill;
         //console.log(update,socket.character.state.Stance,socket.character.state.Skill);
@@ -271,17 +308,31 @@ function handleActionPacket(socket, action, update) {
         case 0:
             //console.log("Spawn");
             socket.character.state.Moving = false;
+            socket.character.state.Stands = false;
             break;
         case 1:
             //console.log(action);
             //console.log("Standing");
-            //console.log("Standing");
+            // console.log("Standing");
+            socket.character.state.Stands = true;
             socket.character.state.Moving = false;
             break;
         case 2:
             // console.log("Walking");
             socket.character.state.Moving = true;
+            socket.character.state.Stands = false;
             break;
+
+
+        case 3:
+        socket.character.state.FightingStance = true;
+        // This one needs to be set everyime we use offensive skill
+        break;
+
+        case 4:
+        socket.character.state.FightingStance = false;
+        break;
+
         case 5:
             console.log('Attack 5');
             break;
@@ -294,14 +345,20 @@ function handleActionPacket(socket, action, update) {
         case 33: 
             console.log('Fly');
             socket.character.state.Moving = true;
+            socket.character.state.Stands = false;
             break;
         case 32:
             //console.log('Run');
-            socket.character.state.Moving = true;
+            // if(socket.character.state.Stands){
+            //     socket.write(socket.character.state.getPacket());
+            // }
+
+
             break;  
         case 37: 
             //console.log('Come Down');
             socket.character.state.Moving = true;
+            socket.character.state.Stands = false;
             break;
             
         case 44:
@@ -314,6 +371,8 @@ function handleActionPacket(socket, action, update) {
         break;
 
         default: 
+            socket.character.state.Stands = true;
+            socket.character.state.Moving = false;
             socket.sendInfoMessage("Skill:("+action.Skill+") is not registered");
             break;
         }
@@ -367,15 +426,14 @@ function handleActionPacket(socket, action, update) {
                         if (other===null) break; // If not found then skip this case.
 
                         other.sendInfoMessage('You are being attacked by '+socket.character.Name);
-                        console.log(other.character.statInfo);
+                        console.log(other.character.infos);
                         
                         AttackPacket = Generic.Battle.calculate(socket.character,other.character);
                         socket.sendInfoMessage('Dmg: '+AttackPacket.DamageHP);
                             eyes.inspect(AttackPacket);
                             
                             other.character.state.CurrentHP -= AttackPacket.DamageHP;
-                            socket.giveEXP(AttackPacket.DamageHP);
-                            console.log("Client attacking monster " + other.character.state.HP + "::" + AttackPacket.TotalDamage);
+                            console.log("Client attacking cllient " + other.character.state.HP + "::" + AttackPacket.TotalDamage);
                             //socket.giveEXP(AttackPacket.TotalDamage); // Give HP relative to the damage we have done
                             
                             socket.Zone.sendToAllAreaLocation( socket.character.state.Location,packets.makeCompressedPacket(0x2C,new Buffer(WorldPC.AttackPacketReply.pack(AttackPacket))),config.viewable_action_distance );
@@ -407,7 +465,7 @@ function handleActionPacket(socket, action, update) {
                                 DefenderIndex: monster.UniqueID,
                                 Status: 1,
                                 // Depends on attacker or defender | hit or miss, block or not |
-                                TotalDamage: socket.character.statInfo.Damage,
+                                TotalDamage: socket.character.infos.Damage,
                                 Deadly: 0,
                                 Light: 0,
                                 Shadow: 0,
@@ -416,11 +474,11 @@ function handleActionPacket(socket, action, update) {
                             };
                             // Testing only
                             //AttackPacket.TotalDamage = 9999999999
-                            //console.log(socket.character.statInfo);
+                            //console.log(socket.character.infos);
 
-                            var dmg = socket.character.statInfo.Damage;
+                            var dmg = socket.character.infos.Damage;
                             var dmgPrecentBonus = 1.50;
-                            var maxDmg = socket.character.statInfo.Damage * dmgPrecentBonus;
+                            var maxDmg = socket.character.infos.Damage * dmgPrecentBonus;
 
                             AttackPacket.TotalDamage = Math.floor( (Math.random() * ( maxDmg - dmg )) + dmg );
 
@@ -431,17 +489,18 @@ function handleActionPacket(socket, action, update) {
 
                             AttackPacket.DamageHP = AttackPacket.TotalDamage;
                             monster.HP -= AttackPacket.TotalDamage;
+                            socket.giveEXP(AttackPacket.TotalDamage);
 
 
-// Things we could use from character statInfo
-// statInfo.Luck
-// statInfo.Damage
-// statInfo.HitRate
-// statInfo.Dodge
-// statInfo.Defense
-// statInfo.LightDamage
-// statInfo.ShadowDamage
-// statInfo.DarkDamage
+// Things we could use from character infos
+// infos.Luck
+// infos.Damage
+// infos.HitRate
+// infos.Dodge
+// infos.Defense
+// infos.LightDamage
+// infos.ShadowDamage
+// infos.DarkDamage
 
                             monster.Attackers.regulate(socket.character._id, AttackPacket.TotalDamage);
                             //monster.HP -= AttackPacket.TotalDamage; // Commented out of now as we dont want to kill things just yet without an AI
@@ -1310,6 +1369,17 @@ function handleActionPacket(socket, action, update) {
         socket.character.state.Location.X = action.Location.X;
         socket.character.state.Location.Y = action.Location.Y;
         socket.character.state.Location.Z = action.Location.Z;
+// console.log(action.Location.X);
+// console.log(action.Location.Y);
+// console.log(action.Location.Z);
+
+
+        // socket.character.RealX = action.Location.X;
+        // socket.character.RealY = action.Location.Y;
+        // socket.character.RealZ = action.Location.Z;
+
+
+
         //console.log(socket.character.state.Location.toString());
         //var y = socket.Zone.GetY(socket.character.state.Location.X, socket.character.state.Location.Z);
         //console.log(socket.character.state.Location.Y+' '+y);
@@ -1318,15 +1388,16 @@ function handleActionPacket(socket, action, update) {
         socket.character.state.LocationTo.Y = action.LocationTo.Y;
         socket.character.state.LocationTo.Z = action.LocationTo.Z;
 
+
         socket.character.state.Direction = action.Direction; //action.Direction;
         socket.character.state.FacingDirection = action.FacingDirection;
 
         socket.character.state.nodeID = action.nodeID;
         socket.character.state.TargetID = action.TargetID;
 
-        socket.character.state.LocationNew.X = action.LocationNew.X;
-        socket.character.state.LocationNew.Y = action.LocationNew.Y;
-        socket.character.state.LocationNew.Z = action.LocationNew.Z;
+        // socket.character.state.LocationNew.X = action.LocationNew.X;
+        // socket.character.state.LocationNew.Y = action.LocationNew.Y;
+        // socket.character.state.LocationNew.Z = action.LocationNew.Z;
 
     } else {
         socket.character.state.Frame = action.Frame;
@@ -1345,30 +1416,31 @@ function handleActionPacket(socket, action, update) {
     }
 
     //if (socket.character.state.Skill!=1) {
+        // console.log("test");
         socket.Zone.sendToAllArea(socket, true, socket.character.state.getPacket(), config.viewable_action_distance);
     //}
 }
 
-WorldPC.Set(0x03, {
-    Restruct: WorldPC.ActionPacket,
+// WorldPC.Set(0x03, {
+//     Restruct: WorldPC.ActionPacket,
 
-    function: function HandleStartAction(socket, action) {
-        handleActionPacket(socket, action, 0);
-    }
-});
+//     function: function HandleStartAction(socket, action) {
+//         handleActionPacket(socket, action, 0);
+//     }
+// });
 
-WorldPC.Set(0x04, {
-    Restruct: WorldPC.ActionPacket,
+// WorldPC.Set(0x04, {
+//     Restruct: WorldPC.ActionPacket,
 
-    function: function HandleDuringAction(socket, action) {
-        handleActionPacket(socket, action, 1);
-    }
-});
+//     function: function HandleDuringAction(socket, action) {
+//         handleActionPacket(socket, action, 1);
+//     }
+// });
 
-WorldPC.Set(0x05, {
-    Restruct: WorldPC.ActionPacket,
+// WorldPC.Set(0x05, {
+//     Restruct: WorldPC.ActionPacket,
 
-    function: function HandleEndAction(socket, action) {
-        handleActionPacket(socket, action, 2);
-    }
-});
+//     function: function HandleEndAction(socket, action) {
+//         handleActionPacket(socket, action, 2);
+//     }
+// });
