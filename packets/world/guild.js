@@ -114,6 +114,65 @@ WorldPC.Set(0x51, {
 	}
 });
 
+// Also sent when activating a costume to bind it to the character
+
+//5E 33 00 11 00 00 00 E9 78 33 01 00 00 00 00 D1
+//07 00 00 00 00 00 00 00 00 00 00               
+
+// Dressing in clothes
+// 91 0300 0000 0000 0000
+var clothingRequest = restruct.
+int32lu('Key').
+int32lu('Value');
+
+WorldPC.Set(0x91, {
+	Restruct: clothingRequest,
+	function: function(client, input) {
+		console.log('Clothing Request:',input);
+
+		switch (input.Key) {
+			case 2:
+			console.log('Select');
+			break;
+			case 3:
+			console.log('Dress');
+			break;
+			default: 
+			console.log('Unknown Key: '+input.Key);
+			break;
+		}
+
+	}
+})
+
+// Registered Clothes
+// 5E 33 00 11 00 00 00 E9 78 33 01 00 00 00 00 D1
+// 07 00 00 00 00 00 00 00 00 00 00
+// PacketID
+// Type
+// 
+
+// Fortune Cookie used
+// 5E 35 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+// 00 00 00 00 00 00 00 00 00 00 00
+
+
+// Obtained silver coins Date is the amount :(
+// 5E 01 00 00 00 00 00 D9 27 00 00 00 00 00 00 D1
+// 07 00 00 00 00 00 00 00 00 00 00i 
+
+
+var itemRegisterUse = restruct.
+int8lu('PacketID').
+int8lu('Type'). // 51 is Register Clothes
+int8lu('Unknown1').
+int32lu('Unknown2').
+int32lu('Duration'). // Game has a custom date format here Example: 20150201 YYYYMMDD but stored as an unsigned int
+int32lu('Unknown3').
+int32lu('ItemID').
+int32lu('Unknown4').
+int32lu('Unknown5');
+
 WorldPC.Set(0x43, {
 	Restruct: onUseAccessoryOrInsignia,
 	function: function(client, input){

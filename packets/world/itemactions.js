@@ -84,6 +84,12 @@ function clientWriteItemActionFailed(client, input){
     })));
 }
 
+// Using a firework
+// 2B 0C 00 00 00 42 8E 4F 75 18 F9 18 00 53 83 01 
+// 00 01 00 00 00 02 00 00 00 02 00 00 00 00 00 00 
+// 00 03 00 00 00 00 00 00 00 38 00 00 00 50 79 4F 
+// 75 88 E7 08 00 00 00 00 00 00 00 00 00          
+
 function clientWriteItemActionSuccess(client, input){
     client.write(new Buffer(ItemActionReplyPacket.pack({
         PacketID: 0x2B,
