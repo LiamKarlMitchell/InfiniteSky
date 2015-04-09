@@ -317,57 +317,89 @@ DWORD TSX_Client::Run()
 
 		if (DevButtons) {
 
-		if (GetAsyncKeyState(VK_F3)) {
-			LoadTranslationCSVs();
-		}
-
-		if (GetAsyncKeyState(VK_F12)!=0)
-		{
-			Log.Write("Force Quit");
-			RunDLL=false;
-			// Terminate process
-			TerminateProcess(ProcessHandle,1);
-		}
-
-		if (GetAsyncKeyState(VK_HOME)!=0)
-		{
-			Log.Write("Load/Save Regions for ZoneID %u",ZoneID);
-			Sleep(300);
-			if (MOBSpawns) delete MOBSpawns;
-			MOBSpawns = new SpawnInfoManager(ZoneID,"MOB");
-			if (NPCSpawns) delete NPCSpawns;
-			NPCSpawns = new SpawnInfoManager(ZoneID,"NPC");
-		}
-
-		/*if (GetAsyncKeyState(VK_F2)!=0)
-		{
-			Sleep(100);
-			LoadTranslationCSVs();
-		}*/
-
-		if (GetAsyncKeyState(VK_END)!=0)
-		{
-			Sleep(300);
-			SpeedHackEnabled=!SpeedHackEnabled;
-			Log.Write("Speed Hack Toggled");
-		}
-
-		//if (GetAsyncKeyState(VK_F8)!=0)
-		//{
-		//	Sleep(100);
-		//	GameTimeAdjust+=0.0001f;
+		//if (GetAsyncKeyState(VK_F3)) {
+			//LoadTranslationCSVs();
 		//}
+			
+		if (GetAsyncKeyState(VK_CONTROL)!=0) {
+			if (GetAsyncKeyState(VK_F12)!=0)
+			{
+				Log.Write("Force Quit");
+				RunDLL=false;
+				// Terminate process
+				TerminateProcess(ProcessHandle,1);
+			}
 
-		//if (GetAsyncKeyState(VK_F9)!=0)
-		//{
-		//	Sleep(100);
-		//	GameTimeAdjust-=0.0001f;
-		//}
+			//if (GetAsyncKeyState(VK_HOME)!=0)
+			//{
+			//	Log.Write("Load/Save Regions for ZoneID %u",ZoneID);
+			//	Sleep(300);
+			//	if (MOBSpawns) delete MOBSpawns;
+			//	MOBSpawns = new SpawnInfoManager(ZoneID,"MOB");
+			//	if (NPCSpawns) delete NPCSpawns;
+			//	NPCSpawns = new SpawnInfoManager(ZoneID,"NPC");
+			//}
+
+			/*if (GetAsyncKeyState(VK_F2)!=0)
+			{
+				Sleep(100);
+				LoadTranslationCSVs();
+			}*/
+
+			// Able to move window
+		    
+			if (GetAsyncKeyState(VK_HOME)!=0) {
+				HWND hwnd = GetForegroundWindow();
+				RECT rc;
+				POINT p;
+				if (GetCursorPos(&p)) {
+                  GetWindowRect(hwnd, &rc);
+				  Log.Write("Setting Window Position to (%d, %d)",p.x,p.y);
+				  SetWindowPos(hwnd, HWND_TOP, p.x, p.y, NULL, NULL, SWP_NOSIZE);
+				}
+			}
+			/*SetWindowPos(
+			  _In_      HWND hWnd,
+			  _In_opt_  HWND hWndInsertAfter,
+			  _In_      int X,
+			  _In_      int Y,
+			  _In_      int cx,
+			  _In_      int cy,
+			  _In_      UINT uFlags
+			)*/
+
+			// TODO Monster Vac Hack :)
+
+			if (GetAsyncKeyState(VK_END)!=0)
+			{
+				Sleep(300);
+				SpeedHackEnabled=!SpeedHackEnabled;
+				Log.Write("Speed Hack Toggled %s value %f",SpeedHackEnabled ? "On" : "Off",GameTimeAdjust);
+			}
+
+			if (GetAsyncKeyState(VK_F8)!=0)
+			{
+				Sleep(100);
+				GameTimeAdjust-=0.0005f;
+				if (GameTimeAdjust < 0) {
+					GameTimeAdjust  = 0;
+				} else {
+				  Log.Write("Speed Hack Decreased to %f",GameTimeAdjust);
+				}
+			}
+
+			if (GetAsyncKeyState(VK_F9)!=0)
+			{
+				Sleep(100);
+				GameTimeAdjust+=0.0005f;
+				Log.Write("Speed Hack Increased to %f",GameTimeAdjust);
+			}
+		}
 
 
 		if (SpeedHackEnabled)
 		{
-			*GameTimeAddress=*GameTimeAddress+GameTimeAdjust;
+			*GameTimeAddress=*GameTimeAddress-GameTimeAdjust;
 		}
 	}
 
@@ -1048,7 +1080,7 @@ void TSX_Client::Init()
 	//00401790 - 83 E8 02              - sub eax,02
 	//00401793 - 75 16                 - jne 004017AB
 	//00401795 - B9 4064AE00           - mov ecx,00AE6440 : [00000000]
-	GameTimeAdjust=-0.15f;
+	GameTimeAdjust=0.002f;
 	GameTimeAddress = (float*)sig->search("D905XXXXXXXXD805????????D91D????????");
 	SpeedHackEnabled=false;
 
