@@ -322,77 +322,85 @@ DWORD TSX_Client::Run()
 		//}
 			
 		if (GetAsyncKeyState(VK_CONTROL)!=0) {
-			if (GetAsyncKeyState(VK_F12)!=0)
-			{
-				Log.Write("Force Quit");
-				RunDLL=false;
-				// Terminate process
-				TerminateProcess(ProcessHandle,1);
-			}
+			HWND hwnd = GetForegroundWindow();
+			DWORD currentWindowProcessID;
+			GetWindowThreadProcessId(hwnd, &currentWindowProcessID);
+			// If the current window in foreground belongs to this process
+			if (currentWindowProcessID == ProcessID) {
 
-			//if (GetAsyncKeyState(VK_HOME)!=0)
-			//{
-			//	Log.Write("Load/Save Regions for ZoneID %u",ZoneID);
-			//	Sleep(300);
-			//	if (MOBSpawns) delete MOBSpawns;
-			//	MOBSpawns = new SpawnInfoManager(ZoneID,"MOB");
-			//	if (NPCSpawns) delete NPCSpawns;
-			//	NPCSpawns = new SpawnInfoManager(ZoneID,"NPC");
-			//}
+				if (GetAsyncKeyState(VK_F12)!=0)
+				{
+					Log.Write("Force Quit");
+					RunDLL=false;
+					// Terminate process
+					Sleep(500);
+					TerminateProcess(ProcessHandle,1);
+				}
 
-			/*if (GetAsyncKeyState(VK_F2)!=0)
-			{
-				Sleep(100);
-				LoadTranslationCSVs();
-			}*/
+				//if (GetAsyncKeyState(VK_HOME)!=0)
+				//{
+				//	Log.Write("Load/Save Regions for ZoneID %u",ZoneID);
+				//	Sleep(300);
+				//	if (MOBSpawns) delete MOBSpawns;
+				//	MOBSpawns = new SpawnInfoManager(ZoneID,"MOB");
+				//	if (NPCSpawns) delete NPCSpawns;
+				//	NPCSpawns = new SpawnInfoManager(ZoneID,"NPC");
+				//}
 
-			// Able to move window
+				/*if (GetAsyncKeyState(VK_F2)!=0)
+				{
+					Sleep(100);
+					LoadTranslationCSVs();
+				}*/
+
+				// Able to move window
 		    
-			if (GetAsyncKeyState(VK_HOME)!=0) {
-				HWND hwnd = GetForegroundWindow();
-				RECT rc;
-				POINT p;
-				if (GetCursorPos(&p)) {
-                  GetWindowRect(hwnd, &rc);
-				  Log.Write("Setting Window Position to (%d, %d)",p.x,p.y);
-				  SetWindowPos(hwnd, HWND_TOP, p.x, p.y, NULL, NULL, SWP_NOSIZE);
+				if (GetAsyncKeyState(VK_HOME)!=0) {
+					RECT rc;
+					POINT p;
+					if (GetCursorPos(&p)) {
+					  GetWindowRect(hwnd, &rc);
+					  Log.Write("Setting Window Position to (%d, %d)",p.x,p.y);
+					  SetWindowPos(hwnd, HWND_TOP, p.x, p.y, NULL, NULL, SWP_NOSIZE);
+					  //SetWindowLong(hwnd, GWL_STYLE, WS_POPUP);
+					}
 				}
-			}
-			/*SetWindowPos(
-			  _In_      HWND hWnd,
-			  _In_opt_  HWND hWndInsertAfter,
-			  _In_      int X,
-			  _In_      int Y,
-			  _In_      int cx,
-			  _In_      int cy,
-			  _In_      UINT uFlags
-			)*/
+				/*SetWindowPos(
+				  _In_      HWND hWnd,
+				  _In_opt_  HWND hWndInsertAfter,
+				  _In_      int X,
+				  _In_      int Y,
+				  _In_      int cx,
+				  _In_      int cy,
+				  _In_      UINT uFlags
+				)*/
 
-			// TODO Monster Vac Hack :)
+				// TODO Monster Vac Hack :)
 
-			if (GetAsyncKeyState(VK_END)!=0)
-			{
-				Sleep(300);
-				SpeedHackEnabled=!SpeedHackEnabled;
-				Log.Write("Speed Hack Toggled %s value %f",SpeedHackEnabled ? "On" : "Off",GameTimeAdjust);
-			}
-
-			if (GetAsyncKeyState(VK_F8)!=0)
-			{
-				Sleep(100);
-				GameTimeAdjust-=0.0005f;
-				if (GameTimeAdjust < 0) {
-					GameTimeAdjust  = 0;
-				} else {
-				  Log.Write("Speed Hack Decreased to %f",GameTimeAdjust);
+				if (GetAsyncKeyState(VK_END)!=0)
+				{
+					Sleep(300);
+					SpeedHackEnabled=!SpeedHackEnabled;
+					Log.Write("Speed Hack Toggled %s value %f",SpeedHackEnabled ? "On" : "Off",GameTimeAdjust);
 				}
-			}
 
-			if (GetAsyncKeyState(VK_F9)!=0)
-			{
-				Sleep(100);
-				GameTimeAdjust+=0.0005f;
-				Log.Write("Speed Hack Increased to %f",GameTimeAdjust);
+				if (GetAsyncKeyState(VK_F8)!=0)
+				{
+					Sleep(100);
+					GameTimeAdjust-=0.0005f;
+					if (GameTimeAdjust < 0) {
+						GameTimeAdjust  = 0;
+					} else {
+					  Log.Write("Speed Hack Decreased to %f",GameTimeAdjust);
+					}
+				}
+
+				if (GetAsyncKeyState(VK_F9)!=0)
+				{
+					Sleep(100);
+					GameTimeAdjust+=0.0005f;
+					Log.Write("Speed Hack Increased to %f",GameTimeAdjust);
+				}
 			}
 		}
 
@@ -462,13 +470,13 @@ void TSX_Client::ZoneChanged()
 
 uint TSX_Client::onMOBPacket(MonsterObject* mob)
 {
-	if (MOBSpawns) MOBSpawns->AddSpawnInfo(mob->UniqueID,mob->MonsterID,mob->Location.x,mob->Location.y,mob->Location.z,mob->FacingDirection);
+	//if (MOBSpawns) MOBSpawns->AddSpawnInfo(mob->UniqueID,mob->MonsterID,mob->Location.x,mob->Location.y,mob->Location.z,mob->FacingDirection);
 	return 0;
 }
 
 uint TSX_Client::onNPCPacket(MonsterObject* npc)
 {
-	if (NPCSpawns) NPCSpawns->AddSpawnInfo(npc->UniqueID,npc->MonsterID,npc->Location.x,npc->Location.y,npc->Location.z,npc->FacingDirection);
+	//if (NPCSpawns) NPCSpawns->AddSpawnInfo(npc->UniqueID,npc->MonsterID,npc->Location.x,npc->Location.y,npc->Location.z,npc->FacingDirection);
 	return 0;
 }
 
@@ -1207,7 +1215,6 @@ uint MyNPCPacket(uint length)
 		uint sizeDataUncompressed = sizeof(uncompressBuffer);
 		uint sizeCompressedData = *(uint*)RecvBuffer+2;
 		//char * dataUncompressed = new char[sizeDataUncompressed];
-		Log.Write("uncompress function is at %08X",uncompress);
 		int z_result = uncompress(uncompressBuffer,&sizeDataUncompressed,RecvBuffer+6,sizeCompressedData);
 		switch (z_result)
 		{
