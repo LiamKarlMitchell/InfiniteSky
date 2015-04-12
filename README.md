@@ -10,6 +10,13 @@ InfiniteSky is an open-source project, emulating a Twelve Sky Server. It is writ
   - Zone features are being implemented.
   - Code will under go cleaning and documentation..
 
+### Donate with PayPal today.
+[
+![Donate with PayPal Credit or any major credit card.](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)
+](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=AV9L6EV4S95GW)
+
+Donations will be used to further improve the project or for server expenses.
+
 Version
 ----
 
