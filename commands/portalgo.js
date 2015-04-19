@@ -5,8 +5,9 @@
 /////////////////////////////////////////////////////////////
 // Command: portalgo
 // Trys to teleport you to a portalinfo on this map
-GMCommands.AddCommand(new Command('portalgo',60,function command_bring(string,client){
+GMCommands.AddCommand(new Command('portalgo',60,function command_bring(string, client){
 	var i = 0;
+	console.log('portalgo: '+string);
 	if (string.length) {
 		i = parseInt(string,10);
 	}
