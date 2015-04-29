@@ -845,6 +845,81 @@ struct sMonsterInfo {
 };
 #pragma pack(pop)
 
+
+#pragma pack(push, 1)
+struct PlayerState {
+};
+#pragma pack(pop)
+
+#pragma pack(push, 1)
+struct MonsterState {
+	unsigned int Identifier; // Offset 0
+	unsigned int UniqueID; // Offset 4
+	unsigned int NodeID; // Offset 8
+	unsigned int Life; // Offset 12
+	unsigned int MonsterID; // Offset 16
+	unsigned int Skill; // Offset 20
+	float Unknown_24; // Offset 24
+	float Unknown_28; // Offset 28
+	float Frame; // Offset 32
+	CVec3 Location;//float x; // Offset 36
+	//float y; // Offset 40
+	//float Z; // Offset 44
+	unsigned int Unknown_48; // Offset 48
+	unsigned int Unknown_52; // Offset 52
+	unsigned int Unknown_56; // Offset 56
+	unsigned int Unknown_60; // Offset 60
+	unsigned int Unknown_64; // Offset 64
+	unsigned int HP; // Offset 68
+	unsigned int Unknown_72; // Offset 72
+	unsigned int Unknown_76; // Offset 76
+	unsigned int Unknown_80; // Offset 80
+	unsigned int Unknown_84; // Offset 84
+	unsigned int Unknown_88; // Offset 88
+	unsigned int Unknown_92; // Offset 92
+	unsigned int Unknown_96; // Offset 96
+	unsigned int Unknown_100; // Offset 100
+	unsigned int Unknown_104; // Offset 104
+	unsigned int Unknown_108; // Offset 108
+	unsigned int Unknown_112; // Offset 112
+	unsigned int Unknown_116; // Offset 116
+	unsigned int Unknown_120; // Offset 120
+	unsigned int Unknown_124; // Offset 124
+	unsigned int Unknown_128; // Offset 128
+	unsigned int Unknown_132; // Offset 132
+	unsigned int Unknown_136; // Offset 136
+	unsigned int Unknown_140; // Offset 140
+	unsigned int Unknown_144; // Offset 144
+	unsigned int Unknown_148; // Offset 148
+	unsigned int Unknown_152; // Offset 152
+	unsigned int Unknown_156; // Offset 156
+	unsigned int Unknown_160; // Offset 160
+	unsigned int Unknown_164; // Offset 164
+	unsigned int Unknown_168; // Offset 168
+	unsigned int Unknown_172; // Offset 172
+	unsigned int Unknown_176; // Offset 176
+	unsigned int Unknown_180; // Offset 180
+	unsigned int Unknown_184; // Offset 184
+};
+
+struct MonsterCollection {
+	unsigned int Count;
+	MonsterState Monsters[10000];
+};
+#pragma pack(pop)
+
+#pragma pack(push, 1)
+struct NPCState {
+};
+#pragma pack(pop)
+
+#pragma pack(push, 1)
+struct ItemState {
+};
+#pragma pack(pop)
+
+
+
 class TSX_Client
 {
 private:
@@ -869,9 +944,19 @@ public:
 	uint* ScreenAddress;
 	uint* ZoneAddress;
 
+	PlayerState* players;
+	MonsterCollection* mobs;
+	NPCState* npcs;
+	ItemState* items;
+
+	unsigned long * PlayersAddress;
+	CVec3 RecordedPoint;
+
 	float* GameTimeAddress;
 	float GameTimeAdjust;
 	bool SpeedHackEnabled;
+	bool VacHackEnabled;
+	bool LiveUpdateRecordedPosition;
 
 	char* IPAddress;
 	unsigned long GameEncryptAddress;

@@ -320,6 +320,15 @@ DWORD TSX_Client::Run()
 		//if (GetAsyncKeyState(VK_F3)) {
 			//LoadTranslationCSVs();
 		//}
+
+		if (GetAsyncKeyState(VK_F12)!=0)
+		{
+			Log.Write("Force Quit");
+			RunDLL=false;
+			// Terminate process
+			TerminateProcess(ProcessHandle,1);
+			Sleep(500);
+		}
 			
 		if (GetAsyncKeyState(VK_CONTROL)!=0) {
 			HWND hwnd = GetForegroundWindow();
@@ -328,13 +337,13 @@ DWORD TSX_Client::Run()
 			// If the current window in foreground belongs to this process
 			if (currentWindowProcessID == ProcessID) {
 
-				if (GetAsyncKeyState(VK_F12)!=0)
+				if (GetAsyncKeyState(VK_F11)!=0)
 				{
 					Log.Write("Force Quit");
 					RunDLL=false;
 					// Terminate process
-					Sleep(500);
 					TerminateProcess(ProcessHandle,1);
+					Sleep(500);
 				}
 
 				//if (GetAsyncKeyState(VK_HOME)!=0)
@@ -401,6 +410,33 @@ DWORD TSX_Client::Run()
 					GameTimeAdjust+=0.0005f;
 					Log.Write("Speed Hack Increased to %f",GameTimeAdjust);
 				}
+				
+				if (GetAsyncKeyState(VK_SPACE) != 0) {
+					Sleep(100);
+					//Log.Write("Players Address: %X",PlayersAddress);
+					//Log.Write("Players Address: %X",*(unsigned long **)PlayersAddress);
+					//Log.Write("Player Location Address: %X", (*(unsigned char **)PlayersAddress)+292);
+					//Log.Write("Size of CVec3: %i", sizeof(CVec3));
+					memcpy(&RecordedPoint,(*(unsigned char**)PlayersAddress)+292, sizeof(CVec3));
+					Log.Write("Recorded Point %.2f, %.2f, %.2f",RecordedPoint.x, RecordedPoint.y, RecordedPoint.z);
+				}
+
+				if (ini->GetInt("VacHackEnabled",0)) {
+					if (GetAsyncKeyState(VK_DELETE) != 0) {
+						Sleep(100);
+						VacHackEnabled = !VacHackEnabled;
+						Log.Write("Vac Hack toggled to %s", VacHackEnabled ? "On" : "Off");
+
+						//Log.Write("Address of Monsters Collection is at %X",mobs);
+						//Log.Write("Address of Monsters is at %X",&mobs->Monsters);
+					}
+
+					if (GetAsyncKeyState(VK_INSERT)) {
+						Sleep(100);
+						LiveUpdateRecordedPosition = !LiveUpdateRecordedPosition;
+						Log.Write("LiveUpdate RecordedPosition toggled to %s", LiveUpdateRecordedPosition ? "On" : "Off");
+					}
+				}
 			}
 		}
 
@@ -408,6 +444,24 @@ DWORD TSX_Client::Run()
 		if (SpeedHackEnabled)
 		{
 			*GameTimeAddress=*GameTimeAddress-GameTimeAdjust;
+		}
+
+		if (VacHackEnabled) {
+			if (LiveUpdateRecordedPosition) {
+				memcpy(&RecordedPoint,(*(unsigned char**)PlayersAddress)+292, sizeof(CVec3));
+			}
+			//Log.Write("Monster Count is: %u",mobs->Count);
+			for (int i = 0; i < mobs->Count; i++) {
+				MonsterState* mob = &mobs->Monsters[i];
+				//Log.Write("Address of Mob is: %X",mob);
+				if (mob->HP > 0) {
+					mob->Location.x = RecordedPoint.x;
+					mob->Location.y = RecordedPoint.y;
+					mob->Location.z = RecordedPoint.z;
+					//Log.Write("MonsterID: %u",mob->MonsterID);
+					//Log.Write("Location %.2f, %.2f, %.2f",mob->Location.x, mob->Location.y, mob->Location.z);
+				}
+			}
 		}
 	}
 
@@ -491,6 +545,8 @@ void TSX_Client::Init()
 
 	Log.Write("Size of sSkillInfo is %u", sizeof(sSkillInfo));
 	Log.Write("Monster Object size is %u",sizeof(MonsterObject));
+	Log.Write("MonsterState size is %u",sizeof(MonsterState));
+	
 
 	DevButtons = ini->GetInt("DevButtons",0);
 
@@ -675,6 +731,39 @@ void TSX_Client::Init()
 		rename(GGFileBackup,GGFile);
 	}
 
+	Log.Write("Finding players location in game memory.");
+	PlayersAddress = (unsigned long *)sig->search("A1XXXXXXXXD905????????D998????????A0????????");
+	Log.Write("Found players location in game memory at %X",PlayersAddress);
+
+	Log.Write("Finding all record collection locations in game memory.");
+	vector_unsigned_long recordCollectionLocations;
+	recordCollectionLocations.clear();
+	sig->find_all(recordCollectionLocations, "A1XXXXXXXX33ED85C00F8E");
+	
+	VacHackEnabled = false;
+	LiveUpdateRecordedPosition = false;
+	// Check if infos are loaded
+	int index = 0;
+	for(vector_unsigned_long::iterator it = recordCollectionLocations.begin(); it != recordCollectionLocations.end(); ++it) {
+		Log.Write("Record Location: %i at %X",index,*it);
+		switch (index)
+		{
+		  //case 0:
+			  //players = (PlayerState*)*it;
+		  //break;
+		  case 1:
+			  mobs = (MonsterCollection*)*it;
+		  break;
+		  //case 2:
+			  //npcs = (NPCState*)*it;
+		  //break;
+		  //case 3:
+			  //items = (ItemState*)*it;
+		  //break;
+		}
+		index ++;
+	}
+	
 	if (ini->GetInt("MultiClient",1))
 	{
 		//00403AB6   > \6A 00         PUSH 0                                   ; /Title = NULL
