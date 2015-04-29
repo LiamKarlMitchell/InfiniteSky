@@ -254,3 +254,4 @@ TSX_Client/TSX_Client.sln
 TSX_Client/TSX_Client.sln
 TSX_Client/TSX_Client/TSX_Client.vcxproj.filters
 /mongo
+node_modules

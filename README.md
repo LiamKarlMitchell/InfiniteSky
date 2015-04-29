@@ -20,7 +20,7 @@ Donations will be used to further improve the project or for server expenses.
 Version
 ----
 
-1.0.05 - Tomato Soup
+1.1.00 - Fruit Salad
 
 Tech
 -----------

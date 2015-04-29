@@ -1,0 +1,28 @@
+{
+    "tags": {
+        "allowUnknownTags": true,
+        "dictionaries": ["jsdoc", "closure"]
+    },
+    "source": {
+        "includePattern": ".+\\.js(doc)?$",
+        "excludePattern": "(^|\\/|\\\\)_"
+    },
+    "plugins": [],
+    "templates": {
+		"cleverLinks": false,
+        "monospaceLinks": false,
+        "systemName": "InfiniteSky",
+        "footer": "Woah Documentation",
+        "copyright": "InfiniteSky",
+        "navType": "vertical",
+        "theme": "superhero",
+        "linenums": true,
+        "collapseSymbols": false,
+        "inverseNav": false,
+        "outputSourceFiles": true,
+        "outputSourcePath": true,
+        "dateFormat": "DD/MM/YYYY",
+        "highlightTutorialCode": true,
+        "syntaxTheme": "sunlight-dark"
+    }
+}
