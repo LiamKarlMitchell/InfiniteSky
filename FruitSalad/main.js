@@ -23,6 +23,12 @@
 // // logger.on('error', function (err) { /* Do Something */ });
 
 
+/**
+ * Represents a book.
+ * @constructor
+ */
+function Book(title, author) {
+}
 
 // winston.profile('Startup');
 

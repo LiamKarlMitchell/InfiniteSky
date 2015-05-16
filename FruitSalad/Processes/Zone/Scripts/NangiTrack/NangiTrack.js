@@ -1,12 +1,19 @@
 // TODO Think of a way to say when config.json is reloaded if NangiTrack_Crontab has been modified then change it.
 
+
+/**
+ * Nangi Track
+ * @namespace
+ */
+ var NangiTrack = function NangiTrack() {
+
 /* @const The recommended crontab value */
 var crontab = "54 * * * *";
 
 schedule({ 
 	name: "NangiTrack",
 	description: "The Nangi Racetrack should run every hour. It has a countdown before it starts for 6 minutes. Active on zone 119 only.",
-	targets: 'Z119'
+	targets: 'Z119',
 	crontab: config.NangiTrack_Crontab || crontab,
 	onLoad: NangiTrack_onLoad,
 	init: NangiTrack_Init
@@ -125,4 +132,6 @@ function NangiTrack_Finished(zone, data) {
 
 	// Calculate win based on the bets.
 	// character.silver += win;
+}
+
 }
