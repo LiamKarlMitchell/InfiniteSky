@@ -1,0 +1,4 @@
+grunt.registerTask('check_mongodb', 'Checks that mongodb connection works.', function() {
+  var done = this.async();
+  setTimeout(done,1000);
+});

@@ -41,4 +41,4 @@ global.api.runInContext = function(file_path){
 }
 
 var ChildSpawner = require('../Helper/ChildSpawner.js');
-var client = new ChildSpawner.Resume();
+var client = ChildSpawner.Resume();
