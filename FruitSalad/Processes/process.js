@@ -13,32 +13,11 @@ var fs = require('fs');
 var vm = require('vm');
 var path = require('path');
 
+global.vmscript = new (require('../vmscript.js'))();
+global.vms = global.vmscript.vms;
 global.api = {};
 
-global.api.runInContext = function(file_path){
-	// vms.loadFIle(entrypoint) instead
-	// client.agent.api.test = function(){
-	// 	console.log("Altered api function");
-	// }
+global.api.spawnScript = vmscript.watch;
 
-	// global.spawner_api.validateAPI(process.pid);
-
-	fs.readFile(file_path, function(err, content){
-		if(err){
-
-			console.log(err);
-			return;
-		}
-
-
-		var code = content.toString();
-		global.vms = function(name, depends, callback){
-
-		}
-		global.require = require;
-		vm.runInThisContext(code);
-	});
-}
-
-var ChildSpawner = require('../Helper/ChildSpawner.js');
-var client = new ChildSpawner.Resume();
+ChildSpawner = require('../Helper/ChildSpawner.js');
+var client = ChildSpawner.Resume();
