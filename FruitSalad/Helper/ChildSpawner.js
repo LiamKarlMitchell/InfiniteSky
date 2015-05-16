@@ -13,7 +13,7 @@ function ChildSpawner(api) {
 
 	var self = this;
 
-	this.api.validateAPI = function(pid){
+	this.api.invalidateAPI = function(pid){
 		if(pid && self.childrens[pid]){
 			self.childrens[pid].agent
 			.send(["ready", self.childrens[pid].agent._onReady]);
@@ -42,17 +42,17 @@ ChildSpawner.prototype.spawnChild = function(opts){
 	var transport = new Transport([child.stdout, child.stdin]);
 	var agent = new Agent(this.api);
 	agent.connect(transport, function (err, api) {
-		if (err) throw err;
+		if (err) {
+			console.log(err);
+			return;
+		}
 
 		if(!self.childrens[opts.name]){
-			api.runInContext(opts.script);
+			api.spawnScript(opts.script);
 			self.childrens[opts.name] = {
 				agent: agent,
 				thread: child
 			};
-		}else{
-			console.log("Reloaded API");
-			api.test();
 		}
 	});
 }
@@ -67,7 +67,12 @@ var ChildSpawnerClient = function(){
 
 	var self = this;
 	this.agent.connect(this.transport, function (err, api) {
-		if (err) throw err;
+		if (err) {
+			console.log(err);
+			return;
+		}
+
+		global.api = self.agent.api;
 		global.spawner_api = api;
 	});
 }
