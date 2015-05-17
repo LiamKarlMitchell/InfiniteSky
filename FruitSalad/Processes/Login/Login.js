@@ -14,17 +14,35 @@ vms('Login Server', [
 			Array of current connected clients.
 		*/
 		this.clients = [];
-
 		this.nextID = 0;
 
-		/* Boolean indicating that the server is running
-		and listening for incoming connections. */
+		/*
+			Boolean indicating that the server is running
+			and listening for incoming connections.
+		*/
 		this.listening = false;
+
+		/*
+			Used Later to see if config has to offer a new port to listen to.
+			If is different than currently listening, re-listen the tcp server,
+			to listen for the new port.
+		*/
 		this.listeningPort = null;
+
+		/*
+			A boolean variable to decide if we want to accept incoming connections.
+		*/
 		this.acceptConnections = false;
+
+		/*
+			A object of packet collection for this current instance.
+		*/
 		this.packetCollection = null;
 
 		var self = this;
+		/*
+			A TCP server instance.
+		*/
 		this.instance = net.createServer(function (socket) { self.onConnection(socket); });
 	}
 
@@ -74,7 +92,7 @@ vms('Login Server', [
 
 	LoginInstance.prototype.init = function(){
 		if(this.listening) return;
-		
+
 		var self = this;
 		this.instance.listen(config.network.ports.login, function(){
 			self.listening = true;

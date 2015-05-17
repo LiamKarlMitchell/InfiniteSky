@@ -50,8 +50,6 @@ function PacketCollection(PacketCollectionName) {
 
 	global[PacketCollectionName] = this;
 
-	console.log(PacketCollectionName);
-	
 	this.Packets = {};
 	this.Get = function(ID) {
 		return this.Packets[ID] || null;
