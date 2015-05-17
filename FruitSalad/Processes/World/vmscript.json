@@ -1,9 +1,0 @@
-{
-	"*": {
-		"paths": ["../../Database", "../../"]
-	},
-	"child": {
-		"name": "Zone",
-		"scripts": {"../Zone": "Zone.js", "../Zone/Packets/": "*", "../../Database": ["Character.js", "Account.js", "Guild.js", "Item.js", "NPC.js", "Quest.js", "Spawns.js", "Monster.js"]}
-	}
-}

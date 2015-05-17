@@ -1,0 +1,35 @@
+{
+	/*
+		Runtime settings
+	*/
+	"server_name": "Development",
+	"data_path": "./Data/",
+
+	/*
+		Database settings
+	*/
+	"database":{
+		"connection_string": "ts1:ts1@localhost:27017/ts1"
+	},
+
+	/*
+		Zone settings
+	*/
+	"zone": {
+		"transfer_timeout_time": 30000,
+	},
+
+	/*
+		World configuration
+	*/
+	"general": {
+		"rates":{
+			"global": {
+				"experience": 1,
+				"drop": 1,
+				"pet_experience": 1
+			}
+		},
+		"maxClients": 10
+	}
+}

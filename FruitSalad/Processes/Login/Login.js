@@ -1,66 +1,98 @@
-// var vms = new vmscript.reciever(process);
+vmscript.watch('Config/network.json');
+vmscript.watch('Config/login.json');
 
-// // console.log(process.env);
+vms('Login Server', [
+	'Config/network.json',
+	'Config/login.json'
+	], function(){
+	net = require('net');
+	CachedBuffer = require('./modules/CachedBuffer.js');
+	PacketCollection = require('./modules/PacketCollection.js');
 
-// vms.depends([
-//  'config.network.json',
-//  'Test',
-//  'Packets_Login'
-// ], function(){ // Callback with argument for reloading/loading a module?
-//  console.log("Login server code 123123", config.network.motd);
-// });
+	function LoginInstance(){
+		/*
+			Array of current connected clients.
+		*/
+		this.clients = [];
 
+		this.nextID = 0;
 
-// vms.depends([
-//  'config.network.json',
-//  'Packets_Login'
-// ], function(){ // Callback with argument for reloading/loading a module?
-//  console.log("cos tam 2");
-// });
+		/* Boolean indicating that the server is running
+		and listening for incoming connections. */
+		this.listening = false;
+		this.listeningPort = null;
+		this.acceptConnections = false;
+		this.packetCollection = null;
 
+		var self = this;
+		this.instance = net.createServer(function (socket) { self.onConnection(socket); });
+	}
 
-// vms.once('load', function(){
-//  console.log("Loaded all modules");
-// });
+	LoginInstance.prototype.onConnection = function(socket){
+		if(!this.acceptConnections) return;
 
+		var self = this;
+		socket.clientID = this.nextID;
+		this.nextID++;
+		socket.authenticated = false;
 
-// config('Network', {
-// 	port: 1234,
-// 	ip: '127.0.0.1' // Put your IP to listen to here.
-// });
+		this.clients.push(socket);
+		CachedBuffer.call(socket, this.packetCollection);
 
-// emit('config', 'Network', {});
+		console.log("[Login] new Connection #" + socket.clientID);
 
+		socket.on('end', function() {
+			return self.onDisconnect(socket);
+		});
 
+		// Need to find out which functions to use and make this tidyer....
+		// Need to check for memory leaks and make sure we actually delete the un needed socket.
+		// Need to make sure using splice won't be slower than deleting the index.
+		// Should maybe look at using room or list rather than array of socket object.
+		socket.on('close', function() {
+			return self.onDisconnect(socket);
+		});
 
-// vms('World', [], function() {
-//   ..... most the same as origional.
-//   World_Prototype.sendToClan = function World_sendToClan(msg) {
+		socket.on('disconnect', function() {
+			return self.onDisconnect(socket);
+		});
 
-//   };
+		socket.on('error', function(err) {
+			return self.onError(socket);
+		});
+	};
 
-//   if (typeof(world) === 'undefined') {
-//   	world = new World();
-//   }
+	LoginInstance.prototype.onDisconnect = function(socket){
+		this.clients.splice(this.clients.indexOf(socket), 1);
+		socket.destroy();
+	};
 
-//   api.sendToClan = World_Prototype.sendToClan.bind(world,1,2,3);
+	LoginInstance.prototype.onError = function(socket){
+		this.clients.splice(this.clients.indexOf(socket), 1);
+		socket.destroy();
+	};
 
-//   api.blah = function() {
-//   	world.blah();
-//   }
+	LoginInstance.prototype.init = function(){
+		if(this.listening) return;
+		
+		var self = this;
+		this.instance.listen(config.network.ports.login, function(){
+			self.listening = true;
+			self.listeningPort = config.network.ports.login;
+			console.log("Login Server Instance listening on:", self.listeningPort);
+		});
 
-// })
+		this.packetCollection = PacketCollection('LoginPC');
 
-// vms('Login', [], function(){
+		vmscript.watch('./Processes/Login/Packets').on('Packets', function(){
+			self.acceptConnections = true;
+		});
+	}
 
-// })
+	if(typeof Login === 'undefined')
+		global.Login = new LoginInstance();
+	else
+		global.Login.__proto__ = LoginInstance.prototype;
 
-// console.log(process.env.test());
-
-// var ChildSpawner = require('../../Helper/ChildSpawner.js');
-// ChildSpawner.resume();
-
-// var spawner = ChildSpawner.Spawner();
-
-
-console.log("Login Server Instance running");
+	global.Login.init();
+});

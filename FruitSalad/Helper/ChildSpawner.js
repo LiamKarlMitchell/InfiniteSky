@@ -1,20 +1,7 @@
-/*    Copywrite Przemyslaw Walczak & Liam Mitchell 2015
- *    This file is part of vmscript.
- *
- *    vmscript is free software: you can redistribute it and/or modify
- *    it under the terms of the GNU General Public License as published by
- *    the Free Software Foundation, either version 3 of the License, or
- *    (at your option) any later version.
- *
- *    vmscript is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *    GNU General Public License for more details.
- *
- *    You should have received a copy of the GNU General Public License
- *    along with vmscript.  If not, see <http://www.gnu.org/licenses/>.
- */
- 
+// This file is part of InfiniteSky.
+// Copyright (c) InfiniteSky Dev Teams - Licensed under GNU GPL
+// For more information, see LICENCE in the main folder
+
 // Setup easy to use module for spawning child processes.
 // Attaching smith.js and allow supplying of an api.
 

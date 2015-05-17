@@ -47,6 +47,8 @@ var fileStats = {};
 var dependencies = {};
 
 function VMScriptObj(){
+	this.readyListeners = [];
+
 	var self = this;
 
 	EventEmitter.on('file added', function(file_path){
@@ -72,6 +74,16 @@ function VMScriptObj(){
 		self.parse(file_path);
 	});
 
+	EventEmitter.on('dependency loaded', function(name){
+		for(var i=0; i<self.readyListeners.length; i++){
+			var listener = self.readyListeners[i];
+			if(listener.name === name){
+				listener.callback();
+				self.readyListeners.splice(i, 1);
+			}
+		}
+	});
+
 	EventEmitter.on('check dependencies', function(){
 		for(var dependent in dependencies){
 			var d = dependencies[dependent];
@@ -91,6 +103,7 @@ function VMScriptObj(){
 							d.callback();
 							d.running = true;
 							EventEmitter.emit('check dependencies');
+							EventEmitter.emit('dependency loaded', dependent);
 						}catch(e){
 							console.log(e);
 							d.hasError = true;
@@ -107,6 +120,7 @@ function VMScriptObj(){
 
 				if(loaded === d.files.length){
 					d.running = true;
+					EventEmitter.emit('dependency loaded', dependent);
 					EventEmitter.emit('check dependencies');
 				}
 			}
@@ -140,29 +154,30 @@ VMScriptObj.prototype.parse = function(file_path){
 		switch(ext){
 			case '.json':
 			try{
-				JSONParser.parse(code);
+				vm.runInThisContext(split_dir[split_dir.length-1].toLowerCase() + '.' + infos.name + ' = ' + code + ';');
+				dependencies[file_name].running = true;
+				EventEmitter.emit('check dependencies');
+			}catch(e){
 				try{
+					vm.runInThisContext(split_dir[split_dir.length-1].toLowerCase() + ' = {};');
 					vm.runInThisContext(split_dir[split_dir.length-1].toLowerCase() + '.' + infos.name + ' = ' + code + ';');
 					dependencies[file_name].running = true;
 					EventEmitter.emit('check dependencies');
 				}catch(e){
 					try{
-						vm.runInThisContext(split_dir[split_dir.length-1].toLowerCase() + ' = {};');
-						vm.runInThisContext(split_dir[split_dir.length-1].toLowerCase() + '.' + infos.name + ' = ' + code + ';');
-						dependencies[file_name].running = true;
-						EventEmitter.emit('check dependencies');
+						JSONParser.parse(code.replace(/(?:\/\*(?:[\s\S]*?)\*\/)|(?:\/\/(?:.*)$)/gm, ''));
 					}catch(e){
+
 						dumpError(e);
 					}
 				}
-			}catch(e){
-				dumpError(e);
 			}
 			break;
 
 			case '.js':
 			try{
 				vm.runInThisContext(code);
+				dependencies[file_name].running = true;
 				EventEmitter.emit('check dependencies');
 			}catch(e){
 		      console.log(e);
@@ -304,7 +319,17 @@ VMScriptObj.prototype.watch = function(file_path){
 			}
 		});
 	});
+	return this;
 };
+
+VMScriptObj.prototype.on = function(name, ready){
+	var dependency = dependencies[name];
+	if(dependency && dependency.running){
+		ready();
+	}else{
+		this.readyListeners.push({name: name, callback: ready});
+	}
+}
 
 /* Exposed function to global scope for registering dependencies. */
 VMScriptObj.prototype.vms = function(name, depends, callback){
