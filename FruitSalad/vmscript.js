@@ -50,6 +50,18 @@ function VMScriptObj(){
 						}
 					}
 				}
+			}else if(d.files && !d.running){
+				var loaded = 0;
+				for(var i=0; i<d.files.length; i++){
+					var name = getFilename(path.parse(d.files[i]));
+					if(dependencies[name] && dependencies[name].running)
+						loaded++;
+				}
+
+				if(loaded === d.files.length){
+					d.running = true;
+					EventEmitter.emit('check dependencies');
+				}
 			}
 		}
 	});
@@ -136,6 +148,12 @@ VMScriptObj.prototype.watch = function(file_path){
 				files: []
 			};
 
+			var split_file_path = file_path.split('\\');
+			dependencies[split_file_path[split_file_path.length-1]] = {
+				files: [],
+				running: false
+			};
+
 			fs.readdir(file_path, function(err, files){
 				if(err){
 					console.log(err);
@@ -144,10 +162,13 @@ VMScriptObj.prototype.watch = function(file_path){
 
 				for(var i=0; i<files.length; i++){
 					var fp = file_path + '\\' + files[i];
+					dependencies[split_file_path[split_file_path.length-1]].files.push(fp);
 					array[file_path].files.push(fp);
 					fileStats[fp] = fs.statSync(fp);
 					EventEmitter.emit('file added', fp);
 				}
+
+				EventEmitter.emit('check dependencies');
 			});
 		}else if(stats.isFile()){
 			array[file_path] = {

@@ -73,7 +73,7 @@ var ChildSpawnerClient = function(){
 		}
 
 		global.api = self.agent.api;
-		global.spawner_api = api;
+		process.api = api;
 	});
 }
 
