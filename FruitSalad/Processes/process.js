@@ -1,7 +1,4 @@
-// setup enviorment for child process
 fs = require('fs');
-// vm = require('vm');
-// path = require('path');
 
 vmscript = new (require('../vmscript.js'))();
 vms = global.vmscript.vms;

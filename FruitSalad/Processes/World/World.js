@@ -28,6 +28,4 @@ vms('World Server', ['Config'], function(){
 
 	// global.api.sendToClan = World.prototype.sendToClan;
 	// process.api.invalidateAPI(process.pid);
-
-	// console.log("jsdoc plugins:", config.jsdoc.plugins);
 });

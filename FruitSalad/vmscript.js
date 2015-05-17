@@ -1,8 +1,46 @@
+/*    Copywrite Przemyslaw Walczak & Liam Mitchell 2015
+ *    This file is part of vmscript.
+ *
+ *    vmscript is free software: you can redistribute it and/or modify
+ *    it under the terms of the GNU General Public License as published by
+ *    the Free Software Foundation, either version 3 of the License, or
+ *    (at your option) any later version.
+ *
+ *    vmscript is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU General Public License for more details.
+ *
+ *    You should have received a copy of the GNU General Public License
+ *    along with vmscript.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 var fs = require('fs');
 var EventEmitter = require('events').EventEmitter;
 EventEmitter = new EventEmitter();
 var vm = require('vm');
 var path = require('path');
+
+var JSONParser = require('jsonlint').parser;
+var jshint = require('jshint').JSHINT;
+var clc = require('cli-color');
+var colors = {orange: clc.xterm(202), info: clc.xterm(33)};
+
+function dumpError(err) {
+  if (typeof err === 'object') {
+    if (err.message) {
+      console.error('\n\r\x1b[31;1mException: ' + err.message+'\x1b[0m\n\r')
+    }
+    // console.log(new Date());
+
+    // if (err.stack) {
+    //   console.error('\x1b[31;1mStacktrace:\x1b[0m','\n',err.stack.split('\n').splice(1).join('\n'));
+    // }
+  } else {
+    console.error('\x1b[31;1m' + err+'\x1b[0m');
+  }
+  // Push to redis if required for logging etc
+}
 
 var array = {};
 var fileStats = {};
@@ -12,17 +50,26 @@ function VMScriptObj(){
 	var self = this;
 
 	EventEmitter.on('file added', function(file_path){
-		console.log("file added", file_path);
+
+		var file_name = getFilename(path.parse(file_path));
+		console.log(colors.orange("[VMS]"), colors.info("added:"), file_name);
+
 		self.parse(file_path);
 	});
 
 	EventEmitter.on('file changed', function(file_path){
-		console.log("file changed", file_path);
+
+		var file_name = getFilename(path.parse(file_path));
+		console.log(colors.orange("[VMS]"), colors.info("changed:"), file_name);
+
 		self.parse(file_path);
 	});
 
 	EventEmitter.on('file removed', function(file_path){
-		console.log("file removed", file_path);
+		var file_name = getFilename(path.parse(file_path));
+		console.log(colors.orange("[VMS]"), colors.orange("removed:"), file_name);
+
+		self.parse(file_path);
 	});
 
 	EventEmitter.on('check dependencies', function(){
@@ -71,7 +118,7 @@ function VMScriptObj(){
 VMScriptObj.prototype.parse = function(file_path){
 	fs.readFile(file_path, function(err, content){
 		if(err){
-			console.log(err);
+			// console.log(err);
 			return;
 		}
 
@@ -93,18 +140,23 @@ VMScriptObj.prototype.parse = function(file_path){
 		switch(ext){
 			case '.json':
 			try{
-				vm.runInThisContext(split_dir[split_dir.length-1].toLowerCase() + '.' + infos.name + ' = ' + code + ';');
-				dependencies[file_name].running = true;
-				EventEmitter.emit('check dependencies');
-			}catch(e){
+				JSONParser.parse(code);
 				try{
-					vm.runInThisContext(split_dir[split_dir.length-1].toLowerCase() + ' = {};');
 					vm.runInThisContext(split_dir[split_dir.length-1].toLowerCase() + '.' + infos.name + ' = ' + code + ';');
 					dependencies[file_name].running = true;
 					EventEmitter.emit('check dependencies');
 				}catch(e){
-					console.log(e);
+					try{
+						vm.runInThisContext(split_dir[split_dir.length-1].toLowerCase() + ' = {};');
+						vm.runInThisContext(split_dir[split_dir.length-1].toLowerCase() + '.' + infos.name + ' = ' + code + ';');
+						dependencies[file_name].running = true;
+						EventEmitter.emit('check dependencies');
+					}catch(e){
+						dumpError(e);
+					}
 				}
+			}catch(e){
+				dumpError(e);
 			}
 			break;
 
@@ -113,7 +165,13 @@ VMScriptObj.prototype.parse = function(file_path){
 				vm.runInThisContext(code);
 				EventEmitter.emit('check dependencies');
 			}catch(e){
-				console.log(e);
+		      console.log(e);
+		      if (!jshint(content.toString())) {
+		        for (var i=0;i<jshint.errors.length;i++) {
+		          var e = jshint.errors[i];
+		          console.log(colors.orange("[VMS] jshint error #"+(i+1)) + colors.info(" Line: "+e.line+" Col: "+e.character+" "+e.reason));
+		        }
+		      }
 			}
 			break;
 		}
@@ -131,14 +189,13 @@ function getFilename(infos){
 
 /* Function used to watch the file or directory for changes. */
 VMScriptObj.prototype.watch = function(file_path){
-	
 	file_path = path.resolve(file_path);
 	if(array[file_path]) return;
 
 	var directory = false;
 	fs.stat(file_path, function(err, stats){
 		if(err){
-			console.log(err);
+			dumpError(err);
 			return;
 		}
 
@@ -156,7 +213,7 @@ VMScriptObj.prototype.watch = function(file_path){
 
 			fs.readdir(file_path, function(err, files){
 				if(err){
-					console.log(err);
+					dumpError(err);
 					return;
 				}
 
@@ -182,7 +239,7 @@ VMScriptObj.prototype.watch = function(file_path){
 			if(directory){
 				fs.readdir(file_path, function(err, files){
 					if(err){
-						console.log(err);
+						dumpError(err);
 						return;
 					}
 
@@ -193,21 +250,24 @@ VMScriptObj.prototype.watch = function(file_path){
 
 					for(var i=0; i<files.length; i++){
 						files[i] = file_path + '\\' + files[i];
+						try{
+							var stat = fs.statSync(files[i]);
+							var index = array[file_path].files.indexOf(files[i]);
+							if(index > -1){
+								var prvStat = fileStats[files[i]];
 
-						var stat = fs.statSync(files[i]);
-						var index = array[file_path].files.indexOf(files[i]);
-						if(index > -1){
-							var prvStat = fileStats[files[i]];
-
-							if(prvStat.mtime.getTime() !== stat.mtime.getTime()){
-								fileStats[files[i]] = stat;
-								EventEmitter.emit('file changed', files[i]);
+								if(prvStat.mtime.getTime() !== stat.mtime.getTime()){
+									fileStats[files[i]] = stat;
+									EventEmitter.emit('file changed', files[i]);
+								}
+								continue;
 							}
-							continue;
-						}
 
-						array[file_path].files.push(files[i]);
-						EventEmitter.emit('file added', files[i]);
+							array[file_path].files.push(files[i]);
+							EventEmitter.emit('file added', files[i]);
+						}catch(e){
+							
+						}
 					}
 
 					for(var i=0; i<array[file_path].files.length; i++){
