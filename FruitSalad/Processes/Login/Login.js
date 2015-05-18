@@ -8,6 +8,7 @@ vms('Login Server', [
 	net = require('net');
 	CachedBuffer = require('./modules/CachedBuffer.js');
 	PacketCollection = require('./modules/PacketCollection.js');
+	restruct = require('./modules/restruct');
 
 	function LoginInstance(){
 		/*
@@ -44,6 +45,8 @@ vms('Login Server', [
 			A TCP server instance.
 		*/
 		this.instance = net.createServer(function (socket) { self.onConnection(socket); });
+		this.recv = {};
+		this.send = {};
 	}
 
 	LoginInstance.prototype.onConnection = function(socket){
@@ -58,6 +61,12 @@ vms('Login Server', [
 		CachedBuffer.call(socket, this.packetCollection);
 
 		console.log("[Login] new Connection #" + socket.clientID);
+
+		try {
+			this.onConnected(socket);
+		} catch (e) {
+			console.log(e);
+		}
 
 		socket.on('end', function() {
 			return self.onDisconnect(socket);
@@ -76,16 +85,18 @@ vms('Login Server', [
 		});
 
 		socket.on('error', function(err) {
-			return self.onError(socket);
+			return self.onError(err, socket);
 		});
 	};
 
 	LoginInstance.prototype.onDisconnect = function(socket){
+		console.log("[Login] connection closed #" + socket.clientID);
 		this.clients.splice(this.clients.indexOf(socket), 1);
 		socket.destroy();
 	};
 
-	LoginInstance.prototype.onError = function(socket){
+	LoginInstance.prototype.onError = function(err, socket){
+		console.log(err);
 		this.clients.splice(this.clients.indexOf(socket), 1);
 		socket.destroy();
 	};
@@ -100,7 +111,7 @@ vms('Login Server', [
 			console.log("Login Server Instance listening on:", self.listeningPort);
 		});
 
-		this.packetCollection = PacketCollection('LoginPC');
+		this.packetCollection = new PacketCollection('LoginPC');
 
 		vmscript.watch('./Processes/Login/Packets').on('Packets', function(){
 			self.acceptConnections = true;

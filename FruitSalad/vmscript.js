@@ -214,42 +214,6 @@ VMScriptObj.prototype.watch = function(file_path){
 			return;
 		}
 
-		if(stats.isDirectory()){
-			directory = true;
-			array[file_path] = {
-				files: []
-			};
-
-			var split_file_path = file_path.split('\\');
-			dependencies[split_file_path[split_file_path.length-1]] = {
-				files: [],
-				running: false
-			};
-
-			fs.readdir(file_path, function(err, files){
-				if(err){
-					dumpError(err);
-					return;
-				}
-
-				for(var i=0; i<files.length; i++){
-					var fp = file_path + '\\' + files[i];
-					dependencies[split_file_path[split_file_path.length-1]].files.push(fp);
-					array[file_path].files.push(fp);
-					fileStats[fp] = fs.statSync(fp);
-					EventEmitter.emit('file added', fp);
-				}
-
-				EventEmitter.emit('check dependencies');
-			});
-		}else if(stats.isFile()){
-			array[file_path] = {
-				stats: stats
-			};
-
-			EventEmitter.emit('file added', file_path);
-		}
-
 		fs.watch(file_path, function(){
 			if(directory){
 				fs.readdir(file_path, function(err, files){
@@ -279,6 +243,7 @@ VMScriptObj.prototype.watch = function(file_path){
 							}
 
 							array[file_path].files.push(files[i]);
+							fileStats[files[i]] = stat;
 							EventEmitter.emit('file added', files[i]);
 						}catch(e){
 							
@@ -318,6 +283,42 @@ VMScriptObj.prototype.watch = function(file_path){
 				}
 			}
 		});
+
+		if(stats.isDirectory()){
+			directory = true;
+			array[file_path] = {
+				files: []
+			};
+
+			var split_file_path = file_path.split('\\');
+			dependencies[split_file_path[split_file_path.length-1]] = {
+				files: [],
+				running: false
+			};
+
+			fs.readdir(file_path, function(err, files){
+				if(err){
+					dumpError(err);
+					return;
+				}
+
+				for(var i=0; i<files.length; i++){
+					var fp = file_path + '\\' + files[i];
+					dependencies[split_file_path[split_file_path.length-1]].files.push(fp);
+					array[file_path].files.push(fp);
+					fileStats[fp] = fs.statSync(fp);
+					EventEmitter.emit('file added', fp);
+				}
+
+				EventEmitter.emit('check dependencies');
+			});
+		}else if(stats.isFile()){
+			array[file_path] = {
+				stats: stats
+			};
+
+			EventEmitter.emit('file added', file_path);
+		}
 	});
 	return this;
 };

@@ -1,0 +1,26 @@
+{
+  "name": "restruct",
+  "version": "0.1.2",
+  "author": {
+    "name": "Tony Young",
+    "email": "tony@rfw.name"
+  },
+  "description": "A JavaScript binary data library.",
+  "main": "./restruct.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rfw/restruct.js.git"
+  },
+  "devDependencies": {
+    "nodeunit": "0.7.x",
+    "owldoc": "x.x.x"
+  },
+  "license": "MIT",
+  "readme": "<a href=\"https://github.com/rfw/restruct.js\"><img style=\"position: fixed; top: 0; right: 0; border: 0;\" src=\"https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png\" alt=\"Fork me on GitHub\"></a>\n\n# restruct.js\n\n_A JavaScript binary data library._\n\n`restruct.js` performs conversion to and from binary data types. It utilizes an\nintuitive declarative API to define formats for binary structure parsers and\nemitters. It works in both the browser and on Node.\n\n`restruct.js` is freely distributable under the terms of the MIT license.\n\nExample:\n\n    > struct = restruct.\n    ... int8lu('opcode').\n    ... int8lu('version').\n    ... string('username', 20);\n\n    > packet = struct.pack({opcode: 1, version: 1, username: \"test\"});\n    [ 1, 1, 116, 101, 115, 116, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]\n\n    > struct.unpack(packet);\n    { opcode: 1,\n      version: 1,\n      username: 'test' }\n\n`restruct.js` has support for typed arrays, where available.\n\n## Usage\n\n### Initializing\n\nA `restruct.js` structure can be defined by using the `restruct` object, e.g.:\n\n    restruct.type(k[, n[, buf]])\n\nThe `type` is specified by one of the types in the [data types](#Data-Types)\nsection.\n\nThe parameter `k` specifies the name of the field in the resulting struct.\n\nThe parameter `n` is optional and, if supplied, will unpack the field into an\narray rather than a scalar value — this is useful for array values in structs.\nThe array will be unpacked according to the endianness of the data type. If the\nsupplied array during packing is shorter than `n`, the result will be padded\nwith null bytes.\n\nThe parameter `buf` is also optional and, if supplied, specifies the array\nthe field will be unpacked into, which can be useful for using typed arrays\nas buffers.\n\nAn example of a structure:\n\n    struct = restruct.\n        int32bu('start_time').\n        int32bu('end_time').\n        int8bu('keys', 10);\n\n### Unpacking\n\nOnce a structure has been initialized, the `unpack` method can be used on any\nobject that supports indexing (both normal and typed arrays):\n\n    struct.unpack([ 0, 0, 0, 1, 73, 150, 2, 210, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0 ]);\n\nThis will return the parsed structure:\n\n    { start_time: 1, end_time: 1234567890, keys: [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 0 ]}\n\n### Packing\n\n`restruct.js` also supports packing structures back to series of bytes:\n\n    struct.pack({ start_time: 1, end_time: 1234567890, keys: [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 0 ]});\n\nThis will return an array of bytes:\n\n    [ 0, 0, 0, 1, 73, 150, 2, 210, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0 ]\n\nOptionally, the `struct.pack` function takes a second argument which specifies\nan array to use for packing into. This can be a typed array:\n\n    var arr = new Uint8Array(1);\n    struct.pack({...}, arr);\n\n## Size\n\nThe size of the structure can be obtained via `struct.size`, e.g.:\n\n    > struct.size\n    18\n\n## Data Types\n\n### pad\n\nA `pad` is the null byte, used for empty fields of a struct.\n\n### boolean\n\nA `boolean` unpacks a 8-bit field into an array of eight boolean values, in\norder of least significant bit to most significant bit, e.g. `37` unpacks to:\n\n    [true, false, true, false, false, true, false, false]\n     1     2      4     8      16     32    64     128\n\n### nibble\n\nA `nibble` unpacks a 8-bit field into an array of low and high nibbles. The\narray is ordered `[0xL, 0xH]`.\n\n### int{8,16,24,32,40,48}{l,b}{s,u}\n\nThese types specify various integer types. The number is indicative of the\nbit size of the integer, the `l` and `b` indicative of little- and\nbig-endianness respectively, and `s` and `u` are indicative of signedness and\nunsignedness.\n\nAs a side note about endianness with regards to the `int8` data type, this only\naffects the packing/unpacking of arrays.\n\n### string\n\nA `string` is a string of variable length. On packing, it will encode the\nstring to UTF-8 and on unpacking will decode the string from UTF-8 (i.e.\nconversion of native JavaScript strings to/from byte sequences, respectively).\n\n### struct\n\nA `struct` is another `Restruct` instance. This enables structs to be packed\ninside of each other, as simple compositions or as arrays of structs.\n",
+  "readmeFilename": "README.md",
+  "_id": "restruct@0.1.2",
+  "dist": {
+    "shasum": "5f99b382d5aeefc6e54b44349c45dc9e504a3219"
+  },
+  "_from": "restruct"
+}

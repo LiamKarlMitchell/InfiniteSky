@@ -1,0 +1,29 @@
+We did a pull request for our changes to restruct but it has not gone anywhere?
+I will probably rewrite restruct to use node.js's buffer object too.
+
+- Changed blank strings to be "" instead of returning JavaScript's default "undefined".
+
+- Fixed areas in restruct.js referencing 'struct[k]' and 'struct[k][i]' when it was undefined.
+ This was causing errors when one or more values were undefined when packing data using restruct.
+ The following example now works:
+
+testStruct = restruct.
+	int8lu("id").
+	string("val1",13).
+	string("val2",13);
+
+testStruct.pack({val1: "Kittens"});
+
+By default, we expected the above test to fill all values with 0's except for "val1".
+The above test would not work as we didn't set any values to "id" or "val2", causing them to be undefined.
+Our usage for this was debugging large structs used in network packets.
+For example, you can just set the important values, and leave others blank.
+
+- Added support for float32l including functional pack/unpack conversion
+Please note that floats being unpacked with this method may have a slight loss of precision.
+This is due to the 'epsilon' issues with JavaScript float conversions, which is documented here:
+http://en.wikipedia.org/wiki/Machine_epsilon
+
+Please see the included restruct.js for these modifications :)
+
+- Liam and Ryan

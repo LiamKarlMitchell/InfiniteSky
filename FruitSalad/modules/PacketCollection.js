@@ -51,31 +51,31 @@ function PacketCollection(PacketCollectionName) {
 	global[PacketCollectionName] = this;
 
 	this.Packets = {};
-	this.Get = function(ID) {
-		return this.Packets[ID] || null;
-	}
-
-	// This is for use with restruct, for using with regular buffer functions replace Restruct with a function to decode the packet data into object you can use.
-	// Arguments for the function should be ID, Packet
-	this.Set = function(ID,options) {
-		var p = {ID: ID, function: defaultPacketFunction};
-		
-		if (options) {
-			if (options.function) p.function = options.function;
-			if (options.Restruct) p.Restruct = options.Restruct;
-			if (options.Size) p.Size = options.Size;
-			if (options.SizeFunction) p.SizeFunction = options.SizeFunction;
-		}
-
-		this.Packets[ID] = p;
-
-		this.LastAdded = ID;
-	}
-
-	this.Remove = function(ID) {
-		delete this.Packets[ID];
-	}
+	return this;
 };
+
+PacketCollection.prototype.Get = function(id){
+	return this.Packets[id] || null;
+}
+
+PacketCollection.prototype.Set = function(id, opts){
+	var p = {ID: id, function: defaultPacketFunction};
+	
+	if (opts) {
+		if (opts.function) p.function = opts.function;
+		if (opts.Restruct) p.Restruct = opts.Restruct;
+		if (opts.Size) p.Size = opts.Size;
+		if (opts.SizeFunction) p.SizeFunction = opts.SizeFunction;
+	}
+
+	this.Packets[id] = p;
+
+	this.LastAdded = id;
+}
+
+PacketCollection.prototype.Remove = function(id) {
+	delete this.Packets[id];
+}
 
 module.exports = PacketCollection;
 
