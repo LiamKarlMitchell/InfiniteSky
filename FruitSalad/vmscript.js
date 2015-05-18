@@ -77,9 +77,20 @@ function VMScriptObj(){
 	EventEmitter.on('dependency loaded', function(name){
 		for(var i=0; i<self.readyListeners.length; i++){
 			var listener = self.readyListeners[i];
-			if(listener.name === name){
-				listener.callback();
-				self.readyListeners.splice(i, 1);
+			if(typeof listener.name === 'object'){
+				if(!listener.loaded) listener.loaded = [];
+				if(listener.name.indexOf(name) > -1 && listener.loaded.indexOf(name) === -1)
+					listener.loaded.push(name);
+
+				if(listener.name.length === listener.loaded.length){
+					listener.callback();
+					self.readyListeners.splice(i, 1);
+				}
+			}else{
+				if(listener.name === name){
+					listener.callback();
+					self.readyListeners.splice(i, 1);
+				}
 			}
 		}
 	});
@@ -324,11 +335,31 @@ VMScriptObj.prototype.watch = function(file_path){
 };
 
 VMScriptObj.prototype.on = function(name, ready){
-	var dependency = dependencies[name];
-	if(dependency && dependency.running){
-		ready();
+	if(typeof name === 'object'){
+		var obj = {
+			name: name,
+			callback: ready,
+			loaded: []
+		};
+
+		for(var n in name){
+			var na = name[n];
+			if(dependencies[na] && dependencies[na].running)
+				obj.loaded.push(na);
+		}
+
+		if(obj.name.length === obj.loaded.length){
+			obj.callback();
+		}else{
+			this.readyListeners.push(obj);
+		}
 	}else{
-		this.readyListeners.push({name: name, callback: ready});
+		var dependency = dependencies[name];
+		if(dependency && dependency.running){
+			ready();
+		}else{
+			this.readyListeners.push({name: name, callback: ready});
+		}
 	}
 }
 

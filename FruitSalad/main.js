@@ -35,5 +35,23 @@ function Book(title, author) {
 var ChildSpawner = require('./Helper/ChildSpawner.js');
 var spawner = new ChildSpawner.Spawner({});
 
+var readline = require('readline'),
+    rl = readline.createInterface(process.stdin, process.stdout);
+
+
+
 spawner.spawnChild({name: 'Login', script: 'Processes\\Login\\Login.js'});
 spawner.spawnChild({name: 'World', script: 'Processes\\World\\World.js'});
+
+
+spawner.onReady(function(){
+	rl.setPrompt('> ');
+	rl.prompt();
+
+	rl.on('line', function(line) {
+	 	console.log(line.trim());
+		rl.prompt();
+	}).on('close', function() {
+		process.exit(0);
+	});
+});

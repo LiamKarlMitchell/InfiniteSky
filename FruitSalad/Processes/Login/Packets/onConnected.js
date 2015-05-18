@@ -19,5 +19,6 @@ Login.onConnected = function (socket) {
 		PacketID: 0x00,
 		Servers: srvs
 	});
+	
 	socket.write(new Buffer(packet));
 }

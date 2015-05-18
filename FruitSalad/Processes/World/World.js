@@ -123,3 +123,7 @@
 
 // 	global.Login.init();
 // });
+
+
+process.api.runCLI();
+// console.log(process.api);

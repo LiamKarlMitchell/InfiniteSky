@@ -14,6 +14,9 @@ var path = require('path');
 function ChildSpawner(api) {
 	this.api = api || {};
 	this.childrens = {};
+	this.totalChildrens = 0;
+	this.totalReadyChildrens = 0;
+	this.callback = null;
 
 	var self = this;
 
@@ -35,9 +38,23 @@ function ChildSpawner(api) {
 			}
 		}
 	}
+
+	this.api.runCLI = function(){
+		self.totalReadyChildrens++;
+		if(self.totalChildrens === self.totalReadyChildrens){
+			if(typeof self.callback === 'function'){
+				self.callback();
+				delete self.callback;
+			}
+		}
+	}
 }
 
-ChildSpawner.prototype.spawnChild = function(opts){
+ChildSpawner.prototype.onReady = function(callback){
+	this.callback = callback;
+};
+
+ChildSpawner.prototype.spawnChild = function(opts, callback){
 	var self = this;
 	var processEnv = path.resolve(__dirname, '..\\Processes\\process.js');
 	var child = spawn(process.execPath, [processEnv]);
@@ -46,8 +63,11 @@ ChildSpawner.prototype.spawnChild = function(opts){
 
 	var transport = new Transport([child.stdout, child.stdin]);
 	var agent = new Agent(this.api);
+
+	this.totalChildrens++;
 	agent.connect(transport, function (err, api) {
 		if (err) {
+			this.totalChildrens--;
 			console.log(err);
 			return;
 		}

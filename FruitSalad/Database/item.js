@@ -207,14 +207,9 @@ vms('Items', [], function(){
 	};
 
 
-
 	//Constructor
 	delete mongoose.models['item_mongoose'];
 	var Item = db.mongoose.model('item', itemSchema);
 
 	db.Item = Item;
-	//module.exports = Item;
-
-	// NEEDS TO BE LAST THING IN FILE!!!
-	main.events.emit('schema_loaded', 'item');
 });

@@ -9,6 +9,7 @@ vms('Login Server', [
 	CachedBuffer = require('./modules/CachedBuffer.js');
 	PacketCollection = require('./modules/PacketCollection.js');
 	restruct = require('./modules/restruct');
+	Database = require('./modules/db.js');
 
 	function LoginInstance(){
 		/*
@@ -47,6 +48,8 @@ vms('Login Server', [
 		this.instance = net.createServer(function (socket) { self.onConnection(socket); });
 		this.recv = {};
 		this.send = {};
+
+		this.databaseConnected = false;
 	}
 
 	LoginInstance.prototype.onConnection = function(socket){
@@ -113,8 +116,14 @@ vms('Login Server', [
 
 		this.packetCollection = new PacketCollection('LoginPC');
 
-		vmscript.watch('./Processes/Login/Packets').on('Packets', function(){
-			self.acceptConnections = true;
+		Database(config.login.database.connection_string, function(){
+			console.log("Database connected @", config.login.database.connection_string);
+			vmscript.watch('Database');
+			vmscript.watch('./Processes/Login/Packets').on(['Packets', 'Database'], function(){
+				self.acceptConnections = true;
+				// console.log(process.api);
+				process.api.runCLI();
+			});
 		});
 	}
 
