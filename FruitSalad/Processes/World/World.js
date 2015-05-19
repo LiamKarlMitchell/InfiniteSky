@@ -125,5 +125,5 @@
 // });
 
 
-process.api.runCLI();
+process.api.run();
 // console.log(process.api);

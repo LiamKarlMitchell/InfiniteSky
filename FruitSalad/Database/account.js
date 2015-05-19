@@ -6,18 +6,19 @@ vms('Account', [], function(){
 	var characterIndi = {};
 
 	db.accountSchema = mongoose.Schema({
-	  _id: { type: Number, unique: true, index: true },
+		_id: { type: Number, unique: true, index: true },
 		Username: { type: String, unique: true, index: true },
 		Password: String,
 	    Email: String,
-		active: {type: Number, default: 0},
+		Logged: {type: Number, default: 0},
 		Level: {type: Number, default: 0},
+		Status: {type: Number, default: 0},
 		LastIP: String,
 		UsePin: { type: Boolean, default: false },
 		Pin: {type: String, default: '0000'},
 		LastLogin: { type: Date, default: Date.now },
 		CharacterIndividuals: {type: characterIndi, default: null},
-	  AP: {type: Number, default: 0}
+		AP: {type: Number, default: 0}
 	});
 
 	delete mongoose.models.account_mongoose;

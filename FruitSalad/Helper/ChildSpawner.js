@@ -39,7 +39,7 @@ function ChildSpawner(api) {
 		}
 	}
 
-	this.api.runCLI = function(){
+	this.api.run = function(){
 		self.totalReadyChildrens++;
 		if(self.totalChildrens === self.totalReadyChildrens){
 			if(typeof self.callback === 'function'){
@@ -67,7 +67,7 @@ ChildSpawner.prototype.spawnChild = function(opts, callback){
 	this.totalChildrens++;
 	agent.connect(transport, function (err, api) {
 		if (err) {
-			this.totalChildrens--;
+			self.totalChildrens--;
 			console.log(err);
 			return;
 		}

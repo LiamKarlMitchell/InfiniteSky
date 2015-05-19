@@ -37,7 +37,7 @@ var spawner = new ChildSpawner.Spawner({});
 
 var readline = require('readline'),
     rl = readline.createInterface(process.stdin, process.stdout);
-
+var vm = require('vm');
 
 
 spawner.spawnChild({name: 'Login', script: 'Processes\\Login\\Login.js'});
@@ -46,11 +46,15 @@ spawner.spawnChild({name: 'World', script: 'Processes\\World\\World.js'});
 
 spawner.onReady(function(){
 	rl.setPrompt('> ');
-	rl.prompt();
+	// rl.prompt();
 
 	rl.on('line', function(line) {
-	 	console.log(line.trim());
-		rl.prompt();
+	 	try{
+	 		console.log(vm.runInThisContext(line.trim()));
+	 	}catch(e){
+	 		console.log(e);
+	 	}
+		// rl.prompt();
 	}).on('close', function() {
 		process.exit(0);
 	});

@@ -1,15 +1,22 @@
 vmscript.watch('Config/network.json');
 vmscript.watch('Config/login.json');
+vmscript.watch('Config/world.json');
 
 vms('Login Server', [
 	'Config/network.json',
-	'Config/login.json'
-	], function(){
+	'Config/login.json',
+	'Config/world.json'
+], function(){
 	net = require('net');
-	CachedBuffer = require('./modules/CachedBuffer.js');
-	PacketCollection = require('./modules/PacketCollection.js');
-	restruct = require('./modules/restruct');
-	Database = require('./modules/db.js');
+	CachedBuffer = require('./Modules/CachedBuffer.js');
+	PacketCollection = require('./Modules/PacketCollection.js');
+	restruct = require('./Modules/restruct');
+	Database = require('./Modules/db.js');
+
+	vmscript.watch('./Generic/structs.js');
+	vmscript.watch('./Generic/CharacterState.js');
+	vmscript.watch('./Generic/CVec3.js');
+	vmscript.watch('./Generic/CharacterInfos.js');
 
 	function LoginInstance(){
 		/*
@@ -119,10 +126,16 @@ vms('Login Server', [
 		Database(config.login.database.connection_string, function(){
 			console.log("Database connected @", config.login.database.connection_string);
 			vmscript.watch('Database');
-			vmscript.watch('./Processes/Login/Packets').on(['Packets', 'Database'], function(){
-				self.acceptConnections = true;
-				// console.log(process.api);
-				process.api.runCLI();
+			vmscript.watch('./Processes/Login/Packets').on([
+					'Packets',
+					'Database',
+					'Generic/structs.js',
+					'Generic/CharacterState.js',
+					'Generic/CVec3.js',
+					'Generic/CharacterInfos.js'
+				], function(){
+					self.acceptConnections = true;
+					process.api.run();
 			});
 		});
 	}
