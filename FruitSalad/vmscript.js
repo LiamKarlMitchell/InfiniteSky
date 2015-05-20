@@ -178,7 +178,6 @@ VMScriptObj.prototype.parse = function(file_path){
 					try{
 						JSONParser.parse(code.replace(/(?:\/\*(?:[\s\S]*?)\*\/)|(?:\/\/(?:.*)$)/gm, ''));
 					}catch(e){
-
 						dumpError(e);
 					}
 				}

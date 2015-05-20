@@ -8,7 +8,7 @@
 	/*
 		Database settings
 	*/
-	"database":{
+	"database": {
 		"connection_string": "ts1:ts1@localhost:27017/ts1"
 	},
 
@@ -23,7 +23,7 @@
 		World configuration
 	*/
 	"general": {
-		"rates":{
+		"rates": {
 			"global": {
 				"experience": 1,
 				"drop": 1,
