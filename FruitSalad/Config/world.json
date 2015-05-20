@@ -16,7 +16,7 @@
 		Zone settings
 	*/
 	"zone": {
-		"transfer_timeout_time": 30000,
+		"transfer_timeout_time": 30000
 	},
 
 	/*
@@ -31,5 +31,9 @@
 			}
 		},
 		"maxClients": 10
-	}
+	},
+
+	"info_directory": "E:\\Games\\Alt1Games\\TwelveSky1\\G03_GDATA\\D01_GIMAGE2D\\005",
+	"world_directory": "E:\\Games\\Alt1Games\\TwelveSky1\\G03_GDATA\\D07_GWORLD"
+
 }

@@ -7,16 +7,23 @@ module.exports = function(grunt) {
   	var done = this.async();
 
   	vmscript.on(['config'], function() {
+  		console.log('Starting config check for itemsToMongo.');
+  		if (!config.world) {
+			console.error('Expecting config.world to be set.');
+	  		return done(false);
+  		}
 
-	  	if (!config.database || !config.database.connection_string) {
-	  		throw new Error('Expecting config.database.connection_string to be set.');
+	  	if (!config.world.database || !config.world.database.connection_string) {
+	  		console.error('Expecting config.database.connection_string to be set.');
+	  		return done(false);
 	  	}
 
-	  	if (!config.info_directory) {
-	  		throw new Error('Expecting config.info_directory to be set. Please run grunt init or grunt locateGameFiles.');
+	  	if (!config.world.info_directory) {
+	  		console.error('Expecting config.info_directory to be set. Please run grunt init or grunt locateGameFiles.');
+	  		return done(false);
 	  	}
 
-		Database(config.database.connection_string, function(){
+		Database(config.world.database.connection_string, function(){
 			console.log("Database connected");
 			vmscript.watch('Database/item.js');
 		});
@@ -27,7 +34,7 @@ module.exports = function(grunt) {
   		// TODO: Load items from Game File
   		console.log('TODO Clear all of the existing Items in MongoDB.');
   		console.log('TODO Load items from Game File into MongoDB.'); // See GameInfoLoader :D.
-  		done();
+  		done(false);
   	});
   	//database
 	//connection_string

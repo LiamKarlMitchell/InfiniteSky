@@ -29,7 +29,7 @@ var colors = {orange: clc.xterm(202), info: clc.xterm(33)};
 function dumpError(err) {
   if (typeof err === 'object') {
     if (err.message) {
-      console.error('\n\r\x1b[31;1mException: ' + err.message+'\x1b[0m\n\r')
+      console.error('\n\r\x1b[31;1mException: ' + err.message+'\x1b[0m\n\r');
     }
     // console.log(new Date());
 
@@ -99,8 +99,9 @@ function VMScriptObj(){
 		for(var dependent in dependencies){
 			var d = dependencies[dependent];
 
+      var loaded;
 			if(d.depends && !d.running && !d.hasError){
-				var loaded = 0;
+				loaded = 0;
 				for(var i=0; i<d.depends.length; i++){
 					var dp = d.depends[i];
 					if(dependencies[dp] && dependencies[dp].running){
@@ -121,12 +122,13 @@ function VMScriptObj(){
 						}
 					}
 				}
-			}else if(d.files && !d.running){
-				var loaded = 0;
+			} else if(d.files && !d.running){
+				loaded = 0;
 				for(var i=0; i<d.files.length; i++){
 					var name = getFilename(path.parse(d.files[i]));
-					if(dependencies[name] && dependencies[name].running)
+					if ( (dependencies[name] && dependencies[name].running) || self[name] !== undefined || global[name] !== undefined) {
 						loaded++;
+					}
 				}
 
 				if(loaded === d.files.length){
@@ -136,6 +138,33 @@ function VMScriptObj(){
 				}
 			}
 		}
+
+		// Check ready listeners
+		for(var i=0; i<self.readyListeners.length; i++){
+			var listener = self.readyListeners[i];
+
+			if(typeof listener.name === 'object'){
+				listener.loaded = [];
+
+				for (var j = 0; j< listener.name.length; j++) {
+					if ((dependencies[listener.name[j]] && dependencies[listener.name[j]].running) || self[listener.name[j]] !== undefined || global[listener.name[j]] !== undefined) {
+						listener.loaded.push(listener.name[j]);
+					}
+				}
+
+				if(listener.name.length === listener.loaded.length){
+					listener.callback();
+					self.readyListeners.splice(i, 1);
+				}
+			} else {
+				if ((dependencies[listener.name] && dependencies[listener.name].running) || self[listener.name] !== undefined || global[listener.name] !== undefined) {
+					listener.callback();
+					self.readyListeners.splice(i, 1);
+				}
+			}
+		}
+
+
 	});
 };
 
@@ -343,8 +372,9 @@ VMScriptObj.prototype.on = function(name, ready){
 
 		for(var n in name){
 			var na = name[n];
-			if(dependencies[na] && dependencies[na].running)
+			if ( (dependencies[na] && dependencies[na].running) || this[na] !== undefined || global[na] !== undefined) {
 				obj.loaded.push(na);
+			}
 		}
 
 		if(obj.name.length === obj.loaded.length){
@@ -360,7 +390,7 @@ VMScriptObj.prototype.on = function(name, ready){
 			this.readyListeners.push({name: name, callback: ready});
 		}
 	}
-}
+};
 
 /* Exposed function to global scope for registering dependencies. */
 VMScriptObj.prototype.vms = function(name, depends, callback){

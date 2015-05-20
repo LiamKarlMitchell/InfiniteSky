@@ -30,6 +30,7 @@ function DB(connectString, callback) {
 
 	// If the connection throws an error
 	mongoose.connection.on('error',function (err) {
+		console.error(err); // TODO: Add a way to handle errors.
 	  dumpError('Mongoose default connection error: ' + err);
 	});
 	
