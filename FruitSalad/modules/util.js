@@ -20,6 +20,13 @@ function dumpError(err) {
 
 var util = {
   package: require('../package.json'),
+  toHexString: function(array){
+    var key = "";
+    for(var i=0; i<array.length; i++){
+      key += array[i].toString(16);
+    }
+    return key;
+  },
 
   dumpError: dumpError,
 

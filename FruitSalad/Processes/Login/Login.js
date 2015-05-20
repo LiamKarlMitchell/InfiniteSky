@@ -12,11 +12,24 @@ vms('Login Server', [
 	PacketCollection = require('./Modules/PacketCollection.js');
 	restruct = require('./Modules/restruct');
 	Database = require('./Modules/db.js');
+	crypto = require('crypto');
+	hexy = require('hexy').hexy;
+	util = require('./Modules/util.js');
 
 	vmscript.watch('./Generic/structs.js');
 	vmscript.watch('./Generic/CharacterState.js');
 	vmscript.watch('./Generic/CVec3.js');
 	vmscript.watch('./Generic/CharacterInfos.js');
+
+	global.api.sendSocketAfterTransferQueue = function(hash){
+		var key = util.toHexString(hash);
+		if(Login.characterTransfer[key]){
+			Login.characterTransfer[key]();
+		}
+		// console.log(key);
+	};
+
+	process.api.invalidateAPI(process.pid);
 
 	function LoginInstance(){
 		/*
@@ -57,6 +70,7 @@ vms('Login Server', [
 		this.send = {};
 
 		this.databaseConnected = false;
+		this.characterTransfer = {};
 	}
 
 	LoginInstance.prototype.onConnection = function(socket){

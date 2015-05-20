@@ -48,6 +48,17 @@ function ChildSpawner(api) {
 			}
 		}
 	}
+
+	this.api.call = function(process_name, callback, args){
+		// console.log(process_name, callback, args);
+
+		var p = self.childrens[process_name];
+
+		if(p.api[callback]){
+			console.log("Calling", process_name, 'for', callback);
+			p.api[callback].apply(self, args);
+		}
+	};
 }
 
 ChildSpawner.prototype.onReady = function(callback){
@@ -76,7 +87,8 @@ ChildSpawner.prototype.spawnChild = function(opts, callback){
 			api.spawnScript(opts.script);
 			self.childrens[opts.name] = {
 				agent: agent,
-				thread: child
+				thread: child,
+				api: api
 			};
 		}
 	});

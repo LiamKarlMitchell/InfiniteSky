@@ -8,7 +8,7 @@
  * @classdesc This is a description of the MyClass class.
  */
 
-vms( 'State', [ 'CVec3' ], function(){
+vms( 'CharacterState', [ 'CVec3', 'Structs' ], function(){
 	EquipItem = function EquipItem() {
 		this.ID = 0;
 		this.Enchant = 0; 
@@ -127,7 +127,7 @@ vms( 'State', [ 'CVec3' ], function(){
 
 	CharacterState_Prototype.setFromCharacter = function(character) {
 		// character.updateInfos(true);
-		character.infos.updateAll();
+		// character.infos.updateAll();
 		// Set the varables from a character's data
 		this.Name = character.Name;
 
@@ -185,11 +185,10 @@ vms( 'State', [ 'CVec3' ], function(){
 
 	// Returns a compressed packet for us to send to whomever
 	CharacterState_Prototype.getPacket = function() {	
-		// console.log("test");
-		this.Frame += 0;
-		return packets.makeCompressedPacket(0x18,new Buffer(WorldPC.ActionReplyPacket.pack(this)));
+		return packets.makeCompressedPacket(0x18,new Buffer(World.send.Action.pack(this)));
 	};
 
 	CharacterState.prototype = CharacterState_Prototype;
 
+	global.CharacterState = CharacterState;
 });

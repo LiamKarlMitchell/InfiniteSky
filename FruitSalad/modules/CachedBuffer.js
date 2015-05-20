@@ -5,6 +5,7 @@
 var hexy = require('hexy').hexy;
 var util = require('./util.js');
 
+var jshint = require('jshint').JSHINT;
 var clc = require('cli-color');
 var colors = {orange: clc.xterm(202), info: clc.xterm(33)};
 
@@ -19,6 +20,9 @@ var CachedBuffer = function(collection, opts){
     this.packet = null;
 
     this.onData = function(chunk){
+        // console.log("Chunk length:", chunk.length);
+        // console.log(hexy(chunk));
+
         this.data = Buffer.concat([this.data, chunk]);
 
         while(this.data.length > 0){
@@ -26,22 +30,28 @@ var CachedBuffer = function(collection, opts){
                 this.size = this.data.readUInt16LE(0);
                 this.step = this.data.readUInt16LE(4);
                 this.id = this.data.readUInt8(8);
-                this.reminder = this.size - 9;
-                this.data = this.data.slice(9, this.data.length);
                 this.packet = collection.Get(this.id);
+                this.data = this.data.slice(9, this.data.length);
+
+                this.size = this.packet && this.packet.Size ? this.packet.Size : this.size;
+                this.reminder = this.size - 9;
 
                 if(this.reminder === 0){
                     if(this.packet === null){
-                        console.log(colors.info('Unrecognised PacketID: 0x' + util.padLeft(this.id.toString(16).toUpperCase(),'0',2) + " Size: " + content.length));
+                        console.log(colors.info('Unrecognised PacketID: 0x' + util.padLeft(this.id.toString(16).toUpperCase(),'0',2) + " Size: " + content.length) + " Chunk Length: " + (chunk.length - 9));
                     }else{
                         if(this.packet.function){
-                            if(this.packet.Restruct){
-                                this.packet.function(this, this.packet.Restruct.unpack(content));
-                            }else{
-                                this.packet.function(this, content);
+                            try{
+                                if(this.packet.Restruct){
+                                    this.packet.function(this, this.packet.Restruct.unpack(content));
+                                }else{
+                                    this.packet.function(this, content);
+                                }
+                            }catch(e){
+                                util.dumpError(e);
                             }
                         }else{
-                            console.log(colors.info('Unrecognised function for PacketID: 0x' + util.padLeft(this.id.toString(16).toUpperCase(),'0',2) + " Size: " + content.length));
+                            console.log(colors.info('Unrecognised function for PacketID: 0x' + util.padLeft(this.id.toString(16).toUpperCase(),'0',2) + " Size: " + content.length) + " Chunk Length: " + (chunk.length - 9));
                         }
                     }
                 }
@@ -53,17 +63,21 @@ var CachedBuffer = function(collection, opts){
                 this.reminder = 0;
 
                 if(this.packet === null){
-                    console.log(colors.info('Unrecognised PacketID: 0x' + util.padLeft(this.id.toString(16).toUpperCase(),'0',2) + " Size: " + content.length));
+                    console.log(colors.info('Unrecognised PacketID: 0x' + util.padLeft(this.id.toString(16).toUpperCase(),'0',2) + " Size: " + content.length) + " Chunk Length: " + (chunk.length - 9));
                     console.log(hexy(content));
                 }else{
                     if(this.packet === null){
-                        console.log(colors.info('Unrecognised PacketID: 0x' + util.padLeft(this.id.toString(16).toUpperCase(),'0',2) + " Size: " + content.length));
+                        console.log(colors.info('Unrecognised PacketID: 0x' + util.padLeft(this.id.toString(16).toUpperCase(),'0',2) + " Size: " + content.length) + " Chunk Length: " + (chunk.length - 9));
                     }else{
                         if(this.packet.function){
-                            if(this.packet.Restruct){
-                                this.packet.function(this, this.packet.Restruct.unpack(content), content);
-                            }else{
-                                this.packet.function(this, content);
+                            try{
+                                if(this.packet.Restruct){
+                                    this.packet.function(this, this.packet.Restruct.unpack(content), content);
+                                }else{
+                                    this.packet.function(this, content);
+                                }
+                            }catch(e){
+                                util.dumpError(e);
                             }
                         }else{
                             console.log(colors.info('Unrecognised function for PacketID: 0x' + util.padLeft(this.id.toString(16).toUpperCase(),'0',2) + " Size: " + content.length));

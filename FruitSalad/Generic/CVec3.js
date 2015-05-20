@@ -100,4 +100,6 @@ vms('CVec3', [], function(){
 			return this.toString();
 		}
 	}
+
+	global.CVec3 = CVec3;
 });

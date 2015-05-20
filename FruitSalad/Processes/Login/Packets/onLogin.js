@@ -26,7 +26,7 @@ Login.send.onLogin = restruct.
 	int32lu('Unk').
 	int32lu('Unk').
 	int32lu('Unk').
-	string('Username', Login.UsernameLength + 1).
+	pad(14). // Hash
 	int32lu('UsePin').
 	int32lu('Unk').
 	string('Pin', 5);
@@ -35,31 +35,27 @@ Login.send.onLoginReply = function(status){
 	var obj = {};
 	obj.PacketID = 0x03;
 	obj.Status = status;
-	obj.Username = this.account ? this.account.Username : "";
+	// obj.Hash = this.socket.hash ? this.socket.hash : ""; // TODO: Instead use a crypto hash, 12 char long as a account id to authorize character transfer.
 	obj.Pin = this.account && this.account.UsePin ? this.account.Pin : "****";
-	obj.UsePin = this.account && this.account.UsePin ? 1 : 0; 
-	this.write(new Buffer(Login.send.onLogin.pack(obj)));
+	obj.UsePin = this.account && this.account.UsePin ? 1 : 0;
+	var buffer = new Buffer(Login.send.onLogin.pack(obj));
+	new Buffer(this.hash).copy(buffer, 14, this.hash);
+	this.write(buffer);
 };
 
 LoginPC.Set(0x03, {
 	Restruct: Login.recv.onLogin,
 	function: function(socket, input){
-		console.log(input);
 		db.Account.findOne({
 			Username: input.Username
 		}, function(err, account) {
-			// if(err){
-			// 	console.log("Error on finding account");
-			// 	return;
-			// }
-
-			socket.account = account;
-
 			if(err) {
 				console.log(err);
 				Login.send.onLoginReply.call(socket, Login.LoginStatus.CannotAuthenticate);
 				return;
 			}
+
+			socket.account = account;
 
 			if(account === null){
 				Login.send.onLoginReply.call(socket, Login.LoginStatus.AccountNotFound);
@@ -84,6 +80,7 @@ LoginPC.Set(0x03, {
 
 			account.Logged = true;
 			socket.authenticated = true;
+			socket.hash = crypto.randomBytes(14);
 
 			account.save();
 			Login.send.onLoginReply.call(socket, Login.LoginStatus.Success);

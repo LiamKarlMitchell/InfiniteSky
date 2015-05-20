@@ -64,6 +64,7 @@ PacketCollection.prototype.Set = function(id, opts){
 	if (opts) {
 		if (opts.function) p.function = opts.function;
 		if (opts.Restruct) p.Restruct = opts.Restruct;
+		if (opts.Size) p.Size = opts.Size;
 	}
 
 	this.Packets[id] = p;
