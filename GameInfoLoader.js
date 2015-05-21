@@ -129,7 +129,7 @@ GameInfoLoader.prototype.Load = function(filename, structure, onRecordFunction) 
 
 			queue.drain = function(err){
 				if (err) {
-					dumpError(err);
+					console.error(err);
 					return;
 				}
 
@@ -170,7 +170,7 @@ GameInfoLoader.prototype.Load = function(filename, structure, onRecordFunction) 
 
 				fs.exists(filepath, function(exists) {
 					if (!exists) {
-						dumpError('Server cannot load "'+filepath+'" skipping translation csv.');
+						console.error('Server cannot load "'+filepath+'" skipping translation csv.');
 						console.log('All '+filename+' records have been processed.');
 						self.emit('loaded', filename);
 						self.Loaded = true;
@@ -196,7 +196,6 @@ GameInfoLoader.prototype.Load = function(filename, structure, onRecordFunction) 
 					 	 		self.infos[record[columns[0]]] = record;
 					 	 		self[record[columns[0]]] = record;
 					 	 	}
-					 	 	//dumpError('Record '+data[columns[0]]+' not found in file: '+filename);
 					 	 }
 					 })
 					 .on("end", function(){

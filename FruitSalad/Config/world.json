@@ -34,6 +34,7 @@
 	},
 
 	"info_directory": "E:\\Games\\Alt1Games\\TwelveSky1\\G03_GDATA\\D01_GIMAGE2D\\005",
-	"world_directory": "E:\\Games\\Alt1Games\\TwelveSky1\\G03_GDATA\\D07_GWORLD"
+	"world_directory": "E:\\Games\\Alt1Games\\TwelveSky1\\G03_GDATA\\D07_GWORLD",
+	"translation_directory": "E:\\Source\\InfiniteSky\\data\\translation"
 
 }
