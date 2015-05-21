@@ -1,7 +1,6 @@
 fs = require('fs');
 
 vmscript = new (require('../VMScript.js'))();
-vms = global.vmscript.vms;
 api = {};
 
 api.spawnScript = vmscript.watch;

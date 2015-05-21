@@ -30,9 +30,20 @@ module.exports = function(grunt) {
 
   	});
 
-  	vmscript.on(['items'], function() {
-  		// TODO: Load items from Game File
-  		console.log('TODO Clear all of the existing Items in MongoDB.');
+  	vmscript.on(['Item'], function() {
+  		console.log('Clearing all existing Items in MongoDB.');
+  		db.Item.remove().exec();
+  		
+  		//var ii = new db.Item();
+  		//ii._id = 1;
+  		//ii.Name = 'Silver';
+  		//ii.save();
+
+		// case '005_00002.IMG':
+		// 			csvFile = 'Items.csv';
+		// 			columns = ['ID','Name','Description1','Description2', 'Description3'];
+		// 			break;
+
   		console.log('TODO Load items from Game File into MongoDB.'); // See GameInfoLoader :D.
   		done(false);
   	});

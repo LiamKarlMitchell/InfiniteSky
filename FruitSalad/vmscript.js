@@ -170,6 +170,9 @@ function VMScriptObj(){
 
 /* Reading the file contents and runs the code in this context. */
 VMScriptObj.prototype.parse = function(file_path){
+	global.vms = this.vms;
+	global.vmscript = this;
+	
 	fs.readFile(file_path, function(err, content){
 		if(err){
 			// console.log(err);

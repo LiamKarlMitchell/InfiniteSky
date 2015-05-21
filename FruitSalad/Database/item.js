@@ -1,7 +1,7 @@
 // This file is part of InfiniteSky.
 // Copyright (c) InfiniteSky Dev Teams - Licensed under GNU GPL
 // For more information, see LICENCE in the main folder
-vms('Items', [], function(){
+vms('Item', [], function(){
 	// Shorthand Types
 	//var String = db.mongoose.Schema.Types.String;
 	//var Number = db.mongoose.Schema.Types.Number;
@@ -208,7 +208,7 @@ vms('Items', [], function(){
 
 
 	//Constructor
-	delete mongoose.models['item_mongoose'];
+	delete mongoose.models['item'];
 	var Item = db.mongoose.model('item', itemSchema);
 
 	db.Item = Item;
