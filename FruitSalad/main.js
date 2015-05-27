@@ -31,8 +31,12 @@ function Book(title, author) {
 }
 
 // winston.profile('Startup');
+var util = require('./Modules/util.js');
 
 var startTime = new Date().getTime();
+util.setupUncaughtExceptionHandler();
+util.outputHeaderText();
+
 
 var ChildSpawner = require('./Helper/ChildSpawner.js');
 var spawner = new ChildSpawner.Spawner({});

@@ -15,6 +15,7 @@ vms('Login Server', [
 	crypto = require('crypto');
 	hexy = require('hexy').hexy;
 	util = require('./Modules/util.js');
+	util.setupUncaughtExceptionHandler();
 
 	vmscript.watch('./Generic/structs.js');
 

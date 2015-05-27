@@ -1,6 +1,7 @@
 {
   "name": "InfiniteSky",
-  "version": "1.2.0",
+  "version": "1.1.00",
+  "version_name": "Fruit Salad",
   "description": "A serverside emulation project for the game Twelve Sky.",
   "main": "main.js",
   "dependencies": {

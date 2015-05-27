@@ -14,6 +14,7 @@ vms('World Server', [
 	restruct = require('./Modules/restruct');
 	Database = require('./Modules/db.js');
 	util = require('./Modules/util.js');
+	util.setupUncaughtExceptionHandler();
 	// packets = require('./Helper/packets.js');
 
 	global.api.sendSocketToTransferQueue = function(obj){

@@ -318,7 +318,7 @@ CharacterInfos.prototype.updateEquipmentByDefault = function(equipment_name){
     break;
 
     default:
-    console.log("CharacterInfos.prototype.updateEquipmentByDefault("+equipment_name+") not found in Switch");
+    process.log("CharacterInfos.prototype.updateEquipmentByDefault("+equipment_name+") not found in Switch");
     return false;
     break;
   }
@@ -331,33 +331,47 @@ CharacterInfos.prototype.updateEquipment = function(equipment_name){
 
   // Check if we have supplied the function with item name we want to take a look at
   if(!equipment_name){
-    console.log("The item was not specified.")
+    process.log("The item was not specified.")
     return;
   }
 
   // Check if the character has the item equiped
   if(!this.client.character[equipment_name]){
     //TODO: Handle the updates of stats if necessary, like weapons do.
-    if(!this.updateEquipmentByDefault(equipment_name)) console.log("Trying to update the ["+equipment_name+"] but character does not have it, or the client.character.infos.updateEquipmentByDefault method cannot initialize default settings for item.");
+    if(!this.updateEquipmentByDefault(equipment_name))
+      process.log("Trying to update the ["+equipment_name+"] but character does not have it, or the client.character.infos.updateEquipmentByDefault method cannot initialize default settings for item.");
     return;
   }
 
   // Get the item from character
   var item = this.client.character[equipment_name];
   if(!item.ID){
-    if(!this.updateEquipmentByDefault(equipment_name)) console.log("Trying to update the ["+equipment_name+"] but character does not have it, or the client.character.infos.updateEquipmentByDefault method cannot initialize default settings for item.");
+    if(!this.updateEquipmentByDefault(equipment_name))
+      process.log("Trying to update the ["+equipment_name+"] but character does not have it, or the client.character.infos.updateEquipmentByDefault method cannot initialize default settings for item.");
     return;
   }
 
 
   // Get the item info
-  var itemInfo = infos.Item[item.ID];
-  if(!itemInfo){
-    console.log("infos.Item["+item.ID+"] has not been found");
+  // var itemInfo = infos.Item[item.ID];
+  // if(!itemInfo){
+  //   process.log("infos.Item["+item.ID+"] has not been found");
+  //   return;
+  // }
+
+  db.Item.getById(item.ID, this.updateEquipment_OnItemInfo);
+}
+
+CharacterInfos.prototype.updateEquipment_OnItemInfo = function(err, itemInfo){
+  if(err){
+    process.log(err);
     return;
   }
 
-
+  if(!itemInfo){
+    process.log("No item info found");
+    return;
+  }
 
   // Get the defaults
   var enchant = item.Enchant*3 || 0;
@@ -401,8 +415,8 @@ CharacterInfos.prototype.updateEquipment = function(equipment_name){
       var MAX_GROWTH = itemInfo.PetStats.MaxGrowth;
       var scale = item.Growth / MAX_GROWTH;
 
-      // console.log("Updating pet ["+item.ID+"]");
-      // console.log("Pet growth: " + item.Growth);
+      // process.log("Updating pet ["+item.ID+"]");
+      // process.log("Pet growth: " + item.Growth);
       switch(item.ID){
         case 9800:
         this.Pet.Damage = (itemInfo.PetStats.Damage / 200) * (scale * 200) + (item.Growth >= MAX_GROWTH ? itemInfo.PetStats.Damage / 100 * 10 : 0);
@@ -499,7 +513,7 @@ CharacterInfos.prototype.updateEquipment = function(equipment_name){
         break;
 
         default:
-        console.log("The ["+item.ID+"] item is not a PET!");
+        process.log("The ["+item.ID+"] item is not a PET!");
         break;
       }
     break;
@@ -639,18 +653,18 @@ CharacterInfos.prototype.updateStat = function(stat_name){
   //     stat_name !== 'ElementalDamage'
   //   ) && Stat === undefined
   // ){
-  //   console.log("Stat " + stat_name + " is undefined");
+  //   process.log("Stat " + stat_name + " is undefined");
   //   return;
   // }
 
   if(!this.Modifiers){
-    console.log("No character modifiers");
+    process.log("No character modifiers");
     return;
   }
 
   var ExpInfo = infos.Exp[this.client.character.Level];
   if(!ExpInfo){
-    console.log("No exp info for level : ", this.client.character.Level);
+    process.log("No exp info for level : ", this.client.character.Level);
     return;
   }
 
@@ -744,17 +758,17 @@ CharacterInfos.prototype.updateStat = function(stat_name){
 }
 
 CharacterInfos.prototype.print = function(){
-  console.log();
-  console.log("Damage : " + this.Damage);
-  console.log("Defense : " + this.Defense);
-  console.log("Max HP : " + this.MaxHP);
-  console.log("Max Chi : " + this.MaxChi);
-  console.log("Hit Rate : " + this.HitRate);
-  console.log("Dodge : " + this.Dodge);
-  console.log("Luck : " + this.Luck);
-  console.log("Resits : ", this.Resists);
-  console.log("Deadly rate : ", this.DeadlyRate);
-  console.log("ElementalDamage : ", this.ElementalDamage);
+  process.log();
+  process.log("Damage : " + this.Damage);
+  process.log("Defense : " + this.Defense);
+  process.log("Max HP : " + this.MaxHP);
+  process.log("Max Chi : " + this.MaxChi);
+  process.log("Hit Rate : " + this.HitRate);
+  process.log("Dodge : " + this.Dodge);
+  process.log("Luck : " + this.Luck);
+  process.log("Resits : ", this.Resists);
+  process.log("Deadly rate : ", this.DeadlyRate);
+  process.log("ElementalDamage : ", this.ElementalDamage);
 }
 
 global.CharacterInfos = CharacterInfos;

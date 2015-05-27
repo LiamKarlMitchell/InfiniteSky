@@ -7,6 +7,7 @@ vms('Zone', ['Config/world.json'], function(){
 	restruct = require('./Modules/restruct');
 	Database = require('./Modules/db.js');
 	util = require('./Modules/util.js');
+	util.setupUncaughtExceptionHandler();
 	packets = require('./Helper/packets.js');
 	nav_mesh = require('./Modules/navtest-revised.js');
 	QuadTree = require('./Modules/QuadTree.js');
@@ -28,10 +29,15 @@ vms('Zone', ['Config/world.json'], function(){
 		this.QuadTree = null;
 	}
 
+	ZoneInstance.prototype.addSocket = function(socket){
+
+	};
+
 	ZoneInstance.prototype.findPath = function(){
-		process.log("Navigation path not initialized");
+		process.log("Navigation not initialized");
 		return null;
 	};
+
 	ZoneInstance.prototype.onDisconnect = function(socket){
 		process.log("["+this.name+"]", socket.character.Name, "disconnected");
 	};
@@ -57,7 +63,7 @@ vms('Zone', ['Config/world.json'], function(){
 		socket.character.state = new CharacterState();
 		socket.character.infos = new CharacterInfos(socket);
 		socket.character.state.setFromCharacter(socket.character);
-		// socket.character.infos.updateAll();
+		socket.character.infos.updateAll();
 
 		CachedBuffer.call(socket, this.packetCollection);
 		socket.write(socket.character.state.getPacket());
@@ -111,6 +117,10 @@ vms('Zone', ['Config/world.json'], function(){
 	ZoneInstance.prototype.init = function(){
 		if(this.initialized) return;
 		this.initialized = true;
+
+		function roundDivisable(v,d) {
+		    return (Math.round(v / d) * d) || d;
+		}
 		var startTime = new Date().getTime();
 		
 		this.packetCollection = new PacketCollection('ZonePC');
@@ -128,8 +138,14 @@ vms('Zone', ['Config/world.json'], function(){
 			// actor_radius	- float
 			// callback		- function, returning waypoints
 
-			// console.log(mesh.dimensions);
-			self.QuadTree = new QuadTree({});
+			var height = Math.abs(mesh.dimensions.bottom) + Math.abs(mesh.dimensions.top);
+			var width = Math.abs(mesh.dimensions.right) + Math.abs(mesh.dimensions.left);
+
+			self.QuadTree = new QuadTree({
+				x: roundDivisable(mesh.dimensions.left, 2),
+				y: roundDivisable(mesh.dimensions.top, 2),
+				size: roundDivisable(Math.max(width, height), 2)
+			});
 
 			Database(config.world.database.connection_string, function(){
 				// process.log("Zone connected @", config.world.database.connection_string);
@@ -144,7 +160,7 @@ vms('Zone', ['Config/world.json'], function(){
 					], function(){
 						process.log("[" + self.name + "] Initialized in", (new Date().getTime() - startTime), "ms");
 						self.acceptConnections = true;
-						// process.api.run();
+						process.api.run();
 						process.api.nextTick();
 				});
 			});

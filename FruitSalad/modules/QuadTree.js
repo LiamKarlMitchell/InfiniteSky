@@ -323,9 +323,11 @@ QuadTree.prototype.update = function update(delta) {
     this.bounds = {
         top: this.y,
         left: this.x,
-        bottom: this.y + this.size,
+        bottom: this.y - this.size,
         right: this.x + this.size
     };
+
+    // process.log(this.bounds);
     //if(this.topLevel) {
         var i, node, leaf;
         for(i = 0; i < this.nodes.length; i++) {

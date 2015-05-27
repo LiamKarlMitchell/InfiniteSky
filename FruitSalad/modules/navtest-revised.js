@@ -1,15 +1,15 @@
 var fs = require('fs');
 var map_mesh = function(url, callback){
-	console.log("Loading: " + url);
+	// console.log("Loading: " + url);
 	this.wVs = [];
 	this.ewVs = [];
 	this.worldFaces = [];
 	this.worldTri = [];
 	this.dimensions = {
-		top: 0,
-		bottom: 0,
-		left: 0,
-		right: 0
+		top: null,
+		bottom: null,
+		left: null,
+		right: null
 	};
 	this._callback = callback;
 
@@ -38,12 +38,24 @@ map_mesh.prototype.parse = function(data){
 		switch(type){
 			case 'v':
 			case 'V':
+			var p1 = parseFloat(line[1]);
+			var p2 = parseFloat(line[2]);
+			var p3 = parseFloat(line[3]);
+
 			parsedObj = [];
-			parsedObj.push(parseFloat(line[1]));
-			parsedObj.push(parseFloat(line[2]));
-			parsedObj.push(parseFloat(line[3]));
+			parsedObj.push(p1);
+			parsedObj.push(p2);
+			parsedObj.push(p3);
 			this.wVs.push(parsedObj);
-			this.ewVs.push({0: parseFloat(line[1]), 1: parseFloat(line[2]), 2: parseFloat(line[3])});
+			this.ewVs.push({0: p1, 1: p2, 2: p3});
+			if(this.dimensions.top === null || this.dimensions.top < p1)
+				this.dimensions.top = p1;
+			if(this.dimensions.left === null || this.dimensions.left > p3)
+				this.dimensions.left = p3;
+			if(this.dimensions.bottom === null || this.dimensions.bottom > p1)
+				this.dimensions.bottom = p1;
+			if(this.dimensions.right === null || this.dimensions.right < p3)
+				this.dimensions.right = p3;
 			break;
 
 			case 'f':
@@ -56,19 +68,14 @@ map_mesh.prototype.parse = function(data){
 
 			this.worldFaces.push(parsedObj);
 			break;
-
-			case 'd':
-			case 'D':
-			this.dimensions.left = parseFloat(line[1]);
-			this.dimensions.top = parseFloat(line[2]);
-			this.dimensions.right = parseFloat(line[3]);
-			this.dimensions.bottom = parseFloat(line[4]);
-			break;
 		}
 	}
 
 	this.worldFaces.reverse();
 	this.build();
+	delete newLines;
+	delete sData;
+	delete data;
 }
 
 map_mesh.prototype.build = function(){
@@ -89,6 +96,8 @@ map_mesh.prototype.build = function(){
 
 		this.worldTri.push(obj);
 	}
+
+	delete this.worldFaces;
 
 	for(var i=this.worldTri.length-1; i >= 0; i--){
 		var tri = this.worldTri[i];
@@ -120,7 +129,7 @@ map_mesh.prototype.build = function(){
 
 	this.getMapEdges();
 
-	console.log("Builded in " + (new Date().getTime() - date) + "ms");
+	process.log("Builded in " + (new Date().getTime() - date) + "ms");
 	if(this._callback){
 		this._callback(this);
 	}
@@ -182,6 +191,10 @@ map_mesh.prototype.getMapEdges = function(){
 
 		this.edges.push([ this.ewVs[a], this.ewVs[b] ]);
 	}
+
+	delete this.ewVs;
+	delete map;
+	delete tris;
 }
 
 map_mesh.prototype.processEdge = function(aS, bS, map, tris, tri, index){
@@ -299,11 +312,14 @@ map_mesh.prototype.findPath = function(from, to, radius, callback){
 	var t = 0;
 	var start = new Date().getTime();
 
+	var bestI;
+	var lowestF;
+	var totalSkipped;
+	
 	while(true){
-		var bestI = null;
-		var lowestF = null;
-
-		var totalSkipped = 0;
+		bestI = null;
+		lowestF = null;
+		totalSkipped = 0;
 		history.push(currentNodeIndex);
 		var total = this.processPoints[currentNodeIndex].length;
 		for(var pIndex in this.processPoints[currentNodeIndex]){
@@ -378,7 +394,6 @@ map_mesh.prototype.findPath = function(from, to, radius, callback){
 
 	points.push([to.x, to.y, to.z]);
 	console.log("Path located in " + (new Date().getTime() - start) + "ms @ " + points.length + " points.");
-
 
 	callback(points);
 }
