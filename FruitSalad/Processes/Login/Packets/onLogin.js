@@ -38,7 +38,8 @@ Login.send.onLoginReply = function(status){
 	// obj.Hash = this.socket.hash ? this.socket.hash : ""; // TODO: Instead use a crypto hash, 12 char long as a account id to authorize character transfer.
 	obj.Pin = this.account && this.account.UsePin ? this.account.Pin : "****";
 	obj.UsePin = this.account && this.account.UsePin ? 1 : 0;
-	var buffer = new Buffer(Login.send.onLogin.pack(obj));
+	var packedObj = Login.send.onLogin.pack(obj);
+	var buffer = new Buffer(packedObj);
 	new Buffer(this.hash).copy(buffer, 14, this.hash);
 	this.write(buffer);
 };
@@ -46,6 +47,7 @@ Login.send.onLoginReply = function(status){
 LoginPC.Set(0x03, {
 	Restruct: Login.recv.onLogin,
 	function: function(socket, input){
+		console.log(input);
 		db.Account.findOne({
 			Username: input.Username
 		}, function(err, account) {
@@ -80,9 +82,8 @@ LoginPC.Set(0x03, {
 
 			account.Logged = true;
 			socket.authenticated = true;
-			socket.hash = crypto.randomBytes(14);
 
-			account.save();
+			// account.save();
 			Login.send.onLoginReply.call(socket, Login.LoginStatus.Success);
 		});
 	}
@@ -98,13 +99,13 @@ Login.send.CharacterInfo = restruct.
 
 LoginPC.Set(0x04, {
 	function: function(socket){
-		if(!socket.authenticated){
+		if(!socket.authenticated || socket.handleGameStart || socket.zoneTransfer){
 			return;
 		}
 
 		socket.characters = [];
 
-		// How do we tell to what server are we logging on?
+		// How do we tell to what server are we logging onto?
 
 		db.Character.find({
 			AccountID: socket.account._id,
@@ -125,12 +126,12 @@ LoginPC.Set(0x04, {
 			for (var i = 0; i < charactersLength; i++) {
 				socket.characters[i] = characters[i];
 				socket.write(
-						new Buffer(Login.send.CharacterInfo.pack({
-							packetID: 0x05,
-							Slot: i,
-							Exists: 1,
-							Character: characters[i]
-						}))
+					new Buffer(Login.send.CharacterInfo.pack({
+						packetID: 0x05,
+						Slot: i,
+						Exists: 1,
+						Character: characters[i]
+					}))
 				);
 			}
 

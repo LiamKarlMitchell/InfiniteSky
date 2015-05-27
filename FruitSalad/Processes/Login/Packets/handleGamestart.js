@@ -14,8 +14,8 @@ Login.send.MapLoadReply = restruct.
 LoginPC.Set(0x09, {
 	Restruct: Login.recv.GameStart,
 	function: function(socket, input){
-		if(!socket.authenticated || socket.handleGameStart) return;
-		socket.handleGameStart = true;
+		if(!socket.authenticated || socket.handleGameStart || socket.zoneTransfer) return;
+			socket.handleGameStart = true;
 
 
 		//TODO: IP cleaning & translations
@@ -27,17 +27,12 @@ LoginPC.Set(0x09, {
 		}
 
 		socket.character = socket.characters[input.Slot];
-		// socket.character.state = new CharacterState();
-		// socket.character.infos = new CharacterInfos(socket);
-		// socket.character.infos.updateAll();
 
 		// TODO: Make sure that we send the player to right map if disconnected w/e.
-		// TODO: Set the guild of character
 
 		var transferObj = {
 			hash: socket.hash,
 			accountID: socket.account._id,
-			toMapID: socket.character.MapID,
 			character: socket.character._id
 		};
 		
@@ -52,7 +47,6 @@ LoginPC.Set(0x09, {
 				IP: '127.0.0.1',
 				Port: config.network.ports.world
 			})));
-			delete Login.characterTransfer[key];
 		};
 	}
 });

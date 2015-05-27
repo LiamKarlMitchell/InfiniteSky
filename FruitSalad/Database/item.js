@@ -239,4 +239,10 @@ vms('Item', [], function(){
 	var Item = db.mongoose.model('item', itemSchema);
 
 	db.Item = Item;
+
+	db.Item.getById = function(id, callback){
+		db.Item.findOne({
+			_id: id
+		}, callback);
+	};
 });

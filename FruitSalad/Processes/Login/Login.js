@@ -17,16 +17,13 @@ vms('Login Server', [
 	util = require('./Modules/util.js');
 
 	vmscript.watch('./Generic/structs.js');
-	vmscript.watch('./Generic/CharacterState.js');
-	vmscript.watch('./Generic/CVec3.js');
-	vmscript.watch('./Generic/CharacterInfos.js');
 
 	global.api.sendSocketAfterTransferQueue = function(hash){
 		var key = util.toHexString(hash);
 		if(Login.characterTransfer[key]){
 			Login.characterTransfer[key]();
+			delete Login.characterTransfer[key];
 		}
-		// console.log(key);
 	};
 
 	process.api.invalidateAPI(process.pid);
@@ -78,6 +75,7 @@ vms('Login Server', [
 
 		var self = this;
 		socket.clientID = this.nextID;
+		socket.hash = crypto.randomBytes(14);
 		this.nextID++;
 		socket.authenticated = false;
 
@@ -114,9 +112,12 @@ vms('Login Server', [
 	};
 
 	LoginInstance.prototype.onDisconnect = function(socket){
-		console.log("[Login] connection closed #" + socket.clientID);
-		this.clients.splice(this.clients.indexOf(socket), 1);
-		socket.destroy();
+		var index = this.clients.indexOf(socket);
+		if(index !== -1){
+			console.log("[Login] connection closed #" + socket.clientID);
+			this.clients.splice(this.clients.indexOf(socket), 1);
+			socket.destroy();
+		}
 	};
 
 	LoginInstance.prototype.onError = function(err, socket){
@@ -143,10 +144,7 @@ vms('Login Server', [
 			vmscript.watch('./Processes/Login/Packets').on([
 					'Packets',
 					'Database',
-					'Generic/structs.js',
-					'Generic/CharacterState.js',
-					'Generic/CVec3.js',
-					'Generic/CharacterInfos.js'
+					'Generic/structs.js'
 				], function(){
 					self.acceptConnections = true;
 					process.api.run();

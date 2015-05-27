@@ -65,15 +65,20 @@ ChildSpawner.prototype.onReady = function(callback){
 	this.callback = callback;
 };
 
-ChildSpawner.prototype.spawnChild = function(opts, callback){
+ChildSpawner.prototype.spawnChild = function(opts, callback, args){
+	args = args || [];
+	
 	var self = this;
 	var processEnv = path.resolve(__dirname, '..\\Processes\\process.js');
-	var child = spawn(process.execPath, [processEnv]);
+	var child = fork(processEnv, args, {silent: true});
 
-	child.stderr.pipe(process.stderr);
+	// console.log(child);
+	if(opts.pipeError === undefined || opts.pipeError === true)
+		child.stderr.pipe(process.stderr);
 
 	var transport = new Transport([child.stdout, child.stdin]);
 	var agent = new Agent(this.api);
+	agent.connectionTimeout = 0;
 
 	this.totalChildrens++;
 	agent.connect(transport, function (err, api) {
@@ -82,9 +87,17 @@ ChildSpawner.prototype.spawnChild = function(opts, callback){
 			console.log(err);
 			return;
 		}
-
 		if(!self.childrens[opts.name]){
-			api.spawnScript(opts.script);
+			if(opts.script)
+				api.spawnScript(opts.script);
+			// if(opts.manual === undefined || opts.manual === true) self.totalReadyChildrens++;
+			// if(self.totalChildrens === self.totalReadyChildrens){
+			// 	if(typeof self.callback === 'function'){
+			// 		self.callback();
+			// 		delete self.callback;
+			// 	}
+			// }
+
 			self.childrens[opts.name] = {
 				agent: agent,
 				thread: child,
@@ -92,10 +105,11 @@ ChildSpawner.prototype.spawnChild = function(opts, callback){
 			};
 		}
 	});
-}
+};
 
 var ChildSpawnerClient = function(){
 	this.agent = new Agent(global.api);
+	this.agent.connectionTimeout = 0;
 
 	process.stdin.resume();
 	console.log = console.error;

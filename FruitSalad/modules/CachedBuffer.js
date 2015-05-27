@@ -19,10 +19,15 @@ var CachedBuffer = function(collection, opts){
     this.reminder = 0;
     this.packet = null;
 
+    var self = this;
     this.onData = function(chunk){
+        if(this.paused){
+            //TODO: Preferably remove the listener for comming data.
+            console.log("We no more handle packets here");
+            return;
+        }
         // console.log("Chunk length:", chunk.length);
         // console.log(hexy(chunk));
-
         this.data = Buffer.concat([this.data, chunk]);
 
         while(this.data.length > 0){
@@ -32,7 +37,6 @@ var CachedBuffer = function(collection, opts){
                 this.id = this.data.readUInt8(8);
                 this.packet = collection.Get(this.id);
                 this.data = this.data.slice(9, this.data.length);
-
                 this.size = this.packet && this.packet.Size ? this.packet.Size : this.size;
                 this.reminder = this.size - 9;
 
@@ -85,11 +89,16 @@ var CachedBuffer = function(collection, opts){
                         }
                     }
                 }
-                break;
+
+    
+                if(this.data.length < 9){
+                    break;
+                }
             }else{
                 break;
             }
         }
+
     }
 
     this.on('data', this.onData);

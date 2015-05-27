@@ -47,6 +47,8 @@ var fileStats = {};
 var dependencies = {};
 
 function VMScriptObj(){
+	global.vms = this.vms;
+	// global.vmscript = this;
 	this.readyListeners = [];
 
 	var self = this;
@@ -169,10 +171,7 @@ function VMScriptObj(){
 };
 
 /* Reading the file contents and runs the code in this context. */
-VMScriptObj.prototype.parse = function(file_path){
-	global.vms = this.vms;
-	global.vmscript = this;
-	
+VMScriptObj.prototype.parse = function(file_path){	
 	fs.readFile(file_path, function(err, content){
 		if(err){
 			// console.log(err);
@@ -245,7 +244,7 @@ function getFilename(infos){
 }
 
 /* Function used to watch the file or directory for changes. */
-VMScriptObj.prototype.watch = function(file_path){
+VMScriptObj.prototype.watch = function(file_path, opts){
 	file_path = path.resolve(file_path);
 	if(array[file_path]) return;
 

@@ -1,10 +1,12 @@
 vmscript.watch('Config/network.json');
 vmscript.watch('Config/login.json');
 vmscript.watch('Config/world.json');
+vmscript.watch('Config/zones.json');
 
 vms('World Server', [
 	'Config/network.json',
-	'Config/world.json'
+	'Config/world.json',
+	'Config/zones.json'
 ], function(){
 	net = require('net');
 	CachedBuffer = require('./Modules/CachedBuffer.js');
@@ -12,7 +14,7 @@ vms('World Server', [
 	restruct = require('./Modules/restruct');
 	Database = require('./Modules/db.js');
 	util = require('./Modules/util.js');
-	packets = require('./Helper/packets.js');
+	// packets = require('./Helper/packets.js');
 
 	global.api.sendSocketToTransferQueue = function(obj){
 		var key = util.toHexString(obj.hash);
@@ -69,6 +71,7 @@ vms('World Server', [
 
 	WorldInstance.prototype.onConnection = function(socket){
 		if(!this.acceptConnections) return;
+		socket.paused = false;
 
 		var self = this;
 		socket.clientID = this.nextID;
@@ -108,9 +111,12 @@ vms('World Server', [
 	};
 
 	WorldInstance.prototype.onDisconnect = function(socket){
-		console.log("[World] connection closed #" + socket.clientID);
-		this.clients.splice(this.clients.indexOf(socket), 1);
-		socket.destroy();
+		var index = this.clients.indexOf(socket);
+		if(index !== -1){
+			console.log("[World] connection closed #" + socket.clientID);
+			this.clients.splice(this.clients.indexOf(socket), 1);
+			socket.destroy();
+		}
 	};
 
 	WorldInstance.prototype.onError = function(err, socket){
@@ -131,19 +137,78 @@ vms('World Server', [
 
 		this.packetCollection = new PacketCollection('WorldPC');
 
+		var lastZoneID = null;
+		var pool = 5;
+		var zones = new ChildSpawner.Spawner({
+			log: function(){
+				console.log.apply(this, arguments);
+			},
+			nextTick: function(){
+				pool++;
+				var callNext = false;
+				for(var id in config.zones){
+					if(!callNext && id !== lastZoneID) continue;
+					else if(id === lastZoneID){
+						callNext = true;
+						continue;
+					}
+
+					var zone = config.zones[id];
+					if(zone && zone.Load){
+						if(pool===0) break;
+						pool--;
+
+						zones.spawnChild({
+							name: parseInt(id),
+							pipeError: false,
+							script: './Processes/Zone/Zone.js'
+						}, null, [id, zone.Name]);
+						lastZoneID = id;
+
+						if(pool===0) break;
+					}
+				}
+			}
+		});
+
+		// TODO: Make zones reloadable.
+		// TODO: Make sure that we save to DB when disconnecting characters from removed zone.
+		if(config.zones){
+			var pipeError = true;
+			for(var id in config.zones){
+				var zone = config.zones[id];
+				if(zone && zone.Load){
+					pool--;
+					zones.spawnChild({
+						pipeError: pipeError,
+						name: parseInt(id),
+						script: './Processes/Zone/Zone.js'
+					}, null, [id, zone.Name]);
+					pipeError = false;
+					lastZoneID = id;
+					if(pool===0) break;
+				}
+			}
+		}
+
+		process.zones = zones.childrens;
+
 		Database(config.world.database.connection_string, function(){
 			console.log("Database connected @", config.world.database.connection_string);
 			vmscript.watch('Database');
 			vmscript.watch('Generic');
-			vmscript.on([
-				'Database',
-				'Generic'
-			], function(){
-				vmscript.watch('./Processes/World/Packets').on([
-						'Packets'
-					], function(){
-						self.acceptConnections = true;
-						process.api.run();
+			zones.onReady(function(){
+				vmscript.on([
+					'Database',
+					'Generic'
+				], function(){
+					vmscript.watch('./Processes/World/Packets').on([
+							'Packets'
+						], function(){
+							console.log("You can now login to the server");
+							self.acceptConnections = true;
+							process.api.run();
+					});
 				});
 			});
 		});

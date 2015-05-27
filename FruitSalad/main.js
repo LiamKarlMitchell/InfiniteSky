@@ -32,6 +32,8 @@ function Book(title, author) {
 
 // winston.profile('Startup');
 
+var startTime = new Date().getTime();
+
 var ChildSpawner = require('./Helper/ChildSpawner.js');
 var spawner = new ChildSpawner.Spawner({});
 
@@ -45,7 +47,8 @@ spawner.spawnChild({name: 'World', script: 'Processes\\World\\World.js'});
 
 
 spawner.onReady(function(){
-	rl.setPrompt('> ');
+	console.log("Server loaded in", (new Date().getTime() - startTime), "ms");
+	// rl.setPrompt('> ');
 	// rl.prompt();
 
 	rl.on('line', function(line) {
