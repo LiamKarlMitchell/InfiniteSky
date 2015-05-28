@@ -1,11 +1,13 @@
 vmscript.watch('Config/network.json');
 vmscript.watch('Config/login.json');
 vmscript.watch('Config/world.json');
+vmscript.watch('Config/newCharacter.json');
 
 vms('Login Server', [
 	'Config/network.json',
 	'Config/login.json',
-	'Config/world.json'
+	'Config/world.json',
+	'Config/newCharacter.json'
 ], function(){
 	net = require('net');
 	CachedBuffer = require('./Modules/CachedBuffer.js');
@@ -18,6 +20,7 @@ vms('Login Server', [
 	util.setupUncaughtExceptionHandler();
 
 	vmscript.watch('./Generic/structs.js');
+	vmscript.watch('./Generic/CharacterInfos.js');
 
 	global.api.sendSocketAfterTransferQueue = function(hash){
 		var key = util.toHexString(hash);

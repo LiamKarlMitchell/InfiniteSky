@@ -7,7 +7,7 @@ vms('Zone', ['Config/world.json'], function(){
 	restruct = require('./Modules/restruct');
 	Database = require('./Modules/db.js');
 	util = require('./Modules/util.js');
-	util.setupUncaughtExceptionHandler();
+	util.setupUncaughtExceptionHandler(process.log);
 	packets = require('./Helper/packets.js');
 	nav_mesh = require('./Modules/navtest-revised.js');
 	QuadTree = require('./Modules/QuadTree.js');

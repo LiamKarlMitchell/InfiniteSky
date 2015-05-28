@@ -3,6 +3,7 @@
 // For more information, see LICENCE in the main folder
 
 mongoose = require('mongoose');
+var mongoSequence = require('mongo-sequence');
 
 //Constructor
 // Handles connecting to the database
@@ -50,7 +51,6 @@ function DB(connectString, callback) {
 	    console.log(docs);
 	  });
 	};
-
 }
 
 module.exports = DB;

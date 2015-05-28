@@ -47,7 +47,6 @@ Login.send.onLoginReply = function(status){
 LoginPC.Set(0x03, {
 	Restruct: Login.recv.onLogin,
 	function: function(socket, input){
-		console.log(input);
 		db.Account.findOne({
 			Username: input.Username
 		}, function(err, account) {
@@ -103,7 +102,8 @@ LoginPC.Set(0x04, {
 			return;
 		}
 
-		socket.characters = [];
+		socket.characters = {};
+		socket.characters.length = 0;
 
 		// How do we tell to what server are we logging onto?
 
@@ -117,28 +117,33 @@ LoginPC.Set(0x04, {
 				return;
 			}
 
-			var charactersLength = typeof(characters) !== "undefined" ? characters.length : 0;
-			if (charactersLength > 3) {
-				console.log("Too many characters!~!!!");
-				charactersLength = 3;
-			}
+			// var charactersLength = typeof(characters) !== "undefined" ? characters.length : 0;
+			// if (charactersLength > 3) {
+			// 	console.log("Too many characters!~!!!");
+			// 	charactersLength = 3;
+			// }
 
-			for (var i = 0; i < charactersLength; i++) {
-				socket.characters[i] = characters[i];
+			socket.characters.length = characters.length;
+			var slots = [0, 1, 2];
+			for (var i = 0; i < characters.length; i++) {
+				var character = characters[i];
+				console.log(character.Slot);
+				slots.splice(slots.indexOf(character.Slot));
+				socket.characters[character.Slot] = character;
 				socket.write(
 					new Buffer(Login.send.CharacterInfo.pack({
 						packetID: 0x05,
-						Slot: i,
+						Slot: character.Slot,
 						Exists: 1,
-						Character: characters[i]
+						Character: character
 					}))
 				);
 			}
 
-			for (var i = charactersLength; i < 3; i++) {
+			for (var i in slots) {
 				socket.write(new Buffer(Login.send.CharacterInfo.pack({
 					packetID: 0x05,
-					Slot: i,
+					Slot: slots[i],
 					Exists: 0
 				})));
 			}

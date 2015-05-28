@@ -20,7 +20,7 @@ LoginPC.Set(0x09, {
 
 		//TODO: IP cleaning & translations
 
-		if(socket.characters && !socket.characters[input.Slot]){
+		if(socket.characters.length && !socket.characters[input.Slot]){
 			console.log('Hack attempt, character slot not full with data.');
 			socket.destroy();
 			return;

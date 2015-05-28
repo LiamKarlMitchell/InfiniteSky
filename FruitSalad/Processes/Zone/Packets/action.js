@@ -22,7 +22,7 @@ Zone.GuildTag_Length = 12;
 Zone.MessageLength = 50;
 Zone.GiftCodeLength = 32;
 
-Zone.MAX_SILVER = 2147483647;
+// Zone.MAX_SILVER = 2147483647;
 
 Zone.send.PersonalShopItem = restruct.
 	int32lu('ID').

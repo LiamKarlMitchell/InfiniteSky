@@ -49,6 +49,7 @@ vms('Character', [], function(){
 
 	var characterSchema = mongoose.Schema({
 		_id: { type: Number, unique: true, index: true },
+		Slot: Number,
 		AccountID: Number,
 		ServerName: String,
 
