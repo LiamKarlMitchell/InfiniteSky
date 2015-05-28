@@ -8,15 +8,17 @@ WorldPC.Set(0x01, {
 	Size: 27,
 	function: function(socket, buffer){
 		// TODO: Add IP validation?
-		var hash = buffer.slice(0, 14);
+		var hash = buffer.slice(0, 12);
 		var key = util.toHexString(hash);
+
 		var transferObj = World.characterTransfer[key];
+		delete World.characterTransfer[key];
+		
 		if(!transferObj){
+			console.log(buffer);
 			console.log("No transfer obj for:", key);
 			return;
 		}
-
-		delete World.characterTransfer[key];
 
 		db.Character.findOne({
 			_id: transferObj.character,
@@ -193,7 +195,13 @@ WorldPC.Set(0x02, {
 		socket.write(CharacterData);
 
 		var WorldAuthData = new Buffer(World.send.Auth.pack({
-			PacketID: 0x17
+			PacketID: 0x17,
+			YongpokFormation: 3,
+			GuanyinStone: 3,
+			FujinStone: 3,
+			JinongStone: 3,
+			YoguaiStone: 3,
+			IntensiveTraining: 3
 		}));
 
 		socket.write(WorldAuthData);

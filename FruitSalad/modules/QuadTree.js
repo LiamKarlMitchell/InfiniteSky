@@ -355,7 +355,7 @@ QuadTree.prototype.update = function update(delta) {
                     leaf = leaf.Parent;
                 }
                 if(placed == false) {
-                    console.error('node not in quad tree...');
+                    process.log('node not in quad tree...');
                 }
             } else {
               // Check if node would fit inside a child leaf
@@ -422,10 +422,8 @@ QuadTree.prototype.update = function update(delta) {
     }
 }
 QuadTree.prototype.inBounds = function(node) {
-   return (this.x < node.x - node.size &&
-               this.x + this.size > node.x + node.size &&
-               this.y < node.y - node.size &&
-               this.y + this.size > node.y + node.size);
+    return  (this.bounds.left <= node.x && this.bounds.right >= node.x) &&
+            (this.bounds.top >= node.y && this.bounds.bottom <= node.y);
 }
 // Returns array of unplaced nodes although this should be empty
 QuadTree.prototype.putNodesInChildrenLeafs = function() {
@@ -565,7 +563,7 @@ QuadTree.prototype.addNode = function(node) {
             this.nodesHash[node.id] = node;
             node.leaf = this;
         } else {
-            console.error('Node outside Quad Tree bounds ' + this.x + ',' + this.y + ' size ' + this.size);
+            process.log('Node outside Quad Tree bounds ' + this.x + ',' + this.y + ' size ' + this.size);
             return null;
         }
     }

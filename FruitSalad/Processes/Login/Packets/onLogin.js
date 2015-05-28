@@ -40,7 +40,7 @@ Login.send.onLoginReply = function(status){
 	obj.UsePin = this.account && this.account.UsePin ? 1 : 0;
 	var packedObj = Login.send.onLogin.pack(obj);
 	var buffer = new Buffer(packedObj);
-	new Buffer(this.hash).copy(buffer, 14, this.hash);
+	new Buffer(this.hash).copy(buffer, 14);
 	this.write(buffer);
 };
 
@@ -127,8 +127,8 @@ LoginPC.Set(0x04, {
 			var slots = [0, 1, 2];
 			for (var i = 0; i < characters.length; i++) {
 				var character = characters[i];
-				console.log(character.Slot);
-				slots.splice(slots.indexOf(character.Slot));
+
+				slots.splice(slots.indexOf(character.Slot), 1);
 				socket.characters[character.Slot] = character;
 				socket.write(
 					new Buffer(Login.send.CharacterInfo.pack({
@@ -139,7 +139,6 @@ LoginPC.Set(0x04, {
 					}))
 				);
 			}
-
 			for (var i in slots) {
 				socket.write(new Buffer(Login.send.CharacterInfo.pack({
 					packetID: 0x05,

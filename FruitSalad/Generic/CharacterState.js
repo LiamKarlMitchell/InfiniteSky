@@ -176,10 +176,10 @@ vms( 'CharacterState', [ 'CVec3', 'Structs' ], function(){
 		this.LocationNew = new CVec3();
 		this.FacingDirection = this.Direction;
 
-		this.CurrentHP = character.Health;
-		this.MaxHP = character.infos.MaxHP;
-		this.CurrentChi = character.Chi;
-		this.MaxChi = character.infos.MaxChi;
+		this.CurrentHP = Math.floor(character.Health);
+		this.MaxHP = Math.floor(character.infos.MaxHP);
+		this.CurrentChi = Math.floor(character.Chi);
+		this.MaxChi = Math.floor(character.infos.MaxChi);
 	};
 
 

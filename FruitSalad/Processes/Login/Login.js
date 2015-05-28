@@ -79,7 +79,14 @@ vms('Login Server', [
 
 		var self = this;
 		socket.clientID = this.nextID;
-		socket.hash = crypto.randomBytes(14);
+		socket.hash = crypto.randomBytes(12);
+		for(var i=0; i < socket.hash.length; i++){
+			while(socket.hash[i] === 0x00){
+				var rb = crypto.randomBytes(1);
+				socket.hash[i] = rb[0];
+			}
+		}
+
 		this.nextID++;
 		socket.authenticated = false;
 

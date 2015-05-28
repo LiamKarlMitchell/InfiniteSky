@@ -1,7 +1,21 @@
-process.log = process.api.log;
-vmscript.watch('Config/world.json');
+process.log = function(){
+	var array = [];
+	for(var i=0; i<arguments.length; i++){
+		array.push(arguments[i]);
+	}
+	array.unshift('[' + process.argv[3] + ']');
+	process.api.log.apply(this, array);
+};
 
-vms('Zone', ['Config/world.json'], function(){
+console.log = process.log;
+
+vmscript.watch('Config/world.json');
+vmscript.watch('Config/network.json');
+
+vms('Zone', [
+	'Config/world.json',
+	'Config/network.json'
+], function(){
 	CachedBuffer = require('./Modules/CachedBuffer.js');
 	PacketCollection = require('./Modules/PacketCollection.js');
 	restruct = require('./Modules/restruct');
@@ -27,10 +41,45 @@ vms('Zone', ['Config/world.json'], function(){
 		this.name = process.argv[3];
 		this.navigation = null;
 		this.QuadTree = null;
+		this.Clients = [];
 	}
 
-	ZoneInstance.prototype.addSocket = function(socket){
+	ZoneInstance.prototype.clientNodeUpdate = function(node, delta) {
+		return { x: this.character.state.Location.X, y: this.character.state.Location.Z, size: this.character.state.Level };
+	};
 
+	ZoneInstance.prototype.addSocket = function(socket){
+		if(!this.QuadTree){
+			process.log("QuadTree is not initialized");
+			return false;
+		}else{
+			this.Clients.push(socket);
+			socket.node = this.QuadTree.addNode(new QuadTree.QuadTreeNode({
+				object: socket,
+				update: this.clientNodeUpdate,
+				type: 'client'
+			}));
+			socket.character.state.UniqueID = socket.node.id;
+			return true;
+		}
+	};
+
+	ZoneInstance.prototype.sendToAllArea = function(origional, sendtoself, buffer, distance){
+		for(var i=this.Clients.length-1; i >= 0; i--){
+			var client = this.Clients[i];
+	        if(sendtoself === false && client === origional) continue;
+	        if(client.character.state.Location.getDistance(origional.character.state.Location) <= distance) {
+	            client.write(buffer);
+	        }
+		}
+
+	    // this.Clients.forEach(function(client) {
+	    //     // if(client.authenticated == false || !client._handle) return;
+	    //     if(sendtoself === false && client === origional) continue;
+	    //     if(client.character.state.Location.getDistance(origional.character.state.Location) <= distance) {
+	    //         client.write(buffer);
+	    //     }
+	    // });
 	};
 
 	ZoneInstance.prototype.findPath = function(){
@@ -39,11 +88,17 @@ vms('Zone', ['Config/world.json'], function(){
 	};
 
 	ZoneInstance.prototype.onDisconnect = function(socket){
-		process.log("["+this.name+"]", socket.character.Name, "disconnected");
+		// this.QuadTree.removeNode(socket.node.id);
+		var index = this.Clients.indexOf(socket);
+		if(index > -1){
+			this.Clients.splice(this.Clients.indexOf(socket), 1);
+			socket.character.save();
+			process.log(socket.character.Name, "disconnected");
+		}
 	};
 
 	ZoneInstance.prototype.onError = function(err, socket){
-		process.log("["+this.name+"]", socket.character.Name, "disconnected with error");
+		process.log(socket.character.Name, "disconnected with error");
 	};
 
 	ZoneInstance.prototype.onFindCharacter = function(socket, err, character){
@@ -59,15 +114,23 @@ vms('Zone', ['Config/world.json'], function(){
 			return;
 		}
 
+	
 		socket.character = character;
-		socket.character.state = new CharacterState();
 		socket.character.infos = new CharacterInfos(socket);
-		socket.character.state.setFromCharacter(socket.character);
-		socket.character.infos.updateAll();
+		var self = this;
+		socket.character.infos.updateAll(function(){
+			socket.character.state = new CharacterState();
+			socket.character.state.setAccountID(socket.character.AccountID);
+			socket.character.state.setCharacterID(socket.character._id);
+			socket.character.state.setFromCharacter(socket.character);
 
-		CachedBuffer.call(socket, this.packetCollection);
-		socket.write(socket.character.state.getPacket());
-		process.log("["+this.name+"]", character.Name, "connected");
+			self.addSocket(socket);
+			
+
+			CachedBuffer.call(socket, self.packetCollection);
+			Zone.sendToAllArea(socket, true, socket.character.state.getPacket(), config.network.viewable_action_distance);
+			process.log(character.Name, "connected");
+		});
 	};
 
 	ZoneInstance.prototype.onMessage = function(type, socket){
@@ -94,10 +157,12 @@ vms('Zone', ['Config/world.json'], function(){
 			var hash = socket.remoteAddress + ":" + socket.remotePort;
 			var characterData = this.socketTransferQueue[hash];
 			if(!characterData){
-				process.log(this.name, "could not retrive character data.");
+				process.log("could not retrive character data.");
 				socket.destroy();
 				return;
 			}
+
+			delete this.socketTransferQueue[hash]; 
 
 			db.Character.findOne({
 				_id: characterData.id,
@@ -158,7 +223,7 @@ vms('Zone', ['Config/world.json'], function(){
 						'Generic/CVec3.js',
 						'Generic/CharacterInfos.js'
 					], function(){
-						process.log("[" + self.name + "] Initialized in", (new Date().getTime() - startTime), "ms");
+						process.log("Initialized in", (new Date().getTime() - startTime), "ms");
 						self.acceptConnections = true;
 						process.api.run();
 						process.api.nextTick();

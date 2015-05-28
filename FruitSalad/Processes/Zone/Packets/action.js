@@ -175,7 +175,8 @@ ZonePC.Set(0x04, {
         client.character.state.Location.Y = input.Location.Y;
         client.character.state.Location.Z = input.Location.Z;
 
-        client.write(client.character.state.getPacket());
+        client.node.update();
+        Zone.sendToAllArea(client, false, client.character.state.getPacket(), config.network.viewable_action_distance);
     }
 });
 
@@ -205,7 +206,8 @@ ZonePC.Set(0x05, {
         client.character.state.LocationNew.Y = input.LocationNew.Y;
         client.character.state.LocationNew.Z = input.LocationNew.Z;
 
-        client.write(client.character.state.getPacket());
+        client.node.update();
+        Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
     }
 });
 
