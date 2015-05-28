@@ -92,6 +92,9 @@ generic.Modifiers = Modifiers;
 var CharacterInfos = function(c, character){
   // TODO : Include all the base stats and erease them from the methods below.
   // this.client = c === null ? this.client.character ;
+  if(typeof process.log !== 'function')
+    process.log = console.log;
+
   if(c === null){
     this.client = {};
     this.client.character = character;
@@ -238,8 +241,8 @@ CharacterInfos.prototype.updateEquipmentByDefault = function(equipment_name){
         ElementalDefense: 0
       };
 
-      this.updateStat('HP');
-      this.updateStat('Chi');
+      this.updateStat('StatVitality');
+      this.updateStat('StatChi');
       this.updateStat('Damage');
       this.updateStat('Defense');
       this.updateStat('Skills');
@@ -325,7 +328,7 @@ CharacterInfos.prototype.updateEquipmentByDefault = function(equipment_name){
   return true;
 }
 
-CharacterInfos.prototype.updateEquipment = function(equipment_name){
+CharacterInfos.prototype.updateEquipment = function(equipment_name, callback){
   // TODO: Callback once the calculation has finished so we can for example send an response for itemActions to wear an item.
 
 
@@ -340,6 +343,8 @@ CharacterInfos.prototype.updateEquipment = function(equipment_name){
     //TODO: Handle the updates of stats if necessary, like weapons do.
     if(!this.updateEquipmentByDefault(equipment_name))
       process.log("Trying to update the ["+equipment_name+"] but character does not have it, or the client.character.infos.updateEquipmentByDefault method cannot initialize default settings for item.");
+    if(typeof callback === 'function')
+      callback.call(this);
     return;
   }
 
@@ -348,6 +353,8 @@ CharacterInfos.prototype.updateEquipment = function(equipment_name){
   if(!item.ID){
     if(!this.updateEquipmentByDefault(equipment_name))
       process.log("Trying to update the ["+equipment_name+"] but character does not have it, or the client.character.infos.updateEquipmentByDefault method cannot initialize default settings for item.");
+    if(typeof callback === 'function')
+      callback.call(this);
     return;
   }
 
@@ -359,10 +366,13 @@ CharacterInfos.prototype.updateEquipment = function(equipment_name){
   //   return;
   // }
 
-  db.Item.getById(item.ID, this.updateEquipment_OnItemInfo);
+  var self = this;
+  db.Item.getById(item.ID, function(err, itemInfo){
+    self.updateEquipment_OnItemInfo(err, itemInfo, equipment_name, item, callback);
+  });
 }
 
-CharacterInfos.prototype.updateEquipment_OnItemInfo = function(err, itemInfo){
+CharacterInfos.prototype.updateEquipment_OnItemInfo = function(err, itemInfo, equipment_name, item, callback){
   if(err){
     process.log(err);
     return;
@@ -372,6 +382,8 @@ CharacterInfos.prototype.updateEquipment_OnItemInfo = function(err, itemInfo){
     process.log("No item info found");
     return;
   }
+
+  // process.log("Item info", itemInfo);
 
   // Get the defaults
   var enchant = item.Enchant*3 || 0;
@@ -601,34 +613,48 @@ CharacterInfos.prototype.updateEquipment_OnItemInfo = function(err, itemInfo){
     break;
   }
 
-
+  if(typeof callback === 'function')
+    callback.call(this);
   return this;
 }
 
-CharacterInfos.prototype.updateAll = function(){
-  this.updateEquipment('Weapon');
-  this.updateEquipment('Armor');
-  this.updateEquipment('Boot');
-  this.updateEquipment('Glove');
-  this.updateEquipment('Cape');
-  this.updateEquipment('Amulet');
-  this.updateEquipment('Ring');
-  this.updateEquipment('Pet');
+CharacterInfos.prototype.updateAll = function(callback){
+  var hasCallback = typeof callback === 'function';
+  if(hasCallback){
+    // console.log("We have callback");
+    var total = 19;
+    var totalCalled = 0;
+    var updateCounter = function(){
+      totalCalled++;
+      // console.log(totalCalled);
+      if(totalCalled === total)
+        callback.call(this);
+    };
+  }
+  
+  this.updateEquipment('Weapon',      (hasCallback ? updateCounter : null));
+  this.updateEquipment('Armor',       (hasCallback ? updateCounter : null));
+  this.updateEquipment('Boot',        (hasCallback ? updateCounter : null));
+  this.updateEquipment('Glove',       (hasCallback ? updateCounter : null));
+  this.updateEquipment('Cape',        (hasCallback ? updateCounter : null));
+  this.updateEquipment('Amulet',      (hasCallback ? updateCounter : null));
+  this.updateEquipment('Ring',        (hasCallback ? updateCounter : null));
+  this.updateEquipment('Pet',         (hasCallback ? updateCounter : null));
 
-  this.updateStat('StatVitality');
-  this.updateStat('StatChi');
-  this.updateStat('StatDexterity');
-  this.updateStat('StatStrength');
+  this.updateStat('StatVitality',     (hasCallback ? updateCounter : null));
+  this.updateStat('StatChi',          (hasCallback ? updateCounter : null));
+  this.updateStat('StatDexterity',    (hasCallback ? updateCounter : null));
+  this.updateStat('StatStrength',     (hasCallback ? updateCounter : null));
 
-  this.updateStat('Defense');
-  this.updateStat('HitRate');
-  this.updateStat('Dodge');
-  this.updateStat('DeadlyRate');
-  this.updateStat('Luck');
-  this.updateStat('Resists');
-  this.updateStat('ElementalDamage');
+  this.updateStat('Defense',          (hasCallback ? updateCounter : null));
+  this.updateStat('HitRate',          (hasCallback ? updateCounter : null));
+  this.updateStat('Dodge',            (hasCallback ? updateCounter : null));
+  this.updateStat('DeadlyRate',       (hasCallback ? updateCounter : null));
+  this.updateStat('Luck',             (hasCallback ? updateCounter : null));
+  this.updateStat('Resists',          (hasCallback ? updateCounter : null));
+  this.updateStat('ElementalDamage',  (hasCallback ? updateCounter : null));
 
-  this.updateSkills();
+  // this.updateSkills();
 }
 
 CharacterInfos.prototype.updateLevel = function(){
@@ -640,8 +666,7 @@ CharacterInfos.prototype.updateSkills = function(){
   
 }
 
-CharacterInfos.prototype.updateStat = function(stat_name){
-  var Stat = this.client.character[stat_name];
+CharacterInfos.prototype.updateStat = function(stat_name, callback){
   // if(
   //   (
   //     stat_name !== 'Defense' &&
@@ -662,9 +687,20 @@ CharacterInfos.prototype.updateStat = function(stat_name){
     return;
   }
 
-  var ExpInfo = infos.Exp[this.client.character.Level];
+  var self = this;
+  var ExpInfo = db.Exp.getByLevel(this.client.character.Level, function(err, expInfo){
+    self.updateStat_OnExpInfo(err, expInfo, stat_name, callback);
+  });
+}
+
+CharacterInfos.prototype.updateStat_OnExpInfo = function(err, ExpInfo, stat_name, callback){
+  if(err){
+    process.log("Could not find exp info for character:", this.client.character.Name);
+    return;
+  }
+
   if(!ExpInfo){
-    process.log("No exp info for level : ", this.client.character.Level);
+    process.log("No exp info for level:", this.client.character.Level);
     return;
   }
 
@@ -674,7 +710,7 @@ CharacterInfos.prototype.updateStat = function(stat_name){
     case 'HP':
     case 'Health':
     var baseHP = this.clan === 0 ? ExpInfo.GuanyinHP : this.clan === 1 ? ExpInfo.FujinHP : ExpInfo.JinongHP;
-    var formula = baseHP + (this.Modifiers.HP * (Stat+this.Armor.Vitality)) + this.Pet.HP;
+    var formula = baseHP + (this.Modifiers.HP * (this.client.character.StatVitality + this.Armor.Vitality)) + this.Pet.HP;
     this.MaxHP = formula;
 
     if(this.client.character.Health > this.MaxHP){
@@ -685,7 +721,7 @@ CharacterInfos.prototype.updateStat = function(stat_name){
 
     case 'StatChi':
     var baseCHI = this.clan === 0 ? ExpInfo.GuanyinChi : this.clan === 1 ? ExpInfo.FujinChi : ExpInfo.JinongChi;
-    var formula = baseCHI + (this.Modifiers.Chi * (Stat + this.Amulet.Chi));
+    var formula = baseCHI + (this.Modifiers.Chi * (this.client.character.StatChi + this.Amulet.Chi));
     this.MaxChi = formula;
 
     if(this.client.character.Chi > this.MaxChi){
@@ -696,6 +732,7 @@ CharacterInfos.prototype.updateStat = function(stat_name){
 
     case 'StatDexterity':
     var baseDodge = this.clan === 0 ? ExpInfo.GuanyinDodge : this.clan === 1 ? ExpInfo.FujinDodge : ExpInfo.JinongDodge;
+    var Stat = this.client.character.StatDexterity;
     Stat += this.Ring.Dexterity;
 
     var dodgeFormula = baseDodge + (this.Modifiers.Dodge * Stat);
@@ -710,7 +747,7 @@ CharacterInfos.prototype.updateStat = function(stat_name){
     case 'StatStrength':
     case 'Damage':
     var baseDamage = this.clan === 0 ? ExpInfo.GuanyinDamage : this.clan === 1 ? ExpInfo.FujinDamage : ExpInfo.JinongDamage;
-    var damageFormula = (baseDamage + (this.Weapon.Mod * Stat)) + baseDamage + this.Weapon.Damage;
+    var damageFormula = (baseDamage + (this.Weapon.Mod * this.client.character.StatStrength)) + baseDamage + this.Weapon.Damage;
     this.Damage = damageFormula;
     this.Damage += this.Pet.Damage;
     break;
@@ -755,6 +792,9 @@ CharacterInfos.prototype.updateStat = function(stat_name){
     this.DeadlyRate = this.Ring.DeadlyRate;
     break;
   }
+
+  if(typeof callback === 'function')
+    callback();
 }
 
 CharacterInfos.prototype.print = function(){

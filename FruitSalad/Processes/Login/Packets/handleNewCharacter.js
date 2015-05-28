@@ -94,7 +94,6 @@ LoginPC.Set(0x06, {
 				newCharacter[info] = newCharInfo[info];
 			}
 
-			// TODO: Add new character items. Like armor, skills, pills etc.
 			switch(input.Clan){
 				case 0: // Guanyin
 				if(input.Hair < 0 || input.Hair > 15){
@@ -171,6 +170,9 @@ LoginPC.Set(0x06, {
 				};
 				break;
 			}
+
+			
+			// TODO (Ane): asd
 
 			var infos = new CharacterInfos(null, newCharacter);
 			infos.updateAll(function(){
