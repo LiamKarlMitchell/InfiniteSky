@@ -7,6 +7,7 @@
   "dependencies": {
     "async": "^1.0.0",
     "encoding": "^0.1.11",
+    "iconv": "^2.1.7",
     "ink-docstrap": "^0.5.2",
     "jshint": "^2.7.0",
     "jsonlint": "^1.6.2",
