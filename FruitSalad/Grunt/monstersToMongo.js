@@ -38,7 +38,7 @@ module.exports = function(grunt) {
 
 		console.log('Please wait loading info into database may take some time.');
 		// Could wrap in try catch and remove infos.Item if failed load for some error in structure etc/
-		var Items = new GameInfoLoader('005_00004.IMG',
+		var Monsters = new GameInfoLoader('005_00004.IMG',
 			restruct.
 		        int32lu("_id"). // 0
 		        string("Name",24). // 4
@@ -269,7 +269,7 @@ module.exports = function(grunt) {
 			  }
 			);
 
-		Items.once('loaded', function(){
+		Monsters.once('loaded', function(){
 			done(true);
 		});
 

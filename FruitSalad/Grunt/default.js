@@ -5,4 +5,19 @@ module.exports = function(grunt) {
     grunt.log.write('Logging some stuff...').ok();
   });
 
+  // Run all of the database import from game files
+  grunt.registerTask('initdb', 'Import information from games files to the DB.', function() {
+	grunt.task.run('itemsToMongo');
+	grunt.task.run('expToMongo');
+	grunt.task.run('monstersToMongo');
+	grunt.task.run('updatetranslation');
+  });
+
+  // Updates translations
+  grunt.registerTask('updatetranslation', 'Updates translations in DB from google spreadsheets.', function() {
+	grunt.task.run('updateTranslationDBItem');
+	grunt.task.run('updateTranslationDBMonster');
+	grunt.task.run('updateTranslationDBNpc');
+  });
+
 };

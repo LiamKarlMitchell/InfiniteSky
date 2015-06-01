@@ -6,11 +6,11 @@ var restruct = require('../Modules/restruct');
 var Tabletop = require('Tabletop');
 
 module.exports = function(grunt) {
-  grunt.registerTask('updateTranslationDBItem', 'Updates all of the item translations in the database with what is in our Google Spreadsheet.', function() {
+  grunt.registerTask('updateTranslationDBNpc', 'Updates all of the item translations in the database with what is in our Google Spreadsheet.', function() {
   	var done = this.async();
 
   	vmscript.on(['config'], function() {
-  		console.log('Starting config check for updateTranslationDBItem.');
+  		console.log('Starting config check for updateTranslationDBNpc.');
   		if (!config.world) {
 			console.error('Expecting config.world to be set.');
 	  		return done(false);
@@ -28,26 +28,28 @@ module.exports = function(grunt) {
 
 		Database(config.world.database.connection_string, function(){
 			console.log("Database connected");
-			vmscript.watch('Database/item.js');
+			vmscript.watch('Database/npc.js');
 		});
 
   	});
 
-  	vmscript.on(['Item'], function() {
+  	vmscript.on(['NPC'], function() {
   		console.log('Getting spreadsheet from Google Docs.');
   		// Item Translation
-  		// https://docs.google.com/spreadsheets/d/1yhC0JLjJ68tkcFoXzC8lRla6bE7qcSGrX6FUxlPYKbA/edit#gid=894866128
+  		// https://docs.google.com/spreadsheets/d/1rL1HPMZi8Yxt8XPqAm15wkJc0Ak1hzqZB1yD864QO4w/edit#gid=1823029235
   		// Publish URL:
-  		// https://docs.google.com/spreadsheets/d/1yhC0JLjJ68tkcFoXzC8lRla6bE7qcSGrX6FUxlPYKbA/pubhtml?gid=894866128&single=true
-		Tabletop.init( { key: 'https://docs.google.com/spreadsheets/d/1yhC0JLjJ68tkcFoXzC8lRla6bE7qcSGrX6FUxlPYKbA/pubhtml?gid=894866128&single=true',
+  		// https://docs.google.com/spreadsheets/d/1rL1HPMZi8Yxt8XPqAm15wkJc0Ak1hzqZB1yD864QO4w/pubhtml
+		Tabletop.init( { key: 'https://docs.google.com/spreadsheets/d/1rL1HPMZi8Yxt8XPqAm15wkJc0Ak1hzqZB1yD864QO4w/pubhtml',
             callback: function(data, tabletop) { 
             	for (var i=0;i<data.length;i++) {
             		console.log('Updating: '+data[i].id+' '+data[i].name);
-					db.Item.update({ _id: data[i].id }, { 
+					db.NPC.update({ _id: data[i].id }, { 
 						Name: data[i].name,
-						Description1: data[i].description1,
-						Description2: data[i].description2,
-						Description3: data[i].description3
+						Chat1: data[i].chat1,
+						Chat2: data[i].chat2,
+						Chat3: data[i].chat3,
+						Chat4: data[i].chat4,
+						Chat5: data[i].chat5
 					}).exec();
         		}
             	done(true);
