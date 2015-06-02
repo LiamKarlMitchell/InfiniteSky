@@ -184,7 +184,7 @@ vms( 'CharacterState', [ 'CVec3', 'Structs' ], function(){
 
 
 	// Returns a compressed packet for us to send to whomever
-	CharacterState_Prototype.getPacket = function() {	
+	CharacterState_Prototype.getPacket = function() {
 		return packets.makeCompressedPacket(0x18,new Buffer(Zone.send.Action.pack(this)));
 	};
 

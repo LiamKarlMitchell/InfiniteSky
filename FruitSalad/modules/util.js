@@ -4,6 +4,7 @@
 var fs = require('fs');
 
 function dumpError(err, logFunction) {
+  console.log(err);
     if (typeof err === 'object') {
       if (err.message) {
         if(logFunction)
@@ -29,6 +30,8 @@ function dumpError(err, logFunction) {
     }
     // Push to redis if required for logging etc
 }
+
+
 
 var util = {
   package: require('../package.json'),

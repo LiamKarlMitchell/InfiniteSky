@@ -43,19 +43,15 @@ Zone.send.Action = restruct.
     string('Name', Zone.CharName_Length+1).
     string('Demostrater', Zone.CharName_Length+1).
     string('Child', Zone.CharName_Length+1).
-    int8lu('Unk', 1).
+    int8lu('Unk').
     int32lu('FactionCapeThing').
-    int32lu('t').
+    int32lu('Unk').
     int32lu('TraitorFlag').
-    int32lu('t').
-
+    int32lu('Unk').
     int32lu('decHead').
-
     int32lu('GlowItems').
-
     int32lu('decBody').
     int32lu('decShoulders').
-
     int32lu('Clan').
     int32lu('Gender').
     int32lu('Hair').
@@ -73,15 +69,24 @@ Zone.send.Action = restruct.
     struct('Pet', structs.Pet).
     int32lu('applyGlowItems').
     string('GuildName', Zone.GuildName_Length+1).
-    int8lu('', 3).
+    int8lu('Unk').
+    int8lu('Unk').
+    int8lu('Unk').
     int32lu('LeaderFlag').
     int8lu('LeaderSubFlag').
-    int8lu('', 15).
-    // string('GuildName2',Zone.GuildName_Length+1).
-
+    int32lu('Unk').
+    int32lu('Unk').
+    int32lu('Unk').
+    int8lu('Unk').
+    int8lu('Unk').
+    int8lu('Unk').
     int8lu('InParty').
-    int8lu('', 15).
-
+    int32lu('Unk').
+    int32lu('Unk').
+    int32lu('Unk').
+    int8lu('Unk').
+    int8lu('Unk').
+    int8lu('Unk').
     int32lu('Stance').
     int32lu('Skill').
     float32l('Frame').
@@ -90,8 +95,8 @@ Zone.send.Action = restruct.
     float32l('Direction').
     int32lu('nodeID').
     int32lu('TargetID').
-    int8lu('t', 4).
-    int8lu('t', 4).
+    int32lu('Unk').
+    int32lu('unk').
     int32lu('SkillID').
     int32lu('SkillLevel').
     struct('LocationNew',structs.CVec3).
@@ -106,29 +111,29 @@ Zone.send.Action = restruct.
 
     int32lu('MonsterDisguise'). // The ID of a monster to disguise as
 
-    int8lu('t', 4).
-    int8lu('t', 4).
+    int32lu('Unk').
+    int32lu('Unk').
 
     int8lu('dueling').
     int8lu('duel_challenger'). // 0 blue 1 gold
-    int8lu('Unk1', 1).
+    int8lu('Unk').
     int8lu('Store'). // 0 none 1 open 2 open but empty
-
 
     string('StoreName', 28).
     struct('StoreItems', Zone.send.PersonalShopItem, 25).
-    int8lu('Unk1', 8).
-    int32lu('').
-    int32lu('Unk1').
-    int32lu('Unk1'). // 130
-    int32lu('Unk1').
-    int32lu('Unk1').
-    int32lu('Unk1').
-    int32lu('Unk1').
-    int32lu('Unk1'). // 135
-    int32lu('Unk1').
-    int32lu('Unk1').
-    int32lu('Unk1');
+    int32lu('Unk').
+    int32lu('Unk').
+    int32lu('Unk').
+    int32lu('Unk').
+    int32lu('Unk'). // 130
+    int32lu('Unk').
+    int32lu('Unk').
+    int32lu('Unk').
+    int32lu('Unk').
+    int32lu('Unk'). // 135
+    int32lu('Unk').
+    int32lu('Unk').
+    int32lu('Unk');
 
 Zone.recv.Action = restruct.
     int32lu('Stance').
@@ -213,6 +218,9 @@ ZonePC.Set(0x05, {
 
 ZonePC.Set(0x8B, {
     function: function(client, input) {
-        // console.log("test", input.length);
+        Zone.broadcastStates(client);
     }
 });
+
+
+// TODO (Ane): Blah

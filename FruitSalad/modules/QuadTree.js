@@ -20,26 +20,32 @@ function AABBCircleIntersect(circle, rectangle) {
     // Circle is x,y, radius
     // Rectangle is top left bottom right
     // We need a copy of the point
-    var circle_copy = {
-        x: circle.x,
-        y: circle.y
-    };
-    // Snap our circle to the rectangle corner/side its nearest
-    if(circle_copy.x > rectangle.right) {
-        circle_copy.x = rectangle.right;
-    } else if(circle_copy.x < rectangle.left) {
-        circle_copy.x = rectangle.left;
-    }
-    if(circle_copy.y > rectangle.bottom) {
-        circle_copy.y = rectangle.bottom;
-    } else if(circle_copy.y < rectangle.top) {
-        circle_copy.y = rectangle.top;
-    }
-    var dx = circle_copy.x - circle.x;
-    var dy = circle_copy.y - circle.y;
-    var distance = Math.sqrt(Math.abs((dx * dx) + (dy * dy)));
-    if(distance < circle.radius) return true;
-    return false;
+    // var circle_copy = {
+    //     x: circle.x,
+    //     y: circle.y
+    // };
+    // // Snap our circle to the rectangle corner/side its nearest
+    // console.log(circle_copy);
+    // console.log(rectangle);
+
+    // if(circle_copy.x > rectangle.right) {
+    //     circle_copy.x = rectangle.right;
+    // } else if(circle_copy.x < rectangle.left) {
+    //     circle_copy.x = rectangle.left;
+    // }
+    // if(circle_copy.y > rectangle.bottom) {
+    //     circle_copy.y = rectangle.bottom;
+    // } else if(circle_copy.y < rectangle.top) {
+    //     circle_copy.y = rectangle.top;
+    // }
+    // var dx = circle_copy.x - circle.x;
+    // var dy = circle_copy.y - circle.y;
+    // var distance = Math.sqrt(Math.abs((dx * dx) + (dy * dy)));
+    // console.log(distance, circle.radius);
+
+    // if(distance < circle.radius) return true;
+    // return false;
+    return true;
 }
 
 function QuadTreeNode(opts) {
@@ -189,6 +195,7 @@ QuadTree.prototype.getNodeByID = function(input) {
   return null;
 }
 QuadTree.prototype.query = function(query) {
+    // console.log(query);
     var results = [];
     if(query === undefined) {
         for(var n = 0; n < this.nodes.length; n++) {
@@ -234,33 +241,46 @@ QuadTree.prototype.query = function(query) {
             if(this.hasChildrenAreas) {
                 // Check if circle intersects square for each of these
                 // If so then query inside
-                var circle = {
-                    x: query.x,
-                    y: query.y,
-                    radius: query.radius
-                };
-                if(AABBCircleIntersect(circle, this.leafs[0].bounds)) {
+                // var circle = {
+                //     x: query.x,
+                //     y: query.y,
+                //     radius: query.radius
+                // };
+                // if(AABBCircleIntersect(circle, this.leafs[0].bounds)) {
+                    // console.log("test");
                     results = results.concat(this.leafs[0].query(query));
-                }
-                if(AABBCircleIntersect(circle, this.leafs[1].bounds)) {
+                // }
+                // if(AABBCircleIntersect(circle, this.leafs[1].bounds)) {
+                    // console.log("test");
                     results = results.concat(this.leafs[1].query(query));
-                }
-                if(AABBCircleIntersect(circle, this.leafs[2].bounds)) {
+                // }
+                // if(AABBCircleIntersect(circle, this.leafs[2].bounds)) {
+                    // console.log("test");
                     results = results.concat(this.leafs[2].query(query));
-                }
-                if(AABBCircleIntersect(circle, this.leafs[3].bounds)) {
+                // }
+                // if(AABBCircleIntersect(circle, this.leafs[3].bounds)) {
+                    // console.log("test");
                     results = results.concat(this.leafs[3].query(query));
-                }
+                // }
+
+                // for(var i=0; i<4; i++){
+                    // this.leafs[i].__proto__ = QuadTree.prototype;
+                // }
+
+                // console.log("Has");
             }
 
             // Check each of the nodes
             for(var n = 0; n < this.nodes.length; n++) {
                 if(this.nodes[n]) {
+                    // console.log('node');
                     // Get distance
                     var dx = this.nodes[n].x - query.x;
                     var dy = this.nodes[n].y - query.y;
-                    var distance = Math.sqrt(Math.abs((dx * dx) + (dy * dy))) - this.nodes[n].size;
+                    var distance = Math.sqrt((dx * dx) + (dy * dy));
                     if(distance <= query.radius) {
+                        // console.log(this.nodes[n].type, query.type);
+                        if(query.type.indexOf(this.nodes[n].type) === -1) continue;
                         results.push({
                             distance: distance,
                             node: this.nodes[n],
@@ -273,47 +293,60 @@ QuadTree.prototype.query = function(query) {
         }
     }
 
-    if(this.topLevel) {
+    // console.log(results.toString());
+
+    // if(this.topLevel) {
         // Do filter functions
-        if(query.filter) {
-            results = results.filter(query.filter);
+        // if(query.filter) {
+        //     results = results.filter(query.filter);
+        // }
+        // if(query.type) {
+        //     if(typeof(query.type) === 'string') {
+        //         query.type = query.type.split(/[\s,]+/);
+ 							// 	results = results.filter(function(r) {
+        //             if(query.type.indexOf(r.node.type) >= 0) {
+        //                 return true;
+        //             }
+        //             return false;
+        //         });
+        //     } else if(Array.isArray(query.type)) {
+        //         results = results.filter(function(r) {
+        //           var type;
+        //           var typeIsFunction = type instanceof Function;
+        //           for (var i=0;i < query.type.length;i++) {
+        //             type = query.type[i];
+        //             if (typeIsFunction && r.node.object instanceof type){
+        //             	return true;
+        //             } else if (type instanceof String && type == r.node.type) {
+        //               return true;
+        //             }
+        //           }
+        //           return false;
+        //         });
+        //     }
+        // }
+        // // Do sorting
+        // if(query.sort !== undefined) {
+        //     if(typeof(query.sort) === 'function') {
+        //         results = results.sort(query.sort);
+        //     } else {
+        //         results = results.sort(function(a, b) {
+        //             return a.distance - b.distance;
+        //         });
+        //     }
+        // }
+
+
+        for(var i=0; i<results.length; i++){
+            var r = results[i];
+            if(query.type.indexOf(r.node.type) === -1)
+                results.splice(i, 1);
         }
-        if(query.type) {
-            if(typeof(query.type) === 'string') {
-                query.type = query.type.split(/[\s,]+/);
- 								results = results.filter(function(r) {
-                    if(query.type.indexOf(r.node.type) >= 0) {
-                        return true;
-                    }
-                    return false;
-                });
-            } else if(Array.isArray(query.type)) {
-                results = results.filter(function(r) {
-                  var type;
-                  var typeIsFunction = type instanceof Function;
-                  for (var i=0;i < query.type.length;i++) {
-                    type = query.type[i];
-                    if (typeIsFunction && r.node.object instanceof type){
-                    	return true;
-                    } else if (type instanceof String && type == r.node.type) {
-                      return true;
-                    }
-                  }
-                  return false;
-                });
-            }
-        }
-        // Do sorting
-        if(query.sort !== undefined) {
-            if(typeof(query.sort) === 'function') {
-                results = results.sort(query.sort);
-            } else {
-                results = results.sort(function(a, b) {
-                    return a.distance - b.distance;
-                });
-            }
-        }
-    }
+
+        // results = results.sort(function(a, b) {
+        //     return a.distance - b.distance;
+        // });
+    // }
     return results;
 }
 QuadTree.prototype.update = function update(delta) {
@@ -422,8 +455,15 @@ QuadTree.prototype.update = function update(delta) {
     }
 }
 QuadTree.prototype.inBounds = function(node) {
-    return  (this.bounds.left <= node.x && this.bounds.right >= node.x) &&
-            (this.bounds.top >= node.y && this.bounds.bottom <= node.y);
+    // console.log(node.x, node.y);
+    // console.log(this.bounds);
+    // return node.x >= this.bounds.left && node.x <= this.bounds.right && node.y >= this.bounds.bottom && node.y <= this.bounds.top;
+    var negX = node.x < 0;
+    var negY = node.y < 0;
+    return  node.x + (negX ? -node.size : node.size) >= this.bounds.left &&
+            node.x + (negX ? -node.size : node.size) <= this.bounds.right &&
+            node.y + (negY ? -node.size : node.size) >= this.bounds.bottom &&
+            node.y + (negY ? -node.size : node.size) <= this.bounds.top;
 }
 // Returns array of unplaced nodes although this should be empty
 QuadTree.prototype.putNodesInChildrenLeafs = function() {
@@ -563,6 +603,8 @@ QuadTree.prototype.addNode = function(node) {
             this.nodesHash[node.id] = node;
             node.leaf = this;
         } else {
+            console.log(this.bounds);
+            console.log(node.x,node.y);
             process.log('Node outside Quad Tree bounds ' + this.x + ',' + this.y + ' size ' + this.size);
             return null;
         }
@@ -581,3 +623,8 @@ if(typeof module !== "undefined" && module.exports) {
 if(typeof window !== "undefined") {
     window.QuadTree = QuadTree;
 }
+
+// if(typeof Zone !== 'undefined'){
+//     // console.log("True");
+//     Zone.QuadTree.__proto__ = QuadTree.prototype;
+// }

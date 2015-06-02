@@ -7,8 +7,6 @@ process.log = function(){
 	process.api.log.apply(this, array);
 };
 
-console.log = process.log;
-
 vmscript.watch('Config/world.json');
 vmscript.watch('Config/network.json');
 
@@ -26,10 +24,7 @@ vms('Zone', [
 	nav_mesh = require('./Modules/navtest-revised.js');
 	QuadTree = require('./Modules/QuadTree.js');
 
-	vmscript.watch('./Generic/structs.js');
-	vmscript.watch('./Generic/CharacterState.js');
-	vmscript.watch('./Generic/CVec3.js');
-	vmscript.watch('./Generic/CharacterInfos.js');
+	vmscript.watch('./Generic');
 
 	function ZoneInstance(){
 		this.initialized = false;
@@ -42,11 +37,8 @@ vms('Zone', [
 		this.navigation = null;
 		this.QuadTree = null;
 		this.Clients = [];
+		this.Npc = [];
 	}
-
-	ZoneInstance.prototype.clientNodeUpdate = function(node, delta) {
-		return { x: this.character.state.Location.X, y: this.character.state.Location.Z, size: this.character.state.Level };
-	};
 
 	ZoneInstance.prototype.addSocket = function(socket){
 		if(!this.QuadTree){
@@ -56,7 +48,13 @@ vms('Zone', [
 			this.Clients.push(socket);
 			socket.node = this.QuadTree.addNode(new QuadTree.QuadTreeNode({
 				object: socket,
-				update: this.clientNodeUpdate,
+				update: function(node, delta) {
+					return {
+						x: this.character.state.Location.X,
+						y: this.character.state.Location.Z,
+						size: this.character.state.Level
+					};
+				},
 				type: 'client'
 			}));
 			socket.character.state.UniqueID = socket.node.id;
@@ -64,22 +62,13 @@ vms('Zone', [
 		}
 	};
 
-	ZoneInstance.prototype.sendToAllArea = function(origional, sendtoself, buffer, distance){
-		for(var i=this.Clients.length-1; i >= 0; i--){
-			var client = this.Clients[i];
-	        if(sendtoself === false && client === origional) continue;
-	        if(client.character.state.Location.getDistance(origional.character.state.Location) <= distance) {
-	            client.write(buffer);
-	        }
-		}
-
-	    // this.Clients.forEach(function(client) {
-	    //     // if(client.authenticated == false || !client._handle) return;
-	    //     if(sendtoself === false && client === origional) continue;
-	    //     if(client.character.state.Location.getDistance(origional.character.state.Location) <= distance) {
-	    //         client.write(buffer);
-	    //     }
-	    // });
+	ZoneInstance.prototype.sendToAllArea = function(client, self, buffer, distance){
+        var found = this.QuadTree.query({ CVec3: client.character.state.Location, radius: distance, type: ['client'] });
+        for(var i=0; i<found.length; i++){
+            var f = found[i];
+            if(!self && f.object === client) continue;
+            if(f.object.write) f.object.write(buffer);
+        }
 	};
 
 	ZoneInstance.prototype.findPath = function(){
@@ -88,7 +77,7 @@ vms('Zone', [
 	};
 
 	ZoneInstance.prototype.onDisconnect = function(socket){
-		// this.QuadTree.removeNode(socket.node.id);
+		this.QuadTree.removeNode(socket.node);
 		var index = this.Clients.indexOf(socket);
 		if(index > -1){
 			this.Clients.splice(this.Clients.indexOf(socket), 1);
@@ -179,10 +168,34 @@ vms('Zone', [
 		}
 	};
 
+	ZoneInstance.prototype.addNPC = function(element){
+		var npc = new Npc(element);
+		npc.setNode(this.QuadTree.addNode(new QuadTree.QuadTreeNode({
+			object: npc,
+			update: function(node, delta) {
+				return {
+					x: this.Location.X,
+					y: this.Location.Z,
+					size: 1
+				};
+			},
+			type: 'npc'
+		})));
+		this.Npc.push(npc);
+	};
+
+	ZoneInstance.prototype.broadcastStates = function(client, self){
+        var found = Zone.QuadTree.query({ CVec3: client.character.state.Location, radius: config.network.viewable_action_distance, type: ['npc'] });
+        for(var i=0; i<found.length; i++){
+            var f = found[i];
+            client.write(f.object.getPacket());
+        }
+	};
+
 	ZoneInstance.prototype.init = function(){
 		if(this.initialized) return;
 		this.initialized = true;
-
+		// Make roundDivisable a function in helpers/util.js or something.
 		function roundDivisable(v,d) {
 		    return (Math.round(v / d) * d) || d;
 		}
@@ -203,6 +216,11 @@ vms('Zone', [
 			// actor_radius	- float
 			// callback		- function, returning waypoints
 
+			// mesh.dimensions.top += 1000;
+			// mesh.dimensions.bottom -= 1000;
+			// mesh.dimensions.left += 1000;
+			// mesh.dimensions.right -= 1000;
+
 			var height = Math.abs(mesh.dimensions.bottom) + Math.abs(mesh.dimensions.top);
 			var width = Math.abs(mesh.dimensions.right) + Math.abs(mesh.dimensions.left);
 
@@ -211,22 +229,37 @@ vms('Zone', [
 				y: roundDivisable(mesh.dimensions.top, 2),
 				size: roundDivisable(Math.max(width, height), 2)
 			});
-
 			Database(config.world.database.connection_string, function(){
-				// process.log("Zone connected @", config.world.database.connection_string);
 				vmscript.watch('Database');
 				vmscript.watch('./Processes/Zone/Packets').on([
 						'Packets',
 						'Database',
-						'Generic/structs.js',
-						'Generic/CharacterState.js',
-						'Generic/CVec3.js',
-						'Generic/CharacterInfos.js'
+						'Generic'
 					], function(){
+						fs.readFile(config.world.data_path + 'spawninfo/' + util.padLeft(self.id,'0', 3) + '.NPC', function(err, data) {
+							if (err) {
+								//console.log(err);
+							} else {
+								var RecordCount = data.readUInt32LE(0);
+
+								var spawndata = restruct.struct('info', structs.SpawnInfo, RecordCount).unpack(data.slice(4));
+								var length = spawndata.info.length,
+									element = null;
+								for (var i = 0; i < length; i++) {
+									element = spawndata.info[i];
+									if (element.ID) {
+										self.addNPC(element);
+									}
+								}
+							}
+						});
+
+
 						process.log("Initialized in", (new Date().getTime() - startTime), "ms");
 						self.acceptConnections = true;
 						process.api.run();
 						process.api.nextTick();
+						console.log = process.log;
 				});
 			});
 		});
