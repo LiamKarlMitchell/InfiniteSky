@@ -2,7 +2,7 @@
 // Copyright (c) InfiniteSky Dev Teams - Licensed under GNU GPL
 // For more information, see LICENCE in the main folder
 vms('SpawnLog', [], function(){
-	var spawnLogSchema = mongoose.Schema({
+	var spawnLogSchema = db.mongoose.Schema({
 	    username: String, // The username of whomever captured this spawn. (As defined in their PrivateServer.ini)
 	    zoneid: Number,   // The ID of the Zone the Spawn was captured in.
 	    id: Number,       // The ID of the thing eg MonsterID or NPCID.
@@ -20,7 +20,7 @@ vms('SpawnLog', [], function(){
 	var SpawnLog = db.mongoose.model('spawnlog', spawnLogSchema);
 	db.SpawnLog = SpawnLog;
 
-	SpawnLog.virtual('created').get( function () {
+	spawnLogSchema.virtual('created').get( function () {
 	  if (this["_created"]) return this["_created"];
 	  return this["_created"] = this._id.getTimestamp();
 	});

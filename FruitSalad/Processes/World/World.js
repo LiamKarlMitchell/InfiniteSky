@@ -3,6 +3,8 @@ vmscript.watch('Config/login.json');
 vmscript.watch('Config/world.json');
 vmscript.watch('Config/zones.json');
 
+async = require('async');
+
 vms('World Server', [
 	'Config/network.json',
 	'Config/world.json',
@@ -71,7 +73,11 @@ vms('World Server', [
 	}
 
 	WorldInstance.prototype.onConnection = function(socket){
-		if(!this.acceptConnections) return;
+		if(!this.acceptConnections) {
+			// TODO: Send packet back to client denying its connection.
+			// There is a packet 00 with status for this kind of thing.
+			return;
+		}
 		socket.paused = false;
 
 		var self = this;
@@ -126,6 +132,26 @@ vms('World Server', [
 		socket.destroy();
 	};
 
+	WorldInstance.prototype.loadZone = function World__loadZone(id, done) {
+		console.log("Spawning Child Process for Zone: " + id + ' ' + (config.zones.name || ''));
+		this.zoneSpawner.spawnChild({
+			name: parseInt(id),
+			pipeError: false,
+			script: './Processes/Zone/Zone.js'
+		}, null, [id]);
+
+		done();
+	};
+
+	WorldInstance.prototype.zoneSpawned = function zoneSpawned(id) {
+	};
+
+	WorldInstance.prototype.zoneInitResponse = function World__zoneInitResponse(err) {
+		console.log('zoneLoaded');
+		console.log(arguments);
+	};
+
+
 	WorldInstance.prototype.init = function(){
 		console.log('World Instance Init. '+ ( new Date() ));
 		if(this.listening) return;
@@ -139,80 +165,54 @@ vms('World Server', [
 
 		this.packetCollection = new PacketCollection('WorldPC');
 
-		var lastZoneID = null;
-		var pool = 5;
-		var zones = new ChildSpawner.Spawner({
+
+		this.zoneSpawner = new ChildSpawner.Spawner({
+			// Exposes a function to be called when a zone is loaded
+			// or if there was a significant error loading a zone.
+			zoneInitResponse: self.zoneInitResponse.bind(self),
+
+			// Exposes log function to the child processe zones which should use process.log
 			log: function(){
 				console.log.apply(this, arguments);
 			},
-			nextTick: function(){
-				pool++;
-				var callNext = false;
-				for(var id in config.zones){
-					if(!callNext && id !== lastZoneID) continue;
-					else if(id === lastZoneID){
-						callNext = true;
-						continue;
-					}
-
-					var zone = config.zones[id];
-					if(zone && zone.Load){
-						if(pool===0) break;
-						pool--;
-						console.log("Spawning Child Process for Zone: " + id + ' ' + (config.zones.name || ''));
-						zones.spawnChild({
-							name: parseInt(id),
-							pipeError: false,
-							script: './Processes/Zone/Zone.js'
-						}, null, [id, zone.Name]);
-						lastZoneID = id;
-
-						if(pool===0) break;
-					}
-				}
-			}
 		});
+
+        console.log('Spawning Zones...');
+        if(config.zones) {
+            var mapLoadQueue = async.queue(this.loadZone.bind(self), config.AsyncZoneLoadLimit || 4);
+            mapLoadQueue.drain = function() {
+                console.log('Zones all queued to load.');
+            }
+
+            for(var id in config.zones) {
+                if(config.zones.hasOwnProperty(id) && !isNaN(id) && config.zones[id].Load == true) {
+                    mapLoadQueue.push(id, this.zoneSpawned.bind(self));
+                }
+            }
+        } else {
+            console.error('\x1B[31mPlease define Zones object in your config.json\x1B[0m');
+        }
 
 		// TODO: Make zones reloadable.
 		// TODO: Make sure that we save to DB when disconnecting characters from removed zone.
-		if(config.zones){
-			var pipeError = true;
-			for(var id in config.zones){
-				var zone = config.zones[id];
-				if(zone && zone.Load){
-					pool--;
-					zones.spawnChild({
-						pipeError: pipeError,
-						name: parseInt(id),
-						script: './Processes/Zone/Zone.js'
-					}, null, [id, zone.Name]);
-					pipeError = false;
-					lastZoneID = id;
-					if(pool===0) break;
-				}
-			}
-		} else {
-			console.error("No Zones have been specified to load in the world configuration.");
-		}
 
-		process.zones = zones.childrens;
+		process.zones = this.zoneSpawner.childrens;
 
-		Database(config.world.database.connection_string, function(){
+		Database(config.world.database.connection_string, function World__onDatabaseConnected(){
 			console.log("Database connected @", config.world.database.connection_string);
 			vmscript.watch('Database');
 			vmscript.watch('Generic');
-			zones.onReady(function(){
-				vmscript.on([
-					'Database',
-					'Generic'
-				], function(){
-					vmscript.watch('./Processes/World/Packets').on([
-							'Packets'
-						], function(){
-							console.log("You can now login to the server");
-							self.acceptConnections = true;
-							process.api.run();
-					});
+
+			vmscript.on([
+				'Database',
+				'Generic'
+			], function(){
+				vmscript.watch('./Processes/World/Packets').on([
+						'Packets'
+					], function(){
+						console.log("You can now login to the server");
+						self.acceptConnections = true;
+						process.api.run();
 				});
 			});
 		});

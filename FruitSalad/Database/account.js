@@ -130,7 +130,7 @@ vms('Account', [], function(){
 		});
 	};
 
-	db.Account.virtual('created').get( function () {
+	db.accountSchema.virtual('created').get( function () {
 	  if (this["_created"]) return this["_created"];
 	  return this["_created"] = this._id.getTimestamp();
 	});

@@ -3,9 +3,30 @@ process.log = function(){
 	for(var i=0; i<arguments.length; i++){
 		array.push(arguments[i]);
 	}
-	array.unshift('[' + process.argv[3] + ']');
+	array.unshift('Zone ' + process.argv[2]);
 	process.api.log.apply(this, array);
 };
+process.exception = function() {
+	var array = [];
+	for(var i=0; i<arguments.length; i++){
+		array.push(arguments[i]);
+	}
+	array.unshift('!Zone ' + process.argv[2]+' Exception');
+	process.api.log.apply(this, array);
+}
+console.log = process.log;
+
+
+
+console.log('21 ***********************~~~~~~~~~~~~~~~*********************');	util = require('./Modules/util.js');
+console.log('22 ***********************~~~~~~~~~~~~~~~*********************');	util.setupUncaughtExceptionHandler(process.exception);
+console.log('23 ***********************~~~~~~~~~~~~~~~*********************');	CachedBuffer = require('./Modules/CachedBuffer.js');
+console.log('24 ***********************~~~~~~~~~~~~~~~*********************');	PacketCollection = require('./Modules/PacketCollection.js');
+console.log('25 ***********************~~~~~~~~~~~~~~~*********************');	restruct = require('./Modules/restruct');
+console.log('26 ***********************~~~~~~~~~~~~~~~*********************');	Database = require('./Modules/db.js');
+console.log('27 ***********************~~~~~~~~~~~~~~~*********************');	packets = require('./Helper/packets.js');
+console.log('28 ***********************~~~~~~~~~~~~~~~*********************');	nav_mesh = require('./Modules/navtest-revised.js');
+console.log('29 ***********************~~~~~~~~~~~~~~~*********************');	QuadTree = require('./Modules/QuadTree.js');
 
 vmscript.watch('Config/world.json');
 vmscript.watch('Config/network.json');
@@ -14,19 +35,11 @@ vms('Zone', [
 	'Config/world.json',
 	'Config/network.json'
 ], function(){
-	CachedBuffer = require('./Modules/CachedBuffer.js');
-	PacketCollection = require('./Modules/PacketCollection.js');
-	restruct = require('./Modules/restruct');
-	Database = require('./Modules/db.js');
-	util = require('./Modules/util.js');
-	util.setupUncaughtExceptionHandler(process.log);
-	packets = require('./Helper/packets.js');
-	nav_mesh = require('./Modules/navtest-revised.js');
-	QuadTree = require('./Modules/QuadTree.js');
 
 	vmscript.watch('./Generic');
 
 	function ZoneInstance(){
+		console.log('Zone Instance Created');
 		this.initialized = false;
 		this.packetCollection = null;
 		this.socketTransferQueue = {};
@@ -194,6 +207,8 @@ vms('Zone', [
 
 	ZoneInstance.prototype.init = function(){
 		if(this.initialized) return;
+
+		console.log('Init');
 		this.initialized = true;
 		// Make roundDivisable a function in helpers/util.js or something.
 		function roundDivisable(v,d) {
@@ -258,17 +273,19 @@ vms('Zone', [
 						process.log("Initialized in", (new Date().getTime() - startTime), "ms");
 						self.acceptConnections = true;
 						process.api.run();
-						process.api.nextTick();
+						process.api.zoneInitResponse();
 						console.log = process.log;
 				});
 			});
 		});
 	}
+console.log('***********************~~~~~~~~~~~~~~~*********************');
+	console.log('ZONE HAS GOT TO 273');
 
-	if(typeof Zone === 'undefined')
+	if(typeof(Zone) === 'undefined') {
 		global.Zone = new ZoneInstance();
-	else
+		global.Zone.init();
+	} else {
 		global.Zone.__proto__ = ZoneInstance.prototype;
-
-	global.Zone.init();
+	}
 });

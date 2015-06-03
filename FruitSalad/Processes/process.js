@@ -14,4 +14,9 @@ api.spawnScript = vmscript.watch;
 // };
 
 ChildSpawner = require('../Helper/ChildSpawner.js');
+
+// Prevent the following warning about possible memory leak with the EventEmitters.
+// (node) warning: possible EventEmitter memory leak detected. 11 listeners added. Use emitter.setMaxListeners() to increase limit.
+process.setMaxListeners(0);
+
 var client = ChildSpawner.Resume();

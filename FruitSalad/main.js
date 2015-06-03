@@ -23,13 +23,6 @@
 // // logger.on('error', function (err) { /* Do Something */ });
 
 
-/**
- * Represents a book.
- * @constructor
- */
-function Book(title, author) {
-}
-
 // winston.profile('Startup');
 var util = require('./Modules/util.js');
 
@@ -45,6 +38,9 @@ var readline = require('readline'),
     rl = readline.createInterface(process.stdin, process.stdout);
 var vm = require('vm');
 
+// Prevent the following warning about possible memory leak with the EventEmitters.
+// (node) warning: possible EventEmitter memory leak detected. 11 listeners added. Use emitter.setMaxListeners() to increase limit.
+process.setMaxListeners(0);
 
 spawner.spawnChild({name: 'Login', script: 'Processes\\Login\\Login.js'});
 spawner.spawnChild({name: 'World', script: 'Processes\\World\\World.js'});

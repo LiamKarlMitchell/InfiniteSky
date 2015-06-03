@@ -5,7 +5,7 @@
   "description": "A serverside emulation project for the game Twelve Sky.",
   "main": "main.js",
   "dependencies": {
-    "async": "^1.0.0",
+    "async": "^1.2.0",
     "encoding": "^0.1.11",
     "iconv": "^2.1.7",
     "ink-docstrap": "^0.5.2",

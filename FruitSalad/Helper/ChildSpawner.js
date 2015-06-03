@@ -73,8 +73,9 @@ ChildSpawner.prototype.spawnChild = function(opts, callback, args){
 	var child = fork(processEnv, args, {silent: true});
 
 	// console.log(child);
-	if(opts.pipeError === undefined || opts.pipeError === true)
+	if(opts.pipeError === undefined || opts.pipeError === true) {
 		child.stderr.pipe(process.stderr);
+	}
 
 	var transport = new Transport([child.stdout, child.stdin]);
 	var agent = new Agent(this.api);
@@ -82,14 +83,18 @@ ChildSpawner.prototype.spawnChild = function(opts, callback, args){
 
 	this.totalChildrens++;
 	agent.connect(transport, function (err, api) {
+		if (typeof(child.onLoaded) === 'function') {
+			child.onLoaded(err);
+		}
 		if (err) {
 			self.totalChildrens--;
 			console.log(err);
 			return;
 		}
 		if(!self.childrens[opts.name]){
-			if(opts.script)
+			if(opts.script) {
 				api.spawnScript(opts.script);
+			}
 			// if(opts.manual === undefined || opts.manual === true) self.totalReadyChildrens++;
 			// if(self.totalChildrens === self.totalReadyChildrens){
 			// 	if(typeof self.callback === 'function'){
@@ -105,6 +110,8 @@ ChildSpawner.prototype.spawnChild = function(opts, callback, args){
 			};
 		}
 	});
+
+	return child;
 };
 
 var ChildSpawnerClient = function(){
