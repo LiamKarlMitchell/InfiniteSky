@@ -130,6 +130,11 @@ vms('Account', [], function(){
 		});
 	};
 
+	db.Account.virtual('created').get( function () {
+	  if (this["_created"]) return this["_created"];
+	  return this["_created"] = this._id.getTimestamp();
+	});
+
 	db.Account.logoutAll = function () {
 	  db.Account.update({}, {
 	    $set: {

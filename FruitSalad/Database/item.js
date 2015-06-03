@@ -240,7 +240,7 @@ vms('Item', [], function(){
 
 	db.Item = Item;
 
-	db.Item.getById = function(id, callback){
+	Item.getById = function(id, callback){
 		db.Item.findOne({
 			_id: id
 		}, callback);

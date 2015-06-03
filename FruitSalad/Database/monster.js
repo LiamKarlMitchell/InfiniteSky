@@ -254,7 +254,7 @@ vms('Item', [], function(){
 
 	db.Monster = Monster;
 
-	db.Monster.getById = function(id, callback){
+	Monster.getById = function(id, callback){
 		db.Monster.findOne({
 			_id: id
 		}, callback);

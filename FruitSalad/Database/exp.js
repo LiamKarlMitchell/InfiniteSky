@@ -39,7 +39,7 @@ vms('Exp', [], function(){
 	var Exp = db.mongoose.model('exp', expSchema);
 	db.Exp = Exp;
 
-	db.Exp.getByLevel = function(level, callback){
+	Exp.getByLevel = function(level, callback){
 		db.Exp.findOne({
 			Level: level
 		}, callback);

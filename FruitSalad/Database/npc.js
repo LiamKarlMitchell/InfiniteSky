@@ -368,7 +368,7 @@ vms('Item', [], function(){
 
 	db.NPC = NPC;
 
-	db.NPC.getById = function(id, callback){
+	NPC.getById = function(id, callback){
 		db.NPC.findOne({
 			_id: id
 		}, callback);

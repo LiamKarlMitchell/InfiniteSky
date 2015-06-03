@@ -16,17 +16,6 @@ function DB(connectString, callback) {
 
 	// When successfully connected
 	mongoose.connection.on('connected', callback);
-	// mongoose.connection.on('connected', function () {
-	//   console.log('Database Connected');
-	//   db.scripts = new vmscript('db','db', function(){
-	// 	console.log('Clearing all accounts that are logged in.');
-	// 	db.Account.logoutAll();
-	//   });
-	//   main.events.emit('db_connected');
-
-	//   //console.log('Mongoose default connection open to ' + dbURI);
-	//   console.log('Mongoose connected');
-	// });
 
 	// If the connection throws an error
 	mongoose.connection.on('error',function (err) {
@@ -44,7 +33,7 @@ function DB(connectString, callback) {
 	  if (this[name]===undefined) { console.error('No db object defined as '+name); return; }
 	  this[name].find(searchfilter,feilds,function(err,docs) {
 	    if (err) {
-	      dumpError(err);
+	      console.error(err);
 	      return;
 	    }
 	    console.log(docs);
