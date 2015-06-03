@@ -116,7 +116,7 @@ var CharacterInfos = function(c, character){
     ElementalDefense: 0
   };
 
-  this.Armor = {
+  this.Outfit = {
     Vitality: 0,
     Defense: 0,
     Dodge: 0,
@@ -253,21 +253,21 @@ CharacterInfos.prototype.updateEquipmentByDefault = function(equipment_name){
     break;
 
 
-    case 'Armor':
-    this.Armor.Defense = 0;
-    this.Armor.Vitality = 0;
-    this.Armor.Dodge = 0;
+    case 'Outfit':
+    this.Outfit.Defense = 0;
+    this.Outfit.Vitality = 0;
+    this.Outfit.Dodge = 0;
 
-    this.Armor.Resists.Light = 0;
-    this.Armor.Resists.Shadow = 0;
-    this.Armor.Resists.Dark = 0;
+    this.Outfit.Resists.Light = 0;
+    this.Outfit.Resists.Shadow = 0;
+    this.Outfit.Resists.Dark = 0;
 
 
     this.updateStat('Defense');
     this.updateStat('Dodge');
     break;
 
-    case 'Boot':
+    case 'Boots':
       this.Boots.Defense = 0;
       this.Boots.Dodge = 0;
 
@@ -276,7 +276,7 @@ CharacterInfos.prototype.updateEquipmentByDefault = function(equipment_name){
     break;
 
 
-    case 'Glove':
+    case 'Gloves':
       this.Gloves.Defense = 0;
       this.Gloves.HitRate = 0;
 
@@ -531,25 +531,25 @@ CharacterInfos.prototype.updateEquipment_OnItemInfo = function(err, itemInfo, eq
     break;
 
 
-    case 'Armor':
+    case 'Outfit':
     var DefenseTick = (itemInfo.Level > 95 && itemInfo.Level <= 145) ? 22 : 14;
     var dodgeTick = (itemInfo.Level > 95 && itemInfo.Level <= 145) ? 3 : 2;
 
-    this.Armor.Defense = (DefenseTick * combine) + itemInfo.Defense;
-    this.Armor.Defense += (this.Armor.Defense / 100 * enchant);
-    this.Armor.Vitality = itemInfo.Vitality;
-    this.Armor.Dodge = (dodgeTick * combine) + itemInfo.ChancetoDodge;
+    this.Outfit.Defense = (DefenseTick * combine) + itemInfo.Defense;
+    this.Outfit.Defense += (this.Outfit.Defense / 100 * enchant);
+    this.Outfit.Vitality = itemInfo.Vitality;
+    this.Outfit.Dodge = (dodgeTick * combine) + itemInfo.ChancetoDodge;
 
-    this.Armor.Resists.Light = itemInfo.LightResistance;
-    this.Armor.Resists.Shadow = itemInfo.ShawdowResistance;
-    this.Armor.Resists.Dark = itemInfo.DarkResistance;
+    this.Outfit.Resists.Light = itemInfo.LightResistance;
+    this.Outfit.Resists.Shadow = itemInfo.ShawdowResistance;
+    this.Outfit.Resists.Dark = itemInfo.DarkResistance;
 
 
     this.updateStat('Defense');
     this.updateStat('Dodge');
     break;
 
-    case 'Boot':
+    case 'Boots':
       var DefenseTick = (itemInfo.Level > 95 && itemInfo.Level <= 145) ? 3 : 2;
       var dodgeTick = (itemInfo.Level > 95 && itemInfo.Level <= 145) ? 8 : 6;
 
@@ -562,7 +562,7 @@ CharacterInfos.prototype.updateEquipment_OnItemInfo = function(err, itemInfo, eq
     break;
 
 
-    case 'Glove':
+    case 'Gloves':
       var DefenseTick = (itemInfo.Level > 95 && itemInfo.Level <= 145) ? 8 : 5;
       // Todo: check values for this level ranges
       var hitTick = (itemInfo.Level > 95 && itemInfo.Level <= 145) ? 13 : 8;
@@ -633,9 +633,9 @@ CharacterInfos.prototype.updateAll = function(callback){
   }
   
   this.updateEquipment('Weapon',      (hasCallback ? updateCounter : null));
-  this.updateEquipment('Armor',       (hasCallback ? updateCounter : null));
-  this.updateEquipment('Boot',        (hasCallback ? updateCounter : null));
-  this.updateEquipment('Glove',       (hasCallback ? updateCounter : null));
+  this.updateEquipment('Outfit',       (hasCallback ? updateCounter : null));
+  this.updateEquipment('Boots',        (hasCallback ? updateCounter : null));
+  this.updateEquipment('Gloves',       (hasCallback ? updateCounter : null));
   this.updateEquipment('Cape',        (hasCallback ? updateCounter : null));
   this.updateEquipment('Amulet',      (hasCallback ? updateCounter : null));
   this.updateEquipment('Ring',        (hasCallback ? updateCounter : null));
@@ -710,7 +710,7 @@ CharacterInfos.prototype.updateStat_OnExpInfo = function(err, ExpInfo, stat_name
     case 'HP':
     case 'Health':
     var baseHP = this.clan === 0 ? ExpInfo.GuanyinHP : this.clan === 1 ? ExpInfo.FujinHP : ExpInfo.JinongHP;
-    var formula = baseHP + (this.Modifiers.HP * (this.client.character.StatVitality + this.Armor.Vitality)) + this.Pet.HP;
+    var formula = baseHP + (this.Modifiers.HP * (this.client.character.StatVitality + this.Outfit.Vitality)) + this.Pet.HP;
     this.MaxHP = formula;
 
     if(this.client.character.Health > this.MaxHP){
@@ -754,7 +754,7 @@ CharacterInfos.prototype.updateStat_OnExpInfo = function(err, ExpInfo, stat_name
 
     case 'Defense':
     var baseDefense = this.clan === 0 ? ExpInfo.GuanyinDefense : this.clan === 1 ? ExpInfo.FujinDefense : ExpInfo.JinongDefense;
-    this.Defense = this.Armor.Defense + this.Boots.Defense + this.Gloves.Defense + this.Cape.Defense + baseDefense;
+    this.Defense = this.Outfit.Defense + this.Boots.Defense + this.Gloves.Defense + this.Cape.Defense + baseDefense;
     this.Defense += this.Pet.Defense;
     break;
 
@@ -765,18 +765,18 @@ CharacterInfos.prototype.updateStat_OnExpInfo = function(err, ExpInfo, stat_name
 
     case 'Dodge':
     var baseDefense = this.clan === 0 ? ExpInfo.GuanyinDefense : this.clan === 1 ? ExpInfo.FujinDefense : ExpInfo.JinongDefense;
-    this.Dodge = this.Boots.Dodge + this.Armor.Dodge + this.DexDodge;
+    this.Dodge = this.Boots.Dodge + this.Outfit.Dodge + this.DexDodge;
     this.Dodge += this.Pet.Dodge;
     break;
 
     case 'Luck':
-    this.Luck = this.Boots.Luck + this.Armor.Luck + this.Gloves.Luck + this.Amulet.Luck + this.Ring.Luck;
+    this.Luck = this.Boots.Luck + this.Outfit.Luck + this.Gloves.Luck + this.Amulet.Luck + this.Ring.Luck;
     break;
 
     case 'Resists':
-    this.Resists.Light = this.Armor.Resists.Light + this.Amulet.Resists.Light + this.Cape.Resists.Light;
-    this.Resists.Shadow = this.Armor.Resists.Shadow + this.Amulet.Resists.Shadow + this.Cape.Resists.Shadow;
-    this.Resists.Dark = this.Armor.Resists.Dark + this.Amulet.Resists.Dark + this.Cape.Resists.Dark;
+    this.Resists.Light = this.Outfit.Resists.Light + this.Amulet.Resists.Light + this.Cape.Resists.Light;
+    this.Resists.Shadow = this.Outfit.Resists.Shadow + this.Amulet.Resists.Shadow + this.Cape.Resists.Shadow;
+    this.Resists.Dark = this.Outfit.Resists.Dark + this.Amulet.Resists.Dark + this.Cape.Resists.Dark;
 
     this.Resists.Light += this.Resists.Light / 136 * this.Pet.ElementalDefense;
     this.Resists.Shadow += this.Resists.Shadow / 136 * this.Pet.ElementalDefense;

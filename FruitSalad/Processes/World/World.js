@@ -176,7 +176,6 @@ vms('World Server', [
 			},
 		});
 
-        console.log('Spawning Zones...');
         if(config.zones) {
             var mapLoadQueue = async.queue(this.loadZone.bind(self), config.AsyncZoneLoadLimit || 4);
             mapLoadQueue.drain = function() {

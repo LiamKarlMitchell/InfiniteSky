@@ -87,11 +87,11 @@ vms('Character', [], function(){
 	// or default 0 hmm... how very odd
 		Ring: {type: itemEquip, default: null}, // 0
 		Cape: {type: itemEquip, default: null}, // 1
-		Armor: {type: itemEquip, default: null}, // 2
-		Glove: {type: itemEquip, default: null}, // 3
+		Outfit: {type: itemEquip, default: null}, // 2
+		Gloves: {type: itemEquip, default: null}, // 3
 		Amulet: {type: itemEquip, default: null}, // 4
-		Boot: {type: itemEquip, default: null}, // 5
-		CalbashBottle: {type: itemEquip, default: null}, // 6
+		Boots: {type: itemEquip, default: null}, // 5
+		Bottle: {type: itemEquip, default: null}, // 6
 		Weapon: {type: itemEquip, default: null}, // 7
 		Pet: {type: petEquip, default :null}, // 8
 
@@ -144,29 +144,21 @@ vms('Character', [], function(){
 
 	characterSchema.methods.nextInventoryIndex = function() {
 		for(var i=0; i<64; i++){
-			if(this.Inventory[i] === undefined) return i;
+			if(this.Inventory[i] === undefined || this.Inventory[i] === null) return i;
 		}
 
 		return null;
 	};
 
-	characterSchema.methods.itemHasSpace = function(item_id, callback){
-		var self = this;
-		db.Item.getById(item_id, function(err, item){
-			if(err){
-				// TODO: Handle this error with a callback
-				return;
-			}
-
-			if(!item){
-				// TODO: Handle if there is no such item with this item ID
-				return;
-			}
-
-			var size = item.getSlotSize();
-
-			// var keys = 
-		});
+	characterSchema.methods.inventoryIntersection = function(x, y, size){
+		if( x >= 8 || y >= 8 || (x + size) >= 8 || (y + size) >= 8 ) return true;
+		var item;
+		for(var i=0; i<64; i++){
+			item = this.Inventory[i];
+			if(item === undefined || item === null) continue;
+			if(item.Row >= x && item.Row <= x + size && item.Column >= y && item.Column <= y + size) return item;
+		}
+		return null;
 	};
 
 	// Add methods to the schema
@@ -283,7 +275,7 @@ vms('Character', [], function(){
 
 	// 	for (var i=0;i<64;i++)
 	// 	{
-	// 		var item = this.Inventory[i];
+	// 		var item = item;
 
 	// 		if (item==null || item.ID==0) continue;
 

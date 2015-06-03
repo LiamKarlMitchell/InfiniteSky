@@ -60,10 +60,10 @@ Zone.send.Action = restruct.
     int32lu('Honor').
     struct('Necklace', structs.Equipt).
     struct('Cape', structs.Equipt).
-    struct('Armor', structs.Equipt).
-    struct('Glove', structs.Equipt).
+    struct('Outfit', structs.Equipt).
+    struct('Gloves', structs.Equipt).
     struct('Ring', structs.Equipt).
-    struct('Boot', structs.Equipt).
+    struct('Boots', structs.Equipt).
     struct('CalbashBottle', structs.Bottle).
     struct('Weapon', structs.Equipt).
     struct('Pet', structs.Pet).

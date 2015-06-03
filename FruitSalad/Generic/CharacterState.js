@@ -76,11 +76,11 @@ vms( 'CharacterState', [ 'CVec3', 'Structs' ], function(){
 		// Equips
 		this.Necklace = new EquipItem();
 		this.Cape = new EquipItem();
-		this.Armor = new EquipItem();
-		this.Glove = new EquipItem();
+		this.Outfit = new EquipItem();
+		this.Gloves = new EquipItem();
 		this.Ring = new EquipItem();
-		this.Boot = new EquipItem();
-		this.CalbashBottle = new EquipItem();
+		this.Boots = new EquipItem();
+		this.Bottle = new EquipItem();
 		this.Weapon = new EquipItem();
 		this.Pet = new EquipItem();
 
@@ -144,11 +144,11 @@ vms( 'CharacterState', [ 'CVec3', 'Structs' ], function(){
 		// Equips
 		this.Necklace = character.Necklace;
 		this.Cape = character.Cape;
-		this.Armor = character.Armor;
-		this.Glove = character.Glove;
+		this.Outfit = character.Outfit;
+		this.Gloves = character.Gloves;
 		this.Ring = character.Ring;
-		this.Boot = character.Boot;
-		this.CalbashBottle = character.CalbashBottle;
+		this.Boots = character.Boots;
+		this.Bottle = character.Bottle;
 		this.Weapon = character.Weapon;
 		this.Pet = character.Pet;
 

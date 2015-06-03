@@ -82,7 +82,7 @@ vms('Item', [], function(){
 
 	});
 
-	itemSchema.getItemType = function() {
+	itemSchema.methods.getItemType = function() {
 		var ItemType;
 		switch (this.ItemType)
 		{
@@ -95,10 +95,10 @@ vms('Item', [], function(){
 			case 6: ItemType = 'CalabashBottle'; break; //testing
 			case 7: ItemType = 'Necklace'; break;
 			case 8: ItemType = 'Cape'; break;
-			case 9: ItemType = 'Outfit'; break; // Armor
-			case 10: ItemType = 'Gloves'; break;
+			case 9: ItemType = 'Outfit'; break; // Outfit
+			case 10: ItemType = 'Glovess'; break;
 			case 11: ItemType = 'Ring'; break;
-			case 12: ItemType = 'Shoes'; break; // Boots
+			case 12: ItemType = 'Boots'; break; // Bootss
 			case 13: ItemType = 'Sword'; break;
 			case 14: ItemType = 'Blade'; break;
 			case 15: ItemType = 'Marble'; break;
@@ -116,17 +116,17 @@ vms('Item', [], function(){
 		return ItemType;
 	};
 
-	itemSchema.InventoryItemType = function() {
+	itemSchema.methods.getInventoryItemType = function() {
 		var ItemType;
 		switch (this.ItemType)
 		{
-			case 6: ItemType = 'CalbashBottle'; break;
+			case 6: ItemType = 'Bottle'; break;
 			case 7: ItemType = 'Amulet'; break;
 			case 8: ItemType = 'Cape'; break;
-			case 9: ItemType = 'Armor'; break;
-			case 10: ItemType = 'Glove'; break;
+			case 9: ItemType = 'Outfit'; break;
+			case 10: ItemType = 'Gloves'; break;
 			case 11: ItemType = 'Ring'; break;
-			case 12: ItemType = 'Boot'; break;
+			case 12: ItemType = 'Boots'; break;
 			case 13:
 			case 14:
 			case 15:
@@ -143,7 +143,7 @@ vms('Item', [], function(){
 		return ItemType;
 	};
 
-	itemSchema.getRareness = function() {
+	itemSchema.methods.getRareness = function() {
 		var Rareness;
 		switch (this.Rareness)
 		{
@@ -170,40 +170,22 @@ vms('Item', [], function(){
 		}
 	};
 
-	itemSchema.getSlotSize = function() {
+	itemSchema.methods.getSlotSize = function() {
 		var t = this.ItemType;
 	    if (t === 2 || t === 7 || t === 11) {
-	        return 1;
+	        return 0;
 	    } else {
-	        return 2;
+	        return 1;
 	    }
 	};
 
-	itemSchema.isStackable = function() {
-		return this.ItemType === infos.Item.Type.Common || this.ItemType === infos.Item.Type.AssistStackable;
+	itemSchema.methods.isStackable = function() {
+		return this.ItemType === ItemType.Common || this.ItemType === ItemType.AssistStackable;
 	}
 
-	itemSchema.isAllowedByClan = function(characterClanID){
-		if (isNaN(characterClanID)) {
-			switch (characterClanID) {
-				case 'Guanyin':
-				characterClanID = 0;
-				break;
-				case 'Fujin':
-				characterClanID = 1;
-				break;
-				case 'Jinong':
-				characterClanID = 2;
-				break;
-				default:
-				return false;
-				break;
-			}
-		}
-		
-		//TODO: Check up on actuall clan restriction value from Item Info
-		if(this.Clan === 1 || this.Clan === (characterClanID +2)) return true;
-		return false;
+	itemSchema.methods.isAllowedByClan = function(clan){
+		clan += 2;
+		return this.Clan === clan;
 	};
 
 	global.ItemType = {
@@ -238,11 +220,12 @@ vms('Item', [], function(){
 	delete mongoose.models['item'];
 	var Item = db.mongoose.model('item', itemSchema);
 
-	db.Item = Item;
-
 	Item.getById = function(id, callback){
 		db.Item.findOne({
 			_id: id
 		}, callback);
 	};
+
+	db.Item = Item;
+
 });

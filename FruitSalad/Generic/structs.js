@@ -163,11 +163,11 @@ structs.Character = restruct.
 	//Equipt structs needed here, try find restruct's struct-in-struct example, or ask for one
 	struct('Amulet',structs.Equipt). // 220
 	struct('Cape',structs.Equipt). // 232
-	struct('Armor',structs.Equipt). // 244
-	struct('Glove',structs.Equipt). // 256
+	struct('Outfit',structs.Equipt). // 244
+	struct('Gloves',structs.Equipt). // 256
 	struct('Ring',structs.Equipt). // 268
-	struct('Boot',structs.Equipt). // 280
-	struct('CalbashBottle',structs.Equipt). //Unknown Equip( using calbash improves ur dmg and reduces ur def(hotkey Q)item ingame ID 90030) // 292
+	struct('Boots',structs.Equipt). // 280
+	struct('Bottle',structs.Equipt). //Unknown Equip( using calbash improves ur dmg and reduces ur def(hotkey Q)item ingame ID 90030) // 292
 	struct('Weapon',structs.Equipt). // 304
 	struct('Pet',structs.Pet). // 316
 	int32lu('storageUse'). // 320

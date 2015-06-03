@@ -34,6 +34,7 @@ vms('Zone', [
 	packets = require('./Helper/packets.js');
 	nav_mesh = require('./Modules/navtest-revised.js');
 	QuadTree = require('./Modules/QuadTree.js');
+	clone = require('clone');
 
 	vmscript.watch('./Generic');
 

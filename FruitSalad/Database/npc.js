@@ -337,7 +337,7 @@ vms('Item', [], function(){
         Unknown279: Number,
         Unknown280: Number,
         CraftWeapon: Number,
-        CraftArmor: Number,
+        CraftOutfit: Number,
         Buff: Number,
         Unknown281: Number,
         ConvertCP: Number,
