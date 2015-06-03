@@ -8,16 +8,14 @@ Zone.recv.useSkill = restruct.
 
 ZonePC.Set(0x19, {
 	Restruct: Zone.recv.useSkill,
-	function: function makeIt(client, input){
-		console.log('make it method');
+	function: function useSkill(client, input){
+		if(client.character.state.onSkillUseState){
+			client.character.state.onSkillUseState = false;
 
-		// if(client.character.state.onSkillStateUpdate){
-			// client.character.state.onSkillStateUpdate = false;
-
+			client.node.update();
 	        client.character.state.SkillID = input.SkillID;
-			client.character.state.SkillLevel = 20;
-
-			Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.viewable_action_distance);
-		// }
+			client.character.state.SkillLevel = input.SkillLevel;
+			Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
+		}
 	}
 });

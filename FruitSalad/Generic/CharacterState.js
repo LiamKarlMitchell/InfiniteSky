@@ -39,9 +39,9 @@ vms( 'CharacterState', [ 'CVec3', 'Structs' ], function(){
 
 	CharacterState = function CharacterState() {
 		// Varables here
-		this.AccountID = -1;
-		this.UniqueID = -1; //?? // Account ID/Client Index??
-		this.CharacterID = -1; //???    // Character ID ???? our new method dosnt use Integer for id.. lawl
+		this.AccountID = 1;
+		this.NodeID = 2; //?? // Account ID/Client Index??
+		this.CharacterID = 3; //???    // Character ID ???? our new method dosnt use Integer for id.. lawl
 		// Will need to make a map of character._id to integer ID thats unique, like its array index
 		// Can probably handle it same way im thinking of handling items and monsters actually :)
 		// And how I already handle Client # :P

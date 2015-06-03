@@ -91,8 +91,16 @@ LoginPC.Set(0x06, {
 
 			var newCharInfo = config.newCharacter[clanName];
 			for (var info in newCharInfo) {
+				if(info === 'Inventory') continue;
 				newCharacter[info] = newCharInfo[info];
 			}
+
+			var tempArray = {};
+			for(var i=0; i<newCharInfo.Inventory.length; i++){
+				tempArray[i] = newCharInfo.Inventory[i];
+			}
+
+			newCharacter.Inventory = tempArray;
 
 			switch(input.Clan){
 				case 0: // Guanyin

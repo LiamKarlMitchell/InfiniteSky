@@ -10,6 +10,7 @@ vms('Character', [], function(){
 	//var Date = db.mongoose.Schema.Types.Date;
 	var ObjectId = db.mongoose.Schema.Types.ObjectId;
 	var Mixed = db.mongoose.Schema.Types.Mixed;
+	// var Object = db.mongoose.Schema.Types.Object;
 
 	// Actuall definitions here
 	var itemEquip = {
@@ -26,8 +27,8 @@ vms('Character', [], function(){
 
 	var storageItemSchema = mongoose.Schema({
 		ID: {type: Number, default: 0 },
-		Column: {type: Number, default: 0 },
-		Row: {type: Number, default: 0 },
+		// Column: {type: Number, default: 0 },
+		// Row: {type: Number, default: 0 },
 		Amount: {type: Number, default: 0 },
 		Enchant: {type: Number, default: 0 },
 	});
@@ -112,75 +113,100 @@ vms('Character', [], function(){
 		RealY: Number,
 		RealZ: Number,
 		Health: Number,
-		Chi: Number,
+		Chi: Number
 
-		StrBonus: { type: Number, default: 0 },
-		DexBonus: { type: Number, default: 0 },
-		LuckBuff: { type: Number, default: 0 },
-		StrengthBuff: { type: Number, default: 0 },
-		ExperienceBuff: { type: Number, default: 0 },
-		AutoPillHP: { type: Number, default: 0 },
-		AutoPillChi: { type: Number, default: 0 },
-		ElementalDamage: { type: Number, default: 0 },
-		ElementalDefense: { type: Number, default: 0 },
-		DarkDamage: { type: Number, default: 0 },
-		FactionDefenseBonus: { type: Number, default: 0 },
-		ChanceDodge_Hit: { type: Number, default: 0 },
-		DamageBonus: { type: Number, default: 0 },
-		SilverBig: { type: Number, default: 0 },
-		Daily1: { type: Number, default: 0 },
-		DailyPvPKill: { type: Number, default: 0 },
-		DailyUnknown: { type: Number, default: 0 },
-		DailyUnknown2: { type: Number, default: 0 }	,
-
-		LastUpdated: { type: Date, default: Date.now },
-
-		Deaths: { type: Number, min: 0, default: 0 },
-		MonstersKilled: {}, // A hash to store monsters killed
+		// StrBonus: { type: Number, default: 0 },
+		// DexBonus: { type: Number, default: 0 },
+		// LuckBuff: { type: Number, default: 0 },
+		// StrengthBuff: { type: Number, default: 0 },
+		// ExperienceBuff: { type: Number, default: 0 },
+		// AutoPillHP: { type: Number, default: 0 },
+		// AutoPillChi: { type: Number, default: 0 },
+		// ElementalDamage: { type: Number, default: 0 },
+		// ElementalDefense: { type: Number, default: 0 },
+		// DarkDamage: { type: Number, default: 0 },
+		// FactionDefenseBonus: { type: Number, default: 0 },
+		// ChanceDodge_Hit: { type: Number, default: 0 },
+		// DamageBonus: { type: Number, default: 0 },
+		// SilverBig: { type: Number, default: 0 },
+		// Daily1: { type: Number, default: 0 },
+		// DailyPvPKill: { type: Number, default: 0 },
+		// DailyUnknown: { type: Number, default: 0 },
+		// DailyUnknown2: { type: Number, default: 0 }	,
+		// LastUpdated: { type: Date, default: Date.now },
+		// Deaths: { type: Number, min: 0, default: 0 }
+		// MonstersKilled: {}, // A hash to store monsters killed
 		//DuelWins: Number,
 		//DuelLosses: Number,
 		//TotalEnemyFactionKills: Number
 		// Misc data
 	});
 
+	characterSchema.methods.nextInventoryIndex = function() {
+		for(var i=0; i<64; i++){
+			if(this.Inventory[i] === undefined) return i;
+		}
+
+		return null;
+	};
+
+	characterSchema.methods.itemHasSpace = function(item_id, callback){
+		var self = this;
+		db.Item.getById(item_id, function(err, item){
+			if(err){
+				// TODO: Handle this error with a callback
+				return;
+			}
+
+			if(!item){
+				// TODO: Handle if there is no such item with this item ID
+				return;
+			}
+
+			var size = item.getSlotSize();
+
+			// var keys = 
+		});
+	};
+
 	// Add methods to the schema
 	// Could make a character can talk function to check if they have any sort of chat/time ban.
-	characterSchema.methods.talk = function() {
-		console.log(this.Name);
-	}
+	// characterSchema.methods.talk = function() {
+	// 	console.log(this.Name);
+	// }
 	// TODO: See why this is not working correctly with the vmscript...
-	characterSchema.methods.updateInfos = function(reloadEXPInfo) {
-		generic.calculateCharacterinfos(this,reloadEXPInfo);
-	}
+	// characterSchema.methods.updateInfos = function(reloadEXPInfo) {
+	// 	generic.calculateCharacterinfos(this,reloadEXPInfo);
+	// }
 
 	// characterSchema.methods.infos = new generic.characterStatsInfoObj();
 
-	characterSchema.methods.getHP = function() {
-		return this.state.CurrentHP;
-	}
+	// characterSchema.methods.getHP = function() {
+	// 	return this.state.CurrentHP;
+	// }
 
-	characterSchema.methods.setHP = function(value) {
-			this.state.CurrentHP = value;
-			if (this.state.CurrentHP > this.state.MaxHP) {
-				this.state.CurrentHP = this.state.MaxHP;
-			}
+	// characterSchema.methods.setHP = function(value) {
+	// 		this.state.CurrentHP = value;
+	// 		if (this.state.CurrentHP > this.state.MaxHP) {
+	// 			this.state.CurrentHP = this.state.MaxHP;
+	// 		}
 
-			if (this.state.CurrentHP<=0) {
-				this.Kill();
-			}
-		}
+	// 		if (this.state.CurrentHP<=0) {
+	// 			this.Kill();
+	// 		}
+	// 	}
 
-	characterSchema.methods.Kill = function(value) {
-		if (this.state.CurrentHP>0) this.state.CurrentHP = 0;
+	// characterSchema.methods.Kill = function(value) {
+	// 	if (this.state.CurrentHP>0) this.state.CurrentHP = 0;
 
-		this.state.Skill = 12;
-		this.state.Frame = 0;
+	// 	this.state.Skill = 12;
+	// 	this.state.Frame = 0;
 						
 
-		//this.state.Stance = 8; // Sheathed weapon
-		//this.state.Stance = 9; // Unsheathed weapon
-		// After dead probably set stance to 1 or 2 respectfully so that other players who see you don't see you constantly dieing?
-	}	
+	// 	//this.state.Stance = 8; // Sheathed weapon
+	// 	//this.state.Stance = 9; // Unsheathed weapon
+	// 	// After dead probably set stance to 1 or 2 respectfully so that other players who see you don't see you constantly dieing?
+	// }	
 
 	// characterSchema.methods.giveEXP = function(exp) {
 	// 	if (this.expinfo==null) return;
@@ -227,141 +253,141 @@ vms('Character', [], function(){
 	// 	return levelGained;
 	// }
 
-	characterSchema.methods.checkItemSlotFree = function(Column,Row,SlotSize,ItemID) {
-		console.log('Checking Slots Free for Column: '+Column+' Row: '+Row+' SlotSize: '+SlotSize);
+	// characterSchema.methods.checkItemSlotFree = function(Column,Row,SlotSize,ItemID) {
+	// 	console.log('Checking Slots Free for Column: '+Column+' Row: '+Row+' SlotSize: '+SlotSize);
 
-		var ColumnMin = 0;
-		var ColumnMax = Column;
+	// 	var ColumnMin = 0;
+	// 	var ColumnMax = Column;
 
-		var RowMin = 0;
-		var RowMax = Row;
+	// 	var RowMin = 0;
+	// 	var RowMax = Row;
 
-		if (SlotSize==4)
-		{
-			ColumnMax++;
-			RowMax++;
-		}
+	// 	if (SlotSize==4)
+	// 	{
+	// 		ColumnMax++;
+	// 		RowMax++;
+	// 	}
 	    
-	    console.log('ColumnMin: '+ColumnMin+' ColumnMax: '+ColumnMax+' RowMin: '+RowMin+' RowMax: '+RowMax);
+	//     console.log('ColumnMin: '+ColumnMin+' ColumnMax: '+ColumnMax+' RowMin: '+RowMin+' RowMax: '+RowMax);
 
-		if (Column > 7 || Row > 7 ) return 1;
+	// 	if (Column > 7 || Row > 7 ) return 1;
 
-		if (Column>0) ColumnMin=Column-1;
-		if (Column==7) ColumnMax = 7;
+	// 	if (Column>0) ColumnMin=Column-1;
+	// 	if (Column==7) ColumnMax = 7;
 
-		if (Row>0) RowMin=Row-1;
-		if (Row==7) RowMax = 7;
+	// 	if (Row>0) RowMin=Row-1;
+	// 	if (Row==7) RowMax = 7;
 
-		// Prevent placing on edges bottom, right
-		if (SlotSize==4 && (Column==7 || Row==7)) return 2;
+	// 	// Prevent placing on edges bottom, right
+	// 	if (SlotSize==4 && (Column==7 || Row==7)) return 2;
 
-		for (var i=0;i<64;i++)
-		{
-			var item = this.Inventory[i];
+	// 	for (var i=0;i<64;i++)
+	// 	{
+	// 		var item = this.Inventory[i];
 
-			if (item==null || item.ID==0) continue;
+	// 		if (item==null || item.ID==0) continue;
 
-			// Find items with Row between Row-1, Row and Row+1 taking into consideration boundrys of inventory
-			if (item.Column >= ColumnMin && item.Column <= ColumnMax && item.Row >= RowMin && item.Row <= RowMax)
-			{
-				// Item overlaps in same spot
-				if (item.Column == Column && item.Row == Row)
-				{
-					if (item.ID != ItemID || 0)
-					{
-						return false;
-					}
-				}
+	// 		// Find items with Row between Row-1, Row and Row+1 taking into consideration boundrys of inventory
+	// 		if (item.Column >= ColumnMin && item.Column <= ColumnMax && item.Row >= RowMin && item.Row <= RowMax)
+	// 		{
+	// 			// Item overlaps in same spot
+	// 			if (item.Column == Column && item.Row == Row)
+	// 			{
+	// 				if (item.ID != ItemID || 0)
+	// 				{
+	// 					return false;
+	// 				}
+	// 			}
 
-				var ii = infos.item[item.ID];
-				if (ii==null)
-				{
-					console.log('checkItemSlotFree() Unknown ItemID: '+item.ID);
-					continue;
-				}
+	// 			var ii = infos.item[item.ID];
+	// 			if (ii==null)
+	// 			{
+	// 				console.log('checkItemSlotFree() Unknown ItemID: '+item.ID);
+	// 				continue;
+	// 			}
 
-				var itemSlotSize = ii.GetSlotCount();
+	// 			var itemSlotSize = ii.GetSlotCount();
 
-				// Overlaps top left
-				if (itemSlotSize == 4 && item.Column<Column && item.Row<Row) return false;
+	// 			// Overlaps top left
+	// 			if (itemSlotSize == 4 && item.Column<Column && item.Row<Row) return false;
 
-				// Overlaps left side
-				if (itemSlotSize == 4 && item.Column<Column) return false;
+	// 			// Overlaps left side
+	// 			if (itemSlotSize == 4 && item.Column<Column) return false;
 
-				// Overlaps from top
-				if (itemSlotSize == 4 && item.Row<Row) return false;
+	// 			// Overlaps from top
+	// 			if (itemSlotSize == 4 && item.Row<Row) return false;
 
-				if (SlotSize==4)
-				{
-					// Check if there are no collisions bottom right sides
-					if (item.Column>Column || item.Row>Row || (item.Column>Column && item.Row>Row)) return false;
-				}
+	// 			if (SlotSize==4)
+	// 			{
+	// 				// Check if there are no collisions bottom right sides
+	// 				if (item.Column>Column || item.Row>Row || (item.Column>Column && item.Row>Row)) return false;
+	// 			}
 
-			}
-		}
-		return true;
-	}
+	// 		}
+	// 	}
+	// 	return true;
+	// }
 
-	characterSchema.methods.checkInventoryItemCollision = function(x, y, size) {
-	    var inventory = this.Inventory;
-	    console.log("We are got new item collision update");
-	    // Calculate the direction of moving item
-	    // Then if we move item upwards or to the left and has 4 squares space
-	    // We can only move it when it intersects with the same item only by 2 squares
-	    // allowed on the side we are direct to.
+	// characterSchema.methods.checkInventoryItemCollision = function(x, y, size) {
+	//     var inventory = this.Inventory;
+	//     console.log("We are got new item collision update");
+	//     // Calculate the direction of moving item
+	//     // Then if we move item upwards or to the left and has 4 squares space
+	//     // We can only move it when it intersects with the same item only by 2 squares
+	//     // allowed on the side we are direct to.
 	    
-	    if((x < 0 || y < 0) || (size === 4 && (y+1 > 7 || x+1 > 7))){
-	        console.log("Out of bonds");
-	        return;
-	    }
+	//     if((x < 0 || y < 0) || (size === 4 && (y+1 > 7 || x+1 > 7))){
+	//         console.log("Out of bonds");
+	//         return;
+	//     }
 
-	    var reservedSlots = {x:[], y:[]};
-	    if(size === 4){
-	        reservedSlots.x.push(x);
-	        reservedSlots.x.push(x+1);
-	        reservedSlots.y.push(y);
-	        reservedSlots.y.push(y+1);
-	    }else{
-	        reservedSlots.x.push(x);
-	        reservedSlots.y.push(y);
-	    }
+	//     var reservedSlots = {x:[], y:[]};
+	//     if(size === 4){
+	//         reservedSlots.x.push(x);
+	//         reservedSlots.x.push(x+1);
+	//         reservedSlots.y.push(y);
+	//         reservedSlots.y.push(y+1);
+	//     }else{
+	//         reservedSlots.x.push(x);
+	//         reservedSlots.y.push(y);
+	//     }
 	    
-	    var freeInventoryIndex;
+	//     var freeInventoryIndex;
 	    
-	    for (var i = 0; i < 64; i++) {
-	        var object = inventory[i];
-	        if(object === null){
-	        	if(freeInventoryIndex === undefined){
-	        		freeInventoryIndex = i;
-	        	}	
-	        	continue;
-	        }
+	//     for (var i = 0; i < 64; i++) {
+	//         var object = inventory[i];
+	//         if(object === null){
+	//         	if(freeInventoryIndex === undefined){
+	//         		freeInventoryIndex = i;
+	//         	}	
+	//         	continue;
+	//         }
 	        
-	        if(!object) {
-	            console.log("Intersection object error");
-	            break;
-	        }
+	//         if(!object) {
+	//             console.log("Intersection object error");
+	//             break;
+	//         }
 	        
-	        var itemInfo = infos.Item[object.ID];
+	//         var itemInfo = infos.Item[object.ID];
 	        
-	        if(!itemInfo){
-	            console.log("No item info for item of ID: " + object.ID);
-	            break;
-	        }
+	//         if(!itemInfo){
+	//             console.log("No item info for item of ID: " + object.ID);
+	//             break;
+	//         }
 	        
-	        if(reservedSlots.x.indexOf(object.Column) >= 0 && reservedSlots.y.indexOf(object.Row) >= 0){
-	            console.log("Intersection of item: " + itemInfo.Name);
-	            return false;
-	        }
-	    }
+	//         if(reservedSlots.x.indexOf(object.Column) >= 0 && reservedSlots.y.indexOf(object.Row) >= 0){
+	//             console.log("Intersection of item: " + itemInfo.Name);
+	//             return false;
+	//         }
+	//     }
 	    
-	    if(freeInventoryIndex === undefined){
-	    	console.log("No free index?");
-	    	return false;
-	    }
+	//     if(freeInventoryIndex === undefined){
+	//     	console.log("No free index?");
+	//     	return false;
+	//     }
 
-	    return {InventoryIndex: freeInventoryIndex, MoveRow: x, MoveColumn: y};
-	}
+	//     return {InventoryIndex: freeInventoryIndex, MoveRow: x, MoveColumn: y};
+	// }
 
 	/*
 		lvl 1:

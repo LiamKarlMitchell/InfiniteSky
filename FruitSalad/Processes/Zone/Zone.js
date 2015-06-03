@@ -57,7 +57,7 @@ vms('Zone', [
 				},
 				type: 'client'
 			}));
-			socket.character.state.UniqueID = socket.node.id;
+			socket.character.state.NodeID = socket.node.id;
 			return true;
 		}
 	};

@@ -143,7 +143,7 @@ structs.Character = restruct.
 	int32lu('Unused1',6).//Will add later // 8
 	int32lu('PlayTime'). // 12
 	string('Name',13). // 25
-	string('StuffLikeLocation',119). // 144
+	pad(119). // 144 StuffLikeLocation
 	int32lu('Clan'). // 148
 	int32lu('Gender'). // 152
 	int32lu('Hair'). // 156

@@ -189,6 +189,7 @@ ZonePC.Set(0x05, {
     Restruct: Zone.recv.Action,
 
     function: function ActionHandler(client, input) {
+        // console.log(input);
         client.character.state.Frame = input.Frame;
         client.character.state.Stance = input.Stance;
         client.character.state.Skill = input.Skill;
@@ -210,16 +211,32 @@ ZonePC.Set(0x05, {
         client.character.state.LocationNew.X = input.LocationNew.X;
         client.character.state.LocationNew.Y = input.LocationNew.Y;
         client.character.state.LocationNew.Z = input.LocationNew.Z;
+        
+        switch(input.Skill){
+            case 41:
+            case 32:
+            case 60:
+            case 66:
+            case 44:
+            case 40:
+            case 61:
+            case 68:
+            case 75:
+            case 67:
+            case 62:
+            client.character.state.onSkillUseState = true;
+            break;
 
-        client.node.update();
-        Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
+            default:
+            client.node.update();
+            Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
+            break;
+        }
     }
 });
 
 ZonePC.Set(0x8B, {
-    function: function(client, input) {
-        Zone.broadcastStates(client);
-    }
+    function: Zone.broadcastStates
 });
 
 

@@ -170,12 +170,12 @@ vms('Item', [], function(){
 		}
 	};
 
-	itemSchema.getSlotCount = function() {
+	itemSchema.getSlotSize = function() {
 		var t = this.ItemType;
 	    if (t === 2 || t === 7 || t === 11) {
 	        return 1;
 	    } else {
-	        return 4;
+	        return 2;
 	    }
 	};
 
