@@ -3,7 +3,7 @@ process.log = function(){
 	for(var i=0; i<arguments.length; i++){
 		array.push(arguments[i]);
 	}
-	array.unshift('Zone ' + process.argv[2]);
+	array.unshift(process.argv[3]);
 	process.api.log.apply(this, array);
 };
 process.exception = function() {
@@ -11,9 +11,11 @@ process.exception = function() {
 	for(var i=0; i<arguments.length; i++){
 		array.push(arguments[i]);
 	}
-	array.unshift('!Zone ' + process.argv[2]+' Exception');
+	array.unshift('!' + process.argv[3]+' Exception\n\r');
 	process.api.log.apply(this, array);
 }
+// TODO: Maybe a debug option to enable this wrapper, so we can debug stuff on runtime.
+// This method is used when all vms console logs are dumped on runtime, we dont want copies of that.
 console.log = process.log;
 
 vmscript.watch('Config/world.json');
@@ -23,20 +25,15 @@ vms('Zone', [
 	'Config/world.json',
 	'Config/network.json'
 ], function(){
-
-
-console.log('21 ***********************~~~~~~~~~~~~~~~*********************');	util = require('./Modules/util.js');
-console.log('22 ***********************~~~~~~~~~~~~~~~*********************');	util.setupUncaughtExceptionHandler(process.exception);
-console.log('23 ***********************~~~~~~~~~~~~~~~*********************');	CachedBuffer = require('./Modules/CachedBuffer.js');
-console.log('24 ***********************~~~~~~~~~~~~~~~*********************');	PacketCollection = require('./Modules/PacketCollection.js');
-console.log('25 ***********************~~~~~~~~~~~~~~~*********************');	restruct = require('./Modules/restruct');
-console.log('26 ***********************~~~~~~~~~~~~~~~*********************');	Database = require('./Modules/db.js');
-console.log(':(');
-console.log('27 ***********************~~~~~~~~~~~~~~~*********************');	packets = require('./Helper/packets.js');
-console.log('28 ***********************~~~~~~~~~~~~~~~*********************');	nav_mesh = require('./Modules/navtest-revised.js');
-console.log('29 ***********************~~~~~~~~~~~~~~~*********************');	QuadTree = require('./Modules/QuadTree.js');
-
-
+	util = require('./Modules/util.js');
+	util.setupUncaughtExceptionHandler(process.exception);
+	CachedBuffer = require('./Modules/CachedBuffer.js');
+	PacketCollection = require('./Modules/PacketCollection.js');
+	restruct = require('./Modules/restruct');
+	Database = require('./Modules/db.js');
+	packets = require('./Helper/packets.js');
+	nav_mesh = require('./Modules/navtest-revised.js');
+	QuadTree = require('./Modules/QuadTree.js');
 
 	vmscript.watch('./Generic');
 
@@ -209,20 +206,14 @@ console.log('29 ***********************~~~~~~~~~~~~~~~*********************');	Q
 
 	ZoneInstance.prototype.init = function(){
 		if(this.initialized) return;
-
-		console.log('Init');
 		this.initialized = true;
-		// Make roundDivisable a function in helpers/util.js or something.
-		function roundDivisable(v,d) {
-		    return (Math.round(v / d) * d) || d;
-		}
+
 		var startTime = new Date().getTime();
 		
 		this.packetCollection = new PacketCollection('ZonePC');
 
 		var self = this;
 		process.on('message', function(type, socket){return global.Zone.onMessage(type, socket);});
-		// console.log("Loading navigation mesh for", this.name);
 		var mesh_path = config.world.data_path + "navigation_mesh/" + this.name + '.obj';
 		this.navigation = new nav_mesh(mesh_path, function(mesh){
 			// process.log("Navigation mesh loaded for", self.name);
@@ -242,9 +233,9 @@ console.log('29 ***********************~~~~~~~~~~~~~~~*********************');	Q
 			var width = Math.abs(mesh.dimensions.right) + Math.abs(mesh.dimensions.left);
 
 			self.QuadTree = new QuadTree({
-				x: roundDivisable(mesh.dimensions.left, 2),
-				y: roundDivisable(mesh.dimensions.top, 2),
-				size: roundDivisable(Math.max(width, height), 2)
+				x: util.roundDivisable(mesh.dimensions.left, 2),
+				y: util.roundDivisable(mesh.dimensions.top, 2),
+				size: util.roundDivisable(Math.max(width, height), 2)
 			});
 			Database(config.world.database.connection_string, function(){
 				vmscript.watch('Database');
@@ -284,12 +275,12 @@ console.log('29 ***********************~~~~~~~~~~~~~~~*********************');	Q
 
 	// TODO: If error loading zone call process.api.zoneInitResponse(error);
 	// Errors loading zones should not stop server from loading just display the error and warning like in old server code :)
-	console.log('ZONE HAS GOT TO 273');
 
 	if(typeof(Zone) === 'undefined') {
 		global.Zone = new ZoneInstance();
-		global.Zone.init();
 	} else {
 		global.Zone.__proto__ = ZoneInstance.prototype;
 	}
+
+	global.Zone.init();
 });

@@ -131,14 +131,13 @@ vms('World Server', [
 		this.clients.splice(this.clients.indexOf(socket), 1);
 		socket.destroy();
 	};
-
 	WorldInstance.prototype.loadZone = function World__loadZone(id, done) {
-		console.log("Spawning Child Process for Zone: " + id + ' ' + (config.zones.name || ''));
+		console.log("Spawning Child Process for Zone: " + id + ' ' + config.zones[id.toString()].Name);
 		this.zoneSpawner.spawnChild({
 			name: parseInt(id),
 			pipeError: false,
 			script: './Processes/Zone/Zone.js'
-		}, null, [id]);
+		}, null, [id, config.zones[id.toString()].Name]);
 
 		done();
 	};

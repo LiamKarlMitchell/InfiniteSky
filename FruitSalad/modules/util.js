@@ -43,6 +43,10 @@ var util = {
     return key;
   },
 
+  roundDivisable: function roundDivisable(v,d) {
+    return (Math.round(v / d) * d) || d;
+  },
+
   dumpError: dumpError,
 
   logHex: function(data) {
