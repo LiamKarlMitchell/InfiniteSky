@@ -207,7 +207,10 @@ VMScriptObj.prototype.parse = function(file_path){
 					EventEmitter.emit('check dependencies');
 				}catch(e){
 					try{
-						JSONParser.parse(code.replace(/(?:\/\*(?:[\s\S]*?)\*\/)|(?:\/\/(?:.*)$)/gm, ''));
+						JSONParser.parse(code.replace(/(?:\/\*(?:[\s\S]*?)\*\/)|(?:\/\/(?:.*)$)/gm, 
+							function (match) { 
+								return new Array(match.split('\n').length).join('\n');
+							}));
 					}catch(e){
 						dumpError(e);
 					}
