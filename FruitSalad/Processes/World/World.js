@@ -127,6 +127,7 @@ vms('World Server', [
 	};
 
 	WorldInstance.prototype.init = function(){
+		console.log('World Instance Init. '+ ( new Date() ));
 		if(this.listening) return;
 
 		var self = this;
@@ -158,7 +159,7 @@ vms('World Server', [
 					if(zone && zone.Load){
 						if(pool===0) break;
 						pool--;
-
+						console.log("Spawning Child Process for Zone: " + id + ' ' + (config.zones.name || ''));
 						zones.spawnChild({
 							name: parseInt(id),
 							pipeError: false,
@@ -190,6 +191,8 @@ vms('World Server', [
 					if(pool===0) break;
 				}
 			}
+		} else {
+			console.error("No Zones have been specified to load in the world configuration.");
 		}
 
 		process.zones = zones.childrens;
@@ -215,10 +218,10 @@ vms('World Server', [
 		});
 	}
 
-	if(typeof World === 'undefined')
+	if(typeof World === 'undefined') {
 		global.World = new WorldInstance();
-	else
+		global.World.init();
+	} else {
 		global.World.__proto__ = WorldInstance.prototype;
-
-	global.World.init();
+	}
 });
