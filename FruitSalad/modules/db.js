@@ -2,7 +2,7 @@
 // Copyright (c) InfiniteSky Dev Teams - Licensed under GNU GPL
 // For more information, see LICENCE in the main folder
 
-mongoose = require('mongoose');
+var mongoose = require('mongoose');
 
 //Constructor
 // Handles connecting to the database

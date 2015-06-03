@@ -16,6 +16,13 @@ process.exception = function() {
 }
 console.log = process.log;
 
+vmscript.watch('Config/world.json');
+vmscript.watch('Config/network.json');
+
+vms('Zone', [
+	'Config/world.json',
+	'Config/network.json'
+], function(){
 
 
 console.log('21 ***********************~~~~~~~~~~~~~~~*********************');	util = require('./Modules/util.js');
@@ -24,17 +31,12 @@ console.log('23 ***********************~~~~~~~~~~~~~~~*********************');	C
 console.log('24 ***********************~~~~~~~~~~~~~~~*********************');	PacketCollection = require('./Modules/PacketCollection.js');
 console.log('25 ***********************~~~~~~~~~~~~~~~*********************');	restruct = require('./Modules/restruct');
 console.log('26 ***********************~~~~~~~~~~~~~~~*********************');	Database = require('./Modules/db.js');
+console.log(':(');
 console.log('27 ***********************~~~~~~~~~~~~~~~*********************');	packets = require('./Helper/packets.js');
 console.log('28 ***********************~~~~~~~~~~~~~~~*********************');	nav_mesh = require('./Modules/navtest-revised.js');
 console.log('29 ***********************~~~~~~~~~~~~~~~*********************');	QuadTree = require('./Modules/QuadTree.js');
 
-vmscript.watch('Config/world.json');
-vmscript.watch('Config/network.json');
 
-vms('Zone', [
-	'Config/world.json',
-	'Config/network.json'
-], function(){
 
 	vmscript.watch('./Generic');
 
@@ -279,7 +281,9 @@ vms('Zone', [
 			});
 		});
 	}
-console.log('***********************~~~~~~~~~~~~~~~*********************');
+
+	// TODO: If error loading zone call process.api.zoneInitResponse(error);
+	// Errors loading zones should not stop server from loading just display the error and warning like in old server code :)
 	console.log('ZONE HAS GOT TO 273');
 
 	if(typeof(Zone) === 'undefined') {
