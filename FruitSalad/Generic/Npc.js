@@ -23,9 +23,8 @@ vms('Npc', [
 
 // npc.Location.set(spawninfo.Location);
 // npc.FacingDirection = spawninfo.Direction;
-		this.UniqueID = 0; // Set to node.id we receive from QuadTree
-		this._ID = global.NpcNextID; // Faction ID?
-		global.NpcNextID++;
+		this.NodeID = 0; // Set to node.id we receive from QuadTree
+		this._ID = ++global.NpcNextID; // Faction ID?
 		this.OtherID = data.ID;
 
 		this.Life = 1;
@@ -43,7 +42,7 @@ vms('Npc', [
 		this.HP = 1; // Find out max hp for this Npc and set it.
 
 		this.NpcStatePacket = restruct.
-			int32lu('UniqueID').
+			int32lu('NodeID').
 			int32lu('ID').
 			int32lu('OtherID').
 			int32lu('Life').
@@ -71,7 +70,7 @@ vms('Npc', [
 		if(!node){
 			return;
 		}
-		this.UniqueID = node.id;
+		this.NodeID = node.id;
 	};
 
 	global.Npc = Npc;

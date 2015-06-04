@@ -298,9 +298,31 @@ ItemAction[3] = function CharacterItem_Equip(input){
 
 // console.log(new EquipItem())
 
+// Revised: 03/06/2015 22:10:39
 ItemAction[1] = function inventoryDropItem(input){
     console.log(input);
 
+    var invItem = this.character.Inventory[input.InventoryIndex];
+
+    var NewItemObj = new ItemObj();
+    NewItemObj.setLocation(this.character.state.Location);
+    NewItemObj.setObj(invItem);
+
+    var node = new QuadTree.QuadTreeNode({
+        object: NewItemObj,
+        update: function(node, delta) {
+            console.log(this.Location.X, this.Location.Z);
+            return {
+                x: this.Location.X,
+                y: this.Location.Z,
+                size: 1
+            };
+        },
+        type: 'item'
+    });
+    var zoneNode = Zone.QuadTree.addNode(node);
+    NewItemObj.setNode(zoneNode);
+    Zone.sendToAllArea(this, true, NewItemObj.getPacket(), config.network.viewable_action_distance);
     Zone.send.itemAction.call(this, 1, input);
 };
 

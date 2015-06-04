@@ -51,6 +51,7 @@ vms('Zone', [
 		this.QuadTree = null;
 		this.Clients = [];
 		this.Npc = [];
+		this.Items = [];
 	}
 
 	ZoneInstance.prototype.addSocket = function(socket){
@@ -197,8 +198,8 @@ vms('Zone', [
 		this.Npc.push(npc);
 	};
 
-	ZoneInstance.prototype.broadcastStates = function(client, self){
-        var found = Zone.QuadTree.query({ CVec3: client.character.state.Location, radius: config.network.viewable_action_distance, type: ['npc'] });
+	ZoneInstance.prototype.broadcastStates = function(client){
+        var found = Zone.QuadTree.query({ CVec3: client.character.state.Location, radius: config.network.viewable_action_distance, type: ['npc', 'item'] });
         for(var i=0; i<found.length; i++){
             var f = found[i];
             client.write(f.object.getPacket());
@@ -277,7 +278,7 @@ vms('Zone', [
 	// TODO: If error loading zone call process.api.zoneInitResponse(error);
 	// Errors loading zones should not stop server from loading just display the error and warning like in old server code :)
 
-	if(typeof(Zone) === 'undefined') {
+	if(typeof Zone === 'undefined') {
 		global.Zone = new ZoneInstance();
 	} else {
 		global.Zone.__proto__ = ZoneInstance.prototype;

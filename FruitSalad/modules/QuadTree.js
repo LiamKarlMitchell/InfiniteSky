@@ -278,6 +278,7 @@ QuadTree.prototype.query = function(query) {
                     var dx = this.nodes[n].x - query.x;
                     var dy = this.nodes[n].y - query.y;
                     var distance = Math.sqrt((dx * dx) + (dy * dy));
+                    // console.log(query.type, this.nodes[n].type, distance);
                     if(distance <= query.radius) {
                         // console.log(this.nodes[n].type, query.type);
                         if(query.type.indexOf(this.nodes[n].type) === -1) continue;

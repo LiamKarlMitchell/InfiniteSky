@@ -236,7 +236,9 @@ ZonePC.Set(0x05, {
 });
 
 ZonePC.Set(0x8B, {
-    function: Zone.broadcastStates
+    function: function(client){
+        Zone.broadcastStates(client);
+    }
 });
 
 

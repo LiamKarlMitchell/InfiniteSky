@@ -152,7 +152,7 @@ vms('World Server', [
 
 
 	WorldInstance.prototype.init = function(){
-		console.log('World Instance Init. '+ ( new Date() ));
+		console.log('World Instance Init.');
 		if(this.listening) return;
 
 		var self = this;
