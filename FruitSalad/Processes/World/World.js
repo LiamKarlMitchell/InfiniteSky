@@ -22,14 +22,14 @@ vms('World Server', [
 	Netmask = require('Netmask').Netmask;
 
 	global.api.sendSocketToTransferQueue = function(obj){
-		var key = util.toHexString(obj.hash);
-		console.log("[World] Adding character transfer:", key);
+		//var key = util.toHexString(obj.hash);
+		console.log('WORLD sendSocketToTransferQueue called');
+		console.log(obj);
+		console.log("[World] Adding character transfer:", obj.username);
 
-		World.characterTransfer[key] = obj;
-		process.api.call('Login', 'sendSocketAfterTransferQueue', [obj.hash]);
+		World.characterTransfer[obj.username] = obj;
+		process.api.call('Login', 'sendSocketAfterTransferQueue', [obj.username]);
 	};
-
-	process.api.invalidateAPI(process.pid);
 
 	function WorldInstance(){
 		/*
@@ -225,4 +225,8 @@ vms('World Server', [
 	} else {
 		global.World.__proto__ = WorldInstance.prototype;
 	}
+	process.api.invalidateAPI(process.pid);
 });
+
+
+console.log(global.api);

@@ -39,11 +39,10 @@ Login.send.onLoginReply = function(status){
 	// USERNAME MUST BE SENT
 	if (this.account) {
 		obj.Username = this.account.Username;
-		//obj.Pin = this.account.UsePin ? this.account.Pin : "****";
 		obj.Pin = '****';
 		obj.UsePin = this.account.UsePin ? 1 : 0;
 	}
-	
+
 	var packedObj = Login.send.onLogin.pack(obj);
 	var buffer = new Buffer(packedObj);
 	

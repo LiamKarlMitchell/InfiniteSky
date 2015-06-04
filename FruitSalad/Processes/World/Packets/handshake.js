@@ -8,15 +8,14 @@ WorldPC.Set(0x01, {
 	Size: 27,
 	function: function(socket, buffer){
 		// TODO: Add IP validation?
-		var hash = buffer.slice(0, 12);
-		var key = util.toHexString(hash);
+		var username = buffer.slice(0, 13);
 
-		var transferObj = World.characterTransfer[key];
-		delete World.characterTransfer[key];
+		var transferObj = World.characterTransfer[username];
+		delete World.characterTransfer[username];
 		
 		if(!transferObj){
 			console.log(buffer);
-			console.log("No transfer obj for:", key);
+			console.log("No transfer obj for:", username);
 			return;
 		}
 

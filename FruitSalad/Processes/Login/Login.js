@@ -24,15 +24,13 @@ vms('Login Server', [
 	vmscript.watch('./Generic/structs.js');
 	vmscript.watch('./Generic/CharacterInfos.js');
 
-	global.api.sendSocketAfterTransferQueue = function(hash){
-		var key = util.toHexString(hash);
-		if(Login.characterTransfer[key]){
-			Login.characterTransfer[key]();
-			delete Login.characterTransfer[key];
+	global.api.sendSocketAfterTransferQueue = function(username){
+		console.log('LOGIN Send socket....');
+		if(Login.characterTransfer[username]){
+			Login.characterTransfer[username]();
+			delete Login.characterTransfer[username];
 		}
 	};
-
-	process.api.invalidateAPI(process.pid);
 
 	function LoginInstance(){
 		/*
@@ -165,10 +163,11 @@ vms('Login Server', [
 		});
 	}
 
-	if(typeof Login === 'undefined')
+	if(typeof Login === 'undefined') {
 		global.Login = new LoginInstance();
-	else
+		global.Login.init();
+	} else {
 		global.Login.__proto__ = LoginInstance.prototype;
-
-	global.Login.init();
+	}
+	process.api.invalidateAPI(process.pid);
 });

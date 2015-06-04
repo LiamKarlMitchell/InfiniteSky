@@ -280,9 +280,9 @@ vms('Zone', [
 
 	if(typeof Zone === 'undefined') {
 		global.Zone = new ZoneInstance();
+		global.Zone.init();
 	} else {
 		global.Zone.__proto__ = ZoneInstance.prototype;
 	}
-
-	global.Zone.init();
+	process.api.invalidateAPI(process.pid);
 });

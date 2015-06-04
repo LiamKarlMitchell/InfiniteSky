@@ -28,7 +28,7 @@ LoginPC.Set(0x09, {
 
 		// TODO: Make sure that we send the player to right map if disconnected w/e.
 		var transferObj = {
-			hash: socket.hash,
+			username: socket.account.Username,
 			accountID: socket.account._id,
 			character: socket.character._id
 		};
@@ -83,24 +83,17 @@ LoginPC.Set(0x09, {
 			theIP = config.externalIP;
 		}
 		
-		process.api.call('World', 'sendSocketToTransferQueue', [transferObj]);
+		process.api.call('World', 'sendSocketToTransferQueue', transferObj);
 		socket.zoneTransfer = true;
 		console.log('Sending client to '+theIP);
 		// Send the transfer to zone packet.
-		socket.write(new Buffer(Login.send.MapLoadReply.pack({
-				packetID: 0x0A,
-				Status: 0,
-				IP: theIP,
-				Port: config.network.ports.world
-		})));
-		// var key = util.toHexString(socket.hash);
-		// Login.characterTransfer[key] = function(){
-		// 	socket.write(new Buffer(Login.send.MapLoadReply.pack({
-		// 		packetID: 0x0A,
-		// 		Status: 0,
-		// 		IP: '127.0.0.1',
-		// 		Port: config.network.ports.world
-		// 	})));
-		// };
+		Login.characterTransfer[socket.account.Username] = function() {
+			socket.write(new Buffer(Login.send.MapLoadReply.pack({
+					packetID: 0x0A,
+					Status: 0,
+					IP: theIP,
+					Port: config.network.ports.world
+			})));
+		}
 	}
 });

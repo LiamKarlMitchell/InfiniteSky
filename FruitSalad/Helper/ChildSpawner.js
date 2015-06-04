@@ -21,6 +21,7 @@ function ChildSpawner(api) {
 	var self = this;
 
 	this.api.invalidateAPI = function(pid){
+		console.log('Invalidate API '+pid);
 		// TODO: Consider a timeout.
 		if(pid && self.childrens[pid]){
 			self.childrens[pid].agent
@@ -50,11 +51,11 @@ function ChildSpawner(api) {
 	}
 
 	this.api.call = function(process_name, callback, args){
-		// console.log(process_name, callback, args);
+		console.log(process_name, callback, args);
 
 		var p = self.childrens[process_name];
-
-		if(p.api[callback]){
+		// TODO: Comment what this does behind the scenes.
+		if(p && p.api[callback]){
 			console.log("Calling", process_name, 'for', callback);
 			p.api[callback].apply(self, args);
 		}
