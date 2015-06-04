@@ -404,8 +404,8 @@ vms('Character', [], function(){
 	*/
 
 	//Constructor
-	delete mongoose.models['character_mongoose'];
-	var Character = db.mongoose.model('character_mongoose', characterSchema);
+	delete db.mongoose.models['characters'];
+	var Character = db.mongoose.model('characters', characterSchema);
 
 	db.Character = Character;
 });

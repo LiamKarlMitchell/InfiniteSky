@@ -18,6 +18,8 @@ vms('Login Server', [
 	hexy = require('hexy').hexy;
 	util = require('./Modules/util.js');
 	util.setupUncaughtExceptionHandler();
+	os = require('os');
+	Netmask = require('Netmask').Netmask;
 
 	vmscript.watch('./Generic/structs.js');
 	vmscript.watch('./Generic/CharacterInfos.js');

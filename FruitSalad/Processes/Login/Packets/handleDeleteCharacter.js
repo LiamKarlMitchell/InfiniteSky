@@ -37,7 +37,7 @@ LoginPC.Set(0x07, {
 			Login.send.deleteCharacterReply.call(socket, 3);
 			return;
 		}
-
+		console.log('Deleting character: '+character.Name);
 		character.remove(function(err, removed){
 			if(err){
 				console.log(err);

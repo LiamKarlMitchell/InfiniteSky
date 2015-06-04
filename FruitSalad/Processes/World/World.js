@@ -18,6 +18,8 @@ vms('World Server', [
 	util = require('./Modules/util.js');
 	util.setupUncaughtExceptionHandler();
 	// packets = require('./Helper/packets.js');
+	os = require('os');
+	Netmask = require('Netmask').Netmask;
 
 	global.api.sendSocketToTransferQueue = function(obj){
 		var key = util.toHexString(obj.hash);
@@ -76,6 +78,7 @@ vms('World Server', [
 		if(!this.acceptConnections) {
 			// TODO: Send packet back to client denying its connection.
 			// There is a packet 00 with status for this kind of thing.
+			console.log('World had connection but it is not ready.');
 			return;
 		}
 		socket.paused = false;

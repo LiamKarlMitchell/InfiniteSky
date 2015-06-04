@@ -21,8 +21,8 @@ vms('Account', [], function(){
 		AP: {type: Number, default: 0}
 	});
 
-	delete mongoose.models.account_mongoose;
-	db.Account = mongoose.model('account_mongoose', db.accountSchema);
+	delete db.mongoose.models['accounts'];
+	db.Account = mongoose.model('accounts', db.accountSchema);
 
 	//Log user out
 	db.Account.logoutUser = function (socket) {
