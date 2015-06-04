@@ -32,10 +32,15 @@ util.outputHeaderText();
 
 
 var ChildSpawner = require('./Helper/ChildSpawner.js');
-var spawner = new ChildSpawner.Spawner({});
+spawner = new ChildSpawner.Spawner({});
 
-var readline = require('readline'),
-    rl = readline.createInterface(process.stdin, process.stdout);
+var repl = require("repl");
+repl.start({
+  prompt: "main> ",
+  input: process.stdin,
+  output: process.stdout
+});
+
 var vm = require('vm');
 
 // Prevent the following warning about possible memory leak with the EventEmitters.
@@ -50,15 +55,4 @@ spawner.onReady(function(){
 	console.log("Server loaded in", (new Date().getTime() - startTime), "ms");
 	// rl.setPrompt('> ');
 	// rl.prompt();
-
-	rl.on('line', function(line) {
-	 	try{
-	 		console.log(vm.runInThisContext(line.trim()));
-	 	}catch(e){
-	 		console.log(e);
-	 	}
-		// rl.prompt();
-	}).on('close', function() {
-		process.exit(0);
-	});
 });
