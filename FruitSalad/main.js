@@ -43,20 +43,35 @@ process.setMaxListeners(0);
 
 spawner.spawnChild({name: 'Login', script: 'Processes\\Login\\Login.js'});
 spawner.spawnChild({name: 'World', script: 'Processes\\World\\World.js'});
-// Database = require('./Modules/db.js');
-// vmscript = require('./vmscript/vmscript.js');
-// vmscript.watch('./Config/login.json');
-// Database()
+vmscript = require('./vmscript.js');
 
-// function createaccount(user, pass, level){
-// 	console.log("test");
-// };
+var v = new vmscript();
+v.watch('Config/login.json');
 
 spawner.onReady(function(){
 	console.log("Server loaded in", (new Date().getTime() - startTime), "ms");
-	repl.start({
+});
+
+repl_context = repl.start({
 	  prompt: "main> ",
 	  input: process.stdin,
 	  output: process.stdout
+}).context;
+
+// Expose things to the repl.
+repl_context.vmscript = v;
+repl_context.spawner = spawner;
+repl_context.api = spawner.api;
+
+// A function we can call once at runtime to grant REPL access to the database.
+// It will load the scripts in the Database directory.
+repl_context.loadDB = function loadDB() {
+	if (global.db !== undefined) {
+		return;
+	}
+	var Database = require('./Modules/db.js');
+	repl_context.db = Database(config.login.database.connection_string, function(){
+		console.log("Database connected @", config.login.database.connection_string);
+		v.watch('Database');
 	});
-});
+};

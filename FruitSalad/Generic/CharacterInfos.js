@@ -368,6 +368,10 @@ CharacterInfos.prototype.updateEquipment = function(equipment_name, callback){
 
   var self = this;
   db.Item.getById(item.ID, function(err, itemInfo){
+    if (err) {
+      console.error(err);
+    }
+    console.log('GetItem '+item.ID);
     self.updateEquipment_OnItemInfo(err, itemInfo, equipment_name, item, callback);
   });
 }

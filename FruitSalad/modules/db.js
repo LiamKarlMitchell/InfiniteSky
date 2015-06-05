@@ -8,10 +8,8 @@ var mongoose = require('mongoose');
 // Handles connecting to the database
 function DB(connectString, callback) {
 	global.db = this;
-
 	this.mongoose = mongoose;
 	global.mongoose = mongoose;
-
 	mongoose.connect(connectString);
 
 	// When successfully connected
@@ -39,6 +37,8 @@ function DB(connectString, callback) {
 	    console.log(docs);
 	  });
 	};
+
+	return this;
 }
 
 module.exports = DB;
