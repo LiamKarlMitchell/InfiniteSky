@@ -25,8 +25,9 @@ vms('Login Server', [
 	vmscript.watch('./Generic/CharacterInfos.js');
 
 	global.api.sendSocketAfterTransferQueue = function(username){
-		console.log('LOGIN Send socket....');
+		console.log('LOGIN Send socket....', username);
 		if(Login.characterTransfer[username]){
+			console.log("Sending response");
 			Login.characterTransfer[username]();
 			delete Login.characterTransfer[username];
 		}
@@ -157,6 +158,7 @@ vms('Login Server', [
 					'Database',
 					'Generic/structs.js'
 				], function(){
+					// db.account.create
 					self.acceptConnections = true;
 					process.api.run();
 			});

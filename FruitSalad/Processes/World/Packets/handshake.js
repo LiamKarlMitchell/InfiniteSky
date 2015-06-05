@@ -1,21 +1,22 @@
-// World.recv.Handshake = restruct.
-	// string('AccountName', 13).
-	// pad(5);
+World.recv.Handshake = restruct.
+	string('AccountName', 13).
+	pad(5);
 // int8lu('Slot').
 // int32lu('MapID');
 
 WorldPC.Set(0x01, {
+	Restruct: World.recv.Handshake,
 	Size: 27,
-	function: function(socket, buffer){
+	function: function(socket, input){
 		// TODO: Add IP validation?
-		var username = buffer.slice(0, 13);
+		// var username = buffer.slice(0, 13);
 
-		var transferObj = World.characterTransfer[username];
-		delete World.characterTransfer[username];
+		var transferObj = World.characterTransfer[input.AccountName];
+		delete World.characterTransfer[input.AccountName];
 		
 		if(!transferObj){
-			console.log(buffer);
-			console.log("No transfer obj for:", username);
+			console.log(input);
+			console.log("No transfer obj for:", input.AccountName);
 			return;
 		}
 

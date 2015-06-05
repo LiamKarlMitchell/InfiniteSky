@@ -50,13 +50,15 @@ function ChildSpawner(api) {
 		}
 	}
 
-	this.api.call = function(process_name, callback, args){
-		console.log(process_name, callback, args);
-
+	this.api.call = function(process_name, callback){
 		var p = self.childrens[process_name];
 		// TODO: Comment what this does behind the scenes.
 		if(p && p.api[callback]){
 			console.log("Calling", process_name, 'for', callback);
+			var args = [];
+			for(var i=2; i<arguments.length; i++){
+				args.push(arguments[i]);
+			}
 			p.api[callback].apply(self, args);
 		}
 	};

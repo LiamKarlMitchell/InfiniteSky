@@ -35,12 +35,6 @@ var ChildSpawner = require('./Helper/ChildSpawner.js');
 spawner = new ChildSpawner.Spawner({});
 
 var repl = require("repl");
-repl.start({
-  prompt: "main> ",
-  input: process.stdin,
-  output: process.stdout
-});
-
 var vm = require('vm');
 
 // Prevent the following warning about possible memory leak with the EventEmitters.
@@ -49,10 +43,20 @@ process.setMaxListeners(0);
 
 spawner.spawnChild({name: 'Login', script: 'Processes\\Login\\Login.js'});
 spawner.spawnChild({name: 'World', script: 'Processes\\World\\World.js'});
+// Database = require('./Modules/db.js');
+// vmscript = require('./vmscript/vmscript.js');
+// vmscript.watch('./Config/login.json');
+// Database()
 
+// function createaccount(user, pass, level){
+// 	console.log("test");
+// };
 
 spawner.onReady(function(){
 	console.log("Server loaded in", (new Date().getTime() - startTime), "ms");
-	// rl.setPrompt('> ');
-	// rl.prompt();
+	repl.start({
+	  prompt: "main> ",
+	  input: process.stdin,
+	  output: process.stdout
+	});
 });

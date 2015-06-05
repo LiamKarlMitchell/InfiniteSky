@@ -85,15 +85,15 @@ LoginPC.Set(0x09, {
 		
 		process.api.call('World', 'sendSocketToTransferQueue', transferObj);
 		socket.zoneTransfer = true;
-		console.log('Sending client to '+theIP);
 		// Send the transfer to zone packet.
-		Login.characterTransfer[socket.account.Username] = function() {
+		Login.characterTransfer[transferObj.username] = function() {
+			console.log('Sending client to '+theIP);
 			socket.write(new Buffer(Login.send.MapLoadReply.pack({
 					packetID: 0x0A,
 					Status: 0,
 					IP: theIP,
 					Port: config.network.ports.world
 			})));
-		}
+		};
 	}
 });

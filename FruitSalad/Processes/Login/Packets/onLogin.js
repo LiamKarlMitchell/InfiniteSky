@@ -62,6 +62,14 @@ LoginPC.Set(0x03, {
 			}
 
 			if(account === null){
+				//TODO: Add configurable flag for adding accounts that does not exists.
+				// console.log("creating account");
+				// db.Account.create({
+				// 	_id: 1,
+				// 	Username: input.Username,
+				// 	Password: input.Password,
+				// 	Level: 80
+				// });
 				Login.send.onLoginReply.call(socket, Login.LoginStatus.AccountNotFound);
 				return;
 			}
