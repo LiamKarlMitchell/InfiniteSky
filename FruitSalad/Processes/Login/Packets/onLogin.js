@@ -65,7 +65,7 @@ LoginPC.Set(0x03, {
 				//TODO: Add configurable flag for adding accounts that does not exists.
 				// console.log("creating account");
 				// db.Account.create({
-				// 	_id: 1,
+				// 	_id: 2,
 				// 	Username: input.Username,
 				// 	Password: input.Password,
 				// 	Level: 80

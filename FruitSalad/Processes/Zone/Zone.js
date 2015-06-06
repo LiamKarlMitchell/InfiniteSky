@@ -198,6 +198,28 @@ vms('Zone', [
 		this.Npc.push(npc);
 	};
 
+	ZoneInstance.prototype.addItem = function(owner, item){
+		console.log("Adding item to the zone", owner.character.Name);
+	    var obj = new ItemObj();
+	    obj.setLocation(owner.character.state.Location);
+	    obj.setOwner(owner.character.Name);
+	    obj.setObj(item);
+
+	    var node = new QuadTree.QuadTreeNode({
+	        object: obj,
+	        update: function(node, delta) {
+	            return {
+	                x: this.Location.X,
+	                y: this.Location.Z,
+	                size: 1
+	            };
+	        },
+	        type: 'item'
+	    });
+	    obj.setNode(this.QuadTree.addNode(node));
+	    this.sendToAllArea(owner, true, obj.getPacket(), config.network.viewable_action_distance);
+	};
+
 	ZoneInstance.prototype.broadcastStates = function(client){
         var found = Zone.QuadTree.query({ CVec3: client.character.state.Location, radius: config.network.viewable_action_distance, type: ['npc', 'item'] });
         for(var i=0; i<found.length; i++){
