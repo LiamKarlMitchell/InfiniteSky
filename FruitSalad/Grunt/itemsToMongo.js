@@ -109,7 +109,14 @@ module.exports = function(grunt) {
 			  function onRecordLoad(record) {
 			  	if (record._id) {
 			  		console.log(record._id, record.Name);
-			  		db.Item.create(record);
+			  		db.Item.create(record, function(err, item) {
+			  			if (err) {
+			  				console.error(err);
+			  				return;
+			  			}
+
+			  			console.log('Confirming save of '+item._id);
+			  		});
 			  	}
 			  }
 			);
