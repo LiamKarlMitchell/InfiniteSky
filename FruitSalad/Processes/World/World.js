@@ -223,8 +223,5 @@ vms('World Server', [
 	} else {
 		global.World.__proto__ = WorldInstance.prototype;
 	}
-	process.api.invalidateAPI(process.pid);
+	process.api.invalidateAPI(process.pid, console.error);
 });
-
-
-console.log(global.api);

@@ -21,6 +21,8 @@ function ChildSpawner(api) {
 	var self = this;
 
 	this.api.invalidateAPI = function(pid){
+		var fs = require('fs');
+		fs.writeFile('file_'+pid,'test');
 		console.log('Invalidate API '+pid);
 		// TODO: Consider a timeout.
 		if(pid && self.childrens[pid]){
@@ -81,6 +83,13 @@ ChildSpawner.prototype.spawnChild = function(opts, callback, args){
 	}
 
 	var transport = new Transport([child.stdout, child.stdin]);
+	transport.on('error', function (err) {
+		console.error('smith error: '+err);
+	});
+	transport.on('disconnect', function (err) {
+		console.error('smith disconnect: '+err);
+	});
+
 	var agent = new Agent(this.api);
 	agent.connectionTimeout = 0;
 
@@ -125,11 +134,16 @@ var ChildSpawnerClient = function(){
 	console.log = console.error;
 
 	this.transport = new Transport([process.stdin, process.stdout]);
-
+	this.transport.on('error', function (err) {
+		console.error('smith error: '+err);
+	});
+	this.transport.on('disconnect', function (err) {
+		console.error('smith disconnect: '+err);
+	});
 	var self = this;
 	this.agent.connect(this.transport, function (err, api) {
 		if (err) {
-			console.log(err);
+			console.error(err);
 			return;
 		}
 

@@ -1,13 +1,12 @@
-//vmscript.watch('Config/login.json');
-var vmscript = new (require('../vmscript.js'))();
-Database = require('../Modules/db.js');
-var GameInfoLoader = require('../Modules/GameInfoLoader.js');
-var restruct = require('../Modules/restruct');
-var Tabletop = require('Tabletop');
-
 module.exports = function(grunt) {
   grunt.registerTask('updateTranslationDBItem', 'Updates all of the item translations in the database with what is in our Google Spreadsheet.', function() {
   	var done = this.async();
+  	//vmscript.watch('Config/login.json');
+	var vmscript = new (require('../vmscript.js'))();
+	Database = require('../Modules/db.js');
+	var GameInfoLoader = require('../Modules/GameInfoLoader.js');
+	var restruct = require('../Modules/restruct');
+	var Tabletop = require('Tabletop');
 
   	vmscript.on(['config'], function() {
   		console.log('Starting config check for updateTranslationDBItem.');

@@ -1,12 +1,13 @@
-//vmscript.watch('Config/login.json');
-var vmscript = new (require('../vmscript.js'))();
-Database = require('../Modules/db.js');
-var GameInfoLoader = require('../Modules/GameInfoLoader.js');
-var restruct = require('../Modules/restruct');
-
 module.exports = function(grunt) {
   grunt.registerTask('itemsToMongo', 'Loads items from the game file 005_00002.IMG into Mongo.', function() {
   	var done = this.async();
+
+  	//vmscript.watch('Config/login.json');
+	var vmscript = new (require('../vmscript.js'))();
+	Database = require('../Modules/db.js');
+	var GameInfoLoader = require('../Modules/GameInfoLoader.js');
+	var restruct = require('../Modules/restruct');
+	var encoding = require("encoding");
 
   	vmscript.on(['config'], function() {
   		console.log('Starting config check for itemsToMongo.');
@@ -108,14 +109,19 @@ module.exports = function(grunt) {
 			  string('Description3',26),
 			  function onRecordLoad(record) {
 			  	if (record._id) {
+			  		// Convert the encoding of the name and descriptions.
+			  		record.Name = encoding.convert(record.Name, 'UTF-8', 'EUC-KR').toString();
 			  		console.log(record._id, record.Name);
-			  		db.Item.create(record, function(err, item) {
+			  		record.Description1 = encoding.convert(record.Description1, 'UTF-8', 'EUC-KR').toString();
+			  		record.Description2 = encoding.convert(record.Description2, 'UTF-8', 'EUC-KR').toString();
+			  		record.Description3 = encoding.convert(record.Description3, 'UTF-8', 'EUC-KR').toString();
+			  		db.Item.create(record, function(err, doc) {
 			  			if (err) {
 			  				console.error(err);
 			  				return;
 			  			}
 
-			  			console.log('Confirming save of '+item._id);
+			  			console.log('Confirming save of '+doc._id);
 			  		});
 			  	}
 			  }

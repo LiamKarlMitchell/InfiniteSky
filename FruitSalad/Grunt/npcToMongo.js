@@ -1,12 +1,13 @@
-//vmscript.watch('Config/login.json');
-var vmscript = new (require('../vmscript.js'))();
-Database = require('../Modules/db.js');
-var GameInfoLoader = require('../Modules/GameInfoLoader.js');
-var restruct = require('../Modules/restruct');
-
 module.exports = function(grunt) {
   grunt.registerTask('npcToMongo', 'Loads npc from the game file 005_00006.IMG into Mongo.', function() {
   	var done = this.async();
+  	//vmscript.watch('Config/login.json');
+	var vmscript = new (require('../vmscript.js'))();
+	Database = require('../Modules/db.js');
+	var GameInfoLoader = require('../Modules/GameInfoLoader.js');
+	var restruct = require('../Modules/restruct');
+	var encoding = require('encoding');
+
 
   	vmscript.on(['config'], function() {
   		console.log('Starting config check for npcToMongo.');
@@ -384,8 +385,21 @@ module.exports = function(grunt) {
 		        string("CellFile", 6025), 
 			  function onRecordLoad(record) {
 			  	if (record._id) {
+			  		record.Name = encoding.convert(record.Name, 'UTF-8', 'EUC-KR').toString();
 			  		console.log(record._id, record.Name);
-			  		db.NPC.create(record);
+			  		record.Chat1 = encoding.convert(record.Chat1, 'UTF-8', 'EUC-KR').toString();
+			  		record.Chat2 = encoding.convert(record.Chat2, 'UTF-8', 'EUC-KR').toString();
+			  		record.Chat3 = encoding.convert(record.Chat3, 'UTF-8', 'EUC-KR').toString();
+					record.Chat4 = encoding.convert(record.Chat4, 'UTF-8', 'EUC-KR').toString();
+			  		record.Chat5 = encoding.convert(record.Chat5, 'UTF-8', 'EUC-KR').toString();
+			  		db.NPC.create(record, function(err, doc) {
+			  			if (err) {
+			  				console.error(err);
+			  				return;
+			  			}
+
+			  			console.log('Confirming save of '+doc._id);
+			  		});
 			  	}
 			  }
 			);

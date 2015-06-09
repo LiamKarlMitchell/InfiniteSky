@@ -137,10 +137,13 @@ vms('Zone', [
 	};
 
 	ZoneInstance.prototype.onMessage = function(type, socket){
+		console.log('Zone Message');
+		console.log(type);
 		var self = this;
 		if(socket)
 		switch(type){
 			case 'world socket':
+			process.log('World socket received');
 			socket.on('end', function() {
 				return self.onDisconnect(socket);
 			});
@@ -238,7 +241,7 @@ vms('Zone', [
 		this.packetCollection = new PacketCollection('ZonePC');
 
 		var self = this;
-		process.on('message', function(type, socket){return global.Zone.onMessage(type, socket);});
+		process.on('message', function(type, socket){ console.log('Message from parent'); return global.Zone.onMessage(type, socket);});
 		var mesh_path = config.world.data_path + "navigation_mesh/" + this.name + '.obj';
 		this.navigation = new nav_mesh(mesh_path, function(mesh){
 			// process.log("Navigation mesh loaded for", self.name);
@@ -309,3 +312,5 @@ vms('Zone', [
 	}
 	process.api.invalidateAPI(process.pid);
 });
+
+process.log(process.on);

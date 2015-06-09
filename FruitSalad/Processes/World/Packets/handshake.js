@@ -217,8 +217,11 @@ WorldPC.Set(0x02, {
 		handshakeData.id = socket.character._id;
 		handshakeData.accountID = socket.character.AccountID;
 		handshakeData.hash = socket.remoteAddress + ":" + socket.remotePort;
+		console.log('Sending socket to Zone: '+socket.character.MapID);
 		zone.thread.send({type: 'character data', data: handshakeData});
 		zone.thread.send('world socket', socket);
 		socket.paused = true;
 	}	
 });
+
+console.log(process.zones['1'].thread.send('message'))
