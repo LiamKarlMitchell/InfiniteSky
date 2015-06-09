@@ -199,7 +199,6 @@ vms('Zone', [
 	};
 
 	ZoneInstance.prototype.addItem = function(owner, item){
-		console.log("Adding item to the zone", owner.character.Name);
 	    var obj = new ItemObj();
 	    obj.setLocation(owner.character.state.Location);
 	    obj.setOwner(owner.character.Name);
@@ -217,6 +216,8 @@ vms('Zone', [
 	        type: 'item'
 	    });
 	    obj.setNode(this.QuadTree.addNode(node));
+		console.log(owner.character.Name, 'dropped item #' + obj.NodeID);
+		console.log(obj.obj);
 	    this.sendToAllArea(owner, true, obj.getPacket(), config.network.viewable_action_distance);
 	};
 

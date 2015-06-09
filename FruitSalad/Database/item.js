@@ -82,6 +82,11 @@ vms('ItemInfo', [], function(){
 
 	});
 
+	itemSchema.methods.isDroppable = function(){
+		//TODO: Check if item is droppable
+		return true;
+	};
+
 	itemSchema.methods.getItemType = function() {
 		var ItemType;
 		switch (this.ItemType)

@@ -1,3 +1,5 @@
+Zone.maxSilver = 2147483647;
+
 Zone.recv.itemAction = restruct.
     int32lu('ActionType').
     int32lu('NodeID').
@@ -57,18 +59,11 @@ Zone.send.itemAction = function(result, input){
     })));
 }
 
-// Revised: 03/06/2015 20:54:54
+// Revised: 09/06/2015 11:20:39
 var ItemAction = {};
 ItemAction[20] = function inventoryMoveItem(input){
-    console.log(input);
     if(input.Amount > 99){
         console.log("Amount higher than allowed");
-        Zone.send.itemAction.call(this, 1, input);
-        return;
-    }
-
-    if(input.LevelRequired > 145 || input.LevelRequired === 0){
-        console.log("Level required is higher than allowed");
         Zone.send.itemAction.call(this, 1, input);
         return;
     }
@@ -148,7 +143,7 @@ ItemAction[20] = function inventoryMoveItem(input){
     });
 };
 
-// Revised: 03/06/2015 22:03:06
+// Revised: 09/06/2015 11:24:30
 ItemAction[14] = function CharacterItem_Unequip(input){
     var equipItem;
     switch(input.InventoryIndex){
@@ -215,15 +210,16 @@ ItemAction[14] = function CharacterItem_Unequip(input){
 
                 return;
             }
-            // TODO: Add character infos update
-            self.character.state.setFromCharacter(self.character);
-            Zone.send.itemAction.call(self, 0, input);
-            Zone.sendToAllArea(self, false, self.character.state.getPacket(), config.network.viewable_action_distance);
+            self.character.infos.updateStat(equipItem, function(){
+                self.character.state.setFromCharacter(self.character);
+                Zone.send.itemAction.call(self, 0, input);
+                Zone.sendToAllArea(self, false, self.character.state.getPacket(), config.network.viewable_action_distance);
+            });
         });
     });
 };
 
-// Revised: 03/06/2015 21:41:06
+// Revised: 09/06/2015 11:24:27
 ItemAction[3] = function CharacterItem_Equip(input){
     var equipItem;
     switch(input.PickupIndex){
@@ -288,34 +284,187 @@ ItemAction[3] = function CharacterItem_Equip(input){
 
                 return;
             }
-            // TODO: Add character infos update
-            self.character.state.setFromCharacter(self.character);
-            Zone.send.itemAction.call(self, 0, input);
-            Zone.sendToAllArea(self, false, self.character.state.getPacket(), config.network.viewable_action_distance);
+            self.character.infos.updateStat(equipItem, function(){
+                self.character.state.setFromCharacter(self.character);
+                Zone.send.itemAction.call(self, 0, input);
+                Zone.sendToAllArea(self, false, self.character.state.getPacket(), config.network.viewable_action_distance);
+            });
         });
     });
 };
 
-// console.log(new EquipItem())
-
-// Revised: 05/06/2015 19:28:54
+// Revised: 09/06/2015 11:14:06
 ItemAction[0] = function inventoryPickupItem(input){
-    console.log("picking up item");
-    console.log(input);
     var node = Zone.QuadTree.getNodeByID(input.NodeID);
-    Zone.QuadTree.removeNode(node);
-    Zone.send.itemAction.call(this, 0, input);
+    if(!node){
+        console.log("Theres no item with this node id");
+        Zone.send.itemAction.call(this, 1, input);
+        return;
+    }
+
+    var invItem = node.object.obj;
+    if(!invItem){
+        console.log("Node object does not exists");
+        Zone.send.itemAction.call(this, 1, input);
+        return;
+    }
+
+    var self = this;
+    if(invItem.ID === 1){
+        console.log("Handling silver pickup");
+        if( (this.character.Silver + invItem.Amount) >  Zone.maxSilver){
+            console.log("Cannot pickup more silver than you can hold. Convert to gold.");
+            Zone.send.itemAction.call(this, 1, input);
+            return;
+        }
+        this.character.Silver += invItem.Amount;
+        node.object.remove();
+        Zone.QuadTree.removeNode(node);
+        this.character.save(function(err){
+            if(err){
+                Zone.send.itemAction.call(self, 1, input);
+                return;
+            }
+            
+            Zone.send.itemAction.call(self, 0, input);
+        });
+        return;
+    }
+
+    db.Item.findById(invItem.ID, function(err, item){
+        if(err){
+            console.log("Error in finding item in db");
+            Zone.send.itemAction.call(self, 1, input);
+            return;
+        }
+
+        if(!item){
+            console.log("No item in db");
+            Zone.send.itemAction.call(self, 1, input);
+            return;
+        }
+
+        var isStackable = item.isStackable();
+        var intersected = self.character.inventoryIntersection(input.PickupRow, input.PickupColumn, item.getSlotSize());
+        var total = intersected ? intersected.Amount + invItem.Amount : 0;
+
+        if(isStackable && intersected && intersected.ID !== invItem.ID){
+            console.log("The intersected item is not the same");
+            Zone.send.itemAction.call(self, 1, input);
+            return;
+        }
+
+        if(isStackable && intersected && total <= 99){
+            intersected.Amount += invItem.Amount;
+        }else if(!intersected){
+            var nextInventoryIndex = self.character.nextInventoryIndex();
+            if(nextInventoryIndex === null){
+                console.log("Next inventory index was null");
+                Zone.send.itemAction.call(self, 1, input);
+                return;
+            }
+            invItem.Column = input.PickupColumn;
+            invItem.Row = input.PickupRow;
+            self.character.Inventory[nextInventoryIndex] = invItem;
+        }else{
+            console.log("Item intersected");
+            Zone.send.itemAction.call(self, 1, input);
+            return;
+        }
+
+        node.object.remove();
+        Zone.QuadTree.removeNode(node);
+        self.character.markModified('Inventory');
+        self.character.save(function(err){
+            if(err){
+                console.log("error on saving on character");
+                Zone.send.itemAction.call(self, 1, input);
+                return;
+            }
+
+            Zone.send.itemAction.call(self, 0, input);
+        });
+    });
 };
 
-// Revised: 05/06/2015 19:28:54
+// Revised: 09/06/2015 11:14:09
 ItemAction[1] = function inventoryDropItem(input){
-    console.log(input);
+    if(input.ItemID === 1){
+        if(input.Amount > this.character.Silver){
+            Zone.send.itemAction.call(this, 1, input);
+            return;
+        }
+
+        var obj = {ID: 1, Amount: input.Amount};
+        Zone.addItem(this, obj);
+
+        this.character.Silver -= input.Amount;
+        this.character.save();
+
+        Zone.send.itemAction.call(this, 0, input);
+        return;
+    }
+
+    if(input.Amount > 99){
+        Zone.send.itemAction.call(this, 1, input);
+        return;
+    }
 
     var invItem = this.character.Inventory[input.InventoryIndex];
-    Zone.addItem(this, invItem);
-    Zone.send.itemAction.call(this, 1, input);
-};
+    if(!invItem){
+        Zone.send.itemAction.call(this, 1, input);
+        return;
+    }
 
+
+    var self = this;
+    db.Item.findById(invItem.ID, function(err, item){
+        if(err){
+            Zone.send.itemAction.call(self, 1, input);
+            return;
+        }
+
+        if(!item){
+            Zone.send.itemAction.call(self, 1, input);
+            return;
+        }
+
+        if(!item.isDroppable()){
+            Zone.send.itemAction.call(self, 1, input);
+            return;
+        }
+
+        var reminder = invItem.Amount - input.Amount;
+        var isStackable = item.isStackable();
+
+        if(isStackable && input.Amount > invItem.Amount){
+            Zone.send.itemAction.call(self, 1, input);
+            return;
+        }
+        
+        if(isStackable && !reminder){
+            self.character.Inventory[input.InventoryIndex] = null;
+        }else if(isStackable && reminder){
+            invItem.Amount = reminder;
+        }else{
+            self.character.Inventory[input.InventoryIndex] = null;
+        }
+
+        var dropItem = clone(invItem, false);
+        dropItem.Amount = input.Amount;
+
+        self.character.markModified('Inventory');
+        self.character.save(function(err){
+            if(err){
+                Zone.send.itemAction.call(self, 1, input);
+                return;
+            }
+
+            Zone.addItem(self, dropItem);
+            Zone.send.itemAction.call(self, 0, input);
+        });
+    });
+};
 
 
 ZonePC.Set(0x14, {

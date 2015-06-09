@@ -23,7 +23,7 @@ vms('ItemObj', [], function() {
 			self.remove();
 		}, 20000);
 
-		this.unk = 0;
+		this.unk = 1;
 		this.Enchant = 0;
 		this.Combine = 0;
 
@@ -32,41 +32,19 @@ vms('ItemObj', [], function() {
 		    int32lu('NodeID'). // +2
 		    int32lu('UniqueID'). // +6
 		    int32lu('ItemObjID'). // +10
-		    int8lu('unk').
-		    int8lu('unk').
-		    int8lu('unk').
-		    int8lu('unk').
-		    int8lu('unk').
-		    int8lu('unk').
-		    int8lu('unk').
-		    int8lu('unk').
-		    int8lu('unk').
-		    int8lu('unk').
-		    int8lu('unk').
-		    int8lu('unk').
+		    int32lu('unk').
+		    int32lu('unk').
+		    int32lu('unk').
 		    int32lu('Amount').
-		    int32lu('Enchant').
+		    int8lu('Enchant').
+		    int8lu('Combine').
+		    int16lu('unk').
 		    struct('Location',structs.CVec3).
-		    int8lu('unk').
-		    int8lu('unk').
-		    int8lu('unk').
-		    int8lu('unk').
-		    int8lu('unk').
-		    int8lu('unk').
-		    int8lu('unk').
-		    int8lu('unk').
-		    int8lu('unk').
-		    int8lu('unk').
-		    int8lu('unk').
-		    int8lu('unk').
-		    int8lu('unk').
-		    int8lu('unk').
-		    int8lu('unk').
-		    int8lu('unk').
-		    int8lu('unk').
-		    int8lu('unk').
-		    int8lu('unk').
-		    int8lu('unk').
+		    int32lu('unk').
+		    int32lu('unk').
+		    int32lu('unk').
+		    int32lu('unk').
+		    int32lu('unk').
 		    float32l('Rotation').
 		    int32lu('JustSpawned');
 	}
@@ -86,8 +64,8 @@ vms('ItemObj', [], function() {
 
 	global.ItemObj.prototype.setObj = function(invItem){
 		this.obj = clone(invItem, false);
-		// if(invItem.Enchant) this.Enchant = invItem.Enchant;
-		// if(invItem.Combine) this.Combine = invItem.Combine;
+		if(invItem.Enchant) this.Enchant = invItem.Enchant;
+		if(invItem.Combine) this.Combine = invItem.Combine;
 		if(invItem.Amount) this.Amount = invItem.Amount;
 		if(invItem.ID) this.ItemObjID = invItem.ID;
 		delete this.obj.Column;
@@ -99,12 +77,13 @@ vms('ItemObj', [], function() {
 	};
 
 	global.ItemObj.prototype.remove = function(){
+		clearTimeout(this.deleteTimmer);
         var found = Zone.QuadTree.query({ CVec3: this.Location, radius: config.network.viewable_action_distance, type: ['client'] });
         for(var i=0; i<found.length; i++){
             var f = found[i];
             f.object.write(this.getPacket());
         }
-		console.log("Removing");
+		console.log("Clearing item from the floor #" + this.NodeID);
 		Zone.QuadTree.removeNode(this.node);
 	};
 });
