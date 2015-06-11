@@ -185,13 +185,15 @@ VMScriptObj.prototype.parse = function(file_path){
 		global.require = require;
 		global.file_path = file_path;
 
-		var split_dir = infos.dir.split('\\');
+		var split_dir = infos.dir.split(path.sep);
 		var file_name = getFilename(infos);
 
 		dependencies[file_name] = {
 			running: false,
 			file_path: file_path
 		};
+
+		console.log(file_name);
 
 		switch(ext){
 			case '.json':
@@ -241,7 +243,7 @@ VMScriptObj.prototype.parse = function(file_path){
 
 /* Function to return a file name based on directory and name. */
 function getFilename(infos){
-	var split_dir = infos.dir.split('\\');
+	var split_dir = infos.dir.split(path.sep);
 	// TODO: Consider adding a __dirname check if we wont name the file outside project directory.
 	return split_dir[split_dir.length-1] + '/' + infos.name + infos.ext.toLowerCase();
 }
@@ -267,12 +269,12 @@ VMScriptObj.prototype.watch = function(file_path, opts){
 					}
 
 					files = files.filter(function(file){
-						var infos = path.parse(file_path + '\\' + file);
+						var infos = path.parse(file_path + path.sep + file);
 						return infos.ext !== '.tmp' && infos.ext !== '.TMP';
 					});
 
 					for(var i=0; i<files.length; i++){
-						files[i] = file_path + '\\' + files[i];
+						files[i] = file_path + path.sep + files[i];
 						try{
 							var stat = fs.statSync(files[i]);
 							var index = array[file_path].files.indexOf(files[i]);
@@ -334,7 +336,7 @@ VMScriptObj.prototype.watch = function(file_path, opts){
 				files: []
 			};
 
-			var split_file_path = file_path.split('\\');
+			var split_file_path = file_path.split(path.sep);
 			dependencies[split_file_path[split_file_path.length-1]] = {
 				files: [],
 				running: false
@@ -347,7 +349,7 @@ VMScriptObj.prototype.watch = function(file_path, opts){
 				}
 
 				for(var i=0; i<files.length; i++){
-					var fp = file_path + '\\' + files[i];
+					var fp = file_path + path.sep + files[i];
 					dependencies[split_file_path[split_file_path.length-1]].files.push(fp);
 					array[file_path].files.push(fp);
 					fileStats[fp] = fs.statSync(fp);

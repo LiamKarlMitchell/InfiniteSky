@@ -312,5 +312,3 @@ vms('Zone', [
 	}
 	process.api.invalidateAPI(process.pid);
 });
-
-process.log(process.on);

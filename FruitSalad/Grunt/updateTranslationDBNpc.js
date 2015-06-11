@@ -2,11 +2,11 @@ module.exports = function(grunt) {
   grunt.registerTask('updateTranslationDBNpc', 'Updates all of the item translations in the database with what is in our Google Spreadsheet.', function() {
   	var done = this.async();
 	//vmscript.watch('Config/login.json');
-	var vmscript = new (require('../vmscript.js'))();
+	var vmscript = new (require('../VMScript.js'))();
 	Database = require('../Modules/db.js');
 	var GameInfoLoader = require('../Modules/GameInfoLoader.js');
 	var restruct = require('../Modules/restruct');
-	var Tabletop = require('Tabletop');
+	var Tabletop = require('tabletop');
 
   	vmscript.on(['config'], function() {
   		console.log('Starting config check for updateTranslationDBNpc.');
@@ -37,18 +37,19 @@ module.exports = function(grunt) {
   		// Item Translation
   		// https://docs.google.com/spreadsheets/d/1rL1HPMZi8Yxt8XPqAm15wkJc0Ak1hzqZB1yD864QO4w/edit#gid=1823029235
   		// Publish URL:
-  		// https://docs.google.com/spreadsheets/d/1rL1HPMZi8Yxt8XPqAm15wkJc0Ak1hzqZB1yD864QO4w/pubhtml
-		Tabletop.init( { key: 'https://docs.google.com/spreadsheets/d/1rL1HPMZi8Yxt8XPqAm15wkJc0Ak1hzqZB1yD864QO4w/pubhtml',
+  		// https://docs.google.com/spreadsheets/d/1rL1HPMZi8Yxt8XPqAm15wkJc0Ak1hzqZB1yD864QO4w/pubhtml?gid=1823029235&single=true
+		Tabletop.init( { key: 'https://docs.google.com/spreadsheets/d/1rL1HPMZi8Yxt8XPqAm15wkJc0Ak1hzqZB1yD864QO4w/pubhtml?gid=1823029235&single=true',
             callback: function(data, tabletop) { 
             	for (var i=0;i<data.length;i++) {
-            		console.log('Updating: '+data[i].id+' '+data[i].name);
-					db.NPC.update({ _id: data[i].id }, { 
-						Name: data[i].name,
-						Chat1: data[i].chat1,
-						Chat2: data[i].chat2,
-						Chat3: data[i].chat3,
-						Chat4: data[i].chat4,
-						Chat5: data[i].chat5
+            		console.log(data[i]);
+            		console.log('Updating: '+data[i].ID+' '+data[i].Name);
+					db.NPC.update({ _id: data[i].ID }, { 
+						Name:  data[i].Name,
+						Chat1: data[i].Chat1,
+						Chat2: data[i].Chat2,
+						Chat3: data[i].Chat3,
+						Chat4: data[i].Chat4,
+						Chat5: data[i].Chat5
 					}).exec();
         		}
             	done(true);

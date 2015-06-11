@@ -2,7 +2,7 @@ module.exports = function(grunt) {
   grunt.registerTask('monstersToMongo', 'Loads monsters from the game file 005_00004.IMG into Mongo.', function() {
   	var done = this.async();
   	//vmscript.watch('Config/login.json');
-	var vmscript = new (require('../vmscript.js'))();
+	var vmscript = new (require('../VMScript.js'))();
 	Database = require('../Modules/db.js');
 	var GameInfoLoader = require('../Modules/GameInfoLoader.js');
 	var restruct = require('../Modules/restruct');

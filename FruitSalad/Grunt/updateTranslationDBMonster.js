@@ -2,11 +2,11 @@ module.exports = function(grunt) {
   grunt.registerTask('updateTranslationDBMonster', 'Updates all of the monster translations in the database with what is in our Google Spreadsheet.', function() {
   	var done = this.async();
     //vmscript.watch('Config/login.json');
-    var vmscript = new (require('../vmscript.js'))();
+    var vmscript = new (require('../VMScript.js'))();
     Database = require('../Modules/db.js');
     var GameInfoLoader = require('../Modules/GameInfoLoader.js');
     var restruct = require('../Modules/restruct');
-    var Tabletop = require('Tabletop');
+    var Tabletop = require('tabletop');
 
   	vmscript.on(['config'], function() {
   		console.log('Starting config check for updateTranslationDBMonster.');
@@ -41,10 +41,10 @@ module.exports = function(grunt) {
 		Tabletop.init( { key: 'https://docs.google.com/spreadsheets/d/1fnV6s_Kho95tra_xc2RyBkCK1CHah6pI_fyTlGOIO2s/pubhtml',
             callback: function(data, tabletop) { 
             	for (var i=0;i<data.length;i++) {
-            		console.log('Updating: '+data[i].id+' '+data[i].name);
-					db.Monster.update({ _id: data[i].id }, { 
-						Name: data[i].name
-					}).exec();
+            		console.log('Updating: '+data[i].ID+' '+data[i].Name);
+      					db.Monster.update({ _id: data[i].ID }, { 
+      						Name: data[i].Name
+      					}).exec();
         		}
             	done(true);
             },

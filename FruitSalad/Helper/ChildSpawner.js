@@ -21,8 +21,6 @@ function ChildSpawner(api) {
 	var self = this;
 
 	this.api.invalidateAPI = function(pid){
-		var fs = require('fs');
-		console.log('Invalidate API '+pid);
 		// TODO: Consider a timeout.
 		if(pid && self.childrens[pid]){
 			self.childrens[pid].agent
@@ -73,12 +71,8 @@ ChildSpawner.prototype.spawnChild = function(opts, callback, args){
 	args = args || [];
 	
 	var self = this;
-	var processEnv = path.resolve(__dirname, '..\\Processes\\process.js');
+	var processEnv = path.resolve(__dirname, '../Processes/process.js');
 	var child = fork(processEnv, args, {silent: true});
-
-	child.on('error', function(err) {
-		console.error('Process Error: '+err);
-	});
 
 	// console.log(child);
 	if(opts.pipeError === undefined || opts.pipeError === true) {

@@ -20,6 +20,6 @@
       "ip": "192.168.0.7"
     }
   ],
-  "externalIP": "192.168.0.7",
+  "externalIP": "10.1.1.14",
   "viewable_action_distance": 700
 }

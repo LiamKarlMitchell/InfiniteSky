@@ -3,7 +3,7 @@ module.exports = function(grunt) {
   	var done = this.async();
 
   	//vmscript.watch('Config/login.json');
-	var vmscript = new (require('../vmscript.js'))();
+	var vmscript = new (require('../VMScript.js'))();
 	Database = require('../Modules/db.js');
 	var GameInfoLoader = require('../Modules/GameInfoLoader.js');
 	var restruct = require('../Modules/restruct');

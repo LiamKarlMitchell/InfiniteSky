@@ -6,13 +6,20 @@
   "main": "main.js",
   "dependencies": {
     "async": "^1.2.0",
+    "cli-color": "^1.0.0",
+    "clone": "^1.0.2",
     "encoding": "^0.1.11",
+    "fast-csv": "^0.6.0",
+    "grunt-gss": "^1.0.4",
+    "hexy": "^0.2.7",
     "iconv": "^2.1.7",
     "ink-docstrap": "^0.5.2",
     "jshint": "^2.7.0",
     "jsonlint": "^1.6.2",
     "mongoose": "^4.0.3",
+    "netmask": "^1.0.5",
     "smith": "^0.1.22",
+    "tabletop": "^1.4.2",
     "winston": "^1.0.0"
   },
   "devDependencies": {
