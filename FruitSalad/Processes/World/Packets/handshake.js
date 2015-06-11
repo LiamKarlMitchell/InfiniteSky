@@ -223,5 +223,3 @@ WorldPC.Set(0x02, {
 		socket.paused = true;
 	}	
 });
-
-console.log(process.zones['1'].thread.send('message'))

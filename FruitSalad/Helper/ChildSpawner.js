@@ -22,7 +22,6 @@ function ChildSpawner(api) {
 
 	this.api.invalidateAPI = function(pid){
 		var fs = require('fs');
-		fs.writeFile('file_'+pid,'test');
 		console.log('Invalidate API '+pid);
 		// TODO: Consider a timeout.
 		if(pid && self.childrens[pid]){
@@ -76,6 +75,10 @@ ChildSpawner.prototype.spawnChild = function(opts, callback, args){
 	var self = this;
 	var processEnv = path.resolve(__dirname, '..\\Processes\\process.js');
 	var child = fork(processEnv, args, {silent: true});
+
+	child.on('error', function(err) {
+		console.error('Process Error: '+err);
+	});
 
 	// console.log(child);
 	if(opts.pipeError === undefined || opts.pipeError === true) {
