@@ -21,7 +21,6 @@ function ChildSpawner(api) {
 	var self = this;
 
 	this.api.invalidateAPI = function(pid){
-		console.log('Invalidate API '+pid);
 		// TODO: Consider a timeout.
 		if(pid && self.childrens[pid]){
 			self.childrens[pid].agent
@@ -72,7 +71,7 @@ ChildSpawner.prototype.spawnChild = function(opts, callback, args){
 	args = args || [];
 	
 	var self = this;
-	var processEnv = path.resolve(__dirname, '..\\Processes\\process.js');
+	var processEnv = path.resolve(__dirname, '../Processes/process.js');
 	var child = fork(processEnv, args, {silent: true});
 
 	// console.log(child);
@@ -81,6 +80,13 @@ ChildSpawner.prototype.spawnChild = function(opts, callback, args){
 	}
 
 	var transport = new Transport([child.stdout, child.stdin]);
+	transport.on('error', function (err) {
+		console.error('smith error: '+err);
+	});
+	transport.on('disconnect', function (err) {
+		console.error('smith disconnect: '+err);
+	});
+
 	var agent = new Agent(this.api);
 	agent.connectionTimeout = 0;
 
@@ -125,11 +131,16 @@ var ChildSpawnerClient = function(){
 	console.log = console.error;
 
 	this.transport = new Transport([process.stdin, process.stdout]);
-
+	this.transport.on('error', function (err) {
+		console.error('smith error: '+err);
+	});
+	this.transport.on('disconnect', function (err) {
+		console.error('smith disconnect: '+err);
+	});
 	var self = this;
 	this.agent.connect(this.transport, function (err, api) {
 		if (err) {
-			console.log(err);
+			console.error(err);
 			return;
 		}
 

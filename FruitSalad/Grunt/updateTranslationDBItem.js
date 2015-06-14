@@ -1,13 +1,12 @@
-//vmscript.watch('Config/login.json');
-var vmscript = new (require('../vmscript.js'))();
-Database = require('../Modules/db.js');
-var GameInfoLoader = require('../Modules/GameInfoLoader.js');
-var restruct = require('../Modules/restruct');
-var Tabletop = require('Tabletop');
-
 module.exports = function(grunt) {
   grunt.registerTask('updateTranslationDBItem', 'Updates all of the item translations in the database with what is in our Google Spreadsheet.', function() {
   	var done = this.async();
+  	//vmscript.watch('Config/login.json');
+	var vmscript = new (require('../VMScript.js'))();
+	Database = require('../Modules/db.js');
+	var GameInfoLoader = require('../Modules/GameInfoLoader.js');
+	var restruct = require('../Modules/restruct');
+	var Tabletop = require('tabletop');
 
   	vmscript.on(['config'], function() {
   		console.log('Starting config check for updateTranslationDBItem.');
@@ -42,12 +41,12 @@ module.exports = function(grunt) {
 		Tabletop.init( { key: 'https://docs.google.com/spreadsheets/d/1yhC0JLjJ68tkcFoXzC8lRla6bE7qcSGrX6FUxlPYKbA/pubhtml?gid=894866128&single=true',
             callback: function(data, tabletop) { 
             	for (var i=0;i<data.length;i++) {
-            		console.log('Updating: '+data[i].id+' '+data[i].name);
-					db.Item.update({ _id: data[i].id }, { 
-						Name: data[i].name,
-						Description1: data[i].description1,
-						Description2: data[i].description2,
-						Description3: data[i].description3
+            		console.log('Updating: '+data[i].ID+' '+data[i].Name);
+					db.Item.update({ _id: data[i].ID }, { 
+						Name: data[i].Name,
+						Description1: data[i].Description1,
+						Description2: data[i].Description2,
+						Description3: data[i].Description3
 					}).exec();
         		}
             	done(true);

@@ -19,7 +19,7 @@ vms('World Server', [
 	util.setupUncaughtExceptionHandler();
 	// packets = require('./Helper/packets.js');
 	os = require('os');
-	Netmask = require('Netmask').Netmask;
+	Netmask = require('netmask').Netmask;
 
 	global.api.sendSocketToTransferQueue = function(obj){
 		//var key = util.toHexString(obj.hash);
@@ -147,10 +147,7 @@ vms('World Server', [
 	};
 
 	WorldInstance.prototype.zoneInitResponse = function World__zoneInitResponse(err) {
-		console.log('zoneLoaded');
-		console.log(arguments);
 	};
-
 
 	WorldInstance.prototype.init = function(){
 		console.log('World Instance Init.');
@@ -223,8 +220,5 @@ vms('World Server', [
 	} else {
 		global.World.__proto__ = WorldInstance.prototype;
 	}
-	process.api.invalidateAPI(process.pid);
+	process.api.invalidateAPI(process.pid, console.error);
 });
-
-
-console.log(global.api);

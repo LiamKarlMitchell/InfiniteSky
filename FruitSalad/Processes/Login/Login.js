@@ -19,7 +19,7 @@ vms('Login Server', [
 	util = require('./Modules/util.js');
 	util.setupUncaughtExceptionHandler();
 	os = require('os');
-	Netmask = require('Netmask').Netmask;
+	Netmask = require('netmask').Netmask;
 
 	vmscript.watch('./Generic/structs.js');
 	vmscript.watch('./Generic/CharacterInfos.js');

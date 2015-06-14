@@ -24,6 +24,7 @@
 
 
 // winston.profile('Startup');
+path = require('path');
 var util = require('./Modules/util.js');
 
 var startTime = new Date().getTime();
@@ -41,9 +42,11 @@ var vm = require('vm');
 // (node) warning: possible EventEmitter memory leak detected. 11 listeners added. Use emitter.setMaxListeners() to increase limit.
 process.setMaxListeners(0);
 
-spawner.spawnChild({name: 'Login', script: 'Processes\\Login\\Login.js'});
-spawner.spawnChild({name: 'World', script: 'Processes\\World\\World.js'});
-vmscript = require('./vmscript.js');
+spawner.spawnChild({name: 'Login', script: 'Processes/Login/Login.js'});
+spawner.spawnChild({name: 'World', script: 'Processes/World/World.js'});
+vmscript = require('./VMScript.js');
+
+global.config = {};
 
 var v = new vmscript();
 v.watch('Config/login.json');

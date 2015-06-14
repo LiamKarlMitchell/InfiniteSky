@@ -1,12 +1,12 @@
-//vmscript.watch('Config/login.json');
-var vmscript = new (require('../vmscript.js'))();
-Database = require('../Modules/db.js');
-var GameInfoLoader = require('../Modules/GameInfoLoader.js');
-var restruct = require('../Modules/restruct');
-
 module.exports = function(grunt) {
   grunt.registerTask('monstersToMongo', 'Loads monsters from the game file 005_00004.IMG into Mongo.', function() {
   	var done = this.async();
+  	//vmscript.watch('Config/login.json');
+	var vmscript = new (require('../VMScript.js'))();
+	Database = require('../Modules/db.js');
+	var GameInfoLoader = require('../Modules/GameInfoLoader.js');
+	var restruct = require('../Modules/restruct');
+	var encoding = require("encoding");
 
   	vmscript.on(['config'], function() {
   		console.log('Starting config check for monstersToMongo.');
@@ -263,8 +263,16 @@ module.exports = function(grunt) {
 		        int32ls("Unknown880"), // 880
 			  function onRecordLoad(record) {
 			  	if (record._id) {
+					record.Name = encoding.convert(record.Name, 'UTF-8', 'EUC-KR').toString();
 			  		console.log(record._id, record.Name);
-			  		db.Monster.create(record);
+			  		db.Monster.create(record, function(err, doc) {
+			  			if (err) {
+			  				console.error(err);
+			  				return;
+			  			}
+
+			  			console.log('Confirming save of '+doc._id);
+			  		});
 			  	}
 			  }
 			);

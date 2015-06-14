@@ -1,12 +1,12 @@
-//vmscript.watch('Config/login.json');
-var vmscript = new (require('../vmscript.js'))();
-Database = require('../Modules/db.js');
-var GameInfoLoader = require('../Modules/GameInfoLoader.js');
-var restruct = require('../Modules/restruct');
-
 module.exports = function(grunt) {
   grunt.registerTask('expToMongo', 'Loads exp info from the game file 005_00001.IMG into Mongo.', function() {
   	var done = this.async();
+	//vmscript.watch('Config/login.json');
+	var vmscript = new (require('../VMScript.js'))();
+	Database = require('../Modules/db.js');
+	var GameInfoLoader = require('../Modules/GameInfoLoader.js');
+	var restruct = require('../Modules/restruct');
+
 
   	vmscript.on(['config'], function() {
   		console.log('Starting config check for expToMongo.');
@@ -70,7 +70,14 @@ module.exports = function(grunt) {
 			  function onRecordLoad(record) {
 			  	if (record.Level) {
 			  		console.log("Exp info for level", record.Level);
-			  		db.Exp.create(record);
+			  		db.Exp.create(record, function(err, doc) {
+			  			if (err) {
+			  				console.error(err);
+			  				return;
+			  			}
+
+			  			console.log('Confirming save of '+doc.Level);
+			  		});
 			  	}
 			  }
 			);
