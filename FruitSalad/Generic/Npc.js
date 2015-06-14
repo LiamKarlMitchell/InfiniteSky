@@ -23,9 +23,9 @@ vms('Npc', [
 
 // npc.Location.set(spawninfo.Location);
 // npc.FacingDirection = spawninfo.Direction;
-		this.NodeID = 0; // Set to node.id we receive from QuadTree
-		this._ID = ++global.NpcNextID; // Faction ID?
-		this.OtherID = data.ID;
+		this.UniqueID = ++global.NpcNextID;
+		this.NodeID = 0;
+		this.NpcID = data.ID;
 
 		this.Life = 1;
 		this.Stance = 0;
@@ -43,8 +43,8 @@ vms('Npc', [
 
 		this.NpcStatePacket = restruct.
 			int32lu('NodeID').
-			int32lu('ID').
-			int32lu('OtherID').
+			int32lu('UniqueID').
+			int32lu('NpcID').
 			int32lu('Life').
 			int32lu('Stance').
 			int32lu('Skill').
@@ -66,11 +66,12 @@ vms('Npc', [
 		return packets.makeCompressedPacket(0x19, new Buffer(this.NpcStatePacket.pack(this)));
 	};
 
-	Npc.prototype.setNode = function(node){
+	Npc.prototype.setNode = function(node, zone){
 		if(!node){
 			return;
 		}
 		this.NodeID = node.id;
+		zone.NpcNodesHash[this.NpcID] = node;
 	};
 
 	global.Npc = Npc;

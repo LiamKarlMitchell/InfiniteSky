@@ -97,6 +97,7 @@ vms('Character', [], function(){
 
 		StorageUse: { type: Number, default: 0 },
 		Silver: { type: Number, default: 0 },
+		StackedSilver: { type: Number, default: 0 },
 		StorageSilver: { type: Number, default: 0 },
 		BankSilver: { type: Number, default: 0 },
 
@@ -161,247 +162,47 @@ vms('Character', [], function(){
 		return null;
 	};
 
-	// Add methods to the schema
-	// Could make a character can talk function to check if they have any sort of chat/time ban.
-	// characterSchema.methods.talk = function() {
-	// 	console.log(this.Name);
-	// }
-	// TODO: See why this is not working correctly with the vmscript...
-	// characterSchema.methods.updateInfos = function(reloadEXPInfo) {
-	// 	generic.calculateCharacterinfos(this,reloadEXPInfo);
-	// }
+	characterSchema.methods.restruct = function(buffer){
+		// TODO: Cut chunks rather than recreating a buffer and fix needed elements.
+		var inventoryBuffer = new Buffer(structs.StorageItem.size * 64);
+		inventoryBuffer.fill(0);
 
-	// characterSchema.methods.infos = new generic.characterStatsInfoObj();
+		for(var i=0; i<64; i++){
+			var item = this.Inventory[i];
+			if(item){
+				new Buffer(structs.StorageItem.pack(item)).copy(inventoryBuffer, structs.StorageItem.size * i);
+			}
+		}
 
-	// characterSchema.methods.getHP = function() {
-	// 	return this.state.CurrentHP;
-	// }
+		inventoryBuffer.copy(buffer, 350);
 
-	// characterSchema.methods.setHP = function(value) {
-	// 		this.state.CurrentHP = value;
-	// 		if (this.state.CurrentHP > this.state.MaxHP) {
-	// 			this.state.CurrentHP = this.state.MaxHP;
-	// 		}
+		var storageBuffer = new Buffer(structs.SmallStorageItem.size * 28);
+		storageBuffer.fill(0);
+		for(var i=0; i<28; i++){
+			var item = this.Storage[i];
+			if(item){
+				new Buffer(structs.SmallStorageItem.pack(item)).copy(storageBuffer, structs.SmallStorageItem.size * i);
+			}
+		}
 
-	// 		if (this.state.CurrentHP<=0) {
-	// 			this.Kill();
-	// 		}
-	// 	}
+		storageBuffer.copy(buffer, 1666);
 
-	// characterSchema.methods.Kill = function(value) {
-	// 	if (this.state.CurrentHP>0) this.state.CurrentHP = 0;
+		// TODO: Fix bank, maybe pass a bank array into this function?
 
-	// 	this.state.Skill = 12;
-	// 	this.state.Frame = 0;
-						
+		// var bankBuffer = new Buffer(structs.SmallStorageItem.size * 28);
+		// bankBuffer.fill(0);
+		// for(var i=0; i<56; i++){
+		// 	var item = this.Bank[i];
+		// 	if(item){
+		// 		var offset = structs.SmallStorageItem.size * i;
+		// 		var itemBuf = new Buffer(structs.SmallStorageItem.pack(item));
+		// 		itemBuf.copy(bankBuffer, offset);
+		// 	}
+		// }
+		// bankBuffer.copy(buffer, 1666);
+		return buffer;
+	};
 
-	// 	//this.state.Stance = 8; // Sheathed weapon
-	// 	//this.state.Stance = 9; // Unsheathed weapon
-	// 	// After dead probably set stance to 1 or 2 respectfully so that other players who see you don't see you constantly dieing?
-	// }	
-
-	// characterSchema.methods.giveEXP = function(exp) {
-	// 	if (this.expinfo==null) return;
-	// 	this.Experience += exp;
-
-	// 	var reminder = this.expinfo.EXPEnd- this.Experience;
-	// 	var levelGained = 0;
-	// 	while(reminder < 0){
-	// 		levelGained++;
-	// 		if((this.Level + levelGained) > 145){
-	// 			this.Experience = infos.Exp[145].EXPEnd;
-	// 			this.Level = 145;
-	// 			console.log("Exceeding the range of infos.Exp");
-	// 			return;
-	// 		}
-	// 		this.expinfo = infos.Exp[this.Level + levelGained];
-	// 		if(!this.expinfo){
-	// 			// console.log("No exp info somehow");
-	// 			return;
-	// 		}
-	// 		this.Experience += 1;
-	// 		reminder = (this.expinfo.EXPEnd - this.expinfo.EXPStart) + reminder;
-	// 	}
-
-	// 	this.SkillPoints += this.expinfo.SkillPoint;
-	// 	this.StatPoints += 5;
-
-	// 	this.Level += levelGained;
-	// 	client.write(new Buffer(respond.pack({
-	// 	    PacketID: 0x2E,
-	// 	    LevelsGained: 145,
-	// 	    CharacterID: client.character._id,
-	// 	    NodeID: client.node.id
-	// 	})));
-
-	//     client.Zone.sendToAllArea(client, true, new Buffer(respond.pack({
-	// 	    PacketID: 0x2E,
-	// 	    LevelsGained: 145,
-	// 	    CharacterID: client.character._id,
-	// 	    NodeID: client.node.id
-	//     })), config.viewable_action_distance);
-
-	    
-	// 	return levelGained;
-	// }
-
-	// characterSchema.methods.checkItemSlotFree = function(Column,Row,SlotSize,ItemID) {
-	// 	console.log('Checking Slots Free for Column: '+Column+' Row: '+Row+' SlotSize: '+SlotSize);
-
-	// 	var ColumnMin = 0;
-	// 	var ColumnMax = Column;
-
-	// 	var RowMin = 0;
-	// 	var RowMax = Row;
-
-	// 	if (SlotSize==4)
-	// 	{
-	// 		ColumnMax++;
-	// 		RowMax++;
-	// 	}
-	    
-	//     console.log('ColumnMin: '+ColumnMin+' ColumnMax: '+ColumnMax+' RowMin: '+RowMin+' RowMax: '+RowMax);
-
-	// 	if (Column > 7 || Row > 7 ) return 1;
-
-	// 	if (Column>0) ColumnMin=Column-1;
-	// 	if (Column==7) ColumnMax = 7;
-
-	// 	if (Row>0) RowMin=Row-1;
-	// 	if (Row==7) RowMax = 7;
-
-	// 	// Prevent placing on edges bottom, right
-	// 	if (SlotSize==4 && (Column==7 || Row==7)) return 2;
-
-	// 	for (var i=0;i<64;i++)
-	// 	{
-	// 		var item = item;
-
-	// 		if (item==null || item.ID==0) continue;
-
-	// 		// Find items with Row between Row-1, Row and Row+1 taking into consideration boundrys of inventory
-	// 		if (item.Column >= ColumnMin && item.Column <= ColumnMax && item.Row >= RowMin && item.Row <= RowMax)
-	// 		{
-	// 			// Item overlaps in same spot
-	// 			if (item.Column == Column && item.Row == Row)
-	// 			{
-	// 				if (item.ID != ItemID || 0)
-	// 				{
-	// 					return false;
-	// 				}
-	// 			}
-
-	// 			var ii = infos.item[item.ID];
-	// 			if (ii==null)
-	// 			{
-	// 				console.log('checkItemSlotFree() Unknown ItemID: '+item.ID);
-	// 				continue;
-	// 			}
-
-	// 			var itemSlotSize = ii.GetSlotCount();
-
-	// 			// Overlaps top left
-	// 			if (itemSlotSize == 4 && item.Column<Column && item.Row<Row) return false;
-
-	// 			// Overlaps left side
-	// 			if (itemSlotSize == 4 && item.Column<Column) return false;
-
-	// 			// Overlaps from top
-	// 			if (itemSlotSize == 4 && item.Row<Row) return false;
-
-	// 			if (SlotSize==4)
-	// 			{
-	// 				// Check if there are no collisions bottom right sides
-	// 				if (item.Column>Column || item.Row>Row || (item.Column>Column && item.Row>Row)) return false;
-	// 			}
-
-	// 		}
-	// 	}
-	// 	return true;
-	// }
-
-	// characterSchema.methods.checkInventoryItemCollision = function(x, y, size) {
-	//     var inventory = this.Inventory;
-	//     console.log("We are got new item collision update");
-	//     // Calculate the direction of moving item
-	//     // Then if we move item upwards or to the left and has 4 squares space
-	//     // We can only move it when it intersects with the same item only by 2 squares
-	//     // allowed on the side we are direct to.
-	    
-	//     if((x < 0 || y < 0) || (size === 4 && (y+1 > 7 || x+1 > 7))){
-	//         console.log("Out of bonds");
-	//         return;
-	//     }
-
-	//     var reservedSlots = {x:[], y:[]};
-	//     if(size === 4){
-	//         reservedSlots.x.push(x);
-	//         reservedSlots.x.push(x+1);
-	//         reservedSlots.y.push(y);
-	//         reservedSlots.y.push(y+1);
-	//     }else{
-	//         reservedSlots.x.push(x);
-	//         reservedSlots.y.push(y);
-	//     }
-	    
-	//     var freeInventoryIndex;
-	    
-	//     for (var i = 0; i < 64; i++) {
-	//         var object = inventory[i];
-	//         if(object === null){
-	//         	if(freeInventoryIndex === undefined){
-	//         		freeInventoryIndex = i;
-	//         	}	
-	//         	continue;
-	//         }
-	        
-	//         if(!object) {
-	//             console.log("Intersection object error");
-	//             break;
-	//         }
-	        
-	//         var itemInfo = infos.Item[object.ID];
-	        
-	//         if(!itemInfo){
-	//             console.log("No item info for item of ID: " + object.ID);
-	//             break;
-	//         }
-	        
-	//         if(reservedSlots.x.indexOf(object.Column) >= 0 && reservedSlots.y.indexOf(object.Row) >= 0){
-	//             console.log("Intersection of item: " + itemInfo.Name);
-	//             return false;
-	//         }
-	//     }
-	    
-	//     if(freeInventoryIndex === undefined){
-	//     	console.log("No free index?");
-	//     	return false;
-	//     }
-
-	//     return {InventoryIndex: freeInventoryIndex, MoveRow: x, MoveColumn: y};
-	// }
-
-	/*
-		lvl 1:
-			experience: 221
-			levelup: 222
-			1tick: 0.45%
-			
-		lvl 2:
-			experience: 510
-			levelup: 511
-			1tick: 0.35%
-			
-		lvl 3:
-			experience: 855
-			levelup: 856
-			1tick: 0.29%	
-			
-		lvl 4:
-			experience: 1244
-			levelup: 1245
-			1tick: 0.26%	
-	*/
 
 	//Constructor
 	delete db.mongoose.models['characters'];

@@ -42,7 +42,7 @@ module.exports = function(grunt) {
 			restruct.
 		        int32lu("_id"). // 0
 		        string("Name",28). // 4
-		        int32lu("Unknown1").
+		        int32lu("Clan").
 		        int32lu("Unknown2").
 		        int32lu("Unknown3").
 		        int32lu("Unknown4").
