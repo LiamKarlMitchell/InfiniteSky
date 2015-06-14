@@ -34,9 +34,11 @@ vms('Zone', [
 	packets = require('./Helper/packets.js');
 	nav_mesh = require('./Modules/navtest-revised.js');
 	QuadTree = require('./Modules/QuadTree.js');
+	GMCommands = require('./Helper/GMCommands.js');
 	clone = require('clone');
 
 	vmscript.watch('./Generic');
+	vmscript.watch('./Commands');
 
 	function ZoneInstance(){
 		console.log('Zone Instance Created');
@@ -85,6 +87,19 @@ vms('Zone', [
         }
 	};
 
+	ZoneInstance.prototype.sendToAllAreaClan = function(client, self, buffer, distance, clan){
+		if (clan === undefined) {
+			clan = client.character.Clan;
+		}
+        var found = this.QuadTree.query({ CVec3: client.character.state.Location, radius: distance, type: ['client'] });
+        for(var i=0; i<found.length; i++){
+            var f = found[i];
+            if(!self && f.object === client) continue;
+            if (f.object.character.Clan !== clan) continue;
+            if(f.object.write) f.object.write(buffer);
+        }
+	};
+
 	ZoneInstance.prototype.findPath = function(){
 		process.log("Navigation not initialized");
 		return null;
@@ -103,6 +118,16 @@ vms('Zone', [
 	ZoneInstance.prototype.onError = function(err, socket){
 		process.log(socket.character.Name, "disconnected with error");
 	};
+
+	ZoneInstance.prototype.onFindAccount = function(socket, err, account) {
+		if (err) {
+			process.log(err);
+			socket.destroy();
+			return;
+		}
+
+		socket.account = account;
+	}
 
 	ZoneInstance.prototype.onFindCharacter = function(socket, err, character){
 		if(err) {
@@ -169,6 +194,10 @@ vms('Zone', [
 			}
 
 			delete this.socketTransferQueue[hash]; 
+
+			db.Account.findOne({_id: characterData.accountID},function(err, account) {
+				return self.onFindAccount(socket, err, account);
+			});
 
 			db.Character.findOne({
 				_id: characterData.id,
@@ -312,3 +341,4 @@ vms('Zone', [
 	}
 	process.api.invalidateAPI(process.pid);
 });
+
