@@ -21,6 +21,77 @@ console.log = process.log;
 vmscript.watch('Config/world.json');
 vmscript.watch('Config/network.json');
 
+var Command = function(Name, Level, Execute) {
+    this.Name = Name;
+    this.Level = Level;
+    this.Execute = Execute;
+    this.Alias = function(Name) {
+        return new Command(Name, this.Level, this.Execute);
+    }
+}
+
+var GMCommandsHandler = function(){
+    this.Commands = [];
+};
+
+GMCommandsHandler.prototype.AddCommand = function(name, level, execute){
+	var command = new Command(name, level, execute);
+
+    for(var i = 0; i < this.Commands.length; i++) {
+        if(this.Commands[i].Name == command.Name) {
+            this.Commands.splice(i, 1);
+        }
+    }
+    this.Commands.push(command);
+};
+
+GMCommandsHandler.prototype.GetCommand = function(name){
+    var command = null;
+    for(var i = 0; i < this.Commands.length; i++) {
+        if(this.Commands[i].Name == name) {
+            command = this.Commands[i];
+            break;
+        }
+    }
+    return command;
+};
+
+GMCommandsHandler.prototype.Execute = function(string, client){
+	if(string === "") return;
+
+    var indexofSpace = string.indexOf(' ');
+    var CommandName = indexofSpace > -1 ? string.substr(0, indexofSpace).toLowerCase() : string;
+    var CommandText = indexofSpace > -1 ? string.substr(indexofSpace + 1) : "";
+    var command = this.GetCommand(CommandName);
+
+    if(command){
+        try {
+        	CommandText.__proto__.getArgs = function(){
+        		var string = this.toString();
+        		var args = string.split(' ');
+        		for(var i=0, len=args.length; i < len; i++){
+        			var a = args[i];
+        			if(parseInt(a)){
+        				args[i] = parseInt(a);
+        			}
+        		}
+
+        		return args;
+        	};
+
+            command.Execute.call(this, CommandText, client);
+        } catch(ex) {
+            dumpError(ex);
+        }
+    }
+};
+
+if(typeof global.GMCommands === 'undefined')
+	global.GMCommands = new GMCommandsHandler();
+else global.GMCommands.__proto__ = GMCommandsHandler.prototype;
+
+vmscript.watch('./Processes/Zone/Commands');
+
 vms('Zone', [
 	'Config/world.json',
 	'Config/network.json'
@@ -49,11 +120,12 @@ vms('Zone', [
 		this.recv = {};
 		this.id = parseInt(process.argv[2]);
 		this.name = process.argv[3];
-		this.navigation = null;
+		this.AI = null;
 		this.QuadTree = null;
 		this.Clients = [];
 		this.Npc = [];
 		this.Items = [];
+		this.NpcNodesHash = {};
 	}
 
 	ZoneInstance.prototype.addSocket = function(socket){
@@ -226,7 +298,7 @@ vms('Zone', [
 				};
 			},
 			type: 'npc'
-		})));
+		})), this);
 		this.Npc.push(npc);
 	};
 
@@ -272,7 +344,7 @@ vms('Zone', [
 		var self = this;
 		process.on('message', function(type, socket){ console.log('Message from parent'); return global.Zone.onMessage(type, socket);});
 		var mesh_path = config.world.data_path + "navigation_mesh/" + this.name + '.obj';
-		this.navigation = new nav_mesh(mesh_path, function(mesh){
+		this.AI = new nav_mesh(mesh_path, function(mesh){
 			// process.log("Navigation mesh loaded for", self.name);
 			// ZoneInstance.prototype.findPath = mesh.findPath;
 			// findPath(from, to, actor_radius, callback)

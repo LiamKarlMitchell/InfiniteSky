@@ -228,6 +228,11 @@ map_mesh.prototype.getParentNodeByLocation = function(x, y, z){
 	// like maybe a range selection of a bucket. 
 	// so maybe bucket.minX >= x && x <= bucket.maxX && y
 	// then querying on that bucket. Should be faster by maybe 50% or 25%
+	// Method:
+	// Split navigation dimensions to n sized squares
+	// Put triangles that are intersecting one of squares
+	// See if Query Location x,y,z is intersecting one of the squares dimensions
+	// Then query a triangle out of this square to get the node
 	var start = new Date().getTime();
 
 	for(var i=this.worldTri.length-1; i>= 0; i--){
@@ -276,6 +281,17 @@ map_mesh.prototype.findPath = function(from, to, radius, callback){
 	var target = this.getParentNodeByLocation(to.x, to.y, to.z);
 	if(!target){
 		console.log("Unknown location for Parent location");
+		return;
+	}
+
+	if(target.index === node.index){
+		callback([ [from.x, from.y, from.z], [to.x, to.y, to.z] ]);
+		return;
+	}
+
+	var straightPath = this.cleanPath([ [from.x, from.y, from.z], [to.x, to.y, to.z] ]);
+	if(straightPath.length === 2){
+		callback(straightPath);
 		return;
 	}
 
@@ -394,7 +410,7 @@ map_mesh.prototype.findPath = function(from, to, radius, callback){
 
 	points.push([to.x, to.y, to.z]);
 	console.log("Path located in " + (new Date().getTime() - start) + "ms @ " + points.length + " points.");
-
+	points = this.cleanPath(points);
 	callback(points);
 }
 

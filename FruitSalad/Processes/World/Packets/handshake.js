@@ -192,6 +192,8 @@ WorldPC.Set(0x02, {
 
 		// TODO: Set the inventory, storage and bank buffers. Fixing enchant, combine, growth etc. of items.
 
+		CharacterData = socket.character.restruct(CharacterData);
+
 		socket.write(CharacterData);
 
 		var WorldAuthData = new Buffer(World.send.Auth.pack({

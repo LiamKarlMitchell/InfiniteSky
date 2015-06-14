@@ -14,7 +14,7 @@ vms('Item', [], function(){
 	var npcschema = mongoose.Schema({
 		_id: { type: Number, unique: true, index: true, default: 0 },
         Name: String, // 4
-        Unknown1: Number,
+        Clan: Number,
         Unknown2: Number,
         Unknown3: Number,
         Unknown4: Number,
