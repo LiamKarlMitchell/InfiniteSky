@@ -129,7 +129,7 @@ map_mesh.prototype.build = function(){
 
 	this.getMapEdges();
 
-	process.log("Builded in " + (new Date().getTime() - date) + "ms");
+	//process.log("Builded in " + (new Date().getTime() - date) + "ms");
 	if(this._callback){
 		this._callback(this);
 	}

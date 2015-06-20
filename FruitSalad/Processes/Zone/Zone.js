@@ -16,88 +16,15 @@ process.exception = function() {
 }
 // TODO: Maybe a debug option to enable this wrapper, so we can debug stuff on runtime.
 // This method is used when all vms console logs are dumped on runtime, we dont want copies of that.
-console.log = process.log;
-
 vmscript.watch('Config/world.json');
 vmscript.watch('Config/network.json');
-
-var Command = function(Name, Level, Execute) {
-    this.Name = Name;
-    this.Level = Level;
-    this.Execute = Execute;
-    this.Alias = function(Name) {
-        return new Command(Name, this.Level, this.Execute);
-    }
-}
-
-var GMCommandsHandler = function(){
-    this.Commands = [];
-};
-
-GMCommandsHandler.prototype.AddCommand = function(name, level, execute){
-	var command = new Command(name, level, execute);
-
-    for(var i = 0; i < this.Commands.length; i++) {
-        if(this.Commands[i].Name == command.Name) {
-            this.Commands.splice(i, 1);
-        }
-    }
-    this.Commands.push(command);
-};
-
-GMCommandsHandler.prototype.GetCommand = function(name){
-    var command = null;
-    for(var i = 0; i < this.Commands.length; i++) {
-        if(this.Commands[i].Name == name) {
-            command = this.Commands[i];
-            break;
-        }
-    }
-    return command;
-};
-
-GMCommandsHandler.prototype.Execute = function(string, client){
-	if(string === "") return;
-
-    var indexofSpace = string.indexOf(' ');
-    var CommandName = indexofSpace > -1 ? string.substr(0, indexofSpace).toLowerCase() : string;
-    var CommandText = indexofSpace > -1 ? string.substr(indexofSpace + 1) : "";
-    var command = this.GetCommand(CommandName);
-
-    if(command){
-        try {
-        	CommandText.__proto__.getArgs = function(){
-        		var string = this.toString();
-        		var args = string.split(' ');
-        		for(var i=0, len=args.length; i < len; i++){
-        			var a = args[i];
-        			if(parseInt(a)){
-        				args[i] = parseInt(a);
-        			}
-        		}
-
-        		return args;
-        	};
-
-            command.Execute.call(this, CommandText, client);
-        } catch(ex) {
-            dumpError(ex);
-        }
-    }
-};
-
-if(typeof global.GMCommands === 'undefined')
-	global.GMCommands = new GMCommandsHandler();
-else global.GMCommands.__proto__ = GMCommandsHandler.prototype;
-
-vmscript.watch('./Processes/Zone/Commands');
 
 vms('Zone', [
 	'Config/world.json',
 	'Config/network.json'
 ], function(){
 	util = require('./Modules/util.js');
-	util.setupUncaughtExceptionHandler(process.exception);
+	util.setupUncaughtExceptionHandler(function(err){ log.error(err); });
 	CachedBuffer = require('./Modules/CachedBuffer.js');
 	PacketCollection = require('./Modules/PacketCollection.js');
 	restruct = require('./Modules/restruct');
@@ -105,14 +32,14 @@ vms('Zone', [
 	packets = require('./Helper/packets.js');
 	nav_mesh = require('./Modules/navtest-revised.js');
 	QuadTree = require('./Modules/QuadTree.js');
-	GMCommands = require('./Helper/GMCommands.js');
 	clone = require('clone');
 
+	bunyan = require('bunyan');
+
 	vmscript.watch('./Generic');
-	vmscript.watch('./Commands');
+	vmscript.watch('./Helper/GMCommands.js');
 
 	function ZoneInstance(){
-		console.log('Zone Instance Created');
 		this.initialized = false;
 		this.packetCollection = null;
 		this.socketTransferQueue = {};
@@ -120,20 +47,54 @@ vms('Zone', [
 		this.recv = {};
 		this.id = parseInt(process.argv[2]);
 		this.name = process.argv[3];
+		this.clean_name = this.name.replace(/\s/gi,'');
 		this.AI = null;
 		this.QuadTree = null;
 		this.Clients = [];
 		this.Npc = [];
 		this.Items = [];
 		this.NpcNodesHash = {};
+
+		global.log = bunyan.createLogger({name: 'InfiniteSky/Zone.'+parseInt(process.argv[2]),
+		    streams: [{
+		        stream: process.stderr
+		    }]
+		});
+		// console.log = log.info.bind(log);
+		// console.error = log.error.bind(log);
+
+		function vmscript_WatchIfExists(path) {
+			fs.stat(path, function(err, stat) {
+				if (err) {
+					// Safe to ignore errors for this sometimes they wont exist.
+					return;
+				}
+
+				vmscript.watch(path);
+			})
+		}
+
+		vmscript_WatchIfExists('./Commands');
+		vmscript_WatchIfExists('./Processes/Zone/Commands');
+		vmscript_WatchIfExists('./Processes/Zone/Commands/'+this.id);
+		vmscript_WatchIfExists('./Processes/Zone/Scripts/'+this.id);
+		vmscript_WatchIfExists('./Processes/Zone/Scripts/'+this.clean_name);
+
+		log.info('Started');
 	}
 
 	ZoneInstance.prototype.addSocket = function(socket){
 		if(!this.QuadTree){
-			process.log("QuadTree is not initialized");
+			log.info("QuadTree is not initialized");
 			return false;
 		}else{
 			this.Clients.push(socket);
+
+			// Attach functions to the socket here
+			socket.sendInfoMessage = function(message) {
+				ZonePC.sendMessageToSocket(this, ':INFO', message);
+			};
+
 			socket.node = this.QuadTree.addNode(new QuadTree.QuadTreeNode({
 				object: socket,
 				update: function(node, delta) {
@@ -173,7 +134,7 @@ vms('Zone', [
 	};
 
 	ZoneInstance.prototype.findPath = function(){
-		process.log("Navigation not initialized");
+		log.info("Navigation not initialized");
 		return null;
 	};
 
@@ -183,17 +144,17 @@ vms('Zone', [
 		if(index > -1){
 			this.Clients.splice(this.Clients.indexOf(socket), 1);
 			socket.character.save();
-			process.log(socket.character.Name, "disconnected");
+			log.info(socket.character.Name, "disconnected");
 		}
 	};
 
 	ZoneInstance.prototype.onError = function(err, socket){
-		process.log(socket.character.Name, "disconnected with error");
+		log.info(socket.character.Name, "disconnected with error");
 	};
 
 	ZoneInstance.prototype.onFindAccount = function(socket, err, account) {
 		if (err) {
-			process.log(err);
+			log.info(err);
 			socket.destroy();
 			return;
 		}
@@ -203,13 +164,13 @@ vms('Zone', [
 
 	ZoneInstance.prototype.onFindCharacter = function(socket, err, character){
 		if(err) {
-			process.log(err);
+			log.info(err);
 			socket.destroy();
 			return;
 		}
 
 		if(!character){
-			process.log("Character not found");
+			log.info("Character not found");
 			socket.destroy();
 			return;
 		}
@@ -229,18 +190,18 @@ vms('Zone', [
 
 			CachedBuffer.call(socket, self.packetCollection);
 			Zone.sendToAllArea(socket, true, socket.character.state.getPacket(), config.network.viewable_action_distance);
-			process.log(character.Name, "connected");
+			log.info(character.Name, "connected");
 		});
 	};
 
 	ZoneInstance.prototype.onMessage = function(type, socket){
-		console.log('Zone Message');
-		console.log(type);
+		log.info('Zone Message');
+		log.info(type);
 		var self = this;
 		if(socket)
 		switch(type){
 			case 'world socket':
-			process.log('World socket received');
+			log.info('World socket received');
 			socket.on('end', function() {
 				return self.onDisconnect(socket);
 			});
@@ -260,7 +221,7 @@ vms('Zone', [
 			var hash = socket.remoteAddress + ":" + socket.remotePort;
 			var characterData = this.socketTransferQueue[hash];
 			if(!characterData){
-				process.log("could not retrive character data.");
+				log.info("could not retrive character data.");
 				socket.destroy();
 				return;
 			}
@@ -320,8 +281,8 @@ vms('Zone', [
 	        type: 'item'
 	    });
 	    obj.setNode(this.QuadTree.addNode(node));
-		console.log(owner.character.Name, 'dropped item #' + obj.NodeID);
-		console.log(obj.obj);
+		log.info(owner.character.Name, 'dropped item #' + obj.NodeID);
+		log.info(obj.obj);
 	    this.sendToAllArea(owner, true, obj.getPacket(), config.network.viewable_action_distance);
 	};
 
@@ -340,12 +301,13 @@ vms('Zone', [
 		var startTime = new Date().getTime();
 		
 		this.packetCollection = new PacketCollection('ZonePC');
+		global.ZonePC = this.packetCollection;
 
 		var self = this;
-		process.on('message', function(type, socket){ console.log('Message from parent'); return global.Zone.onMessage(type, socket);});
+		process.on('message', function(type, socket){ return global.Zone.onMessage(type, socket);});
 		var mesh_path = config.world.data_path + "navigation_mesh/" + this.name + '.obj';
 		this.AI = new nav_mesh(mesh_path, function(mesh){
-			// process.log("Navigation mesh loaded for", self.name);
+			// log.info("Navigation mesh loaded for", self.name);
 			// ZoneInstance.prototype.findPath = mesh.findPath;
 			// findPath(from, to, actor_radius, callback)
 			// from			- object, format: {x, y, z}
@@ -375,7 +337,7 @@ vms('Zone', [
 					], function(){
 						fs.readFile(config.world.data_path + 'spawninfo/' + util.padLeft(self.id,'0', 3) + '.NPC', function(err, data) {
 							if (err) {
-								//console.log(err);
+								//log.info(err);
 							} else {
 								var RecordCount = data.readUInt32LE(0);
 
@@ -392,11 +354,10 @@ vms('Zone', [
 						});
 
 
-						process.log("Initialized in", (new Date().getTime() - startTime), "ms");
+						log.info("Initialized in " + (new Date().getTime() - startTime) + "ms");
 						self.acceptConnections = true;
 						process.api.run();
 						process.api.zoneInitResponse();
-						console.log = process.log;
 				});
 			});
 		});
@@ -413,4 +374,3 @@ vms('Zone', [
 	}
 	process.api.invalidateAPI(process.pid);
 });
-

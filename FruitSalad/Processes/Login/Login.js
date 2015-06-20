@@ -21,6 +21,8 @@ vms('Login Server', [
 	os = require('os');
 	Netmask = require('netmask').Netmask;
 
+	bunyan = require('bunyan');
+
 	vmscript.watch('./Generic/structs.js');
 	vmscript.watch('./Generic/CharacterInfos.js');
 
@@ -34,6 +36,14 @@ vms('Login Server', [
 	};
 
 	function LoginInstance(){
+		log = bunyan.createLogger({name: 'InfiniteSky/Login',
+		    streams: [{
+		        stream: process.stderr
+		    }]
+		});
+
+		log.info('Started');
+
 		/*
 			Array of current connected clients.
 		*/

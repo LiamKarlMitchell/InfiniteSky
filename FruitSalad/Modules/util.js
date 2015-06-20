@@ -3,32 +3,17 @@
 // For more information, see LICENCE in the main folder
 var fs = require('fs');
 
-function dumpError(err, logFunction) {
-  console.log(err);
-  if (typeof err === 'object') {
+function dumpError(err) {
+  if (err instanceof Error) {
     if (err.message) {
-      if(logFunction)
-        logFunction('\n\x1b[31;1m'+ (err.name || 'Error') +': ' + err.message+'\x1b[0m');
-      else
       console.error('\n\x1b[31;1m'+ (err.name || 'Error') +': ' + err.message+'\x1b[0m')
     }
-    if(logFunction)
-      logFunction(new Date());
-    else
-      console.log(new Date());
     if (err.stack) {
-      if(logFunction)
-      logFunction('\x1b[31;1mStacktrace:\x1b[0m','\n',err.stack.split('\n').splice(1).join('\n'));
-        else
       console.error('\x1b[31;1mStacktrace:\x1b[0m','\n',err.stack.split('\n').splice(1).join('\n'));
     }
   } else {
-    if(logFunction)
-      logFunction('\x1b[31;1m' + err+'\x1b[0m');
-    else
-    console.error('\x1b[31;1m' + err+'\x1b[0m');
+      console.error('\x1b[31;1m' + err+'\x1b[0m');
   }
-  // Push to redis if required for logging etc
 }
 
 
@@ -76,10 +61,10 @@ var util = {
     },
 
   setupUncaughtExceptionHandler: function (logFunction) {
-    process.on('uncaughtException', function(exception) {
+    process.on('uncaughtException', logFunction || function(exception) {
       console.log('Uncaught Exception:');
       console.log(arguments);
-      dumpError(exception, logFunction);
+      dumpError(exception);
     });
   },
 

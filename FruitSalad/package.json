@@ -6,6 +6,7 @@
   "main": "main.js",
   "dependencies": {
     "async": "^1.2.0",
+    "bunyan": "^1.4.0",
     "cli-color": "^1.0.0",
     "clone": "^1.0.2",
     "encoding": "^0.1.11",

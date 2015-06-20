@@ -6,7 +6,6 @@
 // Command: commands
 // Used to tell the user all of the commands they can execute
 GMCommands.AddCommand(new Command('commands',0,function command_commands(string,client){
-
 		client.sendInfoMessage('Avaliable Commands for Level: '+client.account.Level);
 		var tmpoutput='';
 		for(var i = 0; i < GMCommands.Commands.length; i++) {

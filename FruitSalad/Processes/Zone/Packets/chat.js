@@ -43,17 +43,35 @@ int32ls('Unknown1');
 // 		//console.log('Type: Faction Message');
 // 	}
 // });
+ZonePC.sendMessageToSocket = function(socket,name,message) {
+	socket.write(
+		new Buffer(
+			Zone.send.chat.pack({
+				PacketID: 0x2A,
+				Name: name,
+				Message: message
+			})
+		)
+	);
+}
+
 ZonePC.Set(0x13, {
 	Restruct: Zone.recv.chat,
 
 	function: function NormalChatRecv(socket, input) {
-		
-		if (input.Message.indexOf('/') === 0) {
-			GMCommands.Execute(input.Message.substr(1), socket); // Need to remove the / so everything after it.
-			return;
+		log.trace('NormalChatRecv');
+		try{
+			if (input.Message.indexOf('/') === 0) {
+				GMCommands.Execute(input.Message.substr(1), socket); // Need to remove the / so everything after it.
+				return;
+			}
 		}
+		catch (e) {
+			console.log(e.toString())
+		}
+
 		console.log("[Normal] " + socket.character.Name + ": " + input.Message);
-		console.dir(socket.account);
+		socket.sendInfoMessage('sup');
 
 		Zone.sendToAllAreaClan(socket, true,
 			new Buffer(

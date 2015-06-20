@@ -604,9 +604,9 @@ QuadTree.prototype.addNode = function(node) {
             this.nodesHash[node.id] = node;
             node.leaf = this;
         } else {
-            console.log(this.bounds);
-            console.log(node.x,node.y);
-            process.log('Node outside Quad Tree bounds ' + this.x + ',' + this.y + ' size ' + this.size);
+            //console.log(this.bounds);
+            //console.log(node.x,node.y);
+            //process.log('Node outside Quad Tree bounds ' + this.x + ',' + this.y + ' size ' + this.size);
             return null;
         }
     }

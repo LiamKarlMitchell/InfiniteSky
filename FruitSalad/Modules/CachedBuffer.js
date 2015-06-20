@@ -23,7 +23,6 @@ var CachedBuffer = function(collection, opts){
     this.onData = function(chunk){
         if(this.paused){
             //TODO: Preferably remove the listener for comming data.
-            console.log("We no more handle packets here");
             return;
         }
         // console.log("Chunk length:", chunk.length);

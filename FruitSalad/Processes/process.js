@@ -12,6 +12,9 @@ api.spawnScript = vmscript.watch;
 // 		console.log(e);
 // 	}
 // };
+console.log = console.error;
+console.dir = console.error;
+
 
 ChildSpawner = require('../Helper/ChildSpawner.js');
 

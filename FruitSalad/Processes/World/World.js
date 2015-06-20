@@ -20,16 +20,25 @@ vms('World Server', [
 	// packets = require('./Helper/packets.js');
 	os = require('os');
 	Netmask = require('netmask').Netmask;
+	bunyan = require('bunyan');
 
 	global.api.sendSocketToTransferQueue = function(obj){
 		//var key = util.toHexString(obj.hash);
-		console.log(obj);
+		log.info(obj);
 		World.characterTransfer[obj.username] = obj;
 		process.api.call('Login', 'sendSocketAfterTransferQueue', obj.username);
-		console.log("Login sendSocketAfterTransferQueue");
+		log.info("Login sendSocketAfterTransferQueue");
 	};
 
 	function WorldInstance(){
+		global.log = bunyan.createLogger({name: 'InfiniteSky/World',
+		    streams: [{
+		        stream: process.stderr
+		    }]
+		});
+
+		log.info('Started');
+
 		/*
 			Array of current connected clients.
 		*/
@@ -76,7 +85,7 @@ vms('World Server', [
 		if(!this.acceptConnections) {
 			// TODO: Send packet back to client denying its connection.
 			// There is a packet 00 with status for this kind of thing.
-			console.log('World had connection but it is not ready.');
+			log.info('World had connection but it is not ready.');
 			return;
 		}
 		socket.paused = false;
@@ -89,12 +98,12 @@ vms('World Server', [
 		this.clients.push(socket);
 		CachedBuffer.call(socket, this.packetCollection);
 
-		console.log("[World] new Connection #" + socket.clientID);
+		log.info("[World] new Connection #" + socket.clientID);
 
 		try {
 			this.onConnected(socket);
 		} catch (e) {
-			console.log(e);
+			log.info(e);
 		}
 
 		socket.on('end', function() {
@@ -121,22 +130,22 @@ vms('World Server', [
 	WorldInstance.prototype.onDisconnect = function(socket){
 		var index = this.clients.indexOf(socket);
 		if(index !== -1){
-			console.log("[World] connection closed #" + socket.clientID);
+			log.info("[World] connection closed #" + socket.clientID);
 			this.clients.splice(this.clients.indexOf(socket), 1);
 			socket.destroy();
 		}
 	};
 
 	WorldInstance.prototype.onError = function(err, socket){
-		console.log(err);
+		log.info(err);
 		this.clients.splice(this.clients.indexOf(socket), 1);
 		socket.destroy();
 	};
 	WorldInstance.prototype.loadZone = function World__loadZone(id, done) {
-		console.log("Spawning Child Process for Zone: " + id + ' ' + config.zones[id.toString()].Name);
+		log.info("Spawning Child Process for Zone: " + id + ' ' + config.zones[id.toString()].Name);
 		this.zoneSpawner.spawnChild({
 			name: parseInt(id),
-			pipeError: false,
+			pipeError: true,
 			script: './Processes/Zone/Zone.js'
 		}, null, [id, config.zones[id.toString()].Name]);
 
@@ -150,14 +159,14 @@ vms('World Server', [
 	};
 
 	WorldInstance.prototype.init = function(){
-		console.log('World Instance Init.');
+		log.info('World Instance Init.');
 		if(this.listening) return;
 
 		var self = this;
 		this.instance.listen(config.network.ports.world, function(){
 			self.listening = true;
 			self.listeningPort = config.network.ports.world;
-			console.log("World Server Instance listening on:", self.listeningPort);
+			log.info("World Server Instance listening on:", self.listeningPort);
 		});
 
 		this.packetCollection = new PacketCollection('WorldPC');
@@ -170,14 +179,14 @@ vms('World Server', [
 
 			// Exposes log function to the child processe zones which should use process.log
 			log: function(){
-				console.log.apply(this, arguments);
+				log.info.apply(this, arguments);
 			},
 		});
 
         if(config.zones) {
             var mapLoadQueue = async.queue(this.loadZone.bind(self), config.AsyncZoneLoadLimit || 4);
             mapLoadQueue.drain = function() {
-                console.log('Zones all queued to load.');
+                log.info('Zones all queued to load.');
             }
 
             for(var id in config.zones) {
@@ -195,7 +204,7 @@ vms('World Server', [
 		process.zones = this.zoneSpawner.childrens;
 
 		Database(config.world.database.connection_string, function World__onDatabaseConnected(){
-			console.log("Database connected @", config.world.database.connection_string);
+			log.info("Database connected @", config.world.database.connection_string);
 			vmscript.watch('Database');
 			vmscript.watch('Generic');
 
@@ -206,7 +215,7 @@ vms('World Server', [
 				vmscript.watch('./Processes/World/Packets').on([
 						'Packets'
 					], function(){
-						console.log("You can now login to the server");
+						log.info("You can now login to the server");
 						self.acceptConnections = true;
 						process.api.run();
 				});

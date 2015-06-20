@@ -75,7 +75,9 @@ ChildSpawner.prototype.spawnChild = function(opts, callback, args){
 	var child = fork(processEnv, args, {silent: true});
 
 	// console.log(child);
-	if(opts.pipeError === undefined || opts.pipeError === true) {
+	if(opts.pipeErrorToStdout) {
+		child.stderr.pipe(process.stdout);
+	} else if(opts.pipeError === undefined || opts.pipeError === true) {
 		child.stderr.pipe(process.stderr);
 	}
 
