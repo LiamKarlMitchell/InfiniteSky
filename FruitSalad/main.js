@@ -23,8 +23,7 @@
 // // logger.on('error', function (err) { /* Do Something */ });
 
 bunyan = require('bunyan');
-log = bunyan.createLogger({name: 'InfiniteSky',
-});
+log = bunyan.createLogger({name: 'InfiniteSky'});
 
 // winston.profile('Startup');
 path = require('path');

@@ -42,6 +42,9 @@ var CachedBuffer = function(collection, opts){
                 if(this.reminder === 0){
                     if(this.packet === null){
                         console.log(colors.info('Unrecognised PacketID: 0x' + util.padLeft(this.id.toString(16).toUpperCase(),'0',2) + " Size: " + content.length) + " Chunk Length: " + (chunk.length - 9));
+                        if (this.unhandledPacket) {
+                            this.unhandledPacket('0x'+this.id.toString(16).toUpperCase()+' Size: '+content.length);
+                        }
                     }else{
                         if(this.packet.function){
                             try{
@@ -66,26 +69,27 @@ var CachedBuffer = function(collection, opts){
                 this.reminder = 0;
 
                 if(this.packet === null){
-                    console.log(colors.info('Unrecognised PacketID: 0x' + util.padLeft(this.id.toString(16).toUpperCase(),'0',2) + " Size: " + content.length) + " Chunk Length: " + (chunk.length - 9));
-                    console.log(hexy(content));
+                    var hexPacketID = util.padLeft(this.id.toString(16).toUpperCase(),'0',2);
+                    console.log(colors.info('Unrecognised PacketID: 0x' + hexPacketID + " Size: " + content.length) + " Chunk Length: " + (chunk.length - 9));
+                    if (this.unhandledPacket) {
+                        this.unhandledPacket('0x'+this.id.toString(16).toUpperCase()+' Size: '+content.length);
+                    }
+                    var hexData = hexy(content);
+                    log.warn({data: hexData, id: hexPacketID, size: content.length },'Unrecognized PacketID');
                 }else{
-                    if(this.packet === null){
-                        console.log(colors.info('Unrecognised PacketID: 0x' + util.padLeft(this.id.toString(16).toUpperCase(),'0',2) + " Size: " + content.length) + " Chunk Length: " + (chunk.length - 9));
-                    }else{
-                        if(this.packet.function){
-                            try{
-                                if(this.packet.Restruct){
-                                    this.packet.function(this, this.packet.Restruct.unpack(content), content);
-                                }else{
-                                    this.packet.function(this, content);
-                                }
-                            }catch(e){
-                                util.dumpError(e);
+                    if(this.packet.function){
+                        try{
+                            if(this.packet.Restruct){
+                                this.packet.function(this, this.packet.Restruct.unpack(content), content);
+                            }else{
+                                this.packet.function(this, content);
                             }
-                        }else{
-                            console.log(colors.info('Unrecognised function for PacketID: 0x' + util.padLeft(this.id.toString(16).toUpperCase(),'0',2) + " Size: " + content.length));
-                            console.log(hexy(content));
+                        }catch(e){
+                            util.dumpError(e);
                         }
+                    }else{
+                        console.log(colors.info('Unrecognised function for PacketID: 0x' + util.padLeft(this.id.toString(16).toUpperCase(),'0',2) + " Size: " + content.length));
+                        console.log(hexy(content));
                     }
                 }
 

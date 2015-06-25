@@ -33,12 +33,12 @@
 		"maxClients": 10
 	},
 
-	"info_directory": "J:\\Alt1Games\\TwelveSky1\\G03_GDATA\\D01_GIMAGE2D\\005",
-	"world_directory": "J:\\Alt1Games\\TwelveSky1\\G03_GDATA\\D07_GWORLD",
-	"translation_directory": "J:\\Source\\InfiniteSky\\data\\translation"
+	//"info_directory": "J:\\Alt1Games\\TwelveSky1\\G03_GDATA\\D01_GIMAGE2D\\005",
+	//"world_directory": "J:\\Alt1Games\\TwelveSky1\\G03_GDATA\\D07_GWORLD",
+	//"translation_directory": "J:\\Source\\InfiniteSky\\data\\translation"
 
-	// "info_directory": "/home/liam/e/Alt1Games/TwelveSky1/G03_GDATA/D01_GIMAGE2D/005",
-	// "world_directory": "/home/liam/e/Alt1Games/TwelveSky1/G03_GDATA/D07_GWORLD",
-	// "translation_directory": "/home/liam/InfiniteSky/data/translation"
+	"info_directory": "/home/liam/e/Alt1Games/TwelveSky1/G03_GDATA/D01_GIMAGE2D/005",
+	"world_directory": "/home/liam/e/Alt1Games/TwelveSky1/G03_GDATA/D07_GWORLD",
+	"translation_directory": "/home/liam/InfiniteSky/data/translation"
 
 }

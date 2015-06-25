@@ -147,7 +147,7 @@ vms('World Server', [
 			name: parseInt(id),
 			pipeError: true,
 			script: './Processes/Zone/Zone.js'
-		}, null, [id, config.zones[id.toString()].Name]);
+		}, null, [id, config.zones[id.toString()].Name, config.zones[id.toString()].DisplayName || id]);
 
 		done();
 	};
@@ -176,11 +176,11 @@ vms('World Server', [
 			// Exposes a function to be called when a zone is loaded
 			// or if there was a significant error loading a zone.
 			zoneInitResponse: self.zoneInitResponse.bind(self),
-
+			// TODO find a way to expose these functions outside of constructor/init.
 			// Exposes log function to the child processe zones which should use process.log
 			log: function(){
 				log.info.apply(this, arguments);
-			},
+			}
 		});
 
         if(config.zones) {
@@ -229,5 +229,5 @@ vms('World Server', [
 	} else {
 		global.World.__proto__ = WorldInstance.prototype;
 	}
-	process.api.invalidateAPI(process.pid, console.error);
+	process.api.invalidateAPI(process.pid);
 });

@@ -47,7 +47,8 @@ vms('Zone', [
 		this.recv = {};
 		this.id = parseInt(process.argv[2]);
 		this.name = process.argv[3];
-		this.clean_name = this.name.replace(/\s/gi,'');
+		this.display_name = process.argv[4];
+		this.clean_name = this.display_name.replace(/[\s#@]/gi,'');
 		this.AI = null;
 		this.QuadTree = null;
 		this.Clients = [];
@@ -60,10 +61,8 @@ vms('Zone', [
 		        stream: process.stderr
 		    }]
 		});
-		// console.log = log.info.bind(log);
-		// console.error = log.error.bind(log);
 
-		function vmscript_WatchIfExists(path) {
+		function vmscript_WatchIfExists(path) {			
 			fs.stat(path, function(err, stat) {
 				if (err) {
 					// Safe to ignore errors for this sometimes they wont exist.
@@ -77,6 +76,7 @@ vms('Zone', [
 		vmscript_WatchIfExists('./Commands');
 		vmscript_WatchIfExists('./Processes/Zone/Commands');
 		vmscript_WatchIfExists('./Processes/Zone/Commands/'+this.id);
+		vmscript_WatchIfExists('./Processes/Zone/Commands/'+this.clean_name);
 		vmscript_WatchIfExists('./Processes/Zone/Scripts/'+this.id);
 		vmscript_WatchIfExists('./Processes/Zone/Scripts/'+this.clean_name);
 
@@ -91,9 +91,18 @@ vms('Zone', [
 			this.Clients.push(socket);
 
 			// Attach functions to the socket here
-			socket.sendInfoMessage = function(message) {
-				ZonePC.sendMessageToSocket(this, ':INFO', message);
+			// TODO: See if we can get this to work prototype like.
+			socket.sendInfoMessage = function(type, message) {
+				if (arguments.length === 1) {
+					message = type;
+					type = ':INFO';
+				}
+				ZonePC.sendMessageToSocket(this, type, message);
 			};
+
+			socket.unhandledPacket = function(message) {
+				ZonePC.sendMessageToSocket(this, ':WARN', 'Unhandled Packet: '+message);
+			}
 
 			socket.node = this.QuadTree.addNode(new QuadTree.QuadTreeNode({
 				object: socket,
@@ -108,6 +117,12 @@ vms('Zone', [
 			}));
 			socket.character.state.NodeID = socket.node.id;
 			return true;
+		}
+	};
+
+	ZoneInstance.prototype.sendToAll= function(buffer) {
+		for (var i=0; i< this.Clients.length; i++) {
+			this.Clients.write(buffer);
 		}
 	};
 
@@ -372,5 +387,10 @@ vms('Zone', [
 	} else {
 		global.Zone.__proto__ = ZoneInstance.prototype;
 	}
+
+	api.sendToAll = function exposedSendToAll(buffer) {
+		Zone.sendToAll(buffer);
+	};
+
 	process.api.invalidateAPI(process.pid);
 });

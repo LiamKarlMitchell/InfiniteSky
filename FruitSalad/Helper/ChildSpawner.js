@@ -49,18 +49,48 @@ function ChildSpawner(api) {
 		}
 	}
 
-	this.api.call = function(process_name, callback){
+	/**
+	 * Calls a function on a child process by name.
+	 * @param  {string}
+	 * @param  {string} The function name to call
+	 */
+	this.api.call = function(process_name, fn){
 		var p = self.childrens[process_name];
 		// TODO: Comment what this does behind the scenes.
-		if(p && p.api[callback]){
-			console.log("Calling", process_name, 'for', callback);
+		if(p && p.api[fn]){
+			log.info({ process_name: process_name },"Calling");
 			var args = [];
 			for(var i=2; i<arguments.length; i++){
 				args.push(arguments[i]);
 			}
-			p.api[callback].apply(self, args);
+			p.api[fn].apply(self, args);
 		}
 	};
+
+	/**
+	 * Calls a function on all child processes matching the filter.
+	 * @param  {(string|regex)} '*' for all
+	 * @param  {string} The function name to call
+	 */
+	this.api.callAll = function(filter, fn) {
+		var childrenNames = Object.keys(self.childrens);
+		var args = [];
+
+		for(var j=2; j<arguments.length; j++){
+			args.push(arguments[j]);
+		}
+		// TODO: Optimize
+		for (var i = 0; i<childrenNames.length; i++) {
+			if (filter === '*' || (filter instanceof RegExp && filter.match(childrenNames[i])) || filter == childrenNames[i]) {
+				var zone = self.childrens(childrenNames[i]);
+				if (zone && zone.api[fn]) {
+					log.info({ child: childrenNames[i], fn: fn },"Calling function on Child.");
+					zone.api[fn].apply(self.zoneSpawner, arguments);
+				}
+
+			}
+		}
+	}
 }
 
 ChildSpawner.prototype.onReady = function(callback){
