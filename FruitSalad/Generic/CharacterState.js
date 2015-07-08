@@ -180,6 +180,9 @@ vms( 'CharacterState', [ 'CVec3', 'Structs' ], function(){
 		this.MaxHP = Math.floor(character.infos.MaxHP);
 		this.CurrentChi = Math.floor(character.Chi);
 		this.MaxChi = Math.floor(character.infos.MaxChi);
+
+		// Clone the infos reference for use in battle calculations
+		this.infos = character.infos;
 	};
 
 

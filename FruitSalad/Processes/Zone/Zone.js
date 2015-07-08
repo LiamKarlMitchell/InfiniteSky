@@ -32,6 +32,8 @@ vms('Zone', [
 	packets = require('./Helper/packets.js');
 	nav_mesh = require('./Modules/navtest-revised.js');
 	QuadTree = require('./Modules/QuadTree.js');
+	Random = require("random-js");
+	random = new Random(Random.engines.mt19937().autoSeed());
 	clone = require('clone');
 
 	bunyan = require('bunyan');

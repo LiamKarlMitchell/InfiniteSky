@@ -71,7 +71,6 @@ ZonePC.Set(0x13, {
 		}
 
 		console.log("[Normal] " + socket.character.Name + ": " + input.Message);
-		socket.sendInfoMessage('sup');
 
 		Zone.sendToAllAreaClan(socket, true,
 			new Buffer(

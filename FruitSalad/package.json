@@ -19,6 +19,7 @@
     "jsonlint": "^1.6.2",
     "mongoose": "^4.0.3",
     "netmask": "^1.0.5",
+    "random-js": "^1.0.4",
     "smith": "^0.1.22",
     "tabletop": "^1.4.2",
     "winston": "^1.0.0"
