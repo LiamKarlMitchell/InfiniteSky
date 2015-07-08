@@ -27,13 +27,15 @@ vms('Login Server', [
 	vmscript.watch('./Generic/CharacterInfos.js');
 
 	global.api.sendSocketAfterTransferQueue = function(username){
-		console.log('LOGIN Send socket....', username);
+		console.log('LOGIN Send socket.... a', username);
 		if(Login.characterTransfer[username]){
 			console.log("Sending response");
 			Login.characterTransfer[username]();
 			delete Login.characterTransfer[username];
 		}
 	};
+
+	global.rpc.invalidateAPI(global.api);
 
 	function LoginInstance(){
 		log = bunyan.createLogger({name: 'InfiniteSky/Login',
@@ -42,7 +44,7 @@ vms('Login Server', [
 		    }]
 		});
 
-		log.info('Started');
+		console.log('Started');
 
 		/*
 			Array of current connected clients.
@@ -170,7 +172,6 @@ vms('Login Server', [
 				], function(){
 					// db.account.create
 					self.acceptConnections = true;
-					process.api.run();
 			});
 		});
 	}
@@ -181,5 +182,6 @@ vms('Login Server', [
 	} else {
 		global.Login.__proto__ = LoginInstance.prototype;
 	}
-	process.api.invalidateAPI(process.pid);
+
+	global.rpc.invalidateAPI(global.api);
 });

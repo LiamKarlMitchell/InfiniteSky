@@ -82,8 +82,8 @@ LoginPC.Set(0x09, {
 		if (theIP === '') {
 			theIP = config.externalIP;
 		}
-		
-		process.api.call('World', 'sendSocketToTransferQueue', transferObj);
+
+		global.rpc.api.call('World', 'sendSocketToTransferQueue', transferObj);
 		socket.zoneTransfer = true;
 		// Send the transfer to zone packet.
 		Login.characterTransfer[transferObj.username] = function() {

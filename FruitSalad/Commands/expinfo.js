@@ -16,7 +16,7 @@ GMCommands.AddCommand(new Command('expinfo',0,function command_expinfo(string,cl
 		client.sendInfoMessage("Finding EXP where Level is "+Level);
 		db.Exp.getByLevel(Level, function(err, exp) {
 			if (err) {
-				log.error(err, 'Error finding EXP Information for Level '+Level);
+				console.log(err, 'Error finding EXP Information for Level '+Level);
 				client.sendInfoMessage('Error: ', err);
 				return;
 			}

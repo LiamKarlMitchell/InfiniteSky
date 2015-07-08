@@ -11,9 +11,9 @@ WorldPC.Set(0x01, {
 		// TODO: Add IP validation?
 		// var username = buffer.slice(0, 13);
 
-		var transferObj = World.characterTransfer[input.AccountName];
-		delete World.characterTransfer[input.AccountName];
-		
+		var transferObj = World.characterTransferArray[input.AccountName];
+		delete World.characterTransferArray[input.AccountName];
+
 		if(!transferObj){
 			console.log(input);
 			console.log("No transfer obj for:", input.AccountName);
@@ -220,8 +220,8 @@ WorldPC.Set(0x02, {
 		handshakeData.accountID = socket.character.AccountID;
 		handshakeData.hash = socket.remoteAddress + ":" + socket.remotePort;
 		console.log('Sending socket to Zone: '+socket.character.MapID);
-		zone.thread.send({type: 'character data', data: handshakeData});
-		zone.thread.send('world socket', socket);
-		socket.paused = true;
-	}	
+		zone.process.send({type: 'character', data: handshakeData});
+		zone.process.send('socket', socket);
+		// socket.paused = true;
+	}
 });
