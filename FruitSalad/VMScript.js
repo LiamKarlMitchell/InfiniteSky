@@ -15,6 +15,8 @@
  *    along with vmscript.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// TODO: Fix a memory leak due to 11 > listeners warning.
+
 var fs = require('fs');
 var EventEmitter = require('events').EventEmitter;
 EventEmitter = new EventEmitter();
@@ -171,7 +173,7 @@ function VMScriptObj(){
 };
 
 /* Reading the file contents and runs the code in this context. */
-VMScriptObj.prototype.parse = function(file_path){	
+VMScriptObj.prototype.parse = function(file_path){
 	fs.readFile(file_path, function(err, content){
 		if(err){
 			// console.log(err);
@@ -209,8 +211,8 @@ VMScriptObj.prototype.parse = function(file_path){
 					EventEmitter.emit('check dependencies');
 				}catch(e){
 					try{
-						JSONParser.parse(code.replace(/(?:\/\*(?:[\s\S]*?)\*\/)|(?:\/\/(?:.*)$)/gm, 
-							function (match) { 
+						JSONParser.parse(code.replace(/(?:\/\*(?:[\s\S]*?)\*\/)|(?:\/\/(?:.*)$)/gm,
+							function (match) {
 								return new Array(match.split('\n').length).join('\n');
 							}));
 					}catch(e){
@@ -292,7 +294,7 @@ VMScriptObj.prototype.watch = function(file_path, opts){
 							fileStats[files[i]] = stat;
 							EventEmitter.emit('file added', files[i]);
 						}catch(e){
-							
+
 						}
 					}
 
