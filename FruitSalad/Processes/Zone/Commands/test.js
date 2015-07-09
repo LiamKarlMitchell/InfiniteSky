@@ -11,7 +11,6 @@ GMCommands.AddCommand(new Command('t',60,function command_test(string, client){
 	attackInfo.DefenderID = client.character.state.CharacterID;
 	//attackInfo.DefenderIndex = 1;
 	attackInfo.TotalDamage = attackInfo.Damage;
-	attackInfo.Deadly = attackInfo.Critical;
 	attackInfo.DamageHP = attackInfo.Damage;
 	
 	// TODO: Send attack packet to target location.
@@ -52,6 +51,15 @@ Zone.recv.attack = restruct.
     int32lu('skillID').
     int8lu('Unk', 40);
 
+// Modes of attack:
+// 1 Player VS Player
+// 2 Player VS Enemy Faction Player
+// 3 Player VS Monster
+// 4 Monster VS Player
+// 5? Player VS NPC
+// 6? NPC VS Player
+
+//rpc.api.callOn('*','addNumbers',[100,200]);
 
 function processAttack(attackInfo, attacker, target) {
 	console.log('DexHitRate: '+attacker.infos.DexHitRate);
@@ -168,24 +176,21 @@ function processAttack(attackInfo, attacker, target) {
 	// 	tDamageValue = tMinDamageValueWithAvatar;
 	// }
 
-	// Get critical
-
-	attackInfo.Critical = 0;
-
-	// Add a critical if possible
+	// Get deadly value if possible
+	attackInfo.Deadly = 0;
 	switch (attackInfo.actionValue) {
 		case 1:
-			if (random.real(0, 100, true) < getCriticalAttackDefValue( attacker, target ) ) {
-				attackInfo.Critical = 1;
+			if (random.real(0, 100, true) < getDeadlyChance( attacker, target ) ) {
+				attackInfo.Deadly = 1;
 				attackPower *= 2;
 			}
 		break;
 		case 2:
-			// Handle critical for skills?
+			// Handle deadly for skills?
 			// Get skill attack type
-			// if 2 or 5? then do critical.
-			// if (random.real(0, 100, true) < getCriticalAttackDefValue( attacker, target ) ) {
-			// 	attackInfo.Critical = 1;
+			// if 2 or 5? then do deadly.
+			// if (random.real(0, 100, true) < getDeadlyChance( attacker, target ) ) {
+			// 	attackInfo.Deadly = 1;
 			// 	attackPower *= 2;
 			// }
 		break;
@@ -207,9 +212,45 @@ function processAttack(attackInfo, attacker, target) {
 	attackInfo.Damage = attackPower;
 }
 
-function getCriticalAttackDefValue(attacker, target) {
-	return 10; // Just for testing a 50% chance to critical.
-	// TODO Write a function to work out the Critical Attack Defense Value
+function getDeadlyChance(attacker, target) {
+	// Get attacker deadly rate
+	// TODO: If there is skill to increase deadly/buff then handle it here/
+	var deadly_rate = attacker.infos.DeadlyRate || 0;
+
+	// TODO: if there is a skill/buff for deadly dodge handle it here.
+	// Get target deadly defense
+	// Monsters & NPC have no deadly dodge rate
+	var deadly_dodge = target.infos.DeadlyDodgeRate || 0
+
+	if (deadly_rate > deadly_dodge)
+	{
+		deadly_rate -= deadly_dodge;
+	}
+	return deadly_rate;
+}
+
+function getDeathPosition(attacker, target) {
+	// 2D 
+	// Get distance between them
+	var deltaX = target.location.x - attacker.location.x;
+	var deltaY = target.location.y - attacker.location.y;
+	var length = Math.sqrt( deltaX * deltaX + deltaY * deltaY );
+
+	// Prevent division by zero
+	if (length < 1) {
+		deltaX = 0;
+		deltaY = 0;
+	} else {
+		deltaX /= length;
+		deltaY /= length;
+	}
+
+	// set action on target to dieing
+	// set their target location x and y to the delta x and delta y.
+	// Set their direction to away?
+
+
+
 }
 
  // 'clan',          
