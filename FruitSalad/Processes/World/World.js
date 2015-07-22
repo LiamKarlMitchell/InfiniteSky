@@ -17,7 +17,7 @@ global.api.sendSocketToTransferQueue = function(obj){
 	global.rpc.api.call('Login', 'sendSocketAfterTransferQueue', obj.username);
 };
 
-global.rpc.invalidateAPI(global.api);
+global.rpc.add(global.api);
 log = {};
 log.info = function(){
 	console.log(arguments);
@@ -94,9 +94,9 @@ worldPrototype.init = function(){
 			if(zone === null) return;
 			// console.log("Invalidated zone", zone);
 			//
-			global.rpc.childrens[zone].api.spawnScript('./Processes/Zone/Zone.js');
-			global.rpc.childrens[zone].spawned = true;
-			process.zones[zone] = global.rpc.childrens[zone];
+			global.rpc.children[zone].api.spawnScript('./Processes/Zone/Zone.js');
+			global.rpc.children[zone].spawned = true;
+			process.zones[zone] = global.rpc.children[zone];
 		});
 	}
 
@@ -105,7 +105,7 @@ worldPrototype.init = function(){
 		for(var id in config.zones){
 			var zone = config.zones[id];
 			var parsedId = parseInt(id);
-			if(zone.Load && (!global.rpc.childrens[parsedId] || !global.rpc.childrens[parsedId].spawned) ){
+			if(zone.Load && (!global.rpc.children[parsedId] || !global.rpc.children[parsedId].spawned) ){
 				global.rpc.join(parsedId, './Processes/process.js', [parsedId, zone.Name]);
 			}
 		}
@@ -272,7 +272,7 @@ vms('World Server', [
 // 			parseInt(id),
 // 			config.zones[id.toString()].Name
 // 		]);
-// 		process.zones[parseInt(id)] = global.rpc.childrens[parseInt(id)];
+// 		process.zones[parseInt(id)] = global.rpc.children[parseInt(id)];
 // 		// this.zoneSpawner.spawnChild({
 // 		// 	name: parseInt(id),
 // 		// 	pipeError: true,
@@ -361,7 +361,7 @@ vms('World Server', [
 // 		// TODO: Make zones reloadable.
 // 		// TODO: Make sure that we save to DB when disconnecting characters from removed zone.
 //
-// 		// process.zones = this.zoneSpawner.childrens;
+// 		// process.zones = this.zoneSpawner.children;
 //
 // 		Database(config.world.database.connection_string, function World__onDatabaseConnected(){
 // 			console.log("Database connected @", config.world.database.connection_string);

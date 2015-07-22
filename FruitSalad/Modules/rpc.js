@@ -2,34 +2,29 @@
 console.log = console.error;
 console.dir = console.error;
 
-function dumpError(err) {
-  if (err instanceof Error) {
-    if (err.message) {
-      console.error('\n\x1b[31;1m'+ (err.name || 'Error') +': ' + err.message+'\x1b[0m')
-    }
-    if (err.stack) {
-      console.error('\x1b[31;1mStacktrace:\x1b[0m','\n',err.stack.split('\n').splice(1).join('\n'));
-    }
-  } else {
-      console.error('\x1b[31;1m' + err+'\x1b[0m');
-  }
-}
-
-
 var fork = require('child_process').fork;
 var path = require('path');
 var ee = require('events').EventEmitter;
 var util = require('util');
+var bson = require('bson');
+var BSON = new bson.BSONPure.BSON;
+var clone = require('clone');
+var crypto = require('crypto');
 
 function rpc(resume){
   this.EventEmitter = new ee();
 
-  this.childrens = {};
+  this.children = {};
   this.data = new Buffer([]);
   this.reminder = 0;
 
-  this.hasChildrens = false;
+  this.hasChildren = false;
   this.isChildren = false;
+  this.invalidatedChildrenCalls = [];
+  this.invalidatedParentCalls = [];
+  this.callOnReady = [];
+  this.processesWaitingForInvalidationTable = {};
+  this.callOnReadyTimeouts = {};
 
   if(resume){
     this.isChildren = true;
@@ -39,8 +34,9 @@ function rpc(resume){
     this.name = process.argv[2];
 
     var outputStream = this.getOutputStream(process);
+
     if(!outputStream){
-      this.EventEmitter.emit('error', '');
+      this.EventEmitter.emit('err', '');
       return;
     }
 
@@ -62,9 +58,9 @@ rpc.prototype.on = function(name, callback){
 rpc.prototype.join = function(name, processPath, args){
   // NOTE: args must be an array or leave it undefined.
 
-  if(this.childrens[name]){
+  if(this.children[name]){
     // TODO (Ane): Logging in appropriate format.
-    this.EventEmitter.emit('warning', 'Children ' + name + ' is already in array of childrens.');
+    this.EventEmitter.emit('warning', 'Children ' + name + ' is already in array of children.');
     return;
   }
 
@@ -74,21 +70,24 @@ rpc.prototype.join = function(name, processPath, args){
   // from rpc.
   // TODO: Check if the path to the file exists.
   var childProcess = fork(processPath, args ? args : [name], {silent: true});
-  this.hasChildrens = true;
+  this.hasChildren = true;
 
   childProcess.stderr.pipe(process.stderr);
 
-  this.childrens[name] = {
+  this.children[name] = {
     process: childProcess,
     api: {},
     name: name
   };
 
   var outputStream = this.getOutputStream(childProcess);
-  if(!outputStream){
-    this.EventEmitter.emit('error', '');
+  var inputStream = this.getInputStream(childProcess);
+
+  if(!outputStream || !inputStream){
+    this.EventEmitter.emit('err', '');
     return;
   }
+
 
   var self = this;
   outputStream.on('readable', function(){
@@ -96,6 +95,19 @@ rpc.prototype.join = function(name, processPath, args){
       self.onChunk(chunk);
     });
   });
+
+  var funcNames = [];
+
+  for(var name in this.functions){
+    funcNames.push(name);
+  }
+
+  // When connecting new child, push current api object
+  obj = {};
+  obj.id = 'API Invalidation';
+  obj.functions = funcNames;
+
+  inputStream.write(this.objectToBuffer(obj));
 };
 
 rpc.prototype.bufferToHex = function(buffer){
@@ -120,20 +132,14 @@ rpc.prototype.getOutputStream = function(process){
 };
 
 rpc.prototype.objectToBuffer = function(obj){
-  var dataString = new Buffer(JSON.stringify(obj));
-  var size = dataString.length;
+  var data = BSON.serialize(obj, false, true, false);
+  var size = data.length;
   size += 4;
   var buffer = new Buffer(size);
   var offset = 0;
 
-  var val = dataString.length;
-  buffer[offset++] = val & 0xff;
-  buffer[offset++] = (val >> 8) & 0xff;
-  buffer[offset++] = (val >> 16) & 0xff;
-  buffer[offset++] = (val >> 24) & 0xff;
-
-  // buffer.writeUIntLE(dataString.length, 0, 4); // Writing 32int unsigned size of data
-  dataString.copy(buffer, 4); // Writing data string at offset 4
+  buffer.writeUIntLE(data.length, 0, 4); // Writing 32int unsigned size of data
+  data.copy(buffer, 4); // Writing data string at offset 4
   return buffer;
 };
 
@@ -152,11 +158,11 @@ rpc.prototype.onChunk = function(chunk){
       this.reminder = 0;
 
       try{
-        var jsonObject = JSON.parse(content.toString());
-        this.onData(jsonObject);
+        var bsonObject = BSON.deserialize(content);
+        this.onData(bsonObject);
       }catch(e){
         // TODO: Propper error object!!!
-        this.EventEmitter.emit('error', e);
+        this.EventEmitter.emit('err', e);
         console.log(e);
       }
 
@@ -169,8 +175,17 @@ rpc.prototype.onChunk = function(chunk){
   }
 };
 
+var apiFunction = function(){
+  var args = []; for (i = 0; i < arguments.length; i++) args.push(arguments[i]);
+  this.input.write(rpc.prototype.objectToBuffer({
+    "id": "call",
+    f: this.name,
+    a: args
+  }));
+}
+
+
 rpc.prototype.onData = function(obj){
-  // console.log(obj, process.pid);
   if(!obj.id) return;
   var self = this;
 
@@ -178,49 +193,92 @@ rpc.prototype.onData = function(obj){
     case 'API Invalidation':
     var inputStream = this.getInputStream(this.process);
     if(!inputStream){
-      this.EventEmitter.emit('error', '');
+      this.EventEmitter.emit('err', '');
       return;
     }
 
     for(var i=0, length=obj.functions.length; i<length; i++){
       var funcName = obj.functions[i];
-      this.api[funcName] = function(){
-        var args = []; for (i = 0; i < arguments.length; i++) args.push(arguments[i]);
-
-        inputStream.write(self.objectToBuffer({
-          "id": "call",
-          f: funcName,
-          a: args
-        }));
-      }
+      this.api[funcName] = apiFunction.bind({name: funcName, input: inputStream});
     }
 
     this.EventEmitter.emit('invalidated', null);
+
+    for(var i=0; i<this.callOnReady.length; i++){
+      var f = this.callOnReady[i];
+      if(f.children) continue;
+      if(this.api && this.api[f.name]){
+        inputStream.write(self.objectToBuffer({
+          "id": "call",
+          f: f.name,
+          a: f.args
+        }));
+        clearTimeout(this.callOnReadyTimeouts[f.hash]);
+        delete this.callOnReadyTimeouts[f.hash];
+        this.callOnReady.splice(i, 1);
+        i = i-1;
+      }
+    }
+
+    if(obj.hash)
+      inputStream.write(self.objectToBuffer({
+        "id": "decrementHashTable",
+        h: obj.hash
+      }));
     break;
+
     case 'Children API Invalidation':
-    var children = this.childrens[obj.name];
+    var children = this.children[obj.name];
     if(!children) return;
 
     var inputStream = this.getInputStream(children.process);
     if(!inputStream){
-      this.EventEmitter.emit('error', '');
+      this.EventEmitter.emit('err', '');
       return;
     }
 
     for(var i=0, length=obj.functions.length; i<length; i++){
       var funcName = obj.functions[i];
-      children.api[funcName] = function(){
-        var args = []; for (i = 0; i < arguments.length; i++) args.push(arguments[i]);
-
-        inputStream.write(self.objectToBuffer({
-          "id": "call",
-          f: funcName,
-          a: args
-        }));
-      }
+      children.api[funcName] = apiFunction.bind({name: funcName, input: inputStream});
     }
 
     this.EventEmitter.emit('invalidated', obj.name);
+
+    for(var i=0; i<this.callOnReady.length; i++){
+      var f = this.callOnReady[i];
+      if(!f || !f.children) continue;
+      var children = this.children[f.children];
+      if(children && children.api && children.api[f.name]){
+        var inStream = this.getInputStream(children.process);
+        inStream.write(self.objectToBuffer({
+          "id": "call",
+          f: f.name,
+          a: f.args
+        }));
+        clearTimeout(this.callOnReadyTimeouts[f.hash]);
+        delete this.callOnReadyTimeouts[f.hash];
+        this.callOnReady.splice(i, 1);
+        i = i-1;
+      }
+    }
+
+    if(obj.hash)
+      inputStream.write(self.objectToBuffer({
+        "id": "decrementHashTable",
+        h: obj.hash
+      }));
+    break;
+
+
+    case 'decrementHashTable':
+    var hashTable = this.processesWaitingForInvalidationTable[obj.h];
+    if(!hashTable) return;
+    hashTable.processes--;
+    if(!hashTable.processes && hashTable.callback){
+      hashTable.callback();
+    }
+
+    delete this.processesWaitingForInvalidationTable[obj.h];
     break;
 
     case 'call':
@@ -230,7 +288,7 @@ rpc.prototype.onData = function(obj){
         func.apply(this, obj.a);
       }catch(e){
         // TODO: Logging
-        this.EventEmitter.emit('error', e);
+        this.EventEmitter.emit('err', e);
       }
     }else{
       this.EventEmitter.emit('warning', '');
@@ -239,51 +297,245 @@ rpc.prototype.onData = function(obj){
   }
 };
 
-rpc.prototype.invalidateAPI = function(api){
-  // TODO: Decide when to refresh the API. Leave if nothing will change to the
-  // children and manage a better way to let know other of freshly unvalidated API.
-  var functions = [];
-  var filteredFunctions = {};
-  for(var funcName in api){
-    if(api[funcName] && typeof api[funcName] !== 'function') continue;
-
-    if(functions.indexOf(funcName) === -1){
-      functions.push(funcName);
-      filteredFunctions[funcName] = api[funcName];
-    }
+rpc.prototype.add = function(obj, callback){
+  if(!obj){
+    this.EventEmitter.emit('err', 'Adding a function to rpc, requires first argument');
+    return;
   }
 
-  this.functions = filteredFunctions;
+  var hash = crypto.randomBytes(8);
+  hash = this.bufferToHex(hash);
 
-  if(this.hasChildrens){
-    for(var child in this.childrens){
-      var c = this.childrens[child];
+  var functions = clone(this.functions, false);
+  var funcNames = [];
+  var functionName;
+
+  functions.call = function(regex, function_name){
+    var args = [];
+    for(var i=2; i<arguments.length; i++){
+      console.log(i);
+    }
+  };
+
+  if(Array.isArray(obj)){
+    for(var i=0, length=obj.length; i<length; i++){
+      var fn = obj[i];
+      if(typeof fn !== 'function') continue;
+      functionName = fn.name;
+      funcNames.push(functionName);
+      functions[functionName] = fn;
+    }
+  }else if(typeof obj === 'object'){
+    for(functionName in obj){
+      if(typeof obj[functionName] !== 'function') continue;
+      funcNames.push(functionName);
+      functions[functionName] = obj[functionName];
+    }
+  }else if(typeof obj === 'function'){
+    functionName = obj.name;
+    funcNames.push(functionName);
+    functions[functionName] = obj;
+  }else{
+    return;
+  }
+
+  var invalidated = 0;
+  for(var i in functions){
+    var v1 = functions[i];
+    var v2 = this.functions[i];
+
+    if(v1 && !v2 || !v1 && v2) invalidated++;
+    else if(v1 && v2 && v1.toString() !== v2.toString()) invalidated++;
+  }
+
+  if(!invalidated){
+    // TODO: Logging
+    return;
+  }
+
+  this.functions = functions;
+  var obj;
+
+  if(typeof callback === 'function')
+    var invalidationTable = this.processesWaitingForInvalidationTable[hash] = {
+      processes: 0,
+      callback: callback
+    };
+
+  if(this.hasChildren){
+    for(var child in this.children){
+      var c = this.children[child];
       var inStream = this.getInputStream(c.process);
       if(!inStream){
-        this.EventEmitter.emit('error', '');
+        console.log("No input stream");
+        this.EventEmitter.emit('err', '');
         return;
       }
 
-      inStream.write(this.objectToBuffer({
-        id: 'API Invalidation',
-        functions: functions
-      }));
+      obj = {};
+      obj.id = 'API Invalidation';
+      obj.functions = funcNames;
+
+
+      if(invalidationTable){
+        invalidationTable.processes++;
+        obj.hash = hash;
+      }
+
+      inStream.write(this.objectToBuffer(obj));
     }
   }
 
   if(this.isChildren){
     var inStream = this.getInputStream(process);
     if(!inStream){
-      this.EventEmitter.emit('error', '');
+      this.EventEmitter.emit('err', '');
       return;
     }
 
-    inStream.write(this.objectToBuffer({
-      id: 'Children API Invalidation',
-      name: this.name,
-      functions: functions
-    }));
+    obj = {};
+    obj.id = 'Children API Invalidation';
+    obj.functions = funcNames;
+    obj.name = this.name;
+
+    if(invalidationTable){
+      invalidationTable.processes++;
+      obj.hash = hash;
+    }
+
+    inStream.write(this.objectToBuffer(obj));
   }
 };
+
+rpc.prototype.remove = function(name){
+  if(name && typeof name === 'string' && this.functions[name]){
+    delete this.functions[name];
+
+
+    var functions = [];
+    for(var name in this.functions){
+      functions.push(name);
+    }
+
+    if(this.hasChildren){
+      for(var child in this.children){
+        var c = this.children[child];
+        var inStream = this.getInputStream(c.process);
+        if(!inStream){
+          this.EventEmitter.emit('err', '');
+          return;
+        }
+
+        inStream.write(this.objectToBuffer({
+          id: 'API Invalidation',
+          functions: functions
+        }));
+      }
+    }
+
+    if(this.isChildren){
+      var inStream = this.getInputStream(process);
+      if(!inStream){
+        this.EventEmitter.emit('err', '');
+        return;
+      }
+
+      inStream.write(this.objectToBuffer({
+        id: 'Children API Invalidation',
+        name: this.name,
+        functions: functions
+      }));
+    }
+  }
+};
+
+rpc.prototype.invalidateAPI = function(api){
+  console.log("rpc.invalidateAPI is depracted", this.name);
+  console.trace();
+};
+
+rpc.prototype.safeCall = function(obj){
+  // TODO: typeof function check, before call.
+  // TODO: Tidy up timeouts.
+
+  var args = [];
+  for(var i=1; i<arguments.length; i++) args.push(arguments[i]);
+  var type = typeof obj;
+  var self = this;
+
+  if(type === 'string'){
+    if(!this.api[obj]){
+      this.callOnReady.push({name: obj.name, args: args, hash: hash});
+      return;
+    }
+
+    try{
+      this.api[obj].apply(null, args);
+    }catch(e){
+      //TODO: Logging
+    }
+  }else if(type === 'object'){
+    // TODO: Make timeout to remove pending call.
+    if(!obj.name && !obj.child){
+      // TODO: Logging, when we dont have a function name to call.
+      return;
+    }
+
+    var callChild = obj.child;
+    var callParent = obj.name;
+    var timeout = obj.timeout || 0;
+
+    // Hash will be used to clear the timeout if called before.
+    var hash = crypto.randomBytes(8);
+    hash = this.bufferToHex(hash);
+
+    if(callChild && !this.children){
+      // console.log("We got a call on children that does not exists");
+      this.callOnReady.push({name: obj.name, args: args, children: obj.child, hash: hash});
+      return;
+    }
+
+    if(callChild && this.children && !this.children[callChild]){
+      // console.log('Call on children that does not exists');
+      this.callOnReady.push({name: obj.name, args: args, children: obj.child, hash: hash});
+      return;
+    }
+
+    if(callChild
+      && this.children
+      && this.children[callChild]
+      && (!this.children[callChild].api || !this.children[callChild].api[obj.name])
+    ){
+      // console.log("Calling on children that has no api or does not have a function yet");
+      this.callOnReady.push({name: obj.name, args: args, children: obj.child, hash: hash});
+      return;
+    }
+
+    if(callChild){
+      try{
+        this.children[callChild].api[obj.name].apply(null, args);
+      }catch(e){
+        // TODO: Logging
+      }
+      return;
+    }
+
+    if(!callParent){
+      // TODO: Logging
+      return;
+    }
+
+    if(!this.api || !this.api[obj.name]){
+      this.callOnReady.push({name: obj.name, args: args, hash: hash});
+      return;
+    }
+
+    try{
+      this.api[obj].apply(null, args);
+    }catch(e){
+      //TODO: Logging
+    }
+  }
+}
 
 module.exports = rpc;

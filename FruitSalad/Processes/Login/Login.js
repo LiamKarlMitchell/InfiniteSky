@@ -35,7 +35,7 @@ vms('Login Server', [
 		}
 	};
 
-	global.rpc.invalidateAPI(global.api);
+	global.rpc.add(global.api);
 
 	function LoginInstance(){
 		log = bunyan.createLogger({name: 'InfiniteSky/Login',
@@ -183,5 +183,5 @@ vms('Login Server', [
 		global.Login.__proto__ = LoginInstance.prototype;
 	}
 
-	global.rpc.invalidateAPI(global.api);
+	global.rpc.add(global.api);
 });

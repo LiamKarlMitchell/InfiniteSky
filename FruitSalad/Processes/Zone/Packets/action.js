@@ -194,9 +194,9 @@ ZonePC.Set(0x05, {
             return;
         }
         // console.log(input);
-        Zone.AI.findPath({x: input.Location.X, y: input.Location.Y, z: input.Location.Z}, {x: input.LocationNew.X, y: input.LocationNew.Y, z: input.LocationNew.Z}, 2, function(points){
-
-        });
+        // Zone.AI.findPath({x: input.Location.X, y: input.Location.Y, z: input.Location.Z}, {x: input.LocationNew.X, y: input.LocationNew.Y, z: input.LocationNew.Z}, 2, function(points){
+				//
+        // });
 
         client.character.state.Frame = input.Frame;
         client.character.state.Stance = input.Stance;
@@ -219,7 +219,7 @@ ZonePC.Set(0x05, {
         client.character.state.LocationNew.X = input.LocationNew.X;
         client.character.state.LocationNew.Y = input.LocationNew.Y;
         client.character.state.LocationNew.Z = input.LocationNew.Z;
-        
+
         switch(input.Skill){
             case 41:
             case 32:

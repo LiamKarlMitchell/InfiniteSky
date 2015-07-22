@@ -58,7 +58,7 @@ if (!global.zonePrototype) {
 };
 
 zonePrototype.init = function Zone__init() {
-	var self = this;	
+	var self = this;
 	// Only allow init once.
 	if (this.inited) return;
 	this.inited = true;
@@ -75,7 +75,7 @@ zonePrototype.init = function Zone__init() {
 			'Database',
 			'Generic'
 		], function() {
-			function vmscript_WatchIfExists(path) {			
+			function vmscript_WatchIfExists(path) {
 				fs.stat(path, function(err, stat) {
 					if (err) {
 						// Safe to ignore errors for this sometimes they wont exist.
@@ -145,7 +145,7 @@ zonePrototype.addSocket = function(socket) {
 			}
 			ZonePC.sendMessageToSocket(this, type, message);
 		};
-		
+
 		socket.unhandledPacket = function(message) {
 			ZonePC.sendMessageToSocket(this, ':WARN', 'Unhandled Packet: '+message);
 		}
@@ -235,7 +235,7 @@ zonePrototype.onProcessMessage = function(type, socket) {
 				console.log("got character");
 				if (err) {
 					// console.log(err);
-					// TODO: Consider socket.disconnect 
+					// TODO: Consider socket.disconnect
 					socket.destroy();
 					return;
 				}
@@ -250,7 +250,7 @@ zonePrototype.onProcessMessage = function(type, socket) {
 				db.Account.findOne({_id: characterData.accountID},function(err, account) {
 					return self.onFindAccount(socket, err, account);
 				});
-				
+
 				socket.character = character;
 				socket.character.infos = new CharacterInfos(socket);
 				socket.character.infos.updateAll(function() {

@@ -195,8 +195,6 @@ VMScriptObj.prototype.parse = function(file_path){
 			file_path: file_path
 		};
 
-		console.log(file_name);
-
 		switch(ext){
 			case '.json':
 			try{

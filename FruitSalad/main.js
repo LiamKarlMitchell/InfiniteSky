@@ -24,7 +24,7 @@ var vm = require('vm');
 // spawner.spawnChild({name: 'Login', script: 'Processes/Login/Login.js'});
 // spawner.spawnChild({name: 'World', script: 'Processes/World/World.js'});
 // TODO Check existance of configs / have defaults?
-var childrens = require('./Config/processes.json');
+var children = require('./Config/processes.json');
 
 global.api = {};
 
@@ -36,7 +36,7 @@ global.api = {};
  */
 global.api.call = function(process_name, fn){
 	// console.log("Calling function");
-	var p = global.rpc.childrens[process_name];
+	var p = global.rpc.children[process_name];
 	// TODO: Comment what this does behind the scenes.
 	if(p && p.api[fn]){
 		// console.log(fn,"Calling", process_name);
@@ -51,16 +51,16 @@ global.api.call = function(process_name, fn){
 // 	console.log("calling test from child process");
 // }
 
-for(var children in childrens){
-	global.rpc.join(children, './Processes/process.js');
+for(var child in children){
+	global.rpc.join(child, './Processes/process.js');
 }
 
-global.rpc.on('invalidated', function(children){
-	if(!global.rpc.childrens[children].spawned){
-		global.rpc.childrens[children].api.spawnScript(childrens[children].script);
-		global.rpc.childrens[children].spawned = true;
+global.rpc.on('invalidated', function(child){
+	if(!global.rpc.children[child].spawned){
+		global.rpc.children[child].api.spawnScript(children[child].script);
+		global.rpc.children[child].spawned = true;
 	}
-	global.rpc.invalidateAPI(global.api);
+	global.rpc.add(global.api);
 });
 
 // rpc.join('Login', 'Processes/Login/Login.js');

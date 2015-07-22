@@ -4,7 +4,7 @@ vmscript = new (require('../VMScript.js'))();
 global.api = {};
 global.api.spawnScript = vmscript.watch;
 
-global.rpc.invalidateAPI(global.api);
+global.rpc.add(global.api);
 
 // console.log("Setting up process env");
 
