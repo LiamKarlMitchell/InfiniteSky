@@ -1,7 +1,8 @@
 {
   "ports": {
     "login": 11091,
-    "world": 11092
+    "world": 11092,
+    "spawnlogger": 13191
   },
   "interfaces": {
     "regular": "0.0.0.0",

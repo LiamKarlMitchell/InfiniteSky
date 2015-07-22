@@ -1,0 +1,14 @@
+{
+    "Login": {
+        "name": "Login",
+        "script": "Processes/Login/Login.js"
+    },
+    "World": {
+        "name": "World",
+        "script": "Processes/World/World.js"
+    },
+    "SpawnLogger": {
+        "name": "SpawnLogger",
+        "script": "Processes/SpawnLogger/SpawnLogger.js"
+    }
+}

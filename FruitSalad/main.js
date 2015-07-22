@@ -23,10 +23,8 @@ var vm = require('vm');
 
 // spawner.spawnChild({name: 'Login', script: 'Processes/Login/Login.js'});
 // spawner.spawnChild({name: 'World', script: 'Processes/World/World.js'});
-
-var childrens = {};
-childrens['Login'] = {name: 'Login', script: 'Processes/Login/Login.js'};
-childrens['World'] = {name: 'World', script: 'Processes/World/World.js'};
+// TODO Check existance of configs / have defaults?
+var childrens = require('./Config/processes.json');
 
 global.api = {};
 
