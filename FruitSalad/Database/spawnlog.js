@@ -2,32 +2,40 @@
 // Copyright (c) InfiniteSky Dev Teams - Licensed under GNU GPL
 // For more information, see LICENCE in the main folder
 vms('SpawnLog', [], function(){
-	var spawnLogSchema = db.mongoose.Schema({
-	    username: String, // The username of whomever captured this spawn. (As defined in their PrivateServer.ini)
-	    zoneid: Number,   // The ID of the Zone the Spawn was captured in.
-	    id: Number,       // The ID of the thing eg MonsterID or NPCID.
-		nodeid: Number,   // The first  identifyer used. (NodeID / instanceID)
-		otherid: Number,  // The second identifyer used. (Who Knows? Maybe index or auto increment?)
-		x: Number,
-		y: Number,
-		z: Number,
-		direction: Number
+	var spawnLogSchema = mongoose.Schema({
+		username: String,
+		type: String,
+	    zoneID: Number,
+	    uniqueID1: Number,
+	    uniqueID2: Number,
+	    id: Number,
+	    x: Number,
+	    y: Number,
+	    z: Number,
+	    direction: Number,
+	    tags: Array,
+	    spawnGroup: Number // Link to a SpawnGroup schema here.
 	});
-	
 
-	//Constructor
-	delete mongoose.models['spawnlog'];
-	var SpawnLog = db.mongoose.model('spawnlog', spawnLogSchema);
-	db.SpawnLog = SpawnLog;
+	spawnLogSchema.index({_id: 1, zoneID: 1, uniqueID1: 1, uniqueID2: 1 });
+	spawnLogSchema.index({zoneID: 1, id: 1, uniqueID1: 1, uniqueID2: 1 });
+	spawnLogSchema.index({id: 1 });
+	spawnLogSchema.index({ username: 1 });
 
 	spawnLogSchema.virtual('created').get( function () {
 	  if (this["_created"]) return this["_created"];
 	  return this["_created"] = this._id.getTimestamp();
 	});
 
-	SpawnLog.getById = function(_id, callback){
-		db.SpawnLog.findOne({
-			_id: _id
-		}, callback);
+	delete mongoose.models['spawnlog'];
+	var SpawnLog = db.mongoose.model('spawnlog', spawnLogSchema);
+	db.SpawnLog = SpawnLog;
+
+	SpawnLog.updateZoneUniqueID = function SpawnLog__updateZoneUniqueID(zoneID, uniqueID1, uniqueID2, values, callback){
+		db.SpawnLog.update({
+			zoneID: zoneID,
+			uniqueID1: uniqueID1,
+			uniqueID2: uniqueID2
+		}, values, {multi: true}, callback);
 	};
 });
