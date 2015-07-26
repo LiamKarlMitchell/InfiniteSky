@@ -1,5 +1,5 @@
 global.rpc = new (require('./Modules/rpc.js'))();
-
+global.rpc.topLevel = true; // This must be done for the very first process only so that child processes stdout which we piped to stderr goes to stdout of this process.
 bunyan = require('bunyan');
 log = bunyan.createLogger({name: 'InfiniteSky'});
 
@@ -60,7 +60,7 @@ global.rpc.on('invalidated', function(child){
 		global.rpc.children[child].api.spawnScript(children[child].script);
 		global.rpc.children[child].spawned = true;
 	}
-	global.rpc.add(global.api);
+	global.rpc.add(global.api); // Need to have these children pipe stderr to stdout and stdout to stdout. They does xd
 });
 
 // rpc.join('Login', 'Processes/Login/Login.js');

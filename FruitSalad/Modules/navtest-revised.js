@@ -48,14 +48,14 @@ map_mesh.prototype.parse = function(data){
 			parsedObj.push(p3);
 			this.wVs.push(parsedObj);
 			this.ewVs.push({0: p1, 1: p2, 2: p3});
-			if(this.dimensions.top === null || this.dimensions.top < p1)
-				this.dimensions.top = p1;
-			if(this.dimensions.left === null || this.dimensions.left > p3)
-				this.dimensions.left = p3;
-			if(this.dimensions.bottom === null || this.dimensions.bottom > p1)
-				this.dimensions.bottom = p1;
-			if(this.dimensions.right === null || this.dimensions.right < p3)
-				this.dimensions.right = p3;
+			if(this.dimensions.top === null || this.dimensions.top < p3)
+				this.dimensions.top = p3;
+			if(this.dimensions.left === null || this.dimensions.left > p1)
+				this.dimensions.left = p1;
+			if(this.dimensions.bottom === null || this.dimensions.bottom > p3)
+				this.dimensions.bottom = p3;
+			if(this.dimensions.right === null || this.dimensions.right < p1)
+				this.dimensions.right = p1;
 			break;
 
 			case 'f':
@@ -171,7 +171,7 @@ map_mesh.prototype.getMapEdges = function(){
 		map[i].tri.edge = [a, b];
 
 		var tA = this.wVs[a];
-		var tB = this.wVs[b];		
+		var tB = this.wVs[b];
 
 		var deltaX = tA[0] - tB[0];
 		var deltaY = tA[2] - tB[2];
@@ -225,7 +225,7 @@ map_mesh.prototype.processEdge = function(aS, bS, map, tris, tri, index){
 
 map_mesh.prototype.getParentNodeByLocation = function(x, y, z){
 	// Consider a bucket layout for faster selection
-	// like maybe a range selection of a bucket. 
+	// like maybe a range selection of a bucket.
 	// so maybe bucket.minX >= x && x <= bucket.maxX && y
 	// then querying on that bucket. Should be faster by maybe 50% or 25%
 	// Method:
@@ -331,7 +331,7 @@ map_mesh.prototype.findPath = function(from, to, radius, callback){
 	var bestI;
 	var lowestF;
 	var totalSkipped;
-	
+
 	while(true){
 		bestI = null;
 		lowestF = null;
@@ -364,7 +364,7 @@ map_mesh.prototype.findPath = function(from, to, radius, callback){
 				g = nodeGCost[point];
 
 			var f = h - g;
-	
+
 			if(lowestF === null || f < lowestF){
 				lowestF = f;
 				bestI = point;
@@ -484,22 +484,22 @@ map_mesh.prototype.throw = function(edges, points, currentPoint){
 }
 
 map_mesh.prototype.lineIntersect = function checkLineIntersection(p0_x, p0_y, p1_x, p1_y, p2_x, p2_y, p3_x, p3_y) {
- 
+
     var s1_x, s1_y, s2_x, s2_y;
     s1_x = p1_x - p0_x;
     s1_y = p1_y - p0_y;
     s2_x = p3_x - p2_x;
     s2_y = p3_y - p2_y;
- 
+
     var s, t;
     s = (-s1_y * (p0_x - p2_x) + s1_x * (p0_y - p2_y)) / (-s2_x * s1_y + s1_x * s2_y);
     t = ( s2_x * (p0_y - p2_y) - s2_y * (p0_x - p2_x)) / (-s2_x * s1_y + s1_x * s2_y);
- 
+
     if (s >= 0 && s <= 1 && t >= 0 && t <= 1)
     {
         return 1;
     }
- 
+
     return 0;
 }
 

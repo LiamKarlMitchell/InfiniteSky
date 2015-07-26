@@ -58,7 +58,7 @@ function VMScriptObj(){
 	EventEmitter.on('file added', function(file_path){
 
 		var file_name = getFilename(path.parse(file_path));
-		console.log(colors.orange("[VMS]"), colors.info("added:"), file_name);
+		// console.log(colors.orange("[VMS]"), colors.info("added:"), file_name);
 
 		self.parse(file_path);
 	});
@@ -66,14 +66,14 @@ function VMScriptObj(){
 	EventEmitter.on('file changed', function(file_path){
 
 		var file_name = getFilename(path.parse(file_path));
-		console.log(colors.orange("[VMS]"), colors.info("changed:"), file_name);
+		// console.log(colors.orange("[VMS]"), colors.info("changed:"), file_name);
 
 		self.parse(file_path);
 	});
 
 	EventEmitter.on('file removed', function(file_path){
 		var file_name = getFilename(path.parse(file_path));
-		console.log(colors.orange("[VMS]"), colors.orange("removed:"), file_name);
+		// console.log(colors.orange("[VMS]"), colors.orange("removed:"), file_name);
 
 		self.parse(file_path);
 	});

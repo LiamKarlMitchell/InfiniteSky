@@ -5,7 +5,7 @@
 	"4": { "Name": "Z004", "Load": false, "DisplayName": "" },
 	"5": { "Name": "Z005", "Load": false, "DisplayName": "" },
 	"6": { "Name": "Z006", "Load": true, "DisplayName": "Padsong Fortress" },
-	"7": { "Name": "Z007", "Load": false, "DisplayName": "" },
+	"7": { "Name": "Z007", "Load": true, "DisplayName": "" },
 	"8": { "Name": "Z008", "Load": false, "DisplayName": "" },
 	"9": { "Name": "Z009", "Load": false, "DisplayName": "" },
 	"10": { "Name": "Z010", "Load": false, "DisplayName": "" },

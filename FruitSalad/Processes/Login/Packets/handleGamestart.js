@@ -30,7 +30,8 @@ LoginPC.Set(0x09, {
 		var transferObj = {
 			username: socket.account.Username,
 			accountID: socket.account._id,
-			character: socket.character._id
+			character: socket.character._id,
+			to: 'Login'
 		};
 
 

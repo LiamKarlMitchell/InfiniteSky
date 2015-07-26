@@ -1,3 +1,5 @@
+// TODO: Removing socket from zone on disconnet.
+
 vmscript.watch('Config/world.json');
 vmscript.watch('Config/network.json');
 
@@ -5,6 +7,30 @@ vms('Zone', [
 			'Config/world.json',
 			'Config/network.json'
 		], function() {
+
+global.api.zoneAlive = function(callback, client){
+	console.log("Got zone alive callback", client);
+	var c = Zone.clientHash[client];
+	if(!c){
+		console.log("Checking one alive for unknown client");
+		return;
+	}
+	global.rpc.getCallback(callback).apply(c);
+};
+
+global.api.onMoveRegions = function(callback, client, moveRegions){
+	console.log("Got move regions callback", client);
+	var c = Zone.clientHash[client];
+	if(!c){
+		console.log("Checking move region for unknown client in zone", Zone.id);
+		return;
+	}
+
+	global.rpc.getCallback(callback).call(c, moveRegions);
+};
+
+
+global.rpc.add(global.api);
 
 
 function ZoneInstance() {
@@ -22,6 +48,7 @@ function ZoneInstance() {
 	random = new Random(Random.engines.mt19937().autoSeed());
 	clone = require('clone');
 	bunyan = require('bunyan');
+	uuid = require('node-uuid');
 
 	vmscript.watch('./Generic');
 	vmscript.watch('./Helper/GMCommands.js');
@@ -41,6 +68,7 @@ function ZoneInstance() {
 	this.Npc = [];
 	this.Items = [];
 	this.NpcNodesHash = {};
+	this.clientHash = {};
 
 	global.log = bunyan.createLogger({
 		name: 'InfiniteSky/Zone.' + parseInt(process.argv[2]),
@@ -59,6 +87,7 @@ if (!global.zonePrototype) {
 
 zonePrototype.init = function Zone__init() {
 	var self = this;
+
 	// Only allow init once.
 	if (this.inited) return;
 	this.inited = true;
@@ -67,6 +96,7 @@ zonePrototype.init = function Zone__init() {
 	Database(config.world.database.connection_string, function() {
 		console.log("Zone database connected");
 		self.databaseConnected = true;
+
 
 		vmscript.watch('Database');
 		vmscript.watch('Generic');
@@ -107,17 +137,17 @@ zonePrototype.init = function Zone__init() {
 			self.QuadTree = new QuadTree({
 				x: -10000,
 				y: -10000,
-				size: 10000
+				size: 20000
 			});
 			return;
 		}
 		self.AI = new nav_mesh(mesh_path, function(mesh) {
-			var height = Math.abs(mesh.dimensions.bottom) + Math.abs(mesh.dimensions.top);
-			var width = Math.abs(mesh.dimensions.right) + Math.abs(mesh.dimensions.left);
+			var height = Math.abs(mesh.dimensions.bottom) + Math.abs(mesh.dimensions.top) + 2;
+			var width = Math.abs(mesh.dimensions.right) + Math.abs(mesh.dimensions.left) + 2;
 
 			self.QuadTree = new QuadTree({
-				x: util.roundDivisable(mesh.dimensions.left, 2),
-				y: util.roundDivisable(mesh.dimensions.top, 2),
+				x: util.roundDivisable(mesh.dimensions.left, 2)-1,
+				y: util.roundDivisable(mesh.dimensions.top, 2)+1,
 				size: util.roundDivisable(Math.max(width, height), 2)
 			});
 		});
@@ -161,7 +191,13 @@ zonePrototype.addSocket = function(socket) {
 			},
 			type: 'client'
 		}));
+		// console.log(socket);
+		// console.log(socket.node);
 		socket.character.state.NodeID = socket.node.id;
+		var hash = uuid.v1();
+		socket.hash = hash;
+		this.clientHash[hash] = socket;
+
 		return true;
 	}
 };
@@ -213,8 +249,16 @@ zonePrototype.onProcessMessage = function(type, socket) {
 	if (socket) switch (type) {
 		case 'socket':
 			// console.log(socket);
-			socket.on('close', function(err) {});
-			socket.on('error', function(err) {});
+			socket.on('close', function(err) {
+				// socket.character.save(function(){
+				// 	console.log("Saved");
+				// });
+			});
+			socket.on('error', function(err) {
+				// socket.character.save(function(){
+				// 	console.log("Saved");
+				// });
+			});
 			socket.on('timeout', function() {});
 
 			var hash = socket.remoteAddress + ":" + socket.remotePort;

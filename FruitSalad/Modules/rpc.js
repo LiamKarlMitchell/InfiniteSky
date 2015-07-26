@@ -1,4 +1,7 @@
 // TODO: Consider more consistent way of setting those.
+// TODO: Registering callbacks.
+// TODO: Add timeout for a callback to fire.
+
 console.log = console.error;
 console.dir = console.error;
 
@@ -24,7 +27,7 @@ function rpc(resume){
   this.invalidatedParentCalls = [];
   this.callOnReady = [];
   this.processesWaitingForInvalidationTable = {};
-  this.callOnReadyTimeouts = {};
+  this.pendingCallbacks = {};
 
   if(resume){
     this.isChildren = true;
@@ -49,6 +52,24 @@ function rpc(resume){
   }
 
   this.functions = {};
+  // TODO: Make a function that will be callable on other side to call a callback.
+}
+
+rpc.prototype.getCallback = function(callback){
+  var callback = this.pendingCallbacks[callback];
+  if(!callback || typeof callback !== 'function'){
+    console.log("Callback does not exists");
+    return;
+  }
+
+  return callback;
+  //
+  // try{
+  //   callback.apply(t, args);
+  //   delete this.pendingCallbacks[callback];
+  // }catch(e){
+  //   // TODO: Logging
+  // }
 }
 
 rpc.prototype.on = function(name, callback){
@@ -72,7 +93,11 @@ rpc.prototype.join = function(name, processPath, args){
   var childProcess = fork(processPath, args ? args : [name], {silent: true});
   this.hasChildren = true;
 
-  childProcess.stderr.pipe(process.stderr);
+  if (this.topLevel) {
+    childProcess.stderr.pipe(process.stdout);
+  } else {
+    childProcess.stderr.pipe(process.stderr);
+  }
 
   this.children[name] = {
     process: childProcess,
@@ -176,7 +201,20 @@ rpc.prototype.onChunk = function(chunk){
 };
 
 var apiFunction = function(){
-  var args = []; for (i = 0; i < arguments.length; i++) args.push(arguments[i]);
+  var args = []; for (i = 0; i < arguments.length; i++){
+    var argument = arguments[i];
+    if(typeof argument === 'function'){
+      var hash = rpc.prototype.bufferToHex(crypto.randomBytes(8));
+      while(this.rpc.pendingCallbacks[hash]){
+        hash = rpc.prototype.bufferToHex(crypto.randomBytes(8));
+      }
+      this.rpc.pendingCallbacks[hash] = argument;
+      arguments[i] = hash;
+    }
+
+    args.push(arguments[i]);
+  }
+
   this.input.write(rpc.prototype.objectToBuffer({
     "id": "call",
     f: this.name,
@@ -199,7 +237,7 @@ rpc.prototype.onData = function(obj){
 
     for(var i=0, length=obj.functions.length; i<length; i++){
       var funcName = obj.functions[i];
-      this.api[funcName] = apiFunction.bind({name: funcName, input: inputStream});
+      this.api[funcName] = apiFunction.bind({name: funcName, input: inputStream, rpc: this});
     }
 
     this.EventEmitter.emit('invalidated', null);
@@ -213,8 +251,6 @@ rpc.prototype.onData = function(obj){
           f: f.name,
           a: f.args
         }));
-        clearTimeout(this.callOnReadyTimeouts[f.hash]);
-        delete this.callOnReadyTimeouts[f.hash];
         this.callOnReady.splice(i, 1);
         i = i-1;
       }
@@ -239,7 +275,7 @@ rpc.prototype.onData = function(obj){
 
     for(var i=0, length=obj.functions.length; i<length; i++){
       var funcName = obj.functions[i];
-      children.api[funcName] = apiFunction.bind({name: funcName, input: inputStream});
+      children.api[funcName] = apiFunction.bind({name: funcName, input: inputStream, rpc: this});
     }
 
     this.EventEmitter.emit('invalidated', obj.name);
@@ -255,8 +291,6 @@ rpc.prototype.onData = function(obj){
           f: f.name,
           a: f.args
         }));
-        clearTimeout(this.callOnReadyTimeouts[f.hash]);
-        delete this.callOnReadyTimeouts[f.hash];
         this.callOnReady.splice(i, 1);
         i = i-1;
       }
@@ -355,7 +389,6 @@ rpc.prototype.add = function(obj, callback){
 
   this.functions = functions;
   var obj;
-
   if(typeof callback === 'function')
     var invalidationTable = this.processesWaitingForInvalidationTable[hash] = {
       processes: 0,
@@ -410,8 +443,6 @@ rpc.prototype.add = function(obj, callback){
 rpc.prototype.remove = function(name){
   if(name && typeof name === 'string' && this.functions[name]){
     delete this.functions[name];
-
-
     var functions = [];
     for(var name in this.functions){
       functions.push(name);
@@ -454,18 +485,31 @@ rpc.prototype.invalidateAPI = function(api){
   console.trace();
 };
 
+
 rpc.prototype.safeCall = function(obj){
   // TODO: typeof function check, before call.
-  // TODO: Tidy up timeouts.
+  // TODO: Add timeouts.
 
-  var args = [];
-  for(var i=1; i<arguments.length; i++) args.push(arguments[i]);
+  var args = []; for (i = 1; i < arguments.length; i++){
+    var argument = arguments[i];
+    if(typeof argument === 'function'){
+      var hash = this.bufferToHex(crypto.randomBytes(8));
+      while(this.pendingCallbacks[hash]){
+        hash = this.bufferToHex(crypto.randomBytes(8));
+      }
+      this.pendingCallbacks[hash] = argument;
+      arguments[i] = hash;
+    }
+
+    args.push(arguments[i]);
+  }
+
   var type = typeof obj;
   var self = this;
 
   if(type === 'string'){
     if(!this.api[obj]){
-      this.callOnReady.push({name: obj.name, args: args, hash: hash});
+      this.callOnReady.push({name: obj.name, args: args});
       return;
     }
 

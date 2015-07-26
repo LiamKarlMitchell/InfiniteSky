@@ -158,6 +158,11 @@ ZonePC.Set(0x03, {
         client.character.RealY = input.Location.Y;
         client.character.RealZ = input.Location.Z;
 
+				client.character.save(function(){
+					// console.log("Saved");
+				});
+
+
         // TODO: Simulate serverside movement and compare.
     }
 });
@@ -183,6 +188,9 @@ ZonePC.Set(0x04, {
 
         client.node.update();
         Zone.sendToAllArea(client, false, client.character.state.getPacket(), config.network.viewable_action_distance);
+				client.character.save(function(){
+					// console.log("Saved");
+				});
     }
 });
 
@@ -240,6 +248,10 @@ ZonePC.Set(0x05, {
             Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
             break;
         }
+
+				// client.character.save(function(){
+				// 	// console.log("Saved");
+				// });
     }
 });
 

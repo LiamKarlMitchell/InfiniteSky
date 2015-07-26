@@ -8,16 +8,69 @@ restruct = require('./Modules/restruct');
 net = require('net');
 PacketCollection = require('./Modules/PacketCollection.js');
 CachedBuffer = require('./Modules/CachedBuffer.js');
+util = require('./Modules/util.js');
+fs = require('fs');
 
 if(typeof process.zones === 'undefined') process.zones = {};
 
 global.api.sendSocketToTransferQueue = function(obj){
 	console.log("Sending socket to transfer queue");
 	World.characterTransferArray[obj.username] = obj;
-	global.rpc.api.call('Login', 'sendSocketAfterTransferQueue', obj.username);
+	var isZone = process.zones[obj.to];
+	if(isZone) isZone.api.sendSocketAfterTransferQueue(obj.username);
+	else global.rpc.api.call(obj.to, 'sendSocketAfterTransferQueue', obj.username);
+};
+
+global.api.isZoneAlive = function(id, zone, client, callback){
+	console.log("Checking if zone", id, "is alive");
+	var alive = process.zones[id];
+	var p = process.zones[zone];
+	if(alive && p){
+		p.api.zoneAlive(callback, client);
+	}
+};
+
+global.api.getMoveRegions = function(id, zone, client, callback){
+	var moveTo = rpc.children[zone];
+	var fromZone = rpc.children[id];
+
+	if(!moveTo || !fromZone){
+		return;
+	}
+
+	var moveRegions = World.moveRegions[moveTo.name];
+	if(!moveRegions){
+		log.info("Could not locate move regions for zone id", zone.name);
+		return;
+	}
+
+	fromZone.api.onMoveRegions(callback, client, moveRegions);
+};
+
+global.api.call = function(processName, functionName){
+	var args = [];
+	for(var i=2; i<arguments.length; i++) args.push(arguments[i]);
+
+	var process = rpc.children[processName];
+	if(!process){
+		log.info('Calling process that does not exist.');
+		return;
+	}
+
+	var func = process.api[functionName];
+	if(!func){
+		log.info('Calling process api with undefined functionName');
+		return;
+	}
+	try{
+		func.apply(this, args);
+	}catch(e){
+		// TODO: Logging
+	}
 };
 
 global.rpc.add(global.api);
+
 log = {};
 log.info = function(){
 	console.log(arguments);
@@ -40,6 +93,7 @@ global.WorldInstance = function(){
 	this.databaseConnected = false;
 	this.characterTransferArray = {};
 	this.packetCollection = null;
+	this.moveRegions = {};
 }
 
 
@@ -92,11 +146,30 @@ worldPrototype.init = function(){
 		this.onInvalidatedZone = true;
 		global.rpc.on('invalidated', function(zone){
 			if(zone === null) return;
-			// console.log("Invalidated zone", zone);
-			//
+
 			global.rpc.children[zone].api.spawnScript('./Processes/Zone/Zone.js');
 			global.rpc.children[zone].spawned = true;
 			process.zones[zone] = global.rpc.children[zone];
+
+			fs.readFile(config.world.data_path + '/wregion/Z' + util.padLeft(zone,'0', 3) + '_ZONEMOVEREGION.WREGION', function(err, data) {
+				if (err) {
+					console.log(err);
+					return;
+				}
+
+				var RecordCount = data.readUInt32LE(0);
+
+				var wregion = restruct.struct('info', structs.WREGION, RecordCount).unpack(data.slice(4));
+				var length = wregion.info.length,
+					element = null;
+
+				self.moveRegions[zone] = [];
+
+				for (var i = 0; i < length; i++) {
+					element = wregion.info[i];
+					self.moveRegions[zone].push(element);
+				}
+			});
 		});
 	}
 

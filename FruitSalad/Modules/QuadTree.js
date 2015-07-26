@@ -57,6 +57,7 @@ function QuadTreeNode(opts) {
     this.x = opts.x || 0;
     this.y = opts.y || 0;
     this.size = opts.size || 1;
+
     this._valueAccess = QuadTreeConstants.useLocal;
     this.object = opts.object || null;
     this.type = undefined;
@@ -354,6 +355,7 @@ QuadTree.prototype.update = function update(delta) {
     // I am not sure how to handle if quad tree moves? I suppose locaitons of nodes should be relative?
     //QuadTreeNode.prototype.update.call(this, delta);
     // Should cache old x,y and size compare if different if so recalculate? That would probably be more work than just calculating it.
+
     this.bounds = {
         top: this.y,
         left: this.x,
@@ -456,16 +458,18 @@ QuadTree.prototype.update = function update(delta) {
     }
 }
 QuadTree.prototype.inBounds = function(node) {
-    // console.log(node.x, node.y);
-    // console.log(this.bounds);
-    // return node.x >= this.bounds.left && node.x <= this.bounds.right && node.y >= this.bounds.bottom && node.y <= this.bounds.top;
     var negX = node.x < 0;
     var negY = node.y < 0;
-    return  node.x + (negX ? -node.size : node.size) >= this.bounds.left &&
-            node.x + (negX ? -node.size : node.size) <= this.bounds.right &&
-            node.y + (negY ? -node.size : node.size) >= this.bounds.bottom &&
-            node.y + (negY ? -node.size : node.size) <= this.bounds.top;
-}
+
+    var fnX = Math.floor(node.x);
+    var fnY = Math.floor(node.y);
+
+    var nodeX = Math.floor(negX ? Math.abs(this.bounds.left) - Math.abs(fnX) : this.bounds.right - fnX);
+    var nodeY = Math.floor(negY ? Math.abs(this.bounds.bottom) - Math.abs(fnY) : this.bounds.top - fnY);
+
+    return nodeX >= 0 && nodeY >= 0;
+};
+
 // Returns array of unplaced nodes although this should be empty
 QuadTree.prototype.putNodesInChildrenLeafs = function() {
     if(!this.hasChildrenAreas) {
@@ -604,10 +608,12 @@ QuadTree.prototype.addNode = function(node) {
             this.nodesHash[node.id] = node;
             node.leaf = this;
         } else {
-            //console.log(this.bounds);
-            //console.log(node.x,node.y);
-            //process.log('Node outside Quad Tree bounds ' + this.x + ',' + this.y + ' size ' + this.size);
-            return null;
+          console.log("Adding node that is out of bounds");
+          console.log(this.bounds);
+          console.log(node.x,node.y);
+          //console.log(this.bounds);
+          //process.log('Node outside Quad Tree bounds ' + this.x + ',' + this.y + ' size ' + this.size);
+          return null;
         }
     }
 
