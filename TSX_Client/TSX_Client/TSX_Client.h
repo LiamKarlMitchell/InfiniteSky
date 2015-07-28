@@ -918,7 +918,38 @@ struct ItemState {
 };
 #pragma pack(pop)
 
+#pragma pack(push, 1)
+struct initPacket {
+	char packetID;
+	unsigned int authID; // Not used
+	char username[20]; // Length 20
+};
 
+struct initPacketReply {
+	char packetID;
+	unsigned int authID;
+};
+
+struct emptyPacket {
+	char packetID;
+	unsigned int authID;
+};
+#pragma pack(pop)
+
+#pragma pack(push, 1)
+struct spawnPacket {
+	char packetID;
+	unsigned int authID;
+	unsigned int uniqueID1;
+	unsigned int uniqueID2;
+	unsigned int id;
+	float x;
+	float y;
+	float z;
+	float direction;
+	unsigned int zoneID;
+};
+#pragma pack(pop)
 
 class TSX_Client
 {
@@ -943,6 +974,11 @@ public:
 	uint PreviousZoneID;
 	uint* ScreenAddress;
 	uint* ZoneAddress;
+	struct sockaddr_in si_other;
+	struct sockaddr_in si_recv;
+	SOCKET sd;
+	bool logServerActive;
+	uint authID;
 
 	PlayerState* players;
 	MonsterCollection* mobs;

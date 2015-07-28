@@ -17,9 +17,8 @@ vms('SpawnLog', [], function(){
 	    spawnGroup: Number // Link to a SpawnGroup schema here.
 	});
 
-	spawnLogSchema.index({_id: 1, zoneID: 1, uniqueID1: 1, uniqueID2: 1 });
-	spawnLogSchema.index({zoneID: 1, id: 1, uniqueID1: 1, uniqueID2: 1 });
-	spawnLogSchema.index({id: 1 });
+	spawnLogSchema.index({_id: 1, zoneID: 1, uniqueID1: 1 });
+	spawnLogSchema.index({zoneID: 1, id: 1, uniqueID1: 1 });
 	spawnLogSchema.index({ username: 1 });
 
 	spawnLogSchema.virtual('created').get( function () {

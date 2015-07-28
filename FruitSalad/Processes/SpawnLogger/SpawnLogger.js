@@ -16,9 +16,12 @@ vms('Spawn Logger', [
 
 	bunyan = require('bunyan');
 
-	function Auth(authInt, rinfo) {
-		this.authInt = authInt;
-		this.rinfo = rinfo;
+	if (typeof(Auth) === 'undefined') {
+		function Auth(authInt, rinfo) {
+			this.authInt = authInt;
+			this.rinfo = rinfo;
+		}
+		global.Auth = Auth;
 	}
 
 	function SpawnLoggerInstance(){
@@ -29,6 +32,8 @@ vms('Spawn Logger', [
 		});
 
 		this.recv = [];
+		this.auths = [];
+		this.nextAuthID = 1;
 
 		var self = this;
 		
@@ -38,8 +43,8 @@ vms('Spawn Logger', [
 		});
 
 		server.on("message", function (msg, rinfo) {
-		  log.info({ msg: msg, from: rinfo.address, port: rinfo.port },"recv" + msg + " from " + rinfo.address + ":" + rinfo.port);
-
+		  //log.info({ from: rinfo.address, port: rinfo.port },"recv from " + rinfo.address + ":" + rinfo.port);
+		  //console.log(hexy(msg));
 		  self.onMessage(msg, rinfo);
 		});
 
@@ -58,8 +63,9 @@ vms('Spawn Logger', [
 	if(typeof AuthPrototype === 'undefined') {
 		global.AuthPrototype = {};
 	}
-	Auth.__proto__ = AuthPrototype;
 
+	Auth.prototype = AuthPrototype;
+	// TODO: Fix the Auth prototype between reloads.
 	AuthPrototype.check = function Auth__check(rinfo) {
 		return rinfo.address == this.rinfo.address && rinfo.port == this.rinfo.port;
 	}
@@ -82,7 +88,7 @@ vms('Spawn Logger', [
   	  	  var auth = null;
   	  	  if (packet_id === 0) {
   	  	  	auth = new Auth(this.nextAuthID++, rinfo);
-  	  	  	this.auths[auth.id] = auth;
+  	  	  	this.auths[auth.authInt] = auth;
   	  	  } else {
 			var authInt = msg.readUInt32LE(1);
 			auth = this.auths[authInt];
@@ -98,14 +104,18 @@ vms('Spawn Logger', [
   	  	  }
 
   	  	  if (allow) {
+  	  	  	  log.info({ from: rinfo.address, port: rinfo.port },"recv from " + rinfo.address + ":" + rinfo.port + ' ' + auth.username);
 		  	  var fn = this.recv[packet_id];
 		  	  if (fn) {
 		  	  	fn.call(this, msg.slice(5), auth, packet_id);
+		  	  } else {
+		  	  	log.warn({packet_id: packet_id},'Unhandled packet');
 		  	  }
 	  	  } else {
 	  	  	// Send a 0 byte back to the client to let them know they are not authenticated.
-	  	  	var reply = new Buffer(1);
+	  	  	var reply = new Buffer(5);
 	  	  	reply.writeUInt8(0, 0);
+	  	  	reply.writeUInt32LE(1, 0);
 			this.sendTo(reply, rinfo.address, rinfo.port);
 	  	  }
   	  } catch (e) {
@@ -115,7 +125,7 @@ vms('Spawn Logger', [
 
 	SpawnLoggerInstance.prototype.sendTo = function SpawnLoggerInstance__sendTo(msg, address, port) {
 		var client = dgram.createSocket('udp4');
-		client.send(message, 0, message.length, port, address, function(err, bytes) {
+		client.send(msg, 0, msg.length, port, address, function(err, bytes) {
 		    if (err) {
 		    	log.error(err);
 		    	return;
@@ -135,6 +145,7 @@ vms('Spawn Logger', [
         // Z
         // Direction
         // ZoneID
+        //console.log(hexy(msg));
         var spawn = {
         	uniqueID1: msg.readUInt32LE(0),
         	uniqueID2: msg.readUInt32LE(4),
@@ -143,27 +154,37 @@ vms('Spawn Logger', [
         	y: msg.readFloatLE(16),
         	z: msg.readFloatLE(20),
         	direction: msg.readFloatLE(24),
-        	zoneID: msg.readUInt32LE(32)
+        	zoneID: msg.readUInt32LE(28)
         };
         return spawn;
 	};
 
 	SpawnLogger.recv.length = 0;
 	SpawnLogger.recv[0] = function initPacket(msg, auth) {
-		console.log('init packet received:' + msg);
+		console.log('init packet received');
 		// Send back an integer key to be used for basic auth.
 		// Basic data that is optional.
-		auth.username = 'Unknown';
 		if (msg.length > 0) {
 			var username = msg.toString();
-			username = username.substr(0, Math.min(username.indexOf(0x00), 20));
+			username = username.substr(0, Math.min(username.indexOf('\0'), 20));
 			auth.username = username;
+			console.log(auth.username+' has joined the spawn loggger with authID '+auth.authInt+'.');
 		}
+
+		var reply = new Buffer(5);
+		reply.writeUInt8(0, 0);
+		reply.writeUInt32LE(auth.authInt, 1);
+
+		var client = dgram.createSocket('udp4');
+		this.sendTo(reply, auth.rinfo.address, auth.rinfo.port);
 	};
 
 	function recvSpawnPacket(msg, auth, packet_id) {
-		console.log('monster packet received:' + msg);
-		var spawn = this.readSpawnMessage(msg)
+		var spawn = this.readSpawnMessage(msg);
+		if (spawn === null) {
+			console.log('Invalid Spawn Packet from '+auth.rinfo.address+':'+auth.rinfo.port + ' ' + auth.username);
+			return;
+		}
 
 		if (packet_id === 1) {
 			spawn.type = 'mon';
@@ -172,10 +193,22 @@ vms('Spawn Logger', [
 		}
 
 		spawn.username = auth.username;
-		log.info(spawn, 'spawn recv');
+		//log.info(spawn, 'spawn received');
 
-		var s = new db.SpawnLog(spawn);
-		s.save();
+		// Only add record if it does not exist at that spot.
+		// spawn.zoneID, spawn.uniqueID2, spawn.id
+		// if so and X Y Z Direction is the same then ignore
+		db.SpawnLog.find({ zoneID: spawn.zoneID, id: spawn.id, uniqueID1: spawn.uniqueID1, x: spawn.x, y: spawn.y, z: spawn.z, direction: spawn.direction }, function foundSpawn(err, docs) {
+			if (err) {
+				log.error(err);
+				return;
+			}
+
+			if (docs.length == 0) {
+				var s = new db.SpawnLog(spawn);
+				s.save();
+			}
+		});
 	};
 
 	SpawnLogger.recv[1] = recvSpawnPacket; // Monster Spawn

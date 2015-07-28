@@ -25,9 +25,9 @@ static const PacketID MonsterUpdatePacketID=0x1A;
 class MonsterObject
 {
 public:
-	uint MonsterID; //Unique ID or Smthing // UniqueID // Index *Server's index :D*
+	uint AttackID; //Unique ID or Smthing // UniqueID // Index *Server's index :D*
 	uint UniqueID;  //UNique Attack ID like Unique ID except its unique to all mobs we can attack.
-	uint AttackID;  //Non Unique ID
+	uint MonsterID;  //Non Unique ID
 	uint Life;// ??? i think 
 	uint Stance;
 	uint animation;

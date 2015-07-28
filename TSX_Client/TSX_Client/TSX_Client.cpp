@@ -226,7 +226,7 @@ TryToFindAllInfoLocations:
 							//int Level,ItemType,Rareness,Clan,LevelRequirement,HonorPointReq,PurchasePrice,SalePrice,DisplayItem2D,Strength,Dexterity,Vitality,Chi,Luck,Damage,Defense,LightDamage,ShadowDamage,DarkDamage,LightResistance,ShawdowResistance,DarkResistance,ChancetoHit,ChancetoDodge,PercentToDeadlyBlow,ValueType,Value1,SkillBonusID1,SkillBonusID2,SkillBonusID3,SkillBonusAmount1,SkillBonusAmount2,SkillBonusAmount3;
 							unsigned long addy = (*(unsigned long*)*it) + (sizeof(sItemInfo)*(ItemID-1));
 							//// TODO optimize memory protection writing & reverting.
-							Log.Write("[%04u] %s at address %08X", ItemID, output_map["Name"].c_str(), addy);
+							//Log.Write("[%04u] %s at address %08X", ItemID, output_map["Name"].c_str(), addy);
 
 							sItemInfo* ii = (sItemInfo*)addy;
 							////strncpy((char*)addy+4,Name.c_str(),28);
@@ -248,7 +248,7 @@ TryToFindAllInfoLocations:
 						case 2: { // Skills
 							unsigned int SkillID = atoi(output_map[header.front()].c_str());
 							unsigned long addy = (*(unsigned long*)*it) + (sizeof(sSkillInfo)*(SkillID-1));
-							Log.Write("[%04u] %s at address %08X", SkillID, output_map["Name"].c_str(), addy);
+							//Log.Write("[%04u] %s at address %08X", SkillID, output_map["Name"].c_str(), addy);
 
 							sSkillInfo* si = (sSkillInfo*)addy;
 							strncpy(si->Name,output_map["Name"].c_str(),28);
@@ -260,7 +260,7 @@ TryToFindAllInfoLocations:
 						case 3: { // Monsters
 							unsigned int MonsterID = atoi(output_map[header.front()].c_str());
 							unsigned long addy = (*(unsigned long*)*it) + (sizeof(sMonsterInfo)*(MonsterID-1));
-							Log.Write("[%04u] %s at address %08X", MonsterID, output_map["Name"].c_str(), addy);
+							//Log.Write("[%04u] %s at address %08X", MonsterID, output_map["Name"].c_str(), addy);
 
 							sMonsterInfo* mi = (sMonsterInfo*)addy;
 							strncpy(mi->Name,output_map["Name"].c_str(),24);
@@ -270,7 +270,7 @@ TryToFindAllInfoLocations:
 							unsigned int ItemID = atoi(output_map[header.front()].c_str());
 							unsigned long addy = (*(unsigned long*)*it) + (sizeof(sNPCInfo)*(ItemID-1));
 							sNPCInfo* ni = (sNPCInfo*)addy;
-							Log.Write("[%04u] %s at address %08X", ItemID, output_map["Name"].c_str(), addy);
+							//Log.Write("[%04u] %s at address %08X", ItemID, output_map["Name"].c_str(), addy);
 
 							strncpy(ni->Name,output_map["Name"].c_str(),28);
 							strncpy(ni->Chat1,output_map["Chat1"].c_str(),51);
@@ -313,7 +313,9 @@ DWORD TSX_Client::Run()
 
 		// If Zone Changed
 		//ZoneID = *ZoneAddress;
-		//if (ZoneID!=PreviousZoneID) ZoneChanged();
+		//if (ZoneID != PreviousZoneID) {
+//			ZoneChanged();
+		//}
 
 		if (DevButtons) {
 
@@ -465,6 +467,31 @@ DWORD TSX_Client::Run()
 		}
 	}
 
+	if (DLL.logServerActive) {
+		
+		//if (GetAsyncKeyState(VK_F5) != 0)
+		//{
+		//	Sleep(100);
+		//	emptyPacket pac;
+		//	pac.packetID = 3;
+		//	pac.authID = DLL.authID;
+
+		//	if (sendto(DLL.sd, (const char*)&pac, sizeof(pac), 0, (struct sockaddr *) &si_other, sizeof(si_other)) == SOCKET_ERROR)
+		//	{
+		//		Log.Write("sendto() failed with error code : %d", WSAGetLastError());
+		//	}
+		//}
+	//	//try to receive some data, this is a blocking call
+	//	initPacketReply reply;
+	//	int from_len, recv_len;
+	//	int recv_len = recvfrom(DLL.sd, (char*)&reply, sizeof(reply), MSG_PEEK, (struct sockaddr *)&si_other, &from_len);
+	//	if (recv_len != 10040) {
+	//		recv_len = recvfrom(DLL.sd, (char*)&reply, sizeof(reply), 0, (struct sockaddr *)&si_other, &from_len);
+	//		Log.Write("Server says %d %d", reply.packetID, reply.authID);
+	//		DLL.logServerActive = false;
+	//	}
+	}
+
 		Sleep(1);
 	}while(RunDLL);
 
@@ -525,12 +552,47 @@ void TSX_Client::ZoneChanged()
 uint TSX_Client::onMOBPacket(MonsterObject* mob)
 {
 	//if (MOBSpawns) MOBSpawns->AddSpawnInfo(mob->UniqueID,mob->MonsterID,mob->Location.x,mob->Location.y,mob->Location.z,mob->FacingDirection);
+	spawnPacket spawn;
+	spawn.packetID = 1;
+	spawn.authID = DLL.authID;
+	spawn.uniqueID1 = mob->AttackID;
+	spawn.uniqueID2 = mob->UniqueID;
+	spawn.id = mob->MonsterID;
+	spawn.x = mob->Location.x;
+	spawn.y = mob->Location.y;
+	spawn.z = mob->Location.z;
+	spawn.direction = mob->FacingDirection;
+	spawn.zoneID = *DLL.ZoneAddress;
+
+	if (sendto(DLL.sd, (const char*)&spawn, sizeof(spawn), 0, (struct sockaddr *) &DLL.si_other, sizeof(DLL.si_other)) == SOCKET_ERROR)
+	{
+		Log.Write("sendto() failed with error code : %d", WSAGetLastError());
+	}
+	Log.Write("Sent Mob Packet");
+
 	return 0;
 }
 
 uint TSX_Client::onNPCPacket(MonsterObject* npc)
 {
 	//if (NPCSpawns) NPCSpawns->AddSpawnInfo(npc->UniqueID,npc->MonsterID,npc->Location.x,npc->Location.y,npc->Location.z,npc->FacingDirection);
+	spawnPacket spawn;
+	spawn.packetID = 2;
+	spawn.authID = DLL.authID;
+	spawn.uniqueID1 = npc->AttackID;
+	spawn.uniqueID2 = npc->UniqueID;
+	spawn.id = npc->MonsterID;
+	spawn.x = npc->Location.x;
+	spawn.y = npc->Location.y;
+	spawn.z = npc->Location.z;
+	spawn.direction = npc->FacingDirection;
+	spawn.zoneID = *DLL.ZoneAddress;
+
+	if (sendto(DLL.sd, (const char*)&spawn, sizeof(spawn), 0, (struct sockaddr *) &DLL.si_other, sizeof(DLL.si_other)) == SOCKET_ERROR)
+	{
+		Log.Write("sendto() failed with error code : %d", WSAGetLastError());
+	}
+
 	return 0;
 }
 
@@ -958,6 +1020,7 @@ void TSX_Client::Init()
 
 	// Get Zone Address
 	ZoneAddress = (uint*)sig->search("8B0DXXXXXXXX83C1CF83F95A");
+									 //A1XXXXXXXX8B??????BF
 	if (ZoneAddress)
 	{
 		Log.Write("Found Zone Address at %08X",ZoneAddress);
@@ -1082,8 +1145,72 @@ void TSX_Client::Init()
 	//	LoadTranslationCSVs();
 	//}
 
+	// End of connect to log server code
+
 	if (ini->GetInt("Halt",0)) {
 		MessageBox(0,"Halt","TSX Client DLL",0);
+	}
+
+	// Connect to spawn logging server if required.
+	DLL.logServerActive = false;
+	if (ini->GetInt("DetourPackets", 1) && ini->GetInt("ChangeIP", 1) == 0 && (ini->GetInt("LogMonster", 0) == 1 || ini->GetInt("LogNPC", 0) == 1)) {
+		WSADATA wsa;
+
+		//Initialise winsock
+		Log.Write("Initialising Winsock...");
+		if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
+		{
+			Log.Write("Failed. Error Code : %d", WSAGetLastError());
+		}
+		else {
+
+			//create socket
+			if ((DLL.sd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == SOCKET_ERROR)
+			{
+				Log.Write("socket() failed with error code : %d", WSAGetLastError());
+			}
+			else {
+				//setup address structure
+				memset((char *)&si_other, 0, sizeof(si_other));
+				si_other.sin_family = AF_INET;
+				si_other.sin_port = htons(ini->GetInt("SpawnLogPort", 13191));
+				si_other.sin_addr.S_un.S_addr = inet_addr(ini->GetString("SpawnLogAddress", "127.0.0.1").c_str());
+
+				// Send an init packet to the logging server and wait for reply.
+
+				initPacket pac;
+				pac.packetID = 0;
+				pac.authID = DLL.authID;
+				strncpy(pac.username, ini->GetString("SpawnLogUsername", "Unknown").c_str(), 20);
+
+				if (sendto(DLL.sd, (const char*)&pac, sizeof(pac), 0, (struct sockaddr *) &si_other, sizeof(si_other)) == SOCKET_ERROR)
+				{
+					Log.Write("sendto() failed with error code : %d", WSAGetLastError());
+				}
+				else {
+					//receive a reply from the logging server
+					//clear the buffer by filling null, as it might have previously received data
+					initPacketReply reply;
+					memset(&reply, 0, sizeof(reply));
+
+					//try to receive some data, this is a blocking call
+					int from_len = sizeof(si_other), recv_len;
+					if ((recv_len = recvfrom(DLL.sd, (char*)&reply, sizeof(reply), 0, (struct sockaddr *) &si_recv, &from_len)) == SOCKET_ERROR)
+					{
+						Log.Write("recvfrom() failed with error code : %d", WSAGetLastError());
+					}
+					else {
+						Log.Write("received packet from spawnlog server length: %i.", recv_len);
+						if (recv_len == sizeof(reply) && reply.packetID == 0 && reply.authID > 0) {
+							DLL.authID = reply.authID;
+							Log.Write("Logging Server authID of %i received.", DLL.authID);
+							DLL.logServerActive = true;
+						}
+					}
+				}
+			}
+		}
+
 	}
 
 	unsigned long RecvPacketLoop = sig->search("8B2C8D????????EB068B4E028D69063BD57C4D8B3D????????8BCD8BD1C1E902F3A58BCA83E1030FB6C0F3A4FF1485????????");
@@ -1133,7 +1260,7 @@ void TSX_Client::Init()
 			}
 
 			// I would prefer this to be hex values for packets to log
-			if (ini->GetInt("LogPackets",0)) {
+			if (ini->GetInt("LogPackets",0) && ini->GetInt("ChangeIP",1) == 0) {
 				for (int i=0;i<0xFF;i++) {
 					GameRecvPacketFunctor[i] = hookRecvLogPacket;
 				}
@@ -1144,11 +1271,15 @@ void TSX_Client::Init()
 				// Hook Packets
 				if (ini->GetInt("ChangeIP",1)==0)
 				{
-					Log.Write("NPC Packet function is at %08X and points too %08X",&GameRecvPacketFunctor[0x19],GameRecvPacketFunctor[0x19]);
-					GameRecvPacketFunctor[0x19] = MyNPCPacket;
-
-					Log.Write("Monster Packet function is at %08X and points too %08X",&GameRecvPacketFunctor[0x1A],GameRecvPacketFunctor[0x1A]);
-					GameRecvPacketFunctor[0x1A] = MyMonsterPacket;
+					if (ini->GetInt("LogNPC", 0) == 1) {
+						Log.Write("NPC Packet function is at %08X and points too %08X", &GameRecvPacketFunctor[0x19], GameRecvPacketFunctor[0x19]);
+						GameRecvPacketFunctor[0x19] = MyNPCPacket;
+					}
+					
+					if (ini->GetInt("LogMonster", 0) == 1) {
+						Log.Write("Monster Packet function is at %08X and points too %08X", &GameRecvPacketFunctor[0x1A], GameRecvPacketFunctor[0x1A]);
+						GameRecvPacketFunctor[0x1A] = MyMonsterPacket;
+					}
 
 					Log.Write("Gameguard Keypacket function is at %08X and points too %08X",&GameRecvPacketFunctor[0x9A],GameRecvPacketFunctor[0x9A]);
 					GameRecvPacketFunctor[0x9A] = MyGameguardKeyPacket;
@@ -1203,6 +1334,11 @@ void TSX_Client::Uninit()
 {
 	if (ini->GetInt("HookFileLoading",1)) {
 		DetourRemove(oCreateFileW);
+	}
+
+	if (DLL.logServerActive) {
+		closesocket(DLL.sd);
+		WSACleanup();
 	}
 }
 
@@ -1327,7 +1463,7 @@ uint MyNPCPacket(uint length)
 	}
 
 	MonsterObject* mon = (MonsterObject*)uncompressBuffer;
-	if (mon->HP>0)
+	if (DLL.logServerActive && mon->HP > 0)
 	{
 		DLL.onNPCPacket(mon);
 	}
@@ -1372,7 +1508,8 @@ uint MyMonsterPacket(uint length)
 	}
 
 	MonsterObject* mon = (MonsterObject*)uncompressBuffer;
-	if (mon->HP>0)
+	Log.Write("Monster Packet ID %i HP %i", mon->MonsterID, mon->HP);
+	if (DLL.logServerActive && mon->HP > 0)
 	{
 		DLL.onMOBPacket(mon);
 	}
