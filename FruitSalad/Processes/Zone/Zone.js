@@ -10,7 +10,7 @@ vms('Zone', [
 
 global.api.zoneAlive = function(callback, client){
 	console.log("Got zone alive callback", client);
-	var c = Zone.clientHash[client];
+	var c = Zone.clientHashTable[client];
 	if(!c){
 		console.log("Checking one alive for unknown client");
 		return;
@@ -20,7 +20,7 @@ global.api.zoneAlive = function(callback, client){
 
 global.api.onMoveRegions = function(callback, client, moveRegions){
 	console.log("Got move regions callback", client);
-	var c = Zone.clientHash[client];
+	var c = Zone.clientHashTable[client];
 	if(!c){
 		console.log("Checking move region for unknown client in zone", Zone.id);
 		return;
@@ -29,12 +29,9 @@ global.api.onMoveRegions = function(callback, client, moveRegions){
 	global.rpc.getCallback(callback).call(c, moveRegions);
 };
 
-
 global.rpc.add(global.api);
 
-
 function ZoneInstance() {
-	console.log('ZoneInstance Constructor called');
 	fs = require('fs');
 	util = require('./Modules/util.js');
 	CachedBuffer = require('./Modules/CachedBuffer.js');
@@ -67,8 +64,8 @@ function ZoneInstance() {
 	this.Clients = [];
 	this.Npc = [];
 	this.Items = [];
-	this.NpcNodesHash = {};
-	this.clientHash = {};
+	this.NpcNodesHashTable = {};
+	this.clientHashTable = {};
 
 	global.log = bunyan.createLogger({
 		name: 'InfiniteSky/Zone.' + parseInt(process.argv[2]),
@@ -78,11 +75,34 @@ function ZoneInstance() {
 	});
 
 	util.setupUncaughtExceptionHandler(function(err){ log.error(err); });
-
 }
 
 if (!global.zonePrototype) {
 	zonePrototype = ZoneInstance.prototype;
+};
+
+zonePrototype.addNPC = function(element){
+	var npc = new Npc(element);
+	npc.setNode(this.QuadTree.addNode(new QuadTree.QuadTreeNode({
+		object: npc,
+		update: function() {
+			this.x = this.translateX(this.object.Location.X);
+			this.y = this.translateY(this.object.Location.Z);
+			// return {
+			// 	x: this.character.state.Location.X,
+			// 	y: this.character.state.Location.Z
+			// };
+		},
+		// update: function() {
+		// 	// return {
+		// 	// 	x: this.Location.X,
+		// 	// 	y: this.Location.Z,
+		// 	// 	size: 1
+		// 	// };
+		// },
+		type: 'npc'
+	})));
+	this.Npc.push(npc);
 };
 
 zonePrototype.init = function Zone__init() {
@@ -94,9 +114,8 @@ zonePrototype.init = function Zone__init() {
 	this.packetCollection = new PacketCollection('ZonePC');
 	global.ZonePC = this.packetCollection;
 	Database(config.world.database.connection_string, function() {
-		console.log("Zone database connected");
+		log.info("Zone database connected");
 		self.databaseConnected = true;
-
 
 		vmscript.watch('Database');
 		vmscript.watch('Generic');
@@ -113,7 +132,7 @@ zonePrototype.init = function Zone__init() {
 					}
 
 					vmscript.watch(path);
-				})
+				});
 			}
 
 			vmscript_WatchIfExists('./Commands');
@@ -126,6 +145,32 @@ zonePrototype.init = function Zone__init() {
 			vmscript_WatchIfExists('./Processes/Zone/Scripts/'+self.id);
 			vmscript_WatchIfExists('./Processes/Zone/Scripts/'+self.clean_name);
 
+			fs.readFile(config.world.data_path + 'spawninfo/' + util.padLeft(self.id,'0', 3) + '.NPC', function(err, data) {
+				if (err) {
+					//console.log(err);
+				} else {
+					var RecordCount = data.readUInt32LE(0);
+
+					var spawndata = restruct.struct('info', structs.SpawnInfo, RecordCount).unpack(data.slice(4));
+					var length = spawndata.info.length,
+						element = null;
+					if(self.id === 6){
+						for (var i = 0; i < length; i++) {
+							element = spawndata.info[i];
+							if (element.ID) {
+								self.addNPC(element);
+							}
+						}
+					}
+					// console.log(self.id, "total npcs", length);
+					// for (var i = 0; i < length; i++) {
+					// 	element = spawndata.info[i];
+					// 	if (element.ID) {
+					// 		self.addNPC(element);
+					// 	}
+					// }
+				}
+			});
 		});
 	});
 
@@ -182,21 +227,21 @@ zonePrototype.addSocket = function(socket) {
 
 		socket.node = this.QuadTree.addNode(new QuadTree.QuadTreeNode({
 			object: socket,
-			update: function(node, delta) {
-				return {
-					x: this.character.state.Location.X,
-					y: this.character.state.Location.Z,
-					size: this.character.state.Level
-				};
+			update: function() {
+				this.x = this.translateX(this.object.character.state.Location.X);
+				this.y = this.translateY(this.object.character.state.Location.Z);
+				// return {
+				// 	x: this.character.state.Location.X,
+				// 	y: this.character.state.Location.Z
+				// };
 			},
 			type: 'client'
 		}));
-		// console.log(socket);
-		// console.log(socket.node);
+
 		socket.character.state.NodeID = socket.node.id;
 		var hash = uuid.v1();
 		socket.hash = hash;
-		this.clientHash[hash] = socket;
+		this.clientHashTable[hash] = socket;
 
 		return true;
 	}

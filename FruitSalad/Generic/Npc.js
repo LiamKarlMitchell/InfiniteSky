@@ -5,24 +5,26 @@
 vms('Npc', [
 	'Structs'
 ], function() {
+	if(typeof Zone !== 'undefined') Zone.send.npcStatePacket = restruct.
+		int32lu('NodeID').
+		int32lu('UniqueID').
+		int32lu('NpcID').
+		int32lu('Life').
+		int32lu('Stance').
+		int32lu('Skill').
+		float32l('Frame').
+		struct('Location',structs.CVec3).
+		int32lu('Unknown3',3).
+		float32l('Direction').
+		float32l('TargetDirection').
+		int32ls('TargetObjectIndex').
+		int32lu('Unknown3',4).
+		struct('LocationTo',structs.CVec3).
+		float32l('FacingDirection').
+		int32lu('HP');
+
 	if(typeof global.NpcNextID === 'undefined') global.NpcNextID = 0;
 	var Npc = function(data) {
-		// this.info = infos.Npc[ID];
-		// if (!this.info) {
-		// 	dumpError(new Error('NPC ID '+ID+' does not exist in Npc Info.'));
-		// 	return null;
-		// }
-// npc.ID = this.NPCNextID;
-
-// this.NPCNextID++;
-
-// if (this.NPCNextID > this.NPCMaxLength) {
-// 	this.NPCNextID = 0; // Could find next free slot and if none free overwrite older items?
-// 	// Quick sort ftw.
-// }
-
-// npc.Location.set(spawninfo.Location);
-// npc.FacingDirection = spawninfo.Direction;
 		this.UniqueID = ++global.NpcNextID;
 		this.NodeID = 0;
 		this.NpcID = data.ID;
@@ -39,39 +41,19 @@ vms('Npc', [
 		this.TargetObjectIndex = -1;
 
 		this.FacingDirection = data.Direction;
-		this.HP = 1; // Find out max hp for this Npc and set it.
-
-		this.NpcStatePacket = restruct.
-			int32lu('NodeID').
-			int32lu('UniqueID').
-			int32lu('NpcID').
-			int32lu('Life').
-			int32lu('Stance').
-			int32lu('Skill').
-			float32l('Frame').
-			struct('Location',structs.CVec3).
-			int32lu('Unknown3',3).
-			float32l('Direction').
-			float32l('TargetDirection').
-			int32ls('TargetObjectIndex').
-			int32lu('Unknown3',4).
-			struct('LocationTo',structs.CVec3).
-			float32l('FacingDirection').
-			int32lu('HP');
-
-		// console.log("Added Npc:", ID);
-	}
-
-	Npc.prototype.getPacket = function() {
-		return packets.makeCompressedPacket(0x19, new Buffer(this.NpcStatePacket.pack(this)));
+		this.HP = 1;
 	};
 
-	Npc.prototype.setNode = function(node, zone){
+	Npc.prototype.getPacket = function() {
+		return packets.makeCompressedPacket(0x19, new Buffer(Zone.send.npcStatePacket.pack(this)));
+	};
+
+	Npc.prototype.setNode = function(node){
 		if(!node){
 			return;
 		}
 		this.NodeID = node.id;
-		zone.NpcNodesHash[this.NpcID] = node;
+		Zone.NpcNodesHashTable[this.NpcID] = node;
 	};
 
 	global.Npc = Npc;
