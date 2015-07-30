@@ -66,6 +66,7 @@ function ZoneInstance() {
 	this.Items = [];
 	this.NpcNodesHashTable = {};
 	this.clientHashTable = {};
+	this.clientNodeTable = {};
 
 	global.log = bunyan.createLogger({
 		name: 'InfiniteSky/Zone.' + parseInt(process.argv[2]),
@@ -154,14 +155,14 @@ zonePrototype.init = function Zone__init() {
 					var spawndata = restruct.struct('info', structs.SpawnInfo, RecordCount).unpack(data.slice(4));
 					var length = spawndata.info.length,
 						element = null;
-					if(self.id === 6){
-						for (var i = 0; i < length; i++) {
-							element = spawndata.info[i];
-							if (element.ID) {
-								self.addNPC(element);
-							}
+					// if(self.id === 6){
+					for (var i = 0; i < length; i++) {
+						element = spawndata.info[i];
+						if (element.ID) {
+							self.addNPC(element);
 						}
 					}
+					// }
 					// console.log(self.id, "total npcs", length);
 					// for (var i = 0; i < length; i++) {
 					// 	element = spawndata.info[i];
@@ -208,43 +209,38 @@ zonePrototype.addSocket = function(socket) {
 	if (!this.QuadTree) {
 		console.log("QuadTree is not initialized");
 		return false;
-	} else {
-		// this.Clients.push(socket);
-
-		// Attach functions to the socket here
-		// TODO: See if we can get this to work prototype like.
-		socket.sendInfoMessage = function(type, message) {
-			if (arguments.length === 1) {
-				message = type;
-				type = ':INFO';
-			}
-			ZonePC.sendMessageToSocket(this, type, message);
-		};
-
-		socket.unhandledPacket = function(message) {
-			ZonePC.sendMessageToSocket(this, ':WARN', 'Unhandled Packet: '+message);
-		}
-
-		socket.node = this.QuadTree.addNode(new QuadTree.QuadTreeNode({
-			object: socket,
-			update: function() {
-				this.x = this.translateX(this.object.character.state.Location.X);
-				this.y = this.translateY(this.object.character.state.Location.Z);
-				// return {
-				// 	x: this.character.state.Location.X,
-				// 	y: this.character.state.Location.Z
-				// };
-			},
-			type: 'client'
-		}));
-
-		socket.character.state.NodeID = socket.node.id;
-		var hash = uuid.v1();
-		socket.hash = hash;
-		this.clientHashTable[hash] = socket;
-
-		return true;
 	}
+
+	// Attach functions to the socket here
+	// TODO: See if we can get this to work prototype like.
+	socket.sendInfoMessage = function(type, message) {
+		if (arguments.length === 1) {
+			message = type;
+			type = ':INFO';
+		}
+		ZonePC.sendMessageToSocket(this, type, message);
+	};
+
+	socket.unhandledPacket = function(message) {
+		ZonePC.sendMessageToSocket(this, ':WARN', 'Unhandled Packet: '+message);
+	}
+
+	socket.node = this.QuadTree.addNode(new QuadTree.QuadTreeNode({
+		object: socket,
+		update: function() {
+			this.x = this.translateX(this.object.character.state.Location.X);
+			this.y = this.translateY(this.object.character.state.Location.Z);
+		},
+		type: 'client'
+	}));
+
+	socket.character.state.NodeID = socket.node.id;
+	var hash = uuid.v1();
+	socket.hash = hash;
+	this.clientHashTable[hash] = socket;
+	this.clientNodeTable[socket.node.id] = socket;
+
+	return true;
 };
 
 zonePrototype.broadcastStates = function(client) {

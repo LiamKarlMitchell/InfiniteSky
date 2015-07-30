@@ -1,3 +1,6 @@
+// TODO: When character is not able to move, we just dont update the values.
+// But we need to send the response back to the client.
+
 var Buff = restruct.
 	int16lu('Amount').
 	int16lu('Time');
@@ -25,13 +28,13 @@ Zone.GiftCodeLength = 32;
 // Zone.MAX_SILVER = 2147483647;
 
 Zone.send.PersonalShopItem = restruct.
-	int32lu('ID').
-	int32lu('Unk').
+	int32lu('ItemID').
+	int32lu('InventoryIndex').
 	int32lu('Amount').
 	int32lu('Price').
 	int8lu('Enchant').
 	int8lu('Combine').
-	int16lu('Unknown');
+	pad(2);
 
 Zone.send.Compress_Hairer = restruct.
     int8lu('packetID').
@@ -39,7 +42,7 @@ Zone.send.Compress_Hairer = restruct.
 
 Zone.send.Action = restruct.
     int32lu('CharacterID').
-    int32lu('UniqueID').
+    int32lu('NodeID').
     string('Name', Zone.CharName_Length+1).
     string('Demostrater', Zone.CharName_Length+1).
     string('Child', Zone.CharName_Length+1).
@@ -188,6 +191,7 @@ ZonePC.Set(0x04, {
 
         client.node.update();
         Zone.sendToAllArea(client, false, client.character.state.getPacket(), config.network.viewable_action_distance);
+
 				client.character.save(function(){
 					// console.log("Saved");
 				});
@@ -252,6 +256,7 @@ ZonePC.Set(0x05, {
 				// client.character.save(function(){
 				// 	// console.log("Saved");
 				// });
+				//
     }
 });
 
