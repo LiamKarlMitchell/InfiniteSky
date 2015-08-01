@@ -67,6 +67,7 @@ function ZoneInstance() {
 	this.NpcNodesHashTable = {};
 	this.clientHashTable = {};
 	this.clientNodeTable = {};
+	this.clientNameTable = {};
 
 	global.log = bunyan.createLogger({
 		name: 'InfiniteSky/Zone.' + parseInt(process.argv[2]),
@@ -89,18 +90,7 @@ zonePrototype.addNPC = function(element){
 		update: function() {
 			this.x = this.translateX(this.object.Location.X);
 			this.y = this.translateY(this.object.Location.Z);
-			// return {
-			// 	x: this.character.state.Location.X,
-			// 	y: this.character.state.Location.Z
-			// };
 		},
-		// update: function() {
-		// 	// return {
-		// 	// 	x: this.Location.X,
-		// 	// 	y: this.Location.Z,
-		// 	// 	size: 1
-		// 	// };
-		// },
 		type: 'npc'
 	})));
 	this.Npc.push(npc);
@@ -155,21 +145,12 @@ zonePrototype.init = function Zone__init() {
 					var spawndata = restruct.struct('info', structs.SpawnInfo, RecordCount).unpack(data.slice(4));
 					var length = spawndata.info.length,
 						element = null;
-					// if(self.id === 6){
 					for (var i = 0; i < length; i++) {
 						element = spawndata.info[i];
 						if (element.ID) {
 							self.addNPC(element);
 						}
 					}
-					// }
-					// console.log(self.id, "total npcs", length);
-					// for (var i = 0; i < length; i++) {
-					// 	element = spawndata.info[i];
-					// 	if (element.ID) {
-					// 		self.addNPC(element);
-					// 	}
-					// }
 				}
 			});
 		});
@@ -239,6 +220,7 @@ zonePrototype.addSocket = function(socket) {
 	socket.hash = hash;
 	this.clientHashTable[hash] = socket;
 	this.clientNodeTable[socket.node.id] = socket;
+	this.clientNameTable[socket.character.Name] = socket;
 
 	return true;
 };

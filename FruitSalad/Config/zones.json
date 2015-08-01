@@ -27,6 +27,7 @@
 	"40": { "Name": "Z040", "Load": false, "DisplayName": "" },
 	"43": { "Name": "Z043", "Load": false, "DisplayName": "" },
 	"46": { "Name": "Z046", "Load": false, "DisplayName": "" },
+	"47": { "Name": "Z047", "Load": true, "DisplayName": "" },
 	"49": { "Name": "Z049", "Load": false, "DisplayName": "" },
 	"50": { "Name": "Z050", "Load": false, "DisplayName": "" },
 	"55": { "Name": "Z055", "Load": false, "DisplayName": "" },
