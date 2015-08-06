@@ -142,6 +142,7 @@ worldPrototype.init = function(){
 
 		// TODO: Add loading zones in async and listen for invalidation before we set
 		// this.singletone for better code flow?
+		// Liam: What?
 	if(!this.onInvalidatedZone){
 		this.onInvalidatedZone = true;
 		global.rpc.on('invalidated', function(zone){
@@ -150,7 +151,7 @@ worldPrototype.init = function(){
 			global.rpc.children[zone].api.spawnScript('./Processes/Zone/Zone.js');
 			global.rpc.children[zone].spawned = true;
 			process.zones[zone] = global.rpc.children[zone];
-
+			
 			fs.readFile(config.world.data_path + '/wregion/Z' + util.padLeft(zone,'0', 3) + '_ZONEMOVEREGION.WREGION', function(err, data) {
 				if (err) {
 					console.log(err);

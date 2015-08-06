@@ -1,0 +1,36 @@
+body {
+  position: relative;
+  width: 960px;
+}
+
+svg {
+  font: 10px sans-serif;
+  shape-rendering: crispEdges;
+}
+
+rect {
+  fill: #fff;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #ddd;
+}
+
+button {
+  position: absolute;
+  right: 30px;
+  top: 30px;
+}
+
+.plan_tooltip {
+  position: absolute;
+  text-align: center;
+  padding: 5px;
+  font: 14px sans-serif;
+  background: rgba(245, 245, 245, 0.75);
+  border: 3px solid #2e2e2e;
+  border-radius: 8px;
+  pointer-events: none;
+}

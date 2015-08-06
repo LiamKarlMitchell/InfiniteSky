@@ -10,5 +10,9 @@
     "SpawnLogger": {
         "name": "SpawnLogger",
         "script": "Processes/SpawnLogger/SpawnLogger.js"
+    },
+    "SpawnEdit": {
+        "name": "SpawnEdit",
+        "script": "Processes/SpawnEdit/SpawnEdit.js"
     }
 }

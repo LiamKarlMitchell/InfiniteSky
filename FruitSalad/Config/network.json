@@ -2,7 +2,8 @@
   "ports": {
     "login": 11091,
     "world": 11092,
-    "spawnlogger": 13191
+    "spawnlogger": 13191,
+    "spawnedit": 8473
   },
   "interfaces": {
     "regular": "0.0.0.0",

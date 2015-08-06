@@ -130,7 +130,7 @@ vms('Spawn Logger', [
 		    	log.error(err);
 		    	return;
 		    }
-		    log.info('UDP message sent to ' + address +':'+ port);
+		    //log.info('UDP message sent to ' + address +':'+ port);
 		    client.close();
 		});
 	}
@@ -161,7 +161,7 @@ vms('Spawn Logger', [
 
 	SpawnLogger.recv.length = 0;
 	SpawnLogger.recv[0] = function initPacket(msg, auth) {
-		console.log('init packet received');
+		//console.log('init packet received');
 		// Send back an integer key to be used for basic auth.
 		// Basic data that is optional.
 		if (msg.length > 0) {
@@ -193,12 +193,10 @@ vms('Spawn Logger', [
 		}
 
 		spawn.username = auth.username;
-		//log.info(spawn, 'spawn received');
+		log.info(spawn, 'spawn received');
 
-		// Only add record if it does not exist at that spot.
-		// spawn.zoneID, spawn.uniqueID2, spawn.id
-		// if so and X Y Z Direction is the same then ignore
-		db.SpawnLog.find({ zoneID: spawn.zoneID, id: spawn.id, uniqueID1: spawn.uniqueID1, x: spawn.x, y: spawn.y, z: spawn.z, direction: spawn.direction }, function foundSpawn(err, docs) {
+		// Only add record if it does not exist already (Based on zoneID, id, type, uniqueID1, uniqueID2)
+		db.SpawnLog.find({ zoneID: spawn.zoneID, id: spawn.id, type: spawn.type, uniqueID1: spawn.uniqueID1, uniqueID2: spawn.uniqueID2 }, function foundSpawn(err, docs) {
 			if (err) {
 				log.error(err);
 				return;

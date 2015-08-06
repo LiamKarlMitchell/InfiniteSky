@@ -186,6 +186,13 @@ ZonePC.Set(0x04, {
         client.character.state.Location.Y = input.Location.Y;
         client.character.state.Location.Z = input.Location.Z;
 
+        // TODO: Send out updates for things that come into focus.
+        // If walking running or jumping action
+        // check time since this was last done against some configured value.(maybe 1 sec?)
+        // get what is around the character (excluding the character)
+        // send their update packets to the client
+        // store time this was done
+
         client.node.update();
         Zone.sendToAllArea(client, false, client.character.state.getPacket(), config.network.viewable_action_distance);
 				client.character.save(function(){
@@ -260,6 +267,3 @@ ZonePC.Set(0x8B, {
         Zone.broadcastStates(client);
     }
 });
-
-
-// TODO (Ane): Blah

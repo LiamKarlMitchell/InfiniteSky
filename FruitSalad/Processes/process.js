@@ -1,8 +1,12 @@
 global.rpc = new (require('../Modules/rpc.js'))(true);
 vmscript = new (require('../VMScript.js'))();
+path = require('path');
 
 global.api = {};
-global.api.spawnScript = vmscript.watch;
+global.api.spawnScript = function(script) {
+	process.directory = path.join(process.cwd(), path.dirname(script));
+	vmscript.watch(script);
+}
 
 global.rpc.add(global.api);
 
