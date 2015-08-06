@@ -1,7 +1,9 @@
 Zone.IPAddressLength = 15;
 Zone.recv.zoneChange = restruct.
   int32lu('MapID').
-  pad(12);
+  int32lu('unk').
+  int32lu('unk2').
+  int32lu('unk3');
 
 Zone.send.zoneChange = restruct.
   int8lu('packetID').
@@ -20,13 +22,13 @@ ZonePC.Set(0x08, {
     client.transferZone = input.MapID;
     // TODO: Callback with error arg to send and status 1 respond
     // telling that it was unable to connect to the other zone.
-
+    console.log(input);
     rpc.api.isZoneAlive(input.MapID, Zone.id, client.hash, function(){
-      this.character.MapID = this.transferZone;
       rpc.api.getMoveRegions(Zone.id, input.MapID, this.hash, function(moveRegions){
         var client = this;
         var portal = moveRegions[0];
 
+        client.character.MapID = client.transferZone;
         client.character.RealX = portal.X;
         client.character.RealY = portal.Y;
         client.character.RealZ = portal.Z;

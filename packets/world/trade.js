@@ -82,7 +82,7 @@ WorldPC.Set(0x26,{
 		console.log(input);
 		var invited = world.findCharacterSocket(input.Name);
 		if(!invited) return;
-		
+
 		invited.write(new Buffer(tradeRequest.pack({
 			PacketID: 0x3f,
 			Name: client.character.Name
@@ -94,7 +94,7 @@ WorldPC.Set(0x28, {
 	Restruct: OnTradeRequestRespondRestruct,
 	function: function(client, input){
 		console.log(input);
-		
+
 		var inviter = world.findCharacterSocket(input.Name);
 		if(input.Result === 0){
 			inviter.write(new Buffer(tradeResponse.pack({
@@ -102,14 +102,14 @@ WorldPC.Set(0x28, {
 				Name: client.character.Name,
 				Result: 0
 			})));
-			
+
 			client.write(new Buffer(tradeStart.pack({
 				PacketID: 0x42
 			})));
 			inviter.write(new Buffer(tradeStart.pack({
 				PacketID: 0x42
 			})));
-			
+
 			client.character.InTrade = inviter;
 			inviter.character.InTrade = client;
 			client.character.TradeAccepted = 0;
@@ -163,19 +163,20 @@ int8lu('Unk1', 1288);
 // Packet 46 Functor 0040DCF0 PacketSize 1290
 
 WorldPC.Set(0x2C, {
-	Size: 9,
+	// Size: 9,
 	function: function(client){
-		if(!client.character.TradeAccepted) client.character.TradeAccepted = 1;
-		
-		if(client.character.TradeAccepted && client.character.InTrade.character.TradeAccepted){
-			client.write(new Buffer(finishTrade.pack({
-				PacketID: 0x46
-			})));
-			client.character.InTrade.write(new Buffer(finishTrade.pack({
-				PacketID: 0x46
-			})));
-		}
-		
+		console.log("Accepting trade");
+		// if(!client.character.TradeAccepted) client.character.TradeAccepted = 1;
+
+		// if(client.character.TradeAccepted && client.character.InTrade.character.TradeAccepted){
+			// client.write(new Buffer(finishTrade.pack({
+			// 	PacketID: 0x46
+			// })));
+			// client.character.InTrade.write(new Buffer(finishTrade.pack({
+			// 	PacketID: 0x46
+			// })));
+		// }
+
 		// client.character.InTrade.write(new Buffer(onTradeAccept.pack({
 		// 	PacketID: 0x45,
 		// 	Unk1: 3,
@@ -186,6 +187,6 @@ WorldPC.Set(0x2C, {
 		// 	Unk1: 3,
 		// 	Unk2: 3
 		// })));
-		console.log(client.character.Name + " is ready to trade with " + client.character.InTrade.character.Name);
+		// console.log(client.character.Name + " is ready to trade with " + client.character.InTrade.character.Name);
 	}
 });

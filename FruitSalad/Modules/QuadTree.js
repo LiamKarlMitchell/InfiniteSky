@@ -77,11 +77,12 @@ QuadTree.prototype.split = function(){
     var node = this.nodes[i];
     for(var leaf=0; leaf<4; leaf++){
       var l = this.leafs[leaf];
-      // process.nextTick((function(){
-        if(l.inBounds(node)){
-          l.addNode(node);
+      process.nextTick((function(){
+        // console.log(this);
+        if(this.leaf.inBounds(this.node)){
+          this.leaf.addNode(this.node);
         }
-      // }).bind({leaf: l, node: node}));
+      }).bind({leaf: l, node: node}));
     }
   }
 

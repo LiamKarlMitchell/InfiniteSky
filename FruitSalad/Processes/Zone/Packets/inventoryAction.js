@@ -126,7 +126,7 @@ ItemAction[20] = function inventoryMoveItem(input){
             obj.Row = input.MoveRow;
             obj.Column = input.MoveColumn;
             obj.Amount = input.Amount;
-            self.character.Inventory[nextInventoryIndex] = obj; 
+            self.character.Inventory[nextInventoryIndex] = obj;
         }else if(!intersected && !reminder){
             invItem.Row = input.MoveRow;
             invItem.Column = input.MoveColumn;
@@ -324,7 +324,7 @@ ItemAction[0] = function inventoryPickupItem(input){
                 Zone.send.itemAction.call(self, 1, input);
                 return;
             }
-            
+
             Zone.send.itemAction.call(self, 0, input);
         });
         return;
@@ -440,7 +440,7 @@ ItemAction[1] = function inventoryDropItem(input){
             Zone.send.itemAction.call(self, 1, input);
             return;
         }
-        
+
         if(isStackable && !reminder){
             self.character.Inventory[input.InventoryIndex] = null;
         }else if(isStackable && reminder){
@@ -528,7 +528,7 @@ ItemAction[5] = function StorageStoreItem(input){
             obj.Row = input.MoveRow;
             obj.Column = input.MoveColumn;
             obj.Amount = input.Amount;
-            self.character.Storage[input.PickupIndex] = obj; 
+            self.character.Storage[input.PickupIndex] = obj;
         }else if(!intersected){
             delete invItem.Column;
             delete invItem.Row;
@@ -627,7 +627,7 @@ ItemAction[15] = function StorageTakeItem(input){
             obj.Row = input.MoveRow;
             obj.Column = input.MoveColumn;
             obj.Amount = input.Amount;
-            self.character.Inventory[nextInventoryIndex] = obj; 
+            self.character.Inventory[nextInventoryIndex] = obj;
         }else if(!intersected && !reminder){
             storageItem.Row = input.MoveRow;
             storageItem.Column = input.MoveColumn;
@@ -708,7 +708,7 @@ ItemAction[4] = function StorageMoveItem(input){
             obj.Row = input.MoveRow;
             obj.Column = input.MoveColumn;
             obj.Amount = input.Amount;
-            self.character.Storage[input.PickupIndex] = obj; 
+            self.character.Storage[input.PickupIndex] = obj;
         }else if(!intersected && !reminder){
             storageItem.Row = input.MoveRow;
             storageItem.Column = input.MoveColumn;
@@ -787,6 +787,7 @@ ItemAction[8] = function ConvertSilverToStack(input){
     });
 };
 
+//TODO: Items for contribution points.
 // Revised: 11/06/2015 21:49:12
 ItemAction[17] = function ShopBuyItem(input){
     console.log(input);
@@ -807,7 +808,7 @@ ItemAction[17] = function ShopBuyItem(input){
             return;
         }
 
-        var node = Zone.NpcNodesHash[input.NodeID];
+        var node = Zone.NpcNodesHashTable[input.NodeID];
         if(!node){
             Zone.send.itemAction.call(self, 1, input);
             return;
@@ -1017,7 +1018,153 @@ ItemAction[2] = function MoveItemToHotbar(input){
 // Revised: 12/06/2015 00:20:54
 ItemAction[11] = function moveItemsFromHotbar(input){
     console.log(input);
+    if(input.Amount > 99){
+      Zone.send.itemAction.call(this, 1, input);
+      return;
+    }
+
+    var invItem = this.character.QuickUseItems[input.InventoryIndex];
+    if(!invItem){
+      Zone.send.itemAction.call(this, 1, input);
+      return;
+    }
+
+    if(invItem.ID !== input.ItemID){
+      Zone.send.itemAction.call(this, 1, input);
+      return;
+    }
+
+    var self = this;
+    db.Item.findById(invItem.ID, function(err, item){
+      if(err){
+        Zone.send.itemAction.call(self, 1, input);
+        return;
+      }
+
+      if(!item){
+        Zone.send.itemAction.call(self, 1, input);
+        return;
+      }
+
+      if(!item.isStackable()){
+        Zone.send.itemAction.call(self, 1, input);
+        return;
+      }
+
+      var intersected = self.character.inventoryIntersection(input.MoveRow, input.MoveColumn, item.getSlotSize());
+      if(intersected && intersected.ID !== invItem.ID){
+        Zone.send.itemAction.call(self, 1, input);
+        return;
+      }
+
+      if(intersected && (intersected.Amount + input.Amount) > 99){
+        Zone.send.itemAction.call(self, 1, input);
+        return;
+      }
+
+      var nextInventoryIndex = self.character.nextInventoryIndex();
+      if(!intersected && nextInventoryIndex === null){
+        Zone.send.itemAction.call(self, 1, input);
+        return;
+      }
+
+      var reminder = invItem.Amount - input.Amount;
+      if(intersected && reminder){
+        invItem.Amount = reminder;
+        intersected.Amount += input.Amount;
+      }else if(intersected && !reminder){
+        intersected += input.Amount;
+        self.character.QuickUseItems[input.InventoryIndex] = null;
+      }else if(!intersected && reminder){
+        var obj = clone(invItem, false);
+        obj.Column = input.MoveColumn;
+        obj.Row = input.MoveRow;
+        obj.Amount = input.Amount;
+
+        self.character.Inventory[nextInventoryIndex] = obj;
+        invItem.Amount = reminder;
+      }else{
+        var obj = clone(invItem, false);
+        obj.Column = input.MoveColumn;
+        obj.Row = input.MoveRow;
+        obj.Amount = input.Amount;
+
+        self.character.Inventory[nextInventoryIndex] = obj;
+        self.character.QuickUseItems[input.InventoryIndex] = null;
+      }
+
+      self.character.markModified('QuickUseItems');
+      self.character.markModified('Inventory');
+
+      self.character.save(function(err){
+        if(err){
+          Zone.send.itemAction.call(self, 1, input);
+          return;
+        }
+
+        Zone.send.itemAction.call(self, 0, input);
+      })
+    });
+};
+
+
+ItemAction[27] = function attachSkillToSkillBar(input){
+  console.log(input);
+  var charSkill = this.character.SkillList[input.InventoryIndex];
+  if(!charSkill){
     Zone.send.itemAction.call(this, 1, input);
+    return;
+  }
+
+  var barSkill = this.character.SkillBar[input.PickupIndex];
+  if(barSkill){
+    Zone.send.itemAction.call(this, 1, input);
+    return;
+  }
+
+  if(input.Amount > charSkill.Level){
+    Zone.send.itemAction.call(this, 1, input);
+    return;
+  }
+
+  this.character.SkillBar[input.PickupIndex] = {
+    Level: input.Amount,
+    ID: charSkill.ID
+  };
+
+  this.character.markModified('SkillBar');
+  var self = this;
+  this.character.save(function(err){
+    if(err){
+      return;
+    }
+
+    Zone.send.itemAction.call(self, 0, input);
+  });
+};
+
+ItemAction[28] = function removeSkillFromSkillBar(input){
+  var barSkill = this.character.SkillBar[input.InventoryIndex];
+  if(!barSkill){
+    Zone.send.itemAction.call(this, 1, input);
+    return;
+  }
+
+  this.character.SkillBar[input.InventoryIndex] = null;
+  this.character.markModified('SkillBar');
+  var self = this;
+  this.character.save(function(err){
+    if(err){
+      return;
+    }
+
+    Zone.send.itemAction.call(self, 0, input);
+  });
+};
+
+ItemAction[31] = function learnSkill(input){
+  console.log(input);
+  Zone.send.itemAction.call(this, 1, input);
 };
 
 

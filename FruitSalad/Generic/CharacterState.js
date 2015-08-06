@@ -11,16 +11,16 @@
 vms( 'CharacterState', [ 'CVec3', 'Structs' ], function(){
 	EquipItem = function EquipItem() {
 		this.ID = 0;
-		this.Enchant = 0; 
+		this.Enchant = 0;
 		this.Combine = 0;
 	}
 
 	StorageItem = function StorageItem() {
 		this.ID = 0;
-		this.Column = 0; 
-		this.Row = 0; 
-		this.Amount = 0; 
-		this.Enchant = 0; 
+		this.Column = 0;
+		this.Row = 0;
+		this.Amount = 0;
+		this.Enchant = 0;
 	}
 
 	QuickUseItem = function QuickUseItem() {
@@ -54,7 +54,7 @@ vms( 'CharacterState', [ 'CVec3', 'Structs' ], function(){
 		// They are some weird object hash id thats unique per system at any time.
 		//or reg id... 1st char = id1 and etc in the db...
 		// not reliable if characters are added or deleted
-		// yesh it it, thier will be number to infinity, just use a 16byte container, you will run out of memeory before you ru out of dspace 
+		// yesh it it, thier will be number to infinity, just use a 16byte container, you will run out of memeory before you ru out of dspace
 		// When an account is logged in I will give it an AccountID and increment that value by 1 so the next login gets next id.
 		// When we make a character state and set it with data from zone server on connect
 		// ill do similar thing bassed on the number in that zone :D
@@ -67,7 +67,7 @@ vms( 'CharacterState', [ 'CVec3', 'Structs' ], function(){
 		this.TraitorFlag = 0; //Change to 03 for traitor?
 		this.GlowItems = 0; // can make fist glow, weapon, and face (like ts2 vanity)
 		this.Clan = 0; // Should use enum?
-		this.Gender = 0; // Should use enum?	
+		this.Gender = 0; // Should use enum?
 		this.Hair = 0;
 		this.Face = 0;
 		this.Level = 0;
@@ -104,6 +104,7 @@ vms( 'CharacterState', [ 'CVec3', 'Structs' ], function(){
 		this.MaxHP = 0;
 		this.CurrentChi = 0;
 		this.MaxChi = 0;
+		this.StoreItems = {};
 
 		// Other misc vars here
 		this.hidden = false;
@@ -131,7 +132,7 @@ vms( 'CharacterState', [ 'CVec3', 'Structs' ], function(){
 		// Set the varables from a character's data
 		this.Name = character.Name;
 
-		//this.FactionCapeThing = 0;//01 girl 02 boy	
+		//this.FactionCapeThing = 0;//01 girl 02 boy
 		//this.TraitorFlag = 0;//Change to 03 for traitor?
 		//this.GlowItems = 0;// can make fist glow, weapon, and face (like ts2 vanity)
 		this.Clan = character.Clan;
@@ -152,7 +153,7 @@ vms( 'CharacterState', [ 'CVec3', 'Structs' ], function(){
 		this.Weapon = character.Weapon;
 		this.Pet = character.Pet;
 
-		this.GuildName = character.GuildName === null ? "" : character.GuildName; 
+		this.GuildName = character.GuildName === null ? "" : character.GuildName;
 
 		this.TagExist = character.GuildTag !== '' ? true : false;
 		this.GuildTag = character.GuildTag;
@@ -169,7 +170,7 @@ vms( 'CharacterState', [ 'CVec3', 'Structs' ], function(){
 		this.LocationTo = new CVec3();
 
 		this.Direction = Math.floor(Math.random() * 360);
-		
+
 		this.TargetObjectIndex = -1;
 		this.TargetObjectUniqueNumber = -1;
 
