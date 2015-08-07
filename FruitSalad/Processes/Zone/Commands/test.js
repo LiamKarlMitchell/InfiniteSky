@@ -12,7 +12,7 @@ GMCommands.AddCommand(new Command('t',60,function command_test(string, client){
 	//attackInfo.DefenderIndex = 1;
 	attackInfo.TotalDamage = attackInfo.Damage;
 	attackInfo.DamageHP = attackInfo.Damage;
-	
+
 	// TODO: Send attack packet to target location.
 	Zone.sendToAllArea(
 		client, true,
@@ -100,7 +100,7 @@ function processAttack(attackInfo, attacker, target) {
 	// if (target.duel && player.id !== target.duel_target_id) return false;
 
 	// Set the character location to the place int he attack action packet
-    
+
     // Do a broadcast of action, handle charging skills?
     //TEST
     target = {
@@ -151,7 +151,7 @@ function processAttack(attackInfo, attacker, target) {
 
 	// Get attack power
 	var attackPower = attacker.infos.Damage;
-	
+
 	// TODO: Skill attack power
 	// Get the ratio to increase attack power by for the skill in use.
 
@@ -230,7 +230,7 @@ function getDeadlyChance(attacker, target) {
 }
 
 function getDeathPosition(attacker, target) {
-	// 2D 
+	// 2D
 	// Get distance between them
 	var deltaX = target.location.x - attacker.location.x;
 	var deltaY = target.location.y - attacker.location.y;
@@ -253,32 +253,32 @@ function getDeathPosition(attacker, target) {
 
 }
 
- // 'clan',          
- // 'Pet',           
- // 'Outfit',        
- // 'Modifiers',     [ 'HP', 'Chi', 'HitRate', 'Dodge', 'Damage' ] 
+ // 'clan',
+ // 'Pet',
+ // 'Outfit',
+ // 'Modifiers',     [ 'HP', 'Chi', 'HitRate', 'Dodge', 'Damage' ]
  // 'Weapon',   { Damage: 4,
 			  // Mod: 3.8599999,
 			  // HitRate: 1,
 			  // ElementalDamage: 0,
 			  // Skills: {},
-			  // AllSkills: 0 }       
- // 'Boots',         
- // 'Ring',          
- // 'Gloves',        
- // 'Cape',          
- // 'Amulet',        
- // 'DexHitRate',    
- // 'DexDodge',      
- // 'Damage',        
- // 'Dodge',         
- // 'Defense',       
- // 'HitRate',       
- // 'MaxHP',         
- // 'MaxChi',        
+			  // AllSkills: 0 }
+ // 'Boots',
+ // 'Ring',
+ // 'Gloves',
+ // 'Cape',
+ // 'Amulet',
+ // 'DexHitRate',
+ // 'DexDodge',
+ // 'Damage',
+ // 'Dodge',
+ // 'Defense',
+ // 'HitRate',
+ // 'MaxHP',
+ // 'MaxChi',
  // 'ElementalDamage'
- // 'Resists',       
- // 'Luck',          
- // 'DeadlyRate',    
- // 'Skills',        
- // 'AllSkills' ]    
+ // 'Resists',
+ // 'Luck',
+ // 'DeadlyRate',
+ // 'Skills',
+ // 'AllSkills' ]

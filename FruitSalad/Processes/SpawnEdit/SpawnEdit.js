@@ -36,67 +36,42 @@ vms('Spawn Logger', [
 			vmscript.watch('Database');
 		});
 
-		// I really want this to be its own function on prototype and prototype functions to be reloadable but its not letting me.. :(
-		this.app.get('/count', function(req, res){ 
-			//self.getSpawnCount(req, res);
-			var search = {};
-			if (req.query.username) {
-				search.username = req.query.username;
-			}
-			if (req.query.zoneID) {
-				search.zoneID = req.query.zoneID;
-			}
-			log.info(req.query);
-			db.SpawnLog.count(search, function(err,count) {
-				if (err) {
-					res.send(err);
-					return;
-				}
-
-				res.send('Collected amount: '+count);
-			});
-		});
-
 		this.app.use(express.static(path.join(process.directory, 'public')));
 	}
 
-	if (global.SpawnEditPrototype === undefined) {
-		global.SpawnEditPrototype = {};
-		process.SpawnEdit = new SpawnEditInstance();
-		global.SocketFunctions = {};
-	}	
-	SpawnEditInstance.prototype = SpawnEditPrototype;
+	var SpawnEditPrototype = SpawnEditInstance.prototype;
 
-	SpawnEditInstance.prototype.onConnection = function SpawnEdit__onConnection(socket) {
+	SpawnEditPrototype.onConnection = function SpawnEdit__onConnection(socket) {
 		log.info('Connection');
 		socket.zoneID = 0;
 		this.join('Z000');
 		socket.on('zone', SocketFunctions.zone.bind(socket));
 	}
 
-	SpawnEditInstance.prototype.getSpawnCount = function SpawnEdit__getSpawnCount(req, res) {
-		// var search = {};
-		// if (req.query.username) {
-		// 	search.username = req.query.username;
-		// }
-		// if (req.query.zoneID) {
-		// 	search.zoneID = req.query.zoneID;
-		// }
-		// log.info(req.query);
-		// db.SpawnLog.count(search, function(err,count) {
-		// 	if (err) {
-		// 		res.send(err);
-		// 		return;
-		// 	}
+	SpawnEditPrototype.getSpawnCount = function SpawnEdit__getSpawnCount(req, res) {
+		var search = {};
+		if (req.query.username) {
+			search.username = req.query.username;
+		}
+		if (req.query.zoneID) {
+			search.zoneID = req.query.zoneID;
+		}
+		log.info(req.query);
+		db.SpawnLog.count(search, function(err,count) {
+			if (err) {
+				res.send(err);
+				return;
+			}
 
-		// 	res.send('Collected amount: '+count);
-		// });
+			res.send('Collected amount: '+count);
+		});
 	}
 
 	// this is a socket
 	// This function is resopnsable for when a client asks for information on a zone.
 	// The socket will join a room for that zone to be notified of other events.
 	// And would leave any existing zone room.
+	var SocketFunctions =  {};
 	SocketFunctions.zone = function Socket__zone(id) {
 		// Leave the previous room
 		//this.zoneID
@@ -139,6 +114,13 @@ vms('Spawn Logger', [
 		});
 	}
 
+	if (typeof process.SpawnEdit === 'undefined') {
+		process.SpawnEdit = new SpawnEditInstance();
+	}else{
+		process.SpawnEdit.__proto__ = SpawnEditPrototype;
+	}
+
+	process.SpawnEdit.app.get('/count', function(req, res){ process.SpawnEdit.getSpawnCount(req, res); });
 });
 
 // Each socket should be able to join a room eg Z001

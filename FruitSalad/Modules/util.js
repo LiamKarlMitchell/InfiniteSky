@@ -2,6 +2,7 @@
 // Copyright (c) InfiniteSky Dev Teams - Licensed under GNU GPL
 // For more information, see LICENCE in the main folder
 var fs = require('fs');
+var exceptionHandlerInitialized = false;
 
 function dumpError(err) {
   if (err instanceof Error) {
@@ -61,6 +62,9 @@ var util = {
     },
 
   setupUncaughtExceptionHandler: function (logFunction) {
+    if(exceptionHandlerInitialized) return;
+    exceptionHandlerInitialized = true;
+
     process.on('uncaughtException', logFunction || function(exception) {
       console.log('Uncaught Exception:');
       console.log(arguments);
