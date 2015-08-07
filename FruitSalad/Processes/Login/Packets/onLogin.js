@@ -45,7 +45,7 @@ Login.send.onLoginReply = function(status){
 
 	var packedObj = Login.send.onLogin.pack(obj);
 	var buffer = new Buffer(packedObj);
-	
+
 	this.write(buffer);
 };
 

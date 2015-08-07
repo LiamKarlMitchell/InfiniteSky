@@ -69,6 +69,71 @@ global.api.call = function(processName, functionName){
 	}
 };
 
+global.api.getCharacterZone = function(character_name, user_hash, zone_id, callback){
+	var client = World.clientNameTable[character_name];
+	if(!client){
+		// TODO: Handle errors.
+		console.log("No character");
+		return;
+	}
+
+	var fromZone = process.zones[zone_id];
+	if(!fromZone){
+		console.log("No zone");
+		return;
+	}
+
+	fromZone.api.onCharacterZone(user_hash, client.ZoneID, character_name, callback);
+};
+
+global.api.sendToAll = function(client, buffer){
+	if(Array.isArray(client)){
+		for(var i=0; i<client.length; i++){
+			var c = World.clientNameTable[client[i]];
+			if(c && c.ZoneID){
+				var p = process.zones[c.ZoneID];
+				if(p){
+					p.api.sendBufferToClient(client[i], buffer);
+				}
+			}
+		}
+	}
+};
+
+global.api.sendToClient = function(client, buffer){
+	var c = World.clientNameTable[client];
+	if(c && c.ZoneID){
+		var p = process.zones[c.ZoneID];
+		if(p){
+			p.api.sendBufferToClient(client, buffer);
+		}
+	}
+};
+
+global.api.invalidateGuildForClient = function(client){
+	if(Array.isArray(client)){
+		for(var i=0; i<client.length; i++){
+			var c = World.clientNameTable[client[i]];
+			if(c && c.ZoneID){
+				var p = process.zones[c.ZoneID];
+				if(p){
+					p.api.invalidateGuildForClient(client[i]);
+				}
+			}
+		}
+	}
+};
+
+global.api.expelFromGuild = function(name, buffer){
+	var c = World.clientNameTable[name];
+	if(c && c.ZoneID){
+		var p = process.zones[c.ZoneID];
+		if(p){
+			p.api.expelFromGuild(name, buffer);
+		}
+	}
+};
+
 global.rpc.add(global.api);
 
 log = {};
@@ -94,6 +159,8 @@ global.WorldInstance = function(){
 	this.characterTransferArray = {};
 	this.packetCollection = null;
 	this.moveRegions = {};
+	this.GuildNameTable = {};
+	this.clientNameTable = {};
 }
 
 
@@ -140,9 +207,8 @@ worldPrototype.init = function(){
 			});
 		});
 
-		// TODO: Add loading zones in async and listen for invalidation before we set
-		// this.singletone for better code flow?
-		// Liam: What?
+	// TODO: Add loading zones in async.
+	//
 	if(!this.onInvalidatedZone){
 		this.onInvalidatedZone = true;
 		global.rpc.on('invalidated', function(zone){
@@ -151,7 +217,7 @@ worldPrototype.init = function(){
 			global.rpc.children[zone].api.spawnScript('./Processes/Zone/Zone.js');
 			global.rpc.children[zone].spawned = true;
 			process.zones[zone] = global.rpc.children[zone];
-			
+
 			fs.readFile(config.world.data_path + '/wregion/Z' + util.padLeft(zone,'0', 3) + '_ZONEMOVEREGION.WREGION', function(err, data) {
 				if (err) {
 					console.log(err);

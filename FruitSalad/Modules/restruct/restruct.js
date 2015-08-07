@@ -233,7 +233,7 @@
         binary.array[binary.offset++] = (val >> 8) & 0xff;
         binary.array[binary.offset++] = val & 0xff;
     };
-	
+
 	// Float Routines
 	//Float to int
 	function FloatToIEEE(f)
@@ -289,7 +289,7 @@
 	  }
 	  return ia;
 	};
-	
+
 	//Convert int array back to float
 	function intArrayToFloat(ia)
 	{
@@ -297,7 +297,7 @@
 	  ia = IntArrayToHexArray(ia);
 	  ia = ia.join("");
 	  ia = HexToFloat(ia);
-	  return IEEEToFloat(ia);	  
+	  return IEEEToFloat(ia);
 	}
 	// End of Float routines
 
@@ -951,7 +951,7 @@
 						//if (typeof(struct) == "undefined") struct = [];
                         //if (struct==null) struct={};
 						//if (typeof(struct[k]) == "undefined") struct[k]={};
-						
+
 						//if (struct==null) { console.log('Errors here'); debugger; }
                         if (struct==null) { pack32l(0,binary); return; }
                         pack32l(struct[k], binary);
@@ -1401,12 +1401,14 @@
                             struct[k] = decodeUTF8(String.fromCharCode.apply(String, bytes));
                         },
 
-                        pack: function(struct, binary) {	
+                        pack: function(struct, binary) {
         					if (struct==null) struct={};
                             if (typeof struct[k] === "undefined")
                             {
                                 struct[k]='';
                             }
+
+                            if(struct[k] === null) struct[k] = "";
 
                             var str = encodeUTF8(struct[k]);
                             var len = Math.min(str.length, n);
@@ -1461,13 +1463,13 @@
                         }
                     }
                 }
-            });                
+            });
             }
         },
 
         // Another struct.
         struct: function(k, s, n) {
-            if(typeof n === "undefined") {				
+            if(typeof n === "undefined") {
                 //return new Restruct(this, 1, { <-- This was reporting wrong sizes for struct-in-struct!
 				return new Restruct(this, s.size, {
                     name: k, type: s,
@@ -1495,7 +1497,7 @@
                 },
 
                 pack: function(struct, binary) {
-					if (typeof struct[k] === "undefined") struct[k]={};									
+					if (typeof struct[k] === "undefined") struct[k]={};
                     for(var i = 0; i < n; ++i) {
 						if (typeof struct[k][i] === "undefined") struct[k][i]={};
                         s.pack(struct[k][i], binary.array, binary.offset);
@@ -1504,29 +1506,29 @@
                 }
             });
         },
-		
+
 		// Floats
         // 32-bit signed little-endian float.
         float32l: function(k, n, buf) {
             if(typeof n === "undefined") {
                 return new Restruct(this, 4, {
                     name: k, type: 'float32l',
-                    unpack: function(binary, struct) {                         
-						
+                    unpack: function(binary, struct) {
+
 						var buf = new ArrayBuffer(4);
 						(new Uint32Array(buf))[0] = unpack32l(binary);
 						var res = (new Float32Array(buf))[0];
-						
-						struct[k] = res;				
+
+						struct[k] = res;
                     },
 
                     pack: function(struct, binary) {
-					if (typeof struct[k] === "undefined") struct[k]={};                        
+					if (typeof struct[k] === "undefined") struct[k]={};
 
 						var buf = new ArrayBuffer(4);
 						(new Float32Array(buf))[0] = struct[k];
 						var res = (new Uint32Array(buf))[0];
-						
+
 						pack32l(res+1, binary);
 				}
                 });
@@ -1542,11 +1544,11 @@
                     }
 
                     for(var i = n - 1; i >= 0; --i) {
-                        
+
 						var buf = new ArrayBuffer(4);
 						(new Uint32Array(buf))[0] = unpack32l(binary);
 						var res = (new Float32Array(buf))[0];
-						
+
 						struct[k][i] = res;
                     }
                 },
@@ -1554,16 +1556,16 @@
                 pack: function(struct, binary) {
 				if (typeof struct[k] === "undefined") struct[k]={};
                     for(var i = n - 1; i >= 0; --i) {
-					if(typeof struct[k][i] === "undefined") struct[k][i]={};                        
+					if(typeof struct[k][i] === "undefined") struct[k][i]={};
 						var buf = new ArrayBuffer(4);
 						(new Float32Array(buf))[0] = struct[k];
 						var res = (new Uint32Array(buf))[0];
-						
+
 						pack32l(res, binary);
                     }
                 }
             });
-        },		
+        },
 
         // Unpack an array to a struct.
         unpack: function(array, offset) {
@@ -1588,8 +1590,8 @@
         objectify: function() {
             if(typeof offset === 'undefined') offset = 0;
             if(typeof array === 'undefined') array = [this.length];
-            
-            function objectify_formats(formats){ 
+
+            function objectify_formats(formats){
                 for(var i = 0; i < formats.length; ++i) {
                     var struct = {};
                     if (typeof(formats[i].type) === 'string') {
@@ -1601,7 +1603,7 @@
 
                         var lb = formats[i].type.indexOf('[');
                         var rb = formats[i].type.indexOf(']');
-                        
+
                         if (lb>-1 && rb>-1) {
                             lb++;
                             rb--;
@@ -1627,7 +1629,7 @@
 
 
             return struct;
-        },      
+        },
 
         // Pack an array to a struct.
         pack: function(struct, array, offset) {
@@ -1639,7 +1641,7 @@
                 array: array
             };
 
-            for(var i = 0; i < this.formats.length; ++i) {                
+            for(var i = 0; i < this.formats.length; ++i) {
                 this.formats[i].pack(struct, binary);
             }
 

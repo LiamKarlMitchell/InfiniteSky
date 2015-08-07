@@ -114,6 +114,31 @@ vms( 'CharacterState', [ 'CVec3', 'Structs' ], function(){
 		this.AccountID = ID;
 	};
 
+	CharacterState_Prototype.removeGuild = function(){
+		delete this.Guild;
+		this.GuildName = "";
+		this.LeaderSubFlag = 0;
+		this.LeaderFlag = 0;
+	};
+
+	CharacterState_Prototype.setGuild = function(obj){
+		this.GuildName = obj.name;
+		this.Guild = obj;
+		var myObj = this.Guild.members[this.Name];
+		if(myObj){
+			if(myObj.privileges === 2){
+				this.LeaderSubFlag = 0;
+			  this.LeaderFlag = this.Guild.level-1;
+			}else if(myObj.privileges === 1){
+				this.LeaderSubFlag = 1;
+			  this.LeaderFlag = this.Guild.level-1;
+			}else{
+				this.LeaderFlag = 1;
+				this.LeaderSubFlag = 3;
+			}
+		}
+	};
+
 	CharacterState_Prototype.setCharacterID = function(ID) {
 		this.CharacterID = ID;
 	};

@@ -34,9 +34,18 @@ WorldPC.Set(0x01, {
 				console.log("Character not found");
 				return;
 			}
-			// socket.account.
-			socket.character = character;
-			socket.write('\x15');
+
+			db.Guild.findByName(character.GuildName, function(err, guild){
+				if(err){
+					console.log("Error on finding the guild on world handshake");
+					return;
+				}
+
+				if(guild) character.GuildLevel = guild.level-1;
+
+				socket.character = character;
+				socket.write('\x15');
+			});
 		});
 	}
 });
@@ -194,6 +203,7 @@ WorldPC.Set(0x02, {
 
 		CharacterData = socket.character.restruct(CharacterData);
 
+
 		socket.write(CharacterData);
 
 		var WorldAuthData = new Buffer(World.send.Auth.pack({
@@ -222,6 +232,9 @@ WorldPC.Set(0x02, {
 		console.log('Sending socket to Zone: '+socket.character.MapID);
 		zone.process.send({type: 'character', data: handshakeData});
 		zone.process.send('socket', socket);
+		World.clientNameTable[socket.character.Name] = {
+			ZoneID: socket.character.MapID
+		};
 		// socket.paused = true;
 	}
 });

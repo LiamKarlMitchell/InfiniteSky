@@ -28,7 +28,7 @@ structs.Bottle= restruct.
 	int8lu('Capacity').
 	int8lu('Capacity').
 	int8lu('Capacity');
-	
+
 structs.ItemEquip = restruct.
 	int32lu('ID').
 	int8lu('Enchant'). // 1 = 3%
@@ -80,7 +80,7 @@ structs.GiftItem = restruct.
 structs.QuickUseItem= restruct.
 	int32lu("ID").
 	int32lu("Amount");
-	
+
 structs.QuickUseSkill= restruct.
 	int32lu("ID").
 	int32lu("Level");
@@ -178,7 +178,7 @@ structs.Character = restruct.
 	struct('QuickUseItems',structs.QuickUseItem,4).
 	int32lu('StorageSilver').
 	pad(1008).
- 
+
 	struct('SkillList',structs.QuickUseSkill,30).
 	struct('SkillBar',structs.QuickUseSkill,24).
 	int32lu('QuestID').//Quest ID
@@ -189,18 +189,15 @@ structs.Character = restruct.
 
 	string('Friends',13,10).
 
-	int8ls('InGuild'). // 3270
-	int8ls(''). // 3271
-	int32lu(''). // 3272
-	int32lu(''). // 3276
-	int32lu(''). // 3280
-	int32lu(''). // 3284
+	string('GuildName', 13).
+	int8ls(''). // 3270
+	int32lu('GuildLevel'). // 3284
 	int32lu('GuildAccess'). // 3288
 	int32lu(''). // 3292
 	int32lu(''). // 3296
+	int32lu('ContributionPoints'). // 3308
 	int32lu(''). // 3300
 	int32lu(''). // 3304
-	int32lu('CP'). // 3308
 	int32lu(''). // 3312
 	int32lu(''). // 3316
 

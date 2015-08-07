@@ -55,6 +55,7 @@ vms('Character', [], function(){
 		ServerName: String,
 
 		GuildName: { type: String, index: true, default: null },
+		GuildAccess: { type: Number, default: 2 },
 		Title: { type: String },
 
 		IsGM: {type: Number, default: 0 },
@@ -75,7 +76,7 @@ vms('Character', [], function(){
 
 		PlayTime: { type: Number, default: 0 },
 		Honor: { type: Number, default: 0 },
-		CP: { type: Number, default: 0 },
+		ContributionPoints: { type: Number, default: 0 },
 
 		Name: { type: String, unique: true, index: true },
 
@@ -142,6 +143,72 @@ vms('Character', [], function(){
 		//TotalEnemyFactionKills: Number
 		// Misc data
 	});
+
+	characterSchema.methods.giveEXP = function(value) {
+			if(!value){
+				return;
+			}
+
+			this.character.Experience += value;
+			if(this.character.Experience > 2000000000) this.character.Experience = 2000000000;
+
+
+
+			// if(value <= 0) return; // If no exp given or - amount
+			//
+			// var expinfo = infos.Exp[this.character.Level];
+			// if (expinfo==null || infos.Exp[145].EXPEnd === this.character.Experience) return;
+			//
+			// this.character.Experience += value;
+			// if(this.character.Experience > infos.Exp[145].EXPEnd) this.character.Experience = infos.Exp[145].EXPEnd;
+			//
+			// var reminder = expinfo.EXPEnd - this.character.Experience;
+			// var levelGained = 0;
+			//
+			// while(reminder < 0){
+			// 		levelGained++;
+			//
+			// 		expinfo = infos.Exp[this.character.Level + levelGained];
+			// 		if(!expinfo) break;
+			//
+			// 		this.character.Experience += 1;
+			// 		this.character.SkillPoints += expinfo.SkillPoint;
+			// 		this.character.StatPoints += (this.character.Level + levelGained) > 99 && (this.character.Level + levelGained) <= 112 ? 0 : (this.character.Level + levelGained) > 112 ? 30 : 5;
+			// 		reminder = (expinfo.EXPEnd - expinfo.EXPStart) + reminder;
+			// }
+			//
+			//
+			// this.send2FUpdate();
+			//
+			// if((this.character.Level + levelGained) > 145 || this.character.Experience > infos.Exp[145].EXPEnd){
+			// 		levelGained = 145 - this.character.Level;
+			// 		this.character.Experience = infos.Exp[145].EXPEnd;
+			// 		this.character.Level = 145;
+			// }else{
+			// 		this.character.Level += levelGained;
+			// }
+			//
+			// console.log(this.character.Name + "' gained "+value+" experience");
+			//
+			// if(levelGained > 0){
+			// 		this.character.state.CurrentHP = this.character.infos.MaxHP;
+			// 		this.character.state.CurrentChi = this.character.infos.MaxChi;
+			// 		this.character.Health = this.character.infos.MaxHP;
+			// 		this.character.Chi = this.character.infos.MaxChi;
+			//
+			// 		this.character.state.Level = this.character.Level;
+			// 		this.character.infos.updateAll();
+			//
+			// 		this.Zone.sendToAllArea(this, true, new Buffer(packets.LevelUpPacket.pack({
+			// 				PacketID: 0x2E,
+			// 				LevelsGained: levelGained,
+			// 				CharacterID: this.character._id,
+			// 				NodeID: this.node.id
+			// 		})), config.viewable_action_distance);
+			// }
+			//
+			// this.character.save();
+	};
 
 	characterSchema.methods.nextInventoryIndex = function() {
 		for(var i=0; i<64; i++){

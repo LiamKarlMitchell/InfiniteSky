@@ -29,6 +29,64 @@ global.api.onMoveRegions = function(callback, client, moveRegions){
 	global.rpc.getCallback(callback).call(c, moveRegions);
 };
 
+global.api.onCharacterZone = function(user_hash, zone, character_name, callback){
+	var c = Zone.clientHashTable[user_hash];
+	if(!c){
+		console.log("On character zone from world have not founded client with hash". user_hash);
+		return;
+	}
+
+	rpc.getCallback(callback).call(c, character_name, zone);
+};
+
+global.api.invalidateGuildForClient = function(client){
+	var c = Zone.clientNameTable[client];
+	if(!c){
+		return;
+	}
+
+	if(c.writable && c.character.state.Guild){
+		c.character.state.Guild.invalidate(c.character.state, function(guild){
+			c.write(new Buffer(Zone.send.onGuildToClient.pack({
+		    PacketID: 0x54,
+		    Switch: 0x42,
+		    InvitedBy: guild.name,
+		    GuildName: guild.name
+		  })));
+
+			console.log(c.character.Name);
+
+			c.character.state.setGuild(guild);
+			// Find a better way maybe.
+			Zone.sendToAllArea(c, false, c.character.state.getPacket(), config.network.viewable_action_distance);
+		});
+	}
+};
+
+global.api.sendBufferToClient = function(client, buffer){
+	var c = Zone.clientNameTable[client];
+	if(!c){
+		return;
+	}
+
+	if(c.writable) c.write(buffer.buffer);
+};
+
+
+global.api.expelFromGuild = function(client, buffer){
+	var c = Zone.clientNameTable[client];
+	if(!c){
+		return;
+	}
+
+	console.log("SOme1 gots expelled :D");
+
+	c.write(buffer.buffer);
+	c.character.state.removeGuild();
+	c.character.GuildName = null;
+	Zone.sendToAllArea(c, true, c.character.state.getPacket(), config.network.viewable_action_distance);
+};
+
 global.rpc.add(global.api);
 
 function ZoneInstance() {
@@ -135,26 +193,29 @@ zonePrototype.init = function Zone__init() {
 			vmscript_WatchIfExists('./Processes/Zone/Commands/'+self.clean_name);
 			vmscript_WatchIfExists('./Processes/Zone/Scripts/'+self.id);
 			vmscript_WatchIfExists('./Processes/Zone/Scripts/'+self.clean_name);
-
-			fs.readFile(config.world.data_path + 'spawninfo/' + util.padLeft(self.id,'0', 3) + '.NPC', function(err, data) {
-				if (err) {
-					//console.log(err);
-				} else {
-					var RecordCount = data.readUInt32LE(0);
-
-					var spawndata = restruct.struct('info', structs.SpawnInfo, RecordCount).unpack(data.slice(4));
-					var length = spawndata.info.length,
-						element = null;
-					for (var i = 0; i < length; i++) {
-						element = spawndata.info[i];
-						if (element.ID) {
-							self.addNPC(element);
-						}
-					}
-				}
-			});
 		});
 	});
+
+	zonePrototype.initSpawn = function(){
+		var self = this;
+		fs.readFile(config.world.data_path + 'spawninfo/' + util.padLeft(self.id,'0', 3) + '.NPC', function(err, data) {
+			if (err) {
+				//console.log(err);
+			} else {
+				var RecordCount = data.readUInt32LE(0);
+
+				var spawndata = restruct.struct('info', structs.SpawnInfo, RecordCount).unpack(data.slice(4));
+				var length = spawndata.info.length,
+					element = null;
+				for (var i = 0; i < length; i++) {
+					element = spawndata.info[i];
+					if (element.ID) {
+						self.addNPC(element);
+					}
+				}
+			}
+		});
+	};
 
 	// Load Navigation Mesh
 	var mesh_path = config.world.data_path + "navigation_mesh/" + this.name + '.obj';
@@ -166,6 +227,7 @@ zonePrototype.init = function Zone__init() {
 				y: -10000,
 				size: 20000
 			});
+			self.initSpawn();
 			return;
 		}
 		self.AI = new nav_mesh(mesh_path, function(mesh) {
@@ -177,6 +239,7 @@ zonePrototype.init = function Zone__init() {
 				y: util.roundDivisable(mesh.dimensions.top, 2)+1,
 				size: util.roundDivisable(Math.max(width, height), 2)
 			});
+			self.initSpawn();
 		});
 	});
 
@@ -185,6 +248,7 @@ zonePrototype.init = function Zone__init() {
 		self.onProcessMessage(arg1, arg2);
 	});
 };
+
 
 zonePrototype.addSocket = function(socket) {
 	if (!this.QuadTree) {
@@ -328,6 +392,23 @@ zonePrototype.onProcessMessage = function(type, socket) {
 
 					self.addSocket(socket);
 
+					if(socket.character.GuildName){
+						db.Guild.findByName(socket.character.GuildName, function(err, guild){
+							if(err){
+								return;
+							}
+
+							if(!guild){
+								return;
+							}
+
+							socket.character.state.setGuild(guild);
+
+							CachedBuffer.call(socket, self.packetCollection);
+							Zone.sendToAllArea(socket, true, socket.character.state.getPacket(), config.network.viewable_action_distance);
+						});
+						return;
+					}
 
 					CachedBuffer.call(socket, self.packetCollection);
 					Zone.sendToAllArea(socket, true, socket.character.state.getPacket(), config.network.viewable_action_distance);
