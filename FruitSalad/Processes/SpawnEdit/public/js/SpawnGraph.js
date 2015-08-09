@@ -62,15 +62,16 @@ var x = d3.scale.linear().domain([-width / 2, width / 2]).range([width, 0]);
 var y = d3.scale.linear().domain([-height / 2, height / 2]).range([height, 0]);
 var xAxis = d3.svg.axis().scale(x).orient("bottom").tickSize(-height);
 var yAxis = d3.svg.axis().scale(y).orient("left").ticks(5).tickSize(-width);
-var zoom = d3.behavior.zoom().x(x).y(y).scaleExtent([-50, 50]).on("zoom", zoomed);
+var zoom = d3.behavior.zoom().x(x).y(y).on("zoom", zoomed);
 var svg = d3.select("body").append("svg").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")").call(zoom);
 svg.append("defs").append("clipPath").attr("id", "clip").append("rect").attr("width", width).attr("height", height);
 var rect = svg.append("rect").attr("width", width).attr("height", height);
 svg.append("g").attr("class", "x axis").attr("transform", "translate(0," + height + ")").call(xAxis);
 svg.append("g").attr("class", "y axis").call(yAxis);
 
-var circles = svg.append('g');
-svg.attr("clip-path", "url(#clip)");
+var content = svg.append('g');
+content.attr("clip-path", "url(#clip)");
+var circles = content.append('g');
 var mobColours = d3.scale.category20b();
 
 function updateGraphData() {
@@ -90,7 +91,7 @@ function updateGraphData() {
     }).attr("cy", function(d) {
         return y(d.z);
     }).attr("r", function(d) {
-        return 20
+        return 15;
     }).style("fill", function(d) {
         switch (d.type) {
             case 'mon':
