@@ -1,9 +1,11 @@
 vmscript.watch('Config/network.json');
 vmscript.watch('Config/login.json');
+vmscript.watch('Config/zones.json');
 
 vms('Spawn Logger', [
 	'Config/network.json',
 	'Config/login.json',
+	'Config/zones.json'
 ], function(){
 	express = require('express');
 	socketio = require('socket.io');
@@ -37,6 +39,9 @@ vms('Spawn Logger', [
 		});
 
 		this.app.use(express.static(path.join(process.directory, 'public')));
+		this.app.get('/zones.json', function(req, res) {
+			res.send(config.zones);
+		});
 	}
 
 	var SpawnEditPrototype = SpawnEditInstance.prototype;
@@ -44,8 +49,8 @@ vms('Spawn Logger', [
 	SpawnEditPrototype.onConnection = function SpawnEdit__onConnection(socket) {
 		log.info('Connection');
 		socket.zoneID = 0;
-		this.join('Z000');
-		socket.on('zone', SocketFunctions.zone.bind(socket));
+		socket.join('Z000');
+		socket.on('zone', function(id){ SocketFunctions.zone(socket, id) });
 	}
 
 	SpawnEditPrototype.getSpawnCount = function SpawnEdit__getSpawnCount(req, res) {
@@ -67,56 +72,56 @@ vms('Spawn Logger', [
 		});
 	}
 
+	if (typeof global.SocketFunctions === 'undefined') {
+		global.SocketFunctions = {};
+	} 
+
 	// this is a socket
 	// This function is resopnsable for when a client asks for information on a zone.
 	// The socket will join a room for that zone to be notified of other events.
 	// And would leave any existing zone room.
-	var SocketFunctions =  {};
-	SocketFunctions.zone = function Socket__zone(id) {
+	SocketFunctions.zone = function Socket__zone(socket, id) {
 		// Leave the previous room
 		//this.zoneID
-		this.leave('Z' + util.padLeft(this.zoneID,'0', 3));
-		this.join('Z' + util.padLeft(id,'0', 3));
-		this.zoneID = id;
-		SocketFunctions.sendLogs.call(this);
+		socket.leave('Z' + util.padLeft(socket.zoneID,'0', 3));
+		socket.join('Z' + util.padLeft(id,'0', 3));
+		socket.zoneID = id;
+		SocketFunctions.refresh(socket);
 	}
 
-	SocketFunctions.sendLogs = function Socket__refresh() {
+	SocketFunctions.refresh = function Socket__refresh(socket) {
 		// Get spawn logs from db that are unique
 		// Send them to the client
-		if (this.zoneID === 0) return;
-		var socket = this;
-		db.SpawnLog.find({ zoneID: this.zoneID }, function foundSpawnLogs(err, docs) {
+		if (socket.zoneID === 0) return;
+		log.info('Getting zone info for '+socket.zoneID);
+		db.SpawnLog.find({ zoneID: socket.zoneID }, function foundSpawnLogs(err, docs) {
 			if (err) {
 				log.error(err);
 				return;
 			}
-
-			socket.send('spawnlogs', docs);
+			socket.emit('spawnlogs', docs);
 		});
 
-		db.SpawnGroup.find({ zoneID: this.zoneID }, function foundSpawnGroups(err, docs) {
+		db.SpawnGroup.find({ zoneID: socket.zoneID }, function foundSpawnGroups(err, docs) {
 			if (err) {
 				log.error(err);
 				return;
 			}
-
-			socket.send('spawngroups', docs);
+			socket.emit('spawngroups', docs);
 		});
 
-		db.SpawnPoints.find({ zoneID: this.zoneID }, function foundSpawnPoints(err, docs) {
+		db.SpawnPoint.find({ zoneID: socket.zoneID }, function foundSpawnPoints(err, docs) {
 			if (err) {
 				log.error(err);
 				return;
 			}
-
-			socket.send('spawnpoints', docs);
+			socket.emit('spawnpoints', docs);
 		});
 	}
 
 	if (typeof process.SpawnEdit === 'undefined') {
 		process.SpawnEdit = new SpawnEditInstance();
-	}else{
+	} else {
 		process.SpawnEdit.__proto__ = SpawnEditPrototype;
 	}
 
