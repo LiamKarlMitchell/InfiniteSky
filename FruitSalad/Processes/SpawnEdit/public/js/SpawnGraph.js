@@ -1,10 +1,15 @@
 var socket = io();
 
 // TODO Figure out how to select selZone and add the zone options to it using d3 map maybe.
+var zoneChangeTimeout = null;
 function selZone_Changed(d) {
     var value = d3.select(this).property("value");
     circles.selectAll("circle").remove();
-    socket.emit('zone', value);
+    reset();
+    clearTimeout(zoneChangeTimeout);
+    zoneChangeTimeout = setTimeout(function() {
+        socket.emit('zone', value);
+    }, 75);
 }
 
 var selZone = d3.select('#selZone').on("change", selZone_Changed);
@@ -58,11 +63,11 @@ set_tooltip_label = function(d) {
         tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px")
     }
 };
-var x = d3.scale.linear().domain([-width / 2, width / 2]).range([width, 0]);
+var x = d3.scale.linear().domain([width / 2, -width / 2]).range([0, width]);
 var y = d3.scale.linear().domain([-height / 2, height / 2]).range([height, 0]);
 var xAxis = d3.svg.axis().scale(x).orient("bottom").tickSize(-height);
 var yAxis = d3.svg.axis().scale(y).orient("left").ticks(5).tickSize(-width);
-var zoom = d3.behavior.zoom().x(x).y(y).on("zoom", zoomed);
+var zoom = d3.behavior.zoom().x(x).y(y).scaleExtent([-10,1]).on("zoom", zoomed);
 var svg = d3.select("body").append("svg").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")").call(zoom);
 svg.append("defs").append("clipPath").attr("id", "clip").append("rect").attr("width", width).attr("height", height);
 var rect = svg.append("rect").attr("width", width).attr("height", height);
@@ -91,7 +96,7 @@ function updateGraphData() {
     }).attr("cy", function(d) {
         return y(d.z);
     }).attr("r", function(d) {
-        return 15;
+        return 20;
     }).style("fill", function(d) {
         switch (d.type) {
             case 'mon':
@@ -179,11 +184,12 @@ function zoomed() {
   // TODO: Togglable zoom, should only drag/zoom when not holding shift key.
     svg.select(".x.axis").call(xAxis);
     svg.select(".y.axis").call(yAxis);
-    circles.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+    circles.attr("transform", "translate(" + zoom.translate() + ")scale(" + zoom.scale() + ")");
 }
 
 function reset() {
-    svg.call(zoom.x(x.domain([-width / 2, width / 2])).y(y.domain([-height / 2, height / 2])).event);
+    zoom.x(x.domain([-width / 2, width / 2])).y(y.domain([-height / 2, height / 2]));
+    zoomed();
 }
 
 
