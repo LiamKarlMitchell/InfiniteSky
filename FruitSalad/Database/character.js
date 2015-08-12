@@ -115,7 +115,11 @@ vms('Character', [], function(){
 		RealY: Number,
 		RealZ: Number,
 		Health: Number,
-		Chi: Number
+		Chi: Number,
+
+		// Usable items table
+		Usable_ProtectionCharm: {type: Number, default: 0},
+		Usable_GuildInsignia: {type: Number, default: 0}
 
 		// StrBonus: { type: Number, default: 0 },
 		// DexBonus: { type: Number, default: 0 },
@@ -218,13 +222,21 @@ vms('Character', [], function(){
 		return null;
 	};
 
-	characterSchema.methods.inventoryIntersection = function(x, y, size){
+	characterSchema.methods.inventoryIntersection = function(slotSizes, x, y, size){
+		// TODO: Add ignore to item that is currently moving.
 		if( x >= 8 || y >= 8 || (x + size) >= 8 || (y + size) >= 8 ) return true;
 		var item;
-		for(var i=0; i<64; i++){
+		for(var i=0; i<this.Inventory.length; i++){
 			item = this.Inventory[i];
 			if(item === undefined || item === null) continue;
-			if(item.Row >= x && item.Row <= x + size && item.Column >= y && item.Column <= y + size) return item;
+			var itemSize = slotSizes[item.ID];
+			if((
+          item.Row >= x && item.Row <= (x + size) ||
+          (item.Row + itemSize) >= x && (item.Row + itemSize) <= (x + size)
+        ) && (
+          item.Column >= y && item.Column <= (y + size) ||
+          (item.Column + itemSize) >= y && (item.Column + itemSize) <= (y + size)
+      )) return item;
 		}
 		return null;
 	};

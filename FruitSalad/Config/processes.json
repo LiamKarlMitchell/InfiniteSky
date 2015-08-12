@@ -14,5 +14,9 @@
     "SpawnEdit": {
         "name": "SpawnEdit",
         "script": "Processes/SpawnEdit/SpawnEdit.js"
+    },
+    "ItemEditor": {
+        "name": "ItemEditor",
+        "script": "Processes/ItemEditor/ItemEditor.js"
     }
 }

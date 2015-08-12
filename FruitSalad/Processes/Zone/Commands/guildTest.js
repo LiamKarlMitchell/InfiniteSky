@@ -21,8 +21,7 @@
 // console.log(test.size);
 
 GMCommands.AddCommand(new Command('g',60,function command_test(string, client){
-  client.character.state.unk1 = 2;
-  client.character.state.unk2 = 2;
+  client.character.state.Name = "Test";
   Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
 }));
 

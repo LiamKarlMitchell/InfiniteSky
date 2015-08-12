@@ -1,0 +1,204 @@
+.color0 { background-color: #759D34 }	/* Main Primary background */
+.color1 { background-color: #CEEC9D }
+.color2 { background-color: #9FC462 }
+.color3 { background-color: #507614 }
+.color4 { background-color: #314F00 }
+
+body{
+  padding: 0;
+  margin: 0;
+  font-family: "Arial";
+  background: #e7e7e7;
+  font-size: 14px;
+}
+
+body:hover{
+  cursor: default;
+}
+
+.header{
+  padding: 10px;
+  color: #FFF;
+  font-size: 16px;
+}
+
+.select{
+  padding: 10px;
+  margin: 10px;
+  background: #fff;
+}
+
+#bp-ac{
+  padding: 0;
+}
+
+#bp-ac input{
+  padding: 0;
+  width: 100%;
+  border: 0;
+  padding-bottom: 10px;
+  padding-top: 10px;
+  margin: 0;
+}
+
+#bp-ac div.padded-row{
+  border: 1px solid #d8d8d8;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+#bp-ac div.bp-autocomplete-dropdown{
+  margin-top: 0px;
+  margin-left: 0;
+}
+
+#bp-ac span.bp-autocomplete-highlight{
+  color: #507614;
+}
+
+#bp-ac div.bp-autocomplete-row{
+  background: transparent;
+}
+
+#bp-ac div.bp-autocomplete-row:hover{
+  color: #000;
+  background: #f0f0f0;
+}
+
+.title{
+  color: #b1b1b1;
+  font-size: 16px;
+  border-bottom: 1px solid #f0f0f0;
+  padding: 5px;
+  padding-bottom: 10px;
+}
+
+div.character.view, div.item.view{
+  padding: 10px;
+  margin: 10px;
+  background: #fff;
+}
+
+.hidden{
+  display: none;
+}
+
+.w65{
+  width: 65%;
+}
+
+.w35{
+  width: 35%;
+}
+
+div.container{
+  float: left;
+}
+
+button{
+  background: #759D34;
+  padding: 8px;
+  color: #fff;
+  border: 0;
+  outline: 0;
+}
+
+button:hover{
+  cursor: pointer;
+  background: #9FC462;
+}
+
+div.selectedItem{
+  margin-top: 10px;
+}
+
+div.inventory{
+  border: 1px solid #000;
+  width: 519px;
+  margin-top: 10px;
+}
+
+div.inventory .row{
+  margin: 0;
+  border-bottom: 1px solid #000;
+}
+
+div.inventory .row.noBorder{
+  margin: 0;
+  border: 0;
+}
+
+div.inventory .row .slot{
+  width: 64px;
+  height: 64px;
+  float: left;
+  border-right: 1px solid #000;
+}
+
+div.inventory .row .slot div{
+  width: 64px;
+  height: 64px;
+}
+
+div.common{
+  background: gray;
+}
+
+div.unique{
+  background: orange;
+}
+
+div.rare{
+  background: gold;
+}
+
+div.elite{
+  background: purple;
+}
+
+div.inventory .row .slot.noBorder{
+  border: 0;
+}
+
+#loading{
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background: black;
+  opacity: 0.5;
+}
+
+.clear{
+  clear: both;
+}
+
+.right{
+  float: right;
+}
+
+.left{
+  float: left;
+}
+
+.marginTop10{
+  margin-top: 10px;
+}
+
+#tooltip{
+  background: black;
+  color: white;
+  padding: 10px;
+  position: fixed;
+}
+
+#tooltip .title{
+  color: white;
+  padding: 0;
+  border: 0;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+
+#tooltip .quality{
+  color: white;
+}

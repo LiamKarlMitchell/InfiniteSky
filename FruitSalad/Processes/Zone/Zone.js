@@ -87,6 +87,39 @@ global.api.expelFromGuild = function(client, buffer){
 	Zone.sendToAllArea(c, true, c.character.state.getPacket(), config.network.viewable_action_distance);
 };
 
+global.api.reloadCharacterData = function(name){
+	var client = Zone.clientNameTable[name];
+	if(!client){
+		log.info("Could not reload data for", name);
+		return;
+	}
+
+	db.Character.findOne({Name: name}, function(err, character){
+		if(err){
+			return;
+		}
+
+		if(!character){
+			return;
+		}
+
+		for(var name in character){
+			client.character[name] = character[name];
+		}
+
+		var CharacterData = new Buffer(Zone.send.CharacterInfo.pack({
+			PacketID: 0x16,
+			Status: 0,
+			character: client.character,
+			Unknown: 0x00
+		}));
+
+		CharacterData = client.character.restruct(CharacterData);
+		client.write(CharacterData);
+		Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
+	});
+};
+
 global.rpc.add(global.api);
 
 function ZoneInstance() {
@@ -126,6 +159,7 @@ function ZoneInstance() {
 	this.clientHashTable = {};
 	this.clientNodeTable = {};
 	this.clientNameTable = {};
+	this.itemSlotSizes = {};
 
 	global.log = bunyan.createLogger({
 		name: 'InfiniteSky/Zone.' + parseInt(process.argv[2]),
@@ -173,26 +207,42 @@ zonePrototype.init = function Zone__init() {
 			'Database',
 			'Generic'
 		], function() {
-			function vmscript_WatchIfExists(path) {
-				fs.stat(path, function(err, stat) {
-					if (err) {
-						// Safe to ignore errors for this sometimes they wont exist.
+			vmscript.on('ItemInfo', function(){
+				db.Item.find(null, '_id ItemType', function(err, docs){
+					if(err){
+						console.log(err);
 						return;
 					}
 
-					vmscript.watch(path);
-				});
-			}
+					for(var i=0; i<docs.length; i++){
+						self.itemSlotSizes[docs[i]._id] = docs[i].getSlotSize();
+					}
 
-			vmscript_WatchIfExists('./Commands');
-			vmscript_WatchIfExists('./Processes/Zone/Packets');
-			vmscript_WatchIfExists('./Processes/Zone/Packets/'+self.id);
-			vmscript_WatchIfExists('./Processes/Zone/Packets/'+self.clean_name);
-			vmscript_WatchIfExists('./Processes/Zone/Commands');
-			vmscript_WatchIfExists('./Processes/Zone/Commands/'+self.id);
-			vmscript_WatchIfExists('./Processes/Zone/Commands/'+self.clean_name);
-			vmscript_WatchIfExists('./Processes/Zone/Scripts/'+self.id);
-			vmscript_WatchIfExists('./Processes/Zone/Scripts/'+self.clean_name);
+					docs.length = 0;
+					if(typeof global.gc === 'function') global.gc();
+
+					function vmscript_WatchIfExists(path) {
+						fs.stat(path, function(err, stat) {
+							if (err) {
+								// Safe to ignore errors for this sometimes they wont exist.
+								return;
+							}
+
+							vmscript.watch(path);
+						});
+					}
+
+					vmscript_WatchIfExists('./Commands');
+					vmscript_WatchIfExists('./Processes/Zone/Packets');
+					vmscript_WatchIfExists('./Processes/Zone/Packets/'+self.id);
+					vmscript_WatchIfExists('./Processes/Zone/Packets/'+self.clean_name);
+					vmscript_WatchIfExists('./Processes/Zone/Commands');
+					vmscript_WatchIfExists('./Processes/Zone/Commands/'+self.id);
+					vmscript_WatchIfExists('./Processes/Zone/Commands/'+self.clean_name);
+					vmscript_WatchIfExists('./Processes/Zone/Scripts/'+self.id);
+					vmscript_WatchIfExists('./Processes/Zone/Scripts/'+self.clean_name);
+				});
+			});
 		});
 	});
 
@@ -249,7 +299,6 @@ zonePrototype.init = function Zone__init() {
 	});
 };
 
-
 zonePrototype.addSocket = function(socket) {
 	if (!this.QuadTree) {
 		console.log("QuadTree is not initialized");
@@ -268,6 +317,19 @@ zonePrototype.addSocket = function(socket) {
 
 	socket.unhandledPacket = function(message) {
 		ZonePC.sendMessageToSocket(this, ':WARN', 'Unhandled Packet: '+message);
+	}
+
+	socket.send2F = function(){
+		this.write(new Buffer(structs.HealingReplyPacket.pack({
+				'PacketID': 0x2F,
+				'Level': this.character.Level,
+				'Experience': this.character.Experience,
+				'Honor': this.character.Honor,
+				'CurrentHP': this.character.state.CurrentHP,
+				'CurrentChi': this.character.state.CurrentChi,
+				'PetActivity': this.character.Pet === null ? 0 : this.character.Pet.Activity,
+				'PetGrowth': this.character.Pet === null ? 0 : this.character.Pet.Growth
+		})));
 	}
 
 	socket.node = this.QuadTree.addNode(new QuadTree.QuadTreeNode({
@@ -318,13 +380,14 @@ zonePrototype.sendToAllAreaClan = function(client, self, buffer, distance, clan)
 	if (clan === undefined) {
 		clan = client.character.Clan;
 	}
-    var found = this.QuadTree.query({ CVec3: client.character.state.Location, radius: distance, type: ['client'] });
-    for(var i=0; i<found.length; i++){
-        var f = found[i];
-        if(!self && f.object === client) continue;
-        if (f.object.character.Clan !== clan) continue;
-        if(f.object.write) f.object.write(buffer);
-    }
+
+  var found = this.QuadTree.query({ CVec3: client.character.state.Location, radius: distance, type: ['client'] });
+  for(var i=0; i<found.length; i++){
+      var f = found[i];
+      if(!self && f.object === client) continue;
+      if (f.object.character.Clan !== clan) continue;
+      if(f.object.write) f.object.write(buffer);
+  }
 };
 
 zonePrototype.onFindAccount = function(socket, err, account) {

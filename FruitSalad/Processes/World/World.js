@@ -134,6 +134,16 @@ global.api.expelFromGuild = function(name, buffer){
 	}
 };
 
+global.api.reloadCharacterData = function(name){
+	var c = World.clientNameTable[name];
+	if(c && c.ZoneID){
+		var p = process.zones[c.ZoneID];
+		if(p){
+			p.api.reloadCharacterData(name);
+		}
+	}
+};
+
 global.rpc.add(global.api);
 
 log = {};

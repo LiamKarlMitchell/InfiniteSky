@@ -3,7 +3,8 @@
     "login": 11091,
     "world": 11092,
     "spawnlogger": 13191,
-    "spawnedit": 8473
+    "spawnedit": 8473,
+    "itemeditor": 8474
   },
   "interfaces": {
     "regular": "0.0.0.0",

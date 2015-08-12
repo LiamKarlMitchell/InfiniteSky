@@ -143,15 +143,27 @@ structs.Character = restruct.
 	int32lu('isGM'). // 4
 	int32lu('Unused1',6).//Will add later // 8
 	int32lu('PlayTime'). // 12
-	string('Name',13). // 25
-	pad(119). // 144 StuffLikeLocation
+	string('Name', 13). // 25
+	pad(71). // 144 StuffLikeLocation
+  int32lu('Usable_ProtectionCharm').
+  int32lu('Usable_GuildInsignia').
+  int32lu('').
+  int32lu('').
+  int32lu('').
+  int32lu('').
+  int32lu('').
+  int32lu('').
+  int32lu('').
+  int32lu('').
+  int32lu('').
+  int32lu('').
 	int32lu('Clan'). // 148
 	int32lu('Gender'). // 152
 	int32lu('Hair'). // 156
 	int32lu('Face'). // 160
 	int32lu('Level'). // 164
 	int32lu('Experience'). // 168
-	int32lu('OtherIngame',2).//Will add later // 172
+	pad(8).//Will add later // 172
 	int32lu('SkillPoints'). // 176
 	int32lu('Honor'). // 180
 	int32lu('StatPoints'). // 184
@@ -159,8 +171,7 @@ structs.Character = restruct.
 	int32lu('StatStrength'). // 192
 	int32lu('StatChi'). // 196
 	int32lu('StatDexterity'). // 200
-	int32lu('GameStuff1'). // 204
-	int32lu('GameStuff2'). //Will add later // 208
+	pad(8). //Will add later // 208
 	//Equipt structs needed here, try find restruct's struct-in-struct example, or ask for one
 	struct('Amulet',structs.Equipt). // 220
 	struct('Cape',structs.Equipt). // 232
@@ -185,7 +196,7 @@ structs.Character = restruct.
 	int32lu('').//??
 	int32lu('QuestStart').//Did you start the quest
 	int32lu('QuestComplete').//Did you complete the quest
-	int8lu('',20).
+	pad(20).
 
 	string('Friends',13,10).
 
@@ -492,138 +503,13 @@ var cbFix = restruct.
 	int32lu("Capacity").
 	int32lu("Unknown");
 
-// structs.setInventoryStorageOnOffsets = function setInventoryOnOffset(buffer, offset, inventory, storage_offset, storage, bank_offset, bank){
-// 	    var InventoryBufferSize = structs.StorageItem.size * inventory.length;
-// 	    var InventoryBuffer = new Buffer(InventoryBufferSize);
-
-// 	    var InventoryOffset = 0;
-// 	    for(var i = 0; i < inventory.length; i++){
-// 	        var object = inventory[i];
-// 	        var workingBuffer;
-// 	        if(object == undefined){
-// 	            workingBuffer = new Buffer(structs.StorageItem.pack());
-// 	            workingBuffer.copy(InventoryBuffer, InventoryOffset);
-// 	        }else{
-// 	            var item = infos.Item[object.ID];
-
-// 	            if(item == undefined){
-// 	                workingBuffer = new Buffer(structs.StorageItem.pack(
-// 	                    object
-// 	                ));
-// 	            }else{
-// 	                if(item.ItemType === 22){
-// 	                    workingBuffer = new Buffer(structs.StorageItemPet.pack(
-// 	                        object
-// 	                    ));
-// 					}else if(item.ItemType === 6){
-// 						workingBuffer = new Buffer(cbFix.pack(
-// 							object
-// 						));
-// 					}else{
-// 	                    workingBuffer = new Buffer(structs.StorageItem.pack(
-// 	                        object
-// 	                    ));
-// 	                }
-// 	            }
-
-// 	            if(workingBuffer !== undefined){
-// 	                workingBuffer.copy(InventoryBuffer, InventoryOffset, 0, workingBuffer.length);
-// 	            }
-// 	        }
-// 	        InventoryOffset += structs.StorageItem.size;
-// 	    }
-
-// 	    InventoryBuffer.copy(buffer, offset, 0, InventoryBuffer.length);
-
-// 	    var StorageBufferSize = structs.SmallStorageItem.size * storage.length;
-// 	    var StorageBuffer = new Buffer(StorageBufferSize);
-
-// 	    var StorageOffset = 0;
-
-// 	    for(var sI = 0; sI < storage.length; sI++){
-// 	        var object = storage[sI];
-// 	        var workingBuffer;
-// 	        if(object === null || object === undefined){
-// 	            workingBuffer = new Buffer(structs.SmallStorageItem.pack());
-// 	            workingBuffer.copy(StorageBuffer, StorageOffset);
-// 	        }else{
-// 	            var item = infos.Item[object.ID];
-
-// 	            if(item == undefined){
-// 	                workingBuffer = new Buffer(structs.SmallStorageItem.pack(
-// 	                    object
-// 	                ));
-// 	            }else{
-
-// 	                if(item.ItemType === 22){
-// 	                    workingBuffer = new Buffer(structs.SmallStorageItemPet.pack(
-// 	                        object
-// 	                    ));
-// 					}else if(item.ItemType === 6){
-// 						workingBuffer = new Buffer(cbFix.pack(
-// 							object
-// 						));
-// 					}else{
-// 	                    workingBuffer = new Buffer(structs.SmallStorageItem.pack(
-// 	                        object
-// 	                    ));
-// 	                }
-// 	            }
-
-// 	            workingBuffer.copy(StorageBuffer, StorageOffset);
-// 	        }
-
-// 	        StorageOffset += structs.SmallStorageItem.size;
-// 	    }
-
-// 	    StorageBuffer.copy(buffer, storage_offset, 0, StorageBuffer.length);
-
-
-// 	    var BankBufferSize = structs.SmallStorageItem.size * bank.length;
-// 	    var BankBuffer = new Buffer(BankBufferSize);
-
-// 	    var BankOffset = 0;
-
-// 	    for(var i = 0; i < bank.length; i++){
-// 	        var object = bank[i];
-// 	        var workingBuffer;
-// 	        if(object === null || object === undefined){
-// 	            workingBuffer = new Buffer(structs.SmallStorageItem.pack());
-// 	            workingBuffer.copy(BankBuffer, BankOffset);
-// 	        }else{
-// 	            var item = infos.Item[object.ID];
-
-// 	            if(item == undefined){
-// 	                workingBuffer = new Buffer(structs.SmallStorageItem.pack(
-// 	                    object
-// 	                ));
-// 	            }else{
-
-// 	                if(item.ItemType === 22){
-// 	                    workingBuffer = new Buffer(structs.SmallStorageItemPet.pack(
-// 	                        object
-// 	                    ));
-// 					}else if(item.ItemType === 6){
-// 						workingBuffer = new Buffer(cbFix.pack(
-// 							object
-// 						));
-// 					}else{
-// 	                    workingBuffer = new Buffer(structs.SmallStorageItem.pack(
-// 	                        object
-// 	                    ));
-// 	                }
-// 	            }
-
-// 	            workingBuffer.copy(BankBuffer, BankOffset);
-// 	        }
-
-// 	        BankOffset += structs.SmallStorageItem.size;
-// 	    }
-
-// 	    BankBuffer.copy(buffer, bank_offset, 0, BankBuffer.length);
-
-
-// 	    return buffer;
-// 	}
-
+structs.HealingReplyPacket = restruct.
+  int8lu('PacketID').
+  int32lu('Level').
+  int32lu('Experience').
+  int32lu('Honor').
+  int32lu('CurrentHP').
+  int32lu('CurrentChi').
+  int32lu('PetActivity').
+  int32lu('PetGrowth');
 });

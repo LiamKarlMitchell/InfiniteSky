@@ -100,7 +100,7 @@ ItemAction[20] = function inventoryMoveItem(input){
             return;
         }
 
-        var intersected = self.character.inventoryIntersection(input.MoveRow, input.MoveColumn, item.getSlotSize());
+        var intersected = self.character.inventoryIntersection(Zone.itemSlotSizes, input.MoveRow, input.MoveColumn, item.getSlotSize());
         var stackable = item.isStackable();
         var reminder = invItem.Amount - input.Amount;
 
@@ -184,7 +184,7 @@ ItemAction[14] = function CharacterItem_Unequip(input){
             return;
         }
 
-        var intersected = self.character.inventoryIntersection(input.MoveRow, input.MoveColumn, item.getSlotSize());
+        var intersected = self.character.inventoryIntersection(Zone.itemSlotSizes, input.MoveRow, input.MoveColumn, item.getSlotSize());
         if(intersected){
             Zone.send.itemAction.call(self, 1, input);
             return;
@@ -344,7 +344,7 @@ ItemAction[0] = function inventoryPickupItem(input){
         }
 
         var isStackable = item.isStackable();
-        var intersected = self.character.inventoryIntersection(input.PickupRow, input.PickupColumn, item.getSlotSize());
+        var intersected = self.character.inventoryIntersection(Zone.itemSlotSizes, input.PickupRow, input.PickupColumn, item.getSlotSize());
         var total = intersected ? intersected.Amount + invItem.Amount : 0;
 
         if(isStackable && intersected && intersected.ID !== invItem.ID){
@@ -388,6 +388,11 @@ ItemAction[0] = function inventoryPickupItem(input){
 
 // Revised: 09/06/2015 11:14:09
 ItemAction[1] = function inventoryDropItem(input){
+  if(Zone.addItem === undefined){
+    Zone.send.itemAction.call(this, 1, input);
+    return;
+  }
+
     if(input.ItemID === 1){
         if(input.Amount > this.character.Silver){
             Zone.send.itemAction.call(this, 1, input);
@@ -590,7 +595,7 @@ ItemAction[15] = function StorageTakeItem(input){
             return;
         }
 
-        var intersected = self.character.inventoryIntersection(input.MoveRow, input.MoveColumn, item.getSlotSize());
+        var intersected = self.character.inventoryIntersection(Zone.itemSlotSizes, input.MoveRow, input.MoveColumn, item.getSlotSize());
         if(intersected && storageItem.ID !== intersected.ID){
             Zone.send.itemAction.call(self, 1, input);
             return;
@@ -851,7 +856,7 @@ ItemAction[17] = function ShopBuyItem(input){
                 return;
             }
 
-            var intersected = self.character.inventoryIntersection(input.MoveRow, input.MoveColumn, item.getSlotSize());
+            var intersected = self.character.inventoryIntersection(Zone.itemSlotSizes, input.MoveRow, input.MoveColumn, item.getSlotSize());
 
             if(intersected && (intersected.Amount + input.Amount) > 99){
                 Zone.send.itemAction.call(self, 1, input);
@@ -1051,7 +1056,7 @@ ItemAction[11] = function moveItemsFromHotbar(input){
         return;
       }
 
-      var intersected = self.character.inventoryIntersection(input.MoveRow, input.MoveColumn, item.getSlotSize());
+      var intersected = self.character.inventoryIntersection(Zone.itemSlotSizes, input.MoveRow, input.MoveColumn, item.getSlotSize());
       if(intersected && intersected.ID !== invItem.ID){
         Zone.send.itemAction.call(self, 1, input);
         return;
@@ -1167,6 +1172,123 @@ ItemAction[31] = function learnSkill(input){
   Zone.send.itemAction.call(this, 1, input);
 };
 
+ItemAction[12] = function learnSkill(input){
+  console.log(input);
+
+  var invItem = this.character.QuickUseItems[input.InventoryIndex];
+  if(!invItem){
+    Zone.send.itemAction.call(this, 1, input);
+    return;
+  }
+
+  if(invItem.ID !== input.ItemID){
+    Zone.send.itemAction.call(this, 1, input);
+    return;
+  }
+
+  if(!invItem.Amount){
+    Zone.send.itemAction.call(this, 1, input);
+    return;
+  }
+
+  var self = this;
+  db.Item.findById(invItem.ID, function(err, item){
+    if(err){
+      Zone.send.itemAction.call(self, 1, input);
+      return;
+    }
+
+    if(!item){
+      Zone.send.itemAction.call(self, 1, input);
+      return;
+    }
+
+    var recovered;
+    switch(item.ValueType){
+      case 1: // Recovering Hp by fixed value
+      recovered = self.character.state.CurrentHP + item.Value1;
+      if(recovered > self.character.infos.MaxHP) recovered = self.character.infos.MaxHP;
+
+      self.character.state.CurrentHP = recovered;
+      self.character.HP = self.character.state.CurrentHP;
+      break;
+
+      case 2: // Recovering Hp by % value
+      recovered = self.character.state.CurrentHP + (item.Value1 * (self.character.infos.MaxHP / 100));
+      if(recovered > self.character.infos.MaxHP) recovered = self.character.infos.MaxHP;
+
+      self.character.state.CurrentHP = recovered;
+      self.character.HP = self.character.state.CurrentHP;
+      break;
+
+      case 3: // Recovering Chi by fixed value
+      recovered = self.character.state.CurrentChi + item.Value1;
+      if(recovered > self.character.infos.MaxChi) recovered = self.character.infos.MaxChi;
+
+      self.character.state.CurrentChi = recovered;
+      self.character.Chi = self.character.state.CurrentChi;
+      break;
+
+      case 4: // Recovering Chi by % value
+      recovered = self.character.state.CurrentChi + (item.Value1 * (self.character.infos.MaxChi / 100));
+      if(recovered > self.character.infos.MaxChi) recovered = self.character.infos.MaxChi;
+
+      self.character.state.CurrentChi = recovered;
+      self.character.Chi = self.character.state.CurrentChi;
+      break;
+
+      case 5:
+      recovered = self.character.state.CurrentChi + (item.Value1 * (self.character.infos.MaxChi / 100));
+      if(recovered > self.character.infos.MaxChi) recovered = self.character.infos.MaxChi;
+
+      self.character.state.CurrentChi = recovered;
+      self.character.Chi = self.character.state.CurrentChi;
+
+      recovered = self.character.state.CurrentHP + (item.Value1 * (self.character.infos.MaxHP / 100));
+      if(recovered > self.character.infos.MaxHP) recovered = self.character.infos.MaxHP;
+
+      self.character.state.CurrentHP = recovered;
+      self.character.HP = self.character.state.CurrentHP;
+      break;
+
+      case 6:
+      if(!self.character.Pet){
+        Zone.send.itemAction.call(self, 1, input);
+        return;
+      }
+
+      if(self.character.Pet.Activity >= 100){
+        Zone.send.itemAction.call(self, 1, input);
+        return;
+      }
+
+      self.character.Pet.Activity += 50;
+      if(self.character.Pet.Activity > 100)
+        self.character.Pet.Activity = 100;
+      break;
+
+      default:
+      console.log(item.ValueType, "of item not supported in ItemAction quick bar usable");
+      Zone.send.itemAction.call(self, 1, input);
+      return;
+    }
+
+    if(--invItem.Amount === 0){
+      self.character.QuickUseItems[input.InventoryIndex] = null;
+    }
+
+    self.character.markModified('QuickUseItems');
+    self.character.save(function(err){
+      if(err){
+        Zone.send.itemAction.call(self, 1, input);
+        return;
+      }
+
+      Zone.send.itemAction.call(self, 0, input);
+      Zone.sendToAllArea(self, false, self.character.state.getPacket(), config.network.viewable_action_distance);
+    });
+  });
+};
 
 ZonePC.Set(0x14, {
     Restruct: Zone.recv.itemAction,

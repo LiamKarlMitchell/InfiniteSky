@@ -505,13 +505,6 @@ ZonePC.Set(0x0B, {
   }
 });
 
-ZonePC.Set(0x43, {
-  Restruct: Zone.recv.guildChat,
-  function: function(client, input){
-    console.log("Registering insignia")
-  }
-});
-
 Zone.send.guildFlag = restruct.
   int8lu('PacketID').
   int32lu('unk').

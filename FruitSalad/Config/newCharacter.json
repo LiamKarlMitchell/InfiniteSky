@@ -58,6 +58,7 @@
 		"RealZ": 1575,
 
 		"Silver": 50000,
+		"StackedSilver": 100,
 
 		"SkillBar": [
 			{ "ID": 20, "Level": 20 },

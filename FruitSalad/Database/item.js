@@ -11,6 +11,8 @@ vms('ItemInfo', [], function(){
 	var ObjectId = db.mongoose.Schema.Types.ObjectId;
 	var Mixed = db.mongoose.Schema.Types.Mixed;
 
+
+
 	var itemSchema = mongoose.Schema({
 		_id: { type: Number, unique: true, index: true, default: 0 },
 	    Name: String,
@@ -140,7 +142,7 @@ vms('ItemInfo', [], function(){
 			case 18:
 			case 19:
 			case 20:
-			case 21: 
+			case 21:
 				ItemType = 'Weapon';
 			break;
 			case 22: ItemType = 'Pet'; break;
@@ -152,8 +154,7 @@ vms('ItemInfo', [], function(){
 		var Rareness;
 		switch (this.Rareness)
 		{
-			case 0: Rareness = 'Common'; break;
-			case 1: Rareness = 'Uncommon'; break;
+			case 1: Rareness = 'Common'; break;
 			case 2: Rareness = 'Unique'; break;
 			case 3: Rareness = 'Rare'; break;
 			case 4: Rareness = 'Elite'; break;
@@ -190,7 +191,7 @@ vms('ItemInfo', [], function(){
 
 	itemSchema.methods.isAllowedByClan = function(clan){
 		clan += 2;
-		return this.Clan === clan;
+		return this.Clan === 1 || this.Clan === clan;
 	};
 
 	global.ItemType = {
@@ -221,6 +222,8 @@ vms('ItemInfo', [], function(){
 	};
 
 
+	itemSchema.index({ Name: 1, ItemType: 1 });
+
 	//Constructor
 	delete mongoose.models['item'];
 	var ItemInfo = db.mongoose.model('item', itemSchema);
@@ -232,5 +235,4 @@ vms('ItemInfo', [], function(){
 	};
 
 	db.Item = ItemInfo;
-
 });
