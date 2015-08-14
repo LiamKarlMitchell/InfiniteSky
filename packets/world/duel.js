@@ -125,7 +125,7 @@ WorldPC.Set(0x22, { // Duel accept/deny
 			client.write(new Buffer(startDuel.pack({
 				"PacketID": 0x39,
 				"Unk1": 1,
-				"Unk2": 0
+				"Unk2": 1
 			})));
 			client.character.state.dueling = 1;
 			Inviter.character.state.dueling = 1;

@@ -4,10 +4,10 @@
 		"Gloves": { "ID": 9, "Enchant": 0, "Combine": 0},
 		"Boots": { "ID": 10, "Enchant": 0, "Combine": 0},
 
-		"StatVitality": 1,
-		"StatStrength": 1,
-		"StatChi": 1,
-		"StatDexterity": 1,
+		"Vitality": 1,
+		"Strength": 1,
+		"Chi": 1,
+		"Dexterity": 1,
 
 
 		"MapID": 1,
@@ -47,10 +47,10 @@
 		"Gloves": { "ID": 15, "Enchant": 0, "Combine": 0},
 		"Boots": { "ID": 16, "Enchant": 0, "Combine": 0},
 
-		"StatVitality": 1,
-		"StatStrength": 1,
-		"StatChi": 1,
-		"StatDexterity": 1,
+		"Vitality": 1,
+		"Strength": 1,
+		"Chi": 1,
+		"Dexterity": 1,
 
 		"MapID": 6,
 		"RealX": -225,
@@ -90,10 +90,10 @@
 		"Gloves": { "ID": 21, "Enchant": 0, "Combine": 0},
 		"Boots": { "ID": 22, "Enchant": 0, "Combine": 0},
 
-		"StatVitality": 1,
-		"StatStrength": 1,
-		"StatChi": 1,
-		"StatDexterity": 1,
+		"Vitality": 1,
+		"Strength": 1,
+		"Chi": 1,
+		"Dexterity": 1,
 
 		"MapID": 11,
 		"RealX": -743,

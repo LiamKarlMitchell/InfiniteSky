@@ -64,7 +64,7 @@ GameInfoLoader.prototype.load = function(filename, structure, onRecordFunction) 
 				var info = self.InfoStruct.unpack(task.data);
 				// Put the element into our function which could transform it.
 				// We expect to be able to get back ID either from the value in record or some sort of getter.
-				info = onRecordFunction(info);
+				info = onRecordFunction(info, task.data);
 				if (info !== undefined && info._id) {
 					// Assign to self as a key on ID for quick reference.
 					// Example infos.Item[1] would be Silver

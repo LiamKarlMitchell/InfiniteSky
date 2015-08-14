@@ -321,14 +321,14 @@ zonePrototype.addSocket = function(socket) {
 
 	socket.send2F = function(){
 		this.write(new Buffer(structs.HealingReplyPacket.pack({
-				'PacketID': 0x2F,
-				'Level': this.character.Level,
-				'Experience': this.character.Experience,
-				'Honor': this.character.Honor,
-				'CurrentHP': this.character.state.CurrentHP,
-				'CurrentChi': this.character.state.CurrentChi,
-				'PetActivity': this.character.Pet === null ? 0 : this.character.Pet.Activity,
-				'PetGrowth': this.character.Pet === null ? 0 : this.character.Pet.Growth
+			'PacketID': 0x2F,
+			'Level': this.character.Level,
+			'Experience': this.character.Experience,
+			'Honor': this.character.Honor,
+			'CurrentHP': this.character.state.CurrentHP,
+			'CurrentChi': this.character.state.CurrentChi,
+			'PetActivity': this.character.Pet === null ? 0 : this.character.Pet.Activity,
+			'PetGrowth': this.character.Pet === null ? 0 : this.character.Pet.Growth
 		})));
 	}
 
@@ -400,11 +400,21 @@ zonePrototype.onProcessMessage = function(type, socket) {
 		case 'socket':
 			// console.log(socket);
 			socket.on('close', function(err) {
+				if(socket.node){
+					console.log("Node removed");
+					Zone.QuadTree.remove(socket.node);
+					socket.node = null;
+				}
 				// socket.character.save(function(){
 				// 	console.log("Saved");
 				// });
 			});
 			socket.on('error', function(err) {
+				if(socket.node){
+					console.log("Node removed");
+					Zone.QuadTree.remove(socket.node);
+					socket.node = null;
+				}
 				// socket.character.save(function(){
 				// 	console.log("Saved");
 				// });

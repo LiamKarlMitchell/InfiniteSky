@@ -20,6 +20,12 @@ GMCommands.AddCommand(new Command('t',60,function command_test(string, client){
 		config.viewable_action_distance);
 }));
 
+GMCommands.AddCommand(new Command('info',60,function command_test(string, client){
+	client.character.infos = new CharacterInfos(client);
+	client.character.infos.update('Weapon');
+	// console.log(client.character.infos.print());
+}));
+
 // Use the packet id 0x2C
 Zone.send.attack = restruct.
     int32lu('Action'). // 0 your attacking

@@ -80,10 +80,10 @@ vms('Character', [], function(){
 
 		Name: { type: String, unique: true, index: true },
 
-		StatStrength: {type: Number, default: 0 },
-		StatChi: {type: Number, default: 0 },
-		StatDexterity: {type: Number, default: 0 },
-		StatVitality: {type: Number, default: 0 },
+		Stat_Strength: {type: Number, default: 0 },
+		Stat_Chi: {type: Number, default: 0 },
+		Stat_Dexterity: {type: Number, default: 0 },
+		Stat_Vitality: {type: Number, default: 0 },
 	// Maybe Ring: {type: itemEquip, default: null}
 	// or default 0 hmm... how very odd
 		Ring: {type: itemEquip, default: null}, // 0
@@ -119,7 +119,9 @@ vms('Character', [], function(){
 
 		// Usable items table
 		Usable_ProtectionCharm: {type: Number, default: 0},
-		Usable_GuildInsignia: {type: Number, default: 0}
+		Usable_GuildInsignia: {type: Number, default: 0},
+		Usable_HermitValut: {type: Number, default: 0},
+		Usable_StorageValut: {type: Number, default: 0}
 
 		// StrBonus: { type: Number, default: 0 },
 		// DexBonus: { type: Number, default: 0 },

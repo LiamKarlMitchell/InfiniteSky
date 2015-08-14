@@ -189,6 +189,14 @@ ZonePC.Set(0x43, {
         });
       break;
 
+      case 8: // Extra storage
+      Zone.send.use43.call(client, input, 0);
+      break;
+
+      case 9: // Extra player storage
+      Zone.send.use43.call(client, input, 0);
+      break;
+
       case 10: // Partial Restoration
         if(invItem.ID !== 99149){
           return;

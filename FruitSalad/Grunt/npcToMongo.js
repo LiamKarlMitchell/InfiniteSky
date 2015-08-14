@@ -382,7 +382,7 @@ module.exports = function(grunt) {
 		        int32lu("Items", 168). // TODO: Work out NPC items for their shops in a nicer format
 		        int8lu("Unk3", 3).
 		        int32lu("Shift8Bytes", 2).
-		        string("CellFile", 6025), 
+		        string("CellFile", 6025),
 			  function onRecordLoad(record) {
 			  	if (record._id) {
 			  		record.Name = encoding.convert(record.Name, 'UTF-8', 'EUC-KR').toString();

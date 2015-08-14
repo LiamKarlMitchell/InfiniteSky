@@ -2,42 +2,31 @@
 // Copyright (c) InfiniteSky Dev Teams - Licensed under GNU GPL
 // For more information, see LICENCE in the main folder
 vms('ItemInfo', [], function(){
-	// Shorthand Types
-	//var String = db.mongoose.Schema.Types.String;
-	//var Number = db.mongoose.Schema.Types.Number;
-	var Bool = db.mongoose.Schema.Types.Boolean;
-	//var Array = db.mongoose.Schema.Types.Array;
-	//var Date = db.mongoose.Schema.Types.Date;
-	var ObjectId = db.mongoose.Schema.Types.ObjectId;
-	var Mixed = db.mongoose.Schema.Types.Mixed;
-
-
-
 	var itemSchema = mongoose.Schema({
 		_id: { type: Number, unique: true, index: true, default: 0 },
 	    Name: String,
 	    Rareness: Number,
 	    ItemType: Number,
 	    DisplayItem2D: Number,
-	    _1: Number,
+	    // _1: Number,
 	    Level: Number, // Level Requirement
 	    Clan: Number,
-	    _4: Number,
-	    _5: Number,
-	    _6: Number,
-	    _7: Number,
-	    _8: Number,
-	    _9: Number,
-	    _10: Number,
-	    _11: Number,
-	    _12: Number,
+	    // _4: Number,
+	    // _5: Number,
+	    // _6: Number,
+	    // _7: Number,
+	    // _8: Number,
+	    // _9: Number,
+	    // _10: Number,
+	    // _11: Number,
+	    // _12: Number,
 	    PurchasePrice: Number,
 	    SalePrice: Number,
-	    _13: Number,
+	    // _13: Number,
 	    Capacity: Number,
 	    LevelRequirement: Number,
 	    HonorPointReq: Number,
-	    _15a: Number,
+	    // _15a: Number,
 	    Strength: Number,
 	    Dexterity: Number,
 	    Vitality: Number,
@@ -45,38 +34,40 @@ vms('ItemInfo', [], function(){
 	    Luck: Number,
 	    Damage: Number,
 	    Defense: Number,
-	    LightDamage: Number,
-	    ShadowDamage: Number,
-	    DarkDamage: Number,
-	    LightResistance: Number,
-	    ShawdowResistance: Number,
-	    DarkResistance: Number,
-	    ChancetoHit: Number,
-	    ChancetoDodge: Number,
-	    PercentToDeadlyBlow: Number,
-	    SkillBonusID1: Number,
-	    SkillBonusID2: Number,
-	    SkillBonusID3: Number,
-	    SkillBonusAmount1: Number,
-	    SkillBonusAmount2: Number,
-	    SkillBonusAmount3: Number,
-	    _14: Number,
+			ElementalDamage: Array,
+	    // LightDamage: Number,
+	    // ShadowDamage: Number,
+	    // DarkDamage: Number,
+	    ElementalDefense: Array,
+			// LightResistance: Number,
+	    // ShawdowResistance: Number,
+	    // DarkResistance: Number,
+	    HitRate: Number,
+	    DodgeRate: Number,
+	    DeadlyRate: Number,
+	    Mastery1: Number,
+	    Mastery2: Number,
+	    Mastery3: Number,
+	    Mastery1_Amount: Number,
+	    Mastery2_Amount: Number,
+	    Mastery3_Amount: Number,
+	    // _14: Number,
 	    ValueType: Number,
 	    Value1: Number,
-	    _16: Number,
-	    _17: Number,
+	    // _16: Number,
+	    // _17: Number,
 	    Refinement: Number,
 	    ChancetoEarnExperiencePointsfromFinalhit: Number,
 	    ExperiencePointEarnedfromFinalhit_PERCENTBONUS_: Number,
-	    _18: Number,
-	    _19: Number,
+	    // _18: Number,
+	    // _19: Number,
 	    DecreaseChiConsumption: Number,
 	    DodgeDeadlyBlow: Number,
-	    IncreaseAllSKillMastery: Number,
-	    _20: Number,
-	    _21: Number,
-	    _22: Number,
-	    _23: Number,
+	    IncreaseAllSkillMastery: Number,
+	    // _20: Number,
+	    // _21: Number,
+	    // _22: Number,
+	    // _23: Number,
 
 	    Description1: String,
 	    Description2: String,
@@ -194,6 +185,12 @@ vms('ItemInfo', [], function(){
 		return this.Clan === 1 || this.Clan === clan;
 	};
 
+	itemSchema.methods.getWeaponModIndex = function(clan){
+		var baseClan = clan === 0 ? 12 : clan === 1 ? 15 : 18;
+		var weaponMod = this.ItemType - baseClan;
+		return weaponMod < 0 || weaponMod > 2 ? 0 : weaponMod;
+	};
+
 	global.ItemType = {
 		SilverCoins: 1,
 		Common: 2,
@@ -224,11 +221,16 @@ vms('ItemInfo', [], function(){
 
 	itemSchema.index({ Name: 1, ItemType: 1 });
 
-	//Constructor
 	delete mongoose.models['item'];
 	var ItemInfo = db.mongoose.model('item', itemSchema);
 
 	ItemInfo.getById = function(id, callback){
+		db.Item.findOne({
+			_id: id
+		}, callback);
+	};
+
+	ItemInfo.findById = function(id, callback){
 		db.Item.findOne({
 			_id: id
 		}, callback);

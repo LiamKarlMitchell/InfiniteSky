@@ -46,27 +46,38 @@ module.exports = function(grunt) {
 			  int32lu("Unknown1").
 			  int32lu("Unknown2").
 			  int32lu("SkillPoint").
-			  int32lu("GuanyinDamage").
-			  int32lu("FujinDamage").
-			  int32lu("JinongDamage").
-			  int32lu("GuanyinDefense").
-			  int32lu("FujinDefense").
-			  int32lu("JinongDefense").
-			  int32lu("GuanyinHitrate").
-			  int32lu("FujinHitrate").
-			  int32lu("JinongHitrate").
-			  int32lu("GuanyinDodge").
-			  int32lu("FujinDodge").
-			  int32lu("JinongDodge").
-			  int32lu("LightDamage").
-			  int32lu("ShadowDamage").
-			  int32lu("DarkDamage").
-			  int32lu("GuanyinHP").
-			  int32lu("FujinHP").
-			  int32lu("JinongHP").
-			  int32lu("GuanyinChi").
-			  int32lu("FujinChi").
-			  int32lu("JinongChi"),
+
+        int32lu('Damage', 3).
+			  // int32lu("GuanyinDamage").
+			  // int32lu("FujinDamage").
+			  // int32lu("JinongDamage").
+
+        int32lu('Defense', 3).
+
+			  // int32lu("GuanyinDefense").
+			  // int32lu("FujinDefense").
+			  // int32lu("JinongDefense").
+        int32lu('HitRate', 3).
+
+			  // int32lu("GuanyinHitrate").
+			  // int32lu("FujinHitrate").
+			  // int32lu("JinongHitrate").
+        int32lu('Dodge', 3).
+			  // int32lu("GuanyinDodge").
+			  // int32lu("FujinDodge").
+			  // int32lu("JinongDodge").
+        int32lu('ElementalDamage', 3).
+			  // int32lu("LightDamage").
+			  // int32lu("ShadowDamage").
+			  // int32lu("DarkDamage").
+        int32lu('BaseHP', 3).
+			  // int32lu("GuanyinHP").
+			  // int32lu("FujinHP").
+			  // int32lu("JinongHP").
+        int32lu('BaseChi', 3),
+			  // int32lu("GuanyinChi").
+			  // int32lu("FujinChi").
+			  // int32lu("JinongChi"),
 			  function onRecordLoad(record) {
 			  	if (record.Level) {
 			  		console.log("Exp info for level", record.Level);

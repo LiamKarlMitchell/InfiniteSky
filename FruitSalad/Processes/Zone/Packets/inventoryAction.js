@@ -1,222 +1,222 @@
 Zone.maxSilver = 2147483647;
 
 Zone.recv.itemAction = restruct.
-    int32lu('ActionType').
-    int32lu('NodeID').
-    int32lu('Unk1').
-    int32lu('ItemID').
-    int32lu('LevelRequired').
-    int32lu('ItemType').
-    int32lu('ItemQuality').
-    int32lu('Amount').
-    int32lu('InventoryIndex').
-    int32lu('PickupColumn').
-    int32lu('PickupRow').
-    int32lu('PickupIndex').
-    int32lu('MoveColumn').
-    int32lu('MoveRow').
-    int32lu('Unk6').
-    int32lu('Unk7').
-    int32lu('Unk8');
+  int32lu('ActionType').
+  int32lu('NodeID').
+  int32lu('Unk1').
+  int32lu('ItemID').
+  int32lu('LevelRequired').
+  int32lu('ItemType').
+  int32lu('ItemQuality').
+  int32lu('Amount').
+  int32lu('InventoryIndex').
+  int32lu('PickupColumn').
+  int32lu('PickupRow').
+  int32lu('PickupIndex').
+  int32lu('MoveColumn').
+  int32lu('MoveRow').
+  int32lu('Unk6').
+  int32lu('Unk7').
+  int32lu('Unk8');
 
 
 Zone.send.itemActionResult = restruct.
-    int8lu('PacketID').
-    int32lu('ActionType').
-    int32lu('NodeID').
-    int32lu('Unk1').
-    int32lu('ItemID').
-    int32lu('LevelRequired').
-    int32lu('ItemType').
-    int32lu('ItemQuality').
-    int32lu('Amount').
-    int32lu('InventoryIndex').
-    int32lu('PickupColumn').
-    int32lu('PickupRow').
-    int32lu('PickupIndex').
-    int32lu('MoveColumn').
-    int32lu('MoveRow').
-    int32lu('Result');
+  int8lu('PacketID').
+  int32lu('ActionType').
+  int32lu('NodeID').
+  int32lu('Unk1').
+  int32lu('ItemID').
+  int32lu('LevelRequired').
+  int32lu('ItemType').
+  int32lu('ItemQuality').
+  int32lu('Amount').
+  int32lu('InventoryIndex').
+  int32lu('PickupColumn').
+  int32lu('PickupRow').
+  int32lu('PickupIndex').
+  int32lu('MoveColumn').
+  int32lu('MoveRow').
+  int32lu('Result');
 
 Zone.send.itemAction = function(result, input){
-    this.write(new Buffer(Zone.send.itemActionResult.pack({
-        PacketID: 0x2B,
-        ActionType: input.ActionType,
-        NodeID: input.NodeID,
-        Unk1: input.Unk1,
-        ItemID: input.ItemID,
-        LevelRequired: input.LevelRequired,
-        ItemType: input.ItemType,
-        ItemQuality: input.ItemQuality,
-        Amount: input.Amount,
-        InventoryIndex: input.InventoryIndex,
-        PickupColumn: input.PickupColumn,
-        PickupRow: input.PickupRow,
-        PickupIndex: input.PickupIndex,
-        MoveRow: input.MoveRow,
-        MoveColumn: input.MoveColumn,
-        Result: result
-    })));
+  this.write(new Buffer(Zone.send.itemActionResult.pack({
+    PacketID: 0x2B,
+    ActionType: input.ActionType,
+    NodeID: input.NodeID,
+    Unk1: input.Unk1,
+    ItemID: input.ItemID,
+    LevelRequired: input.LevelRequired,
+    ItemType: input.ItemType,
+    ItemQuality: input.ItemQuality,
+    Amount: input.Amount,
+    InventoryIndex: input.InventoryIndex,
+    PickupColumn: input.PickupColumn,
+    PickupRow: input.PickupRow,
+    PickupIndex: input.PickupIndex,
+    MoveRow: input.MoveRow,
+    MoveColumn: input.MoveColumn,
+    Result: result
+  })));
 }
 
 // Revised: 09/06/2015 11:20:39
 var ItemAction = {};
 ItemAction[20] = function inventoryMoveItem(input){
-    if(input.Amount > 99){
-        console.log("Amount higher than allowed");
-        Zone.send.itemAction.call(this, 1, input);
-        return;
+  if(input.Amount > 99){
+      console.log("Amount higher than allowed");
+      Zone.send.itemAction.call(this, 1, input);
+      return;
+  }
+
+  var invItem = this.character.Inventory[input.InventoryIndex];
+  if(!invItem){
+      console.log("Item has is not in inventory");
+      Zone.send.itemAction.call(this, 1, input);
+      return;
+  }
+
+  var self = this;
+  db.Item.getById(input.ItemID, function(err, item){
+    if(err){
+      console.log(err);
+      return;
     }
 
-    var invItem = this.character.Inventory[input.InventoryIndex];
-    if(!invItem){
-        console.log("Item has is not in inventory");
-        Zone.send.itemAction.call(this, 1, input);
-        return;
+    if(!item){
+      console.log("No item founded");
+      return;
     }
 
-    var self = this;
-    db.Item.getById(input.ItemID, function(err, item){
-        if(err){
-            console.log(err);
-            return;
-        }
+    if(invItem.ID !== input.ItemID){
+      console.log("Inventory item dont match");
+      Zone.send.itemAction.call(this, 1, input);
+      return;
+    }
 
-        if(!item){
-            console.log("No item founded");
-            return;
-        }
+    var nextInventoryIndex = self.character.nextInventoryIndex();
+    if(nextInventoryIndex === null){
+      console.log("Theres no next inventoryIndex");
+      Zone.send.itemAction.call(this, 1, input);
+      return;
+    }
 
-        if(invItem.ID !== input.ItemID){
-            console.log("Inventory item dont match");
-            Zone.send.itemAction.call(this, 1, input);
-            return;
-        }
+    var intersected = self.character.inventoryIntersection(Zone.itemSlotSizes, input.MoveRow, input.MoveColumn, item.getSlotSize());
+    var stackable = item.isStackable();
+    var reminder = invItem.Amount - input.Amount;
 
-        var nextInventoryIndex = self.character.nextInventoryIndex();
-        if(nextInventoryIndex === null){
-            console.log("Theres no next inventoryIndex");
-            Zone.send.itemAction.call(this, 1, input);
-            return;
-        }
+    if(stackable && input.Amount === 0){
+      Zone.send.itemAction.call(self, 1, input);
+      return;
+    }
 
-        var intersected = self.character.inventoryIntersection(Zone.itemSlotSizes, input.MoveRow, input.MoveColumn, item.getSlotSize());
-        var stackable = item.isStackable();
-        var reminder = invItem.Amount - input.Amount;
+    if(stackable && intersected && reminder){
+      // If the item can be stacked on another, same item. Eg Pills.
+      // And also if the item we are taking x amount, remains in inventory.
+      invItem.Amount = reminder;
+      intersected.Amount -= input.Amount;
+    }else if(stackable && intersected && !reminder){
+      // If item is stackable and parent item is removed from inventory.
+      intersected.Amount += input.Amount;
+      self.character.Inventory[input.InventoryIndex] = null;
+    }else if(stackable && !intersected && reminder){
+      // If item is stackable, and targeted place is allowed for placing.
+      // Parent item remains in inventory.
+      self.character.Inventory[input.InventoryIndex].Amount = reminder;
+      var obj = clone(invItem, false);
+      obj.Row = input.MoveRow;
+      obj.Column = input.MoveColumn;
+      obj.Amount = input.Amount;
+      self.character.Inventory[nextInventoryIndex] = obj;
+    }else if(!intersected && !reminder){
+      invItem.Row = input.MoveRow;
+      invItem.Column = input.MoveColumn;
+      self.character.Inventory[nextInventoryIndex] = invItem;
+      self.character.Inventory[input.InventoryIndex] = null;
+    }else{
+      Zone.send.itemAction.call(self, 1, input);
+      return;
+    }
 
-        if(stackable && input.Amount === 0){
-            Zone.send.itemAction.call(self, 1, input);
-            return;
-        }
-
-        if(stackable && intersected && reminder){
-            // If the item can be stacked on another, same item. Eg Pills.
-            // And also if the item we are taking x amount, remains in inventory.
-            invItem.Amount = reminder;
-            intersected.Amount -= input.Amount;
-        }else if(stackable && intersected && !reminder){
-            // If item is stackable and parent item is removed from inventory.
-            intersected.Amount += input.Amount;
-            self.character.Inventory[input.InventoryIndex] = null;
-        }else if(stackable && !intersected && reminder){
-            // If item is stackable, and targeted place is allowed for placing.
-            // Parent item remains in inventory.
-            self.character.Inventory[input.InventoryIndex].Amount = reminder;
-            var obj = clone(invItem, false);
-            obj.Row = input.MoveRow;
-            obj.Column = input.MoveColumn;
-            obj.Amount = input.Amount;
-            self.character.Inventory[nextInventoryIndex] = obj;
-        }else if(!intersected && !reminder){
-            invItem.Row = input.MoveRow;
-            invItem.Column = input.MoveColumn;
-            self.character.Inventory[nextInventoryIndex] = invItem;
-            self.character.Inventory[input.InventoryIndex] = null;
-        }else{
-            Zone.send.itemAction.call(self, 1, input);
-            return;
-        }
-
-        self.character.markModified('Inventory');
-        self.character.save();
-        Zone.send.itemAction.call(self, 0, input);
-    });
+    self.character.markModified('Inventory');
+    self.character.save();
+    Zone.send.itemAction.call(self, 0, input);
+  });
 };
 
 // Revised: 09/06/2015 11:24:30
 ItemAction[14] = function CharacterItem_Unequip(input){
-    var equipItem;
-    switch(input.InventoryIndex){
-        case 0: equipItem = 'Amulet'; break; // Amulet
-        case 1: equipItem = 'Cape'; break; // Cape
-        case 2: equipItem = 'Outfit'; break; // Outfit
-        case 3: equipItem = 'Gloves'; break; // Gloves
-        case 4: equipItem = 'Ring'; break; // Ring
-        case 5: equipItem = 'Boots'; break; // Boots
-        case 6: equipItem = 'Bottle'; break; // Bootsle
-        case 7: equipItem = 'Weapon'; break; // Weapon
-        case 8: equipItem = 'Pet'; break; // Pet
-        default: break;
-    }
+  var equipItem;
+  switch(input.InventoryIndex){
+      case 0: equipItem = 'Amulet'; break; // Amulet
+      case 1: equipItem = 'Cape'; break; // Cape
+      case 2: equipItem = 'Outfit'; break; // Outfit
+      case 3: equipItem = 'Gloves'; break; // Gloves
+      case 4: equipItem = 'Ring'; break; // Ring
+      case 5: equipItem = 'Boots'; break; // Boots
+      case 6: equipItem = 'Bottle'; break; // Bootsle
+      case 7: equipItem = 'Weapon'; break; // Weapon
+      case 8: equipItem = 'Pet'; break; // Pet
+      default: break;
+  }
 
-    if(!equipItem){
-        console.log("Undefined item was tried to be removed of character");
+  if(!equipItem){
+      console.log("Undefined item was tried to be removed of character");
+      Zone.send.itemAction.call(self, 1, input);
+      return;
+  }
+
+  var charItem = this.character[equipItem];
+  if(!charItem && charItem.ID){
+      console.log("Character does not wear this item");
+      Zone.send.itemAction.call(self, 1, input);
+      return;
+  }
+
+  var self = this;
+  db.Item.getById(charItem.ID, function(err, item){
+    if(err){
         Zone.send.itemAction.call(self, 1, input);
         return;
     }
 
-    var charItem = this.character[equipItem];
-    if(!charItem && charItem.ID){
-        console.log("Character does not wear this item");
+    if(!item){
         Zone.send.itemAction.call(self, 1, input);
         return;
     }
 
-    var self = this;
-    db.Item.getById(charItem.ID, function(err, item){
-        if(err){
-            Zone.send.itemAction.call(self, 1, input);
-            return;
-        }
+    var intersected = self.character.inventoryIntersection(Zone.itemSlotSizes, input.MoveRow, input.MoveColumn, item.getSlotSize());
+    if(intersected){
+        Zone.send.itemAction.call(self, 1, input);
+        return;
+    }
 
-        if(!item){
-            Zone.send.itemAction.call(self, 1, input);
-            return;
-        }
+    var nextInventoryIndex = self.character.nextInventoryIndex();
 
-        var intersected = self.character.inventoryIntersection(Zone.itemSlotSizes, input.MoveRow, input.MoveColumn, item.getSlotSize());
-        if(intersected){
-            Zone.send.itemAction.call(self, 1, input);
-            return;
-        }
+    if(nextInventoryIndex === null){
+        console.log("No free space for item that has now being unequiped");
+        Zone.send.itemAction.call(self, 1, input);
+        return;
+    }
 
-        var nextInventoryIndex = self.character.nextInventoryIndex();
+    var obj = clone(charItem, false);
+    obj.Column = input.MoveColumn;
+    obj.Row = input.MoveRow;
 
-        if(nextInventoryIndex === null){
-            console.log("No free space for item that has now being unequiped");
-            Zone.send.itemAction.call(self, 1, input);
-            return;
-        }
+    self.character[equipItem] = null;
+    self.character.Inventory[nextInventoryIndex] = obj;
+    self.character.markModified('Inventory');
+    self.character.save(function(err){
+      if(err){
 
-        var obj = clone(charItem, false);
-        obj.Column = input.MoveColumn;
-        obj.Row = input.MoveRow;
-
-        self.character[equipItem] = null;
-        self.character.Inventory[nextInventoryIndex] = obj;
-        self.character.markModified('Inventory');
-        self.character.save(function(err){
-            if(err){
-
-                return;
-            }
-            self.character.infos.updateStat(equipItem, function(){
-                self.character.state.setFromCharacter(self.character);
-                Zone.send.itemAction.call(self, 0, input);
-                Zone.sendToAllArea(self, false, self.character.state.getPacket(), config.network.viewable_action_distance);
-            });
-        });
+          return;
+      }
+      self.character.infos.update(equipItem, function(){
+        self.character.state.setFromCharacter(self.character);
+        Zone.send.itemAction.call(self, 0, input);
+        Zone.sendToAllArea(self, false, self.character.state.getPacket(), config.network.viewable_action_distance);
+      });
     });
+  });
 };
 
 // Revised: 09/06/2015 11:24:27
@@ -284,7 +284,7 @@ ItemAction[3] = function CharacterItem_Equip(input){
 
                 return;
             }
-            self.character.infos.updateStat(equipItem, function(){
+            self.character.infos.update(equipItem, function(){
                 self.character.state.setFromCharacter(self.character);
                 Zone.send.itemAction.call(self, 0, input);
                 Zone.sendToAllArea(self, false, self.character.state.getPacket(), config.network.viewable_action_distance);
@@ -1168,11 +1168,96 @@ ItemAction[28] = function removeSkillFromSkillBar(input){
 };
 
 ItemAction[31] = function learnSkill(input){
+  // Categories
+  // 1 = General
+  // 3 and 4 = Support
+  // 2 = Attack
+
+  console.log("Learning skill");
   console.log(input);
-  Zone.send.itemAction.call(this, 1, input);
+  var self = this;
+  db.Skill.findById(input.ItemID, function(err, skill){
+    if(err){
+      console.log("Error on finding skills")
+      Zone.send.itemAction.call(self, 1, input);
+      return;
+    }
+
+    if(!skill){
+      console.log("Skill not founded")
+      Zone.send.itemAction.call(self, 1, input);
+      return;
+    }
+
+    if(!skill.isUsedByClan(self.character.Clan)){
+      Zone.send.itemAction.call(self, 1, input);
+      return;
+    }
+
+    if(skill.PointsToLearn > self.character.SkillPoints){
+      Zone.send.itemAction.call(self, 1, input);
+      return;
+    }
+
+    var index = 0;
+    var alreadyLearned;
+    var freeIndex = null;
+
+    switch(skill.Category){
+      case 2:
+      index = 20;
+      break;
+
+      case 3:
+      case 4:
+      index = 10;
+      break;
+    }
+
+    for(var i=index; i<(index+10); i++){
+      var charSkill = self.character.SkillList[i];
+      if(charSkill && charSkill.ID === input.ItemID){
+        alreadyLearned = true;
+        break;
+      }
+
+      if(freeIndex === null && !charSkill){
+        freeIndex = i;
+      }
+    }
+
+    console.log(freeIndex);
+
+    if(!freeIndex){
+      Zone.send.itemAction.call(self, 1, input);
+      return;
+    }
+
+    if(alreadyLearned){
+      Zone.send.itemAction.call(self, 1, input);
+      return;
+    }
+
+    self.character.SkillPoints -= skill.PointsToLearn;
+
+    self.character.SkillList[freeIndex] = {
+      ID: input.ItemID,
+      Level: skill.PointsToLearn
+    };
+
+    self.character.markModified('SkillList');
+    self.character.save(function(err){
+      if(err){
+        Zone.send.itemAction.call(self, 1, input);
+        return;
+      }
+
+      Zone.send.itemAction.call(self, 0, input);
+    });
+  });
 };
 
-ItemAction[12] = function learnSkill(input){
+ItemAction[12] = function useQuickItem(input){
   console.log(input);
 
   var invItem = this.character.QuickUseItems[input.InventoryIndex];

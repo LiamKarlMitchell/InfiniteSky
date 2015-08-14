@@ -72,21 +72,23 @@ module.exports = function(grunt) {
 			  int32ls("Luck").
 			  int32ls("Damage").
 			  int32ls("Defense").
-			  int32ls("LightDamage").
-			  int32ls("ShadowDamage").
-			  int32ls("DarkDamage").
-			  int32ls("LightResistance").
-			  int32ls("ShawdowResistance").
-			  int32ls("DarkResistance").
-			  int32ls("ChancetoHit").
-			  int32ls("ChancetoDodge").
-			  int32ls("PercentToDeadlyBlow").
-			  int32ls("SkillBonusID1").
-			  int32ls("SkillBonusID2").
-			  int32ls("SkillBonusID3").
-			  int32ls("SkillBonusAmount1").
-			  int32ls("SkillBonusAmount2").
-			  int32ls("SkillBonusAmount3").
+        int32ls('ElementalDamage', 3).
+			  // int32ls("LightDamage").
+			  // int32ls("ShadowDamage").
+			  // int32ls("DarkDamage").
+        int32ls('ElementalDefense', 3).
+			  // int32ls("LightResistance").
+			  // int32ls("ShawdowResistance").
+			  // int32ls("DarkResistance").
+			  int32ls("HitRate").
+			  int32ls("DodgeRate").
+			  int32ls("DeadlyRate").
+			  int32ls("Mastery1").
+			  int32ls("Mastery2").
+			  int32ls("Mastery3").
+			  int32ls("Mastery1_Amount").
+			  int32ls("Mastery2_Amount").
+			  int32ls("Mastery3_Amount").
 			  int32ls("_14").
 			  int32ls("ValueType").
 			  int32ls("Value1").
@@ -99,7 +101,7 @@ module.exports = function(grunt) {
 			  int32ls("_19").
 			  int32ls("DecreaseChiConsumption").
 			  int32ls("DodgeDeadlyBlow").
-			  int32ls("IncreaseAllSKillMastery").
+			  int32ls("IncreaseAllSkillMastery").
 			  int32ls("_20").
 			  int32ls("_21").
 			  int32ls("_22").
@@ -111,7 +113,6 @@ module.exports = function(grunt) {
 			  	if (record._id) {
 			  		// Convert the encoding of the name and descriptions.
 			  		record.Name = encoding.convert(record.Name, 'UTF-8', 'EUC-KR').toString();
-			  		console.log(record._id, record.Name);
 			  		record.Description1 = encoding.convert(record.Description1, 'UTF-8', 'EUC-KR').toString();
 			  		record.Description2 = encoding.convert(record.Description2, 'UTF-8', 'EUC-KR').toString();
 			  		record.Description3 = encoding.convert(record.Description3, 'UTF-8', 'EUC-KR').toString();

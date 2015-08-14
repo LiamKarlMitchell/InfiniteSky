@@ -136,20 +136,21 @@ QuadTree.prototype.inBounds = function(node){
 };
 
 QuadTree.prototype.remove = function(node){
-  this.nodes.splice(this.nodes.indexOf(node), 1);
-  if(this.parent && this.parent.hasLeafs){
-    var totalNodes = 0;
-    for(var i=0; i<4; i++){
-      totalNodes += this.parent.leafs[i].nodes.length;
-    }
-
-    if(totalNodes < this.parent.leafSize){
-      this.parent.nodes = []; // This might be unecessary
-      for(var i=0; i<4; i++) this.parent.nodes = this.parent.nodes.concat(this.parent.leafs[i].nodes);
-      this.parent.hasLeafs = false;
-      this.parent.leafs = [];
-    }
-  }
+  
+  // this.nodes.splice(this.nodes.indexOf(node), 1);
+  // if(this.parent && this.parent.hasLeafs){
+  //   var totalNodes = 0;
+  //   for(var i=0; i<4; i++){
+  //     totalNodes += this.parent.leafs[i].nodes.length;
+  //   }
+  //
+  //   if(totalNodes < this.parent.leafSize){
+  //     this.parent.nodes = []; // This might be unecessary
+  //     for(var i=0; i<4; i++) this.parent.nodes = this.parent.nodes.concat(this.parent.leafs[i].nodes);
+  //     this.parent.hasLeafs = false;
+  //     this.parent.leafs = [];
+  //   }
+  // }
 };
 
 QuadTree.prototype.query = function(query){
