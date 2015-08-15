@@ -122,6 +122,10 @@ function updateSpawnPoints() {
 
 }
 
+function getSpawnPointsFromData() {
+
+}
+
 socket.on('spawnlogs', function(data) {
     window.spawnlogs = data;
     updateGraphData();
@@ -136,8 +140,7 @@ socket.on('spawnpoints', function(data) {
 });
 
 function getDateTimeFromObjectID(_id) {
-    var timestamp = _id.toString().substring(0, 8);
-    return new Date(parseInt(timestamp, 16) * 1000);
+    return _id.getDate();
 }
 
 function SpawnGroup() {
@@ -157,11 +160,12 @@ SpawnGroup.prototype.add = function SpawnGroup__add(id, amount) {
 }
 
 function SpawnPoint() {
-  this.type = 'point';
+  this.type = 'npc';
   this.x = 0;
   this.y = 0;
   this.z = 0;
-  this.spawns = [];
+  this.id = 0;
+  this.direction = 0;
 }
 
 SpawnPoint.prototype.add = function SpawnPoint__add(id, direction) {

@@ -75,6 +75,8 @@ vms('ItemInfo', [], function(){
 
 	});
 
+	itemSchema.index({ Name: 1, ItemType: 1 });
+
 	itemSchema.methods.isDroppable = function(){
 		//TODO: Check if item is droppable
 		return true;
