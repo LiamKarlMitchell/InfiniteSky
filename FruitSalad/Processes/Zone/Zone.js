@@ -363,6 +363,18 @@ zonePrototype.broadcastStates = function(client) {
 	}
 };
 
+zonePrototype.sendToAllAreaLocation = function(location, distance, buffer) {
+	var found = this.QuadTree.query({
+		CVec3: location,
+		radius: distance,
+		type: ['client']
+	});
+	for (var i = 0; i < found.length; i++) {
+		var f = found[i];
+		f.object.write(buffer);
+	}
+};
+
 zonePrototype.sendToAllArea = function(client, self, buffer, distance) {
 	var found = this.QuadTree.query({
 		CVec3: client.character.state.Location,
@@ -393,6 +405,125 @@ zonePrototype.sendToAllAreaClan = function(client, self, buffer, distance, clan)
 zonePrototype.onFindAccount = function(socket, err, account) {
 	socket.account = account;
 }
+
+
+
+// Moves a character socket to a location and optionally a zoneID (Not yet implemented)
+// Returns false if it failed, true if success
+zonePrototype.move = function zone_move_character_socket(socket, location, zoneID) {
+    //var ChangeZone = false;
+    // Teleport to zone
+    // Make sure zoneID is number.
+    // if(zoneID && zoneID != this.character.MapID) {
+    //     var thePort = 0;
+    //     var theIP = '';
+    //     var status = 0;
+    //     console.log("Teleporting to Zone ID's not tested yet");
+    //     // Check if zone id exists
+    //     var TransferZone = worldserver.findZoneByID(zoneID);
+    //     if(TransferZone == null) {
+    //         console.log("Zone not found");
+    //         status = 1;
+    //         this.write(
+    //         new Buffer(
+    //         packets.MapLoadReply.pack({
+    //             packetID: 0x0A,
+    //             Status: status,
+    //             IP: theIP,
+    //             Port: thePort
+    //         })));
+    //         return false;
+    //     }
+    //     console.log('Zone found');
+    //     if(Location) {
+    //         // Use the location
+    //         console.log('Location set');
+    //         this.character.state.Location.X = location.X;
+    //         this.character.state.Location.Y = location.Y;
+    //         this.character.state.Location.Z = location.Z;
+    //         this.character.state.Skill = 0;
+    //         this.character.state.Frame = 0;
+    //         this.sendActionStateToArea();
+    //     } else {
+    //         // Get a location for the zone
+    //         console.log('Finding portal 0 endpoint');
+    //         var PortalEndPoint = TransferZone.getPortalEndPoint(0);
+    //         if(PortalEndPoint) {
+    //             console.log('Location set');
+    //             this.character.state.Location.X = PortalEndPoint.X;
+    //             this.character.state.Location.Y = PortalEndPoint.Y;
+    //             this.character.state.Location.Z = PortalEndPoint.Z;
+    //             // Get random spot in that radius?
+    //         } else {
+    //             console.log('Location not set');
+    //             this.character.state.Location.X = 0;
+    //             this.character.state.Location.Y = 0;
+    //             this.character.state.Location.Z = 0;
+    //         }
+    //     }
+    //     // The Character State object for use in world for moving and health etc.
+    //     //this.character.state.setFromCharacter(this.character);
+    //     //console.log(this.character.state.Location);
+    //     // Ask the zones/mapservers if they are ready for connections
+    //     // If not then set Status to 1
+    //     //status = 1;
+    //     // Add to WorldServer client transfer.
+    //     // Set the zoneID and XYZ they are to goto.
+    //     this.character.MapID = TransferZone.getID();
+    //     this.zoneTransfer = true;
+    //     this.zoneForceTransfer = true;
+    //     worldserver.addSocketToTransferQueue(this);
+    //     console.log('Tell client which map server to connect too');
+    //     //socket.characters[gamestart.Slot].MapID << get the map id of character :P
+    //     // Get world.clients ip, check if it is on lan with server,
+    //     // if so send it servers lan ip and port
+    //     // otherwise send it real world ip and port
+    //     theIP = config.externalIP;
+    //     if(_util.cleanIP(this.remoteAddress).indexOf('127') == 0) {
+    //         theIP = '127.0.0.1'
+    //     }
+    //     console.log('IP for client to connect too before translation: ' + theIP);
+    //     for(var i = 0; i < natTranslations.length; i++) {
+    //         if(natTranslations[i].contains(_util.cleanIP(this.remoteAddress))) {
+    //             theIP = natTranslations[i].ip;
+    //             break;
+    //         }
+    //     }
+    //     console.log('IP for client to connect too: ' + theIP);
+    //     thePort = config.ports.world;
+    //     console.log({
+    //         packetID: 0x0A,
+    //         Status: status,
+    //         IP: theIP,
+    //         Port: thePort
+    //     });
+    //     this.account.save();
+    //     this.character.save();
+    //     this.write(
+    //     new Buffer(
+    //     packets.MapLoadReply.pack({
+    //         packetID: 0x0A,
+    //         Status: status,
+    //         IP: theIP,
+    //         Port: thePort
+    //     })));
+    //     return true;
+    // }
+    var oldLocation = socket.character.state.Location.copy();
+    if(location) {
+        socket.character.state.Location.X = location.X;
+        socket.character.state.Location.Y = location.Y;
+        socket.character.state.Location.Z = location.Z;
+    }
+    // Send character update packet
+    socket.character.state.Skill = 0;
+    socket.character.state.Frame = 0;
+
+    var packet = socket.character.state.getPacket();
+    Zone.sendToAllAreaLocation(oldLocation, config.network.viewable_action_distance, packet);
+    Zone.sendToAllArea(socket, true, packet, config.network.viewable_action_distance);
+    return true;
+};
 
 
 zonePrototype.onProcessMessage = function(type, socket) {
