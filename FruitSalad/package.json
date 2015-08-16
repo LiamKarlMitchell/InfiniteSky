@@ -6,6 +6,7 @@
   "main": "main.js",
   "dependencies": {
     "async": "^1.3.0",
+    "body-parser": "^1.13.3",
     "bson": "^0.2.22",
     "bunyan": "^1.4.0",
     "cli-color": "^1.0.0",
@@ -20,6 +21,7 @@
     "jshint": "^2.7.0",
     "jsonlint": "^1.6.2",
     "mongoose": "^4.0.6",
+    "mongoose-cache": "^0.1.4",
     "netmask": "^1.0.5",
     "node-uuid": "^1.4.3",
     "random-js": "^1.0.4",
