@@ -48,14 +48,15 @@ structs.SmallStorageItemPet = restruct.
 
 structs.Pet= restruct.
 	int32lu("ID").
+	int16lu('Activity').
 	int16lu('Unknown').
-	int16lu('Activity').
-	int32lu('Growth'); // 1250 = 0.001
-
-structs.PetEquip = restruct.
-	int32lu("ID").
-	int16lu('Activity').
 	int32lu('Growth');
+//
+// structs.PetEquip = restruct.
+// 	int32lu("ID").
+//   int8lu('').
+// 	int8lu('Activity').
+// 	int32lu('Growth');
 
 structs.StorageItem = restruct.
 	int32lu("ID").
@@ -140,8 +141,11 @@ structs.Equip = function()
 
 // Need to find skill and statpoints
 structs.Character = restruct.
-	int32lu('isGM'). // 4
-	int32lu('Unused1',6).//Will add later // 8
+  int32lu('Usable_LuckyEnchanting').
+  int32lu('Usable_LuckyUpgrading').
+  int32lu('Usable_LuckyCombining').
+  pad(16).
+	// int32lu('Unused1',6).//Will add later // 8
 	int32lu('PlayTime'). // 12
 	string('Name', 13). // 25
 	pad(71). // 144 StuffLikeLocation

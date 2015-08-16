@@ -36,6 +36,7 @@
 // if(typeof generic === 'undefined'){
 //   generic = {};
 // }
+var uuid = require('node-uuid');
 
 var Modifiers = [];
 var GuanyinModifiers = {
@@ -84,11 +85,37 @@ Modifiers.push(JinongModifiers);
 
 var calculation = {};
 calculation.Damage = function(item, enchant, combine, done){
+  // Damage is missed by 1, some calculations are Math.floor'ed.
   this.Damage = this.ExpInfo.Damage[this.Clan] * 2;
-  this.Damage += this.character.Stat_Strength * this.Weapon.Mod;
+  this.Damage += Math.floor(this.character.Stat_Strength * this.Weapon.Mod);
   this.Damage += this.Weapon.Damage;
 
-  console.log("Damage:", this.Damage);
+  if(this.Damage > this.Pet.Damage){
+    this.Damage += this.Pet.Damage / 100 * this.Pet.Scale;
+  }else{
+    this.Damage += this.Damage;
+  }
+
+  done();
+};
+
+calculation.Defense = function(item, enchant, combine, done){
+  // Damage is missed by 1, some calculations are Math.floor'ed.
+  this.Defense = this.ExpInfo.Defense[this.Clan];
+  this.Defense += this.Outfit.Defense;
+  this.Defense += this.Boots.Defense;
+  this.Defense += this.Gloves.Defense;
+  this.Defense += this.Cape.Defense;
+
+  if(this.Defense > this.Pet.Defense){
+    this.Defense += this.Pet.Defense / 100 * this.Pet.Scale;
+  }else{
+    this.Defense += this.Defense;
+  }
+
+  this.Defense = Math.floor(this.Defense);
+
+  done();
 };
 
 calculation.Cape = function(item, enchant, combine, done){
@@ -116,7 +143,7 @@ calculation.Cape = function(item, enchant, combine, done){
     break;
   }
 
-  done();
+  this.update(['DodgeRate', 'Luck', 'Mastery', 'ElementalDefense', 'Defense', 'DodgeDeadlyBlow'], done);
 };
 
 calculation.Outfit = function(item, enchant, combine, done){
@@ -146,11 +173,15 @@ calculation.Outfit = function(item, enchant, combine, done){
       0,  // Shadow
       0   // Dark
     ];
+    this.Outfit.Vitality = 0;
+    this.Outfit.Luck = 0;
     this.Outfit.Mastery = {};
+    this.Outfit.AllMastery = 0;
+    this.Outfit.DodgeRate = 0;
     break;
   }
 
-  done();
+  this.update(['DodgeRate', 'Luck', 'Mastery', 'ElementalDefense', 'Defense', 'MaxHP'], done);
 };
 
 calculation.Weapon = function(item, enchant, combine, done){
@@ -169,7 +200,7 @@ calculation.Weapon = function(item, enchant, combine, done){
     this.Weapon.HitRate = item.HitRate;
     this.Weapon.HitRate += hitTick * combine;
 
-    this.Weapon.ElementalDamage = this.Clan === 0 ? item.LightDamage : this.Clan === 1 ? item.ShadowDamage : item.DarkDamage;
+    this.Weapon.ElementalDamage = item.ElementalDamage[this.Clan];
 
     this.Weapon.Mastery = this.getMasteryBonuses(item);
     this.Weapon.AllMastery = item.IncreaseAllSkillMastery;
@@ -185,7 +216,16 @@ calculation.Weapon = function(item, enchant, combine, done){
     break;
   }
 
-  this.update('Damage');
+  this.update(['Damage', 'HitRate', 'ElementalDamage', 'Mastery'], done);
+};
+
+calculation.HitRate = function(item, enchant, combine, done){
+  this.HitRate = Math.floor(this.Modifiers.HitRate * this.character.Stat_Dexterity);
+  this.HitRate += this.Gloves.HitRate;
+  this.HitRate += this.Weapon.HitRate;
+  this.HitRate += this.Pet.HitRate;
+
+  this.HitRate = Math.floor(this.HitRate);
   done();
 };
 
@@ -204,8 +244,6 @@ calculation.Boots = function(item, enchant, combine, done){
 
     this.Boots.Luck = item.Luck;
     this.Boots.Mastery = this.getMasteryBonuses(item);
-
-    console.log(this.Boots);
     break;
 
     default:
@@ -216,7 +254,7 @@ calculation.Boots = function(item, enchant, combine, done){
     break;
   }
 
-  done();
+  this.update(['DodgeRate', 'Luck', 'Defense', 'Mastery'], done);
 };
 
 calculation.Gloves = function(item, enchant, combine, done){
@@ -234,18 +272,117 @@ calculation.Gloves = function(item, enchant, combine, done){
 
     this.Gloves.Luck = item.Luck;
     this.Gloves.Mastery = this.getMasteryBonuses(item);
-
-    console.log(this.Gloves);
     break;
 
     default:
     this.Gloves.HitRate = 0;
     this.Gloves.Mastery = {};
     this.Gloves.Luck = 0;
-    this.Gloves.HitRate = 0;
+    this.Gloves.Defense = 0;
     break;
   }
 
+  this.update(['HitRate', 'Luck', 'Defense', 'Mastery'], done);
+};
+
+calculation.Luck = function(item, enchant, combine, done){
+  this.Luck = this.Outfit.Luck;
+  this.Luck += this.Boots.Luck;
+  this.Luck += this.Ring.Luck;
+  this.Luck += this.Amulet.Luck;
+  this.Luck += this.Gloves.Luck;
+
+  done();
+};
+
+calculation.DeadlyRate = function(item, enchant, combine, done){
+  done();
+};
+
+calculation.DodgeRate = function(item, enchant, combine, done){
+  this.DodgeRate = this.ExpInfo.Dodge[this.Clan];
+  this.DodgeRate += this.Outfit.DodgeRate;
+  this.DodgeRate += this.Boots.DodgeRate;
+  this.DodgeRate += this.Pet.DodgeRate;
+
+  if(this.DodgeRate > this.Pet.DodgeRate){
+    this.DodgeRate += this.Pet.DodgeRate / 100 * this.Pet.Scale;
+  }else{
+    this.DodgeRate += this.DodgeRate;
+  }
+
+  done();
+};
+
+calculation.ElementalDamage = function(item, enchant, combine, done){
+  this.ElementalDamage = this.ExpInfo.ElementalDamage[this.Clan];
+  this.ElementalDamage += this.Weapon.ElementalDamage;
+  this.ElementalDamage += this.Ring.ElementalDamage;
+  this.ElementalDamage += this.Pet.ElementalDamage;
+
+  done();
+};
+
+calculation.Mastery = function(item, enchant, combine, done){
+  this.SkillMastery = {};
+  this.AllSkillsMastery = 0;
+
+  this.concatMastery(this.Pet);
+  this.concatMastery(this.Boots);
+  this.concatMastery(this.Weapon);
+  this.concatMastery(this.Outfit);
+  this.concatMastery(this.Cape);
+  this.concatMastery(this.Amulet);
+  this.concatMastery(this.Ring);
+  this.concatMastery(this.Gloves);
+
+  done();
+};
+
+calculation.MaxHP = function(item, enchant, combine, done){
+  this.MaxHP = this.ExpInfo.BaseHP[this.Clan];
+  this.MaxHP += Math.floor((this.character.Stat_Vitality + this.Outfit.Vitality) * this.Modifiers.HP);
+
+  if(this.MaxHP > this.Pet.HP){
+    this.MaxHP += this.Pet.HP / 100 * this.Pet.Scale;
+  }else{
+    this.MaxHP += this.MaxHP;
+  }
+
+  done();
+};
+
+calculation.MaxChi = function(item, enchant, combine, done){
+  this.MaxChi = this.ExpInfo.BaseChi[this.Clan];
+  this.MaxChi += Math.floor(
+    (this.character.Stat_Chi + this.Amulet.Chi) * this.Modifiers.Chi
+  );
+
+  done();
+};
+
+calculation.ElementalDefense = function(item, enchant, combine, done){
+  this.ElementalDefense[0] = this.Outfit.ElementalDefense[0];
+  this.ElementalDefense[1] = this.Outfit.ElementalDefense[1];
+  this.ElementalDefense[2] = this.Outfit.ElementalDefense[2];
+
+  this.ElementalDefense[0] += this.Amulet.ElementalDefense[0];
+  this.ElementalDefense[1] += this.Amulet.ElementalDefense[1];
+  this.ElementalDefense[2] += this.Amulet.ElementalDefense[2];
+
+  this.ElementalDefense[0] += this.Cape.ElementalDefense[0];
+  this.ElementalDefense[1] += this.Cape.ElementalDefense[1];
+  this.ElementalDefense[2] += this.Cape.ElementalDefense[2];
+
+  // TODO: Pet adding elemental defense.
+  // this.ElementalDefense[0] += this.Pet.ElementalDefense[0];
+  // this.ElementalDefense[1] += this.Pet.ElementalDefense[1];
+  // this.ElementalDefense[2] += this.Pet.ElementalDefense[2];
+
+  done();
+};
+
+calculation.DodgeDeadlyBlow = function(item, enchant, combine, done){
   done();
 };
 
@@ -258,7 +395,6 @@ calculation.Ring = function(item, enchant, combine, done){
     this.Ring.Luck = item.Luck;
     this.Ring.Mastery = this.getMasteryBonuses(item);
     this.Ring.AllMastery = item.IncreaseAllSkillMastery;
-    console.log(this.Ring);
     break;
 
     default:
@@ -271,7 +407,7 @@ calculation.Ring = function(item, enchant, combine, done){
     break;
   }
 
-  done();
+  this.update(['DeadlyRate', 'DodgeRate', 'HitRate', 'Luck', 'ElementalDamage', 'Mastery'], done);
 };
 
 calculation.Amulet = function(item, enchant, combine, done){
@@ -282,7 +418,6 @@ calculation.Amulet = function(item, enchant, combine, done){
     this.Amulet.Luck = item.Luck;
     this.Amulet.Mastery = this.getMasteryBonuses(item);
     this.Amulet.AllMastery = item.IncreaseAllSkillMastery;
-    console.log(this.Amulet);
     break;
 
     default:
@@ -294,30 +429,53 @@ calculation.Amulet = function(item, enchant, combine, done){
     break;
   }
 
-  done();
+  this.update(['MaxChi', 'Luck', 'ElementalDefense', 'Mastery'], done);
 };
 
 calculation.Pet = function(item, enchant, combine, done){
   switch(typeof item){
     case 'object':
-    // this.Amulet.ElementalDefense = item.ElementalDefense;
-    // this.Amulet.Chi = item.Chi;
-    // this.Amulet.Luck = item.Luck;
-    // this.Amulet.Mastery = this.getMasteryBonuses(item);
-    // this.Amulet.AllMastery = item.IncreaseAllSkillMastery;
-    // console.log(this.Amulet);
+    if(!item.Pet){
+      return;
+    }
+
+    // If pet increases 100% of total damage and its > than their max, its then capped to the max Damage.
+
+    if(item.Pet.MaxGrowth < this.character.Pet.Growth) this.character.Pet.Growth = item.Pet.MaxGrowth;
+
+    var isMaxed = this.character.Pet.Growth === item.Pet.MaxGrowth;
+
+    this.Pet.Scale = 100 / item.Pet.MaxGrowth * this.character.Pet.Growth;
+
+    this.Pet.HP = item.Pet.HP;
+    this.Pet.HP += isMaxed ? item.Pet.HP / 100 * 10 : 0;
+
+    this.Pet.Damage = item.Pet.Damage;
+    this.Pet.Damage += isMaxed ? item.Pet.Damage / 100 * 10 : 0;
+    this.Pet.Defense = item.Pet.Defense;
+    this.Pet.Defense += isMaxed ? item.Pet.Defense / 100 * 10 : 0;
+
+    this.Pet.Mastery = item.Pet.Mastery;
+    this.Pet.DodgeRate = item.Pet.DodgeRate;
+    this.Pet.HitRate = item.Pet.HitRate;
+    this.Pet.ElementalDamage = item.Pet.ElementalDamage;
+    this.Pet.ElementalDefense = item.Pet.ElementalDefense;
     break;
 
     default:
-    // this.Amulet.ElementalDefense = [0,0,0];
-    // this.Amulet.Chi = 0;
-    // this.Amulet.Luck = 0;
-    // this.Amulet.Mastery = {};
-    // this.Amulet.AllMastery = 0;
+    this.Pet.HP = 0;
+    this.Pet.Damage = 0;
+    this.Pet.Defense = 0;
+    this.Pet.Mastery = {};
+    this.Pet.DodgeRate = 0;
+    this.Pet.HitRate = 0;
+    this.Pet.ElementalDamage = 0;
+    this.Pet.ElementalDefense = 0;
+    this.Pet.Scale = 0;
     break;
   }
 
-  done();
+  this.update(['MaxHP', 'Damage', 'Defense', 'Mastery', 'DodgeRate', 'HitRate', 'ElementalDamage', 'ElementalDefense'], done);
 };
 
 vms('CharacterInfo', [], function(){
@@ -332,11 +490,11 @@ vms('CharacterInfo', [], function(){
       return;
     }
 
-    this.MaxHP    = 0;
-    this.MaxChi   = 0;
-    this.Damage   = 0;
+    this.MaxHP = 0;
+    this.MaxChi = 0;
+    this.Damage = 0;
     this.Defense  = 0;
-    this.Dodge    = 0;
+    this.DodgeRate = 0;
     this.HitRate  = 0;
     this.ElementalDamage = 0;
     this.ElementalDefense = [
@@ -346,7 +504,7 @@ vms('CharacterInfo', [], function(){
     ];
 
     this.SkillMastery = {};
-    this.AllSkillsMastery = {};
+    this.AllSkillsMastery = 0;
     this.Chance_ReturnDamage = 0;
     this.Chance_DeadlyBlow = 0;
     this.AcupressureDefense = 0;
@@ -429,13 +587,27 @@ vms('CharacterInfo', [], function(){
       Chi: 0,
       Damage: 0,
       Defense: 0,
-      Skills: {},
-      Dodge: 0,
+      Mastery: {},
+      DodgeRate: 0,
       HitRate: 0,
       ElementalDamage: 0,
-      ElementalDefense: 0
+      ElementalDefense: 0,
+      MaxGrowth: 0,
+      Scale: 0
     };
+
+    this.updateCalls = {};
   }
+
+  CharacterInfos.prototype.concatMastery = function(obj){
+    for(var skillID in obj.Mastery)
+      if(this.SkillMastery[skillID] === undefined)
+        this.SkillMastery[skillID] = obj.Mastery[skillID];
+      else
+        this.SkillMastery[skillID] =+ obj.Mastery[skillID];
+
+      if(obj.AllMastery) this.AllSkillsMastery += obj.AllMastery;
+  };
 
   CharacterInfos.prototype.getMasteryBonuses = function(item){
     var result = {};
@@ -446,12 +618,32 @@ vms('CharacterInfo', [], function(){
   };
 
   CharacterInfos.prototype.onExpInfo = function(name, oncalc_callback){
+    if(typeof oncalc_callback !== 'function'){
+      var callback = (function(id){
+        var table = this.updateCalls[id];
+        if(!table){
+          return;
+        }
+
+        if(++table.counter === table.length){
+          if(typeof table.callback === 'function'){
+            this.updateCalls[id].callback.call(this);
+          }
+
+          delete this.updateCalls[id];
+        }
+      }).bind(this, oncalc_callback);
+
+      oncalc_callback = callback;
+    }
+
     var func = calculation[name];
     if(typeof func !== 'function'){
       console.log("Calculation method of", name, "is not a function, found:", typeof func);
-      oncalc_callback();
+      if(typeof oncalc_callback === 'function') oncalc_callback();
       return;
     }
+
 
     var charItem = this.character[name];
     var self = this;
@@ -472,810 +664,64 @@ vms('CharacterInfo', [], function(){
     }
   };
 
-  CharacterInfos.prototype.update = function infos_Update(name, oncalc_callback){
-    if(typeof oncalc_callback !== 'function') oncalc_callback = function(){};
+  CharacterInfos.prototype.update = function infos_Update(n, oncalc_callback){
+    var id = uuid.v4();
+    var names = [];
+    if(typeof n === 'string') names.push(n); else names = n;
+    this.updateCalls[id] = {counter: 0, length: names.length, callback: oncalc_callback};
 
     var self = this;
-    if(this.Level !== this.character.Level || this.ExpInfo === undefined){
-      db.Exp.getByLevel(this.character.Level, function(err, exp){
-        if(err){
-          return;
-        }
+    for(var i=0; i<names.length; i++){
+      var name = names[i];
+      if(this.Level !== this.character.Level || this.ExpInfo === undefined){
+        db.Exp.getByLevel(this.character.Level, function(err, exp){
+          if(err){
+            return;
+          }
 
-        if(!exp){
-          return;
-        }
+          if(!exp){
+            return;
+          }
 
-        self.ExpInfo = exp;
-        self.onExpInfo.call(self, name, oncalc_callback);
-      });
-    }else{
-      this.onExpInfo.call(self, name, oncalc_callback);
+          self.ExpInfo = exp;
+          self.onExpInfo.call(self, name, id);
+        });
+      }else{
+        this.onExpInfo.call(self, name, id);
+      }
     }
   };
 
   CharacterInfos.prototype.updateAll = function infos_UpdateAll(onready_callback){
-    onready_callback();
+    var equipment = ['Weapon', 'Outfit', 'Gloves', 'Boots', 'Cape', 'Amulet', 'Pet', 'Ring'];
+    var loaded = 0;
+    var callback = function(){
+      if(++loaded === equipment.length){
+        if(typeof onready_callback === 'function') onready_callback();
+      }
+    }
+
+    for(var i=0; i<equipment.length; i++) this.update(equipment[i], callback);
+  };
+
+  CharacterInfos.prototype.print = function(){
+    console.log("Character Infos:");
+    console.log("MaxHP:", this.MaxHP);
+    console.log("MaxChi:", this.MaxChi);
+    console.log("Damage:", this.Damage);
+    console.log("Defense:", this.Defense);
+    console.log("DodgeRate:", this.DodgeRate);
+    console.log("HitRate:", this.HitRate);
+    console.log("ElementalDamage:", this.ElementalDamage);
+    console.log("ElementalDefense:", this.ElementalDefense);
+    console.log("SkillMastery:", this.SkillMastery);
+    console.log("AllSkillsMastery:", this.AllSkillsMastery);
+    console.log("Chance_ReturnDamage:", this.Chance_ReturnDamage);
+    console.log("Chance_DeadlyBlow:", this.Chance_DeadlyBlow);
+    console.log("AcupressureDefense:", this.AcupressureDefense);
+    console.log("Chance_Acupressure:", this.Chance_Acupressure);
+    console.log("Luck:", this.Luck);
   };
 
   global.CharacterInfos = CharacterInfos;
 });
-
-// var Modifiers = [];
-
-//
-// var GainModifiers = {
-//   HP: 15.31,
-//   Chi: 20,
-//   HitRate: 5.1399999,
-//   Dodge: 2.5699999,
-//   Damage: [
-//     1.4299999, // UnarmedDamageMod
-//     3.8599999, // SwordDamageMod
-//     4.3000002, // BladeDamagemod
-//     4.0799999 // MarbleDamageMod
-//   ]
-// };
-//
-// var FujinModifiers = {
-//   HP: 14.29,
-//   Chi: 17.14,
-//   HitRate: 4.5700002,
-//   Dodge: 2.29,
-//   Damage: [
-//     1.36, // UnarmedDamageMod
-//     3.1700001, // KatanaFujinDamageMod
-//     2.71, // KatanaDoubleBladeDamageMod
-//     2.9400001 // LuteDamageMod
-//   ]
-// };
-//
-// var JinongModifiers = {
-//   HP: 16.33,
-//   Chi: 22.29,
-//   HitRate: 5.71,
-//   Dodge: 2.8599999,
-//   Damage: [
-//     2.5899999, // UnarmedDamageMod
-//     5.3899999, // BladeDamageMod
-//     5.6100001, // SpearDamageMod
-//     5.1700001 // SecpterDamageMod
-//   ]
-// };
-//
-// Modifiers.push(GainModifiers);
-// Modifiers.push(FujinModifiers);
-// Modifiers.push(JinongModifiers);
-//
-//
-// generic.Modifiers = Modifiers;
-//
-//
-// var CharacterInfos = function(c, character){
-//   // TODO : Include all the base stats and erease them from the methods below.
-//   // this.client = c === null ? this.client.character ;
-//   if(typeof process.log !== 'function')
-//     process.log = console.log;
-//
-//   if(c === null){
-//     this.client = {};
-//     this.client.character = character;
-//   }else{
-//     this.client = c;
-//   }
-//   this.clan = this.client.character.Clan;
-//
-//
-//   this.Pet = {
-//     HP: 0,
-//     Chi: 0,
-//     Damage: 0,
-//     Defense: 0,
-//     Skills: {},
-//     Dodge: 0,
-//     HitRate: 0,
-//     ElementalDamage: 0,
-//     ElementalDefense: 0
-//   };
-//
-//   this.Outfit = {
-//     Vitality: 0,
-//     Defense: 0,
-//     Dodge: 0,
-//     Resists: {
-//       Light: 0,
-//       Shadow: 0,
-//       Dark : 0
-//     },
-//     Luck: 0,
-//     Skills: {},
-//     AllSkills: 0
-//   };
-//
-//   this.Modifiers = generic.Modifiers[this.client.character.Clan] || null;
-//   this.Weapon = {
-//     Damage: 0,
-//     Mod: this.Modifiers.Damage[0],
-//     HitRate: 0,
-//     ElementalDamage: 0,
-//     Skills: {},
-//     AllSkills: 0
-//   };
-//
-//   this.Boots = {
-//     Defense: 0,
-//     Dodge: 0,
-//     Luck: 0,
-//     Skills: {},
-//     AllSkills: 0
-//   };
-//
-//   this.Ring = {
-//     Dexterity: 0,
-//     ElementalDamage: 0,
-//     DeadlyRate: 0,
-//     Luck: 0,
-//     Skills: {},
-//     AllSkills: 0
-//   };
-//
-//   this.Gloves = {
-//     Defense: 0,
-//     HitRate: 0,
-//     Luck: 0,
-//     Skills: {},
-//     AllSkills: 0
-//   };
-//
-//   this.Cape = {
-//     Defense: 0,
-//     Resists: {
-//       Light: 0,
-//       Shadow: 0,
-//       Dark : 0
-//     },
-//     Skills: {},
-//     AllSkills: 0
-//   };
-//   this.Amulet = {
-//     Chi: 0,
-//     Resists: {
-//       Light: 0,
-//       Shadow: 0,
-//       Dark : 0
-//     },
-//     Luck: 0,
-//     Skills: {},
-//     AllSkills: 0
-//   };
-//
-//   this.DexHitRate = 0;
-//   this.DexDodge = 0;
-//
-//   this.Damage = 0;
-//   this.Dodge = 0;
-//   this.Defense = 0;
-//   this.HitRate = 0;
-//   this.MaxHP = 0;
-//   this.MaxChi = 0;
-//
-//   this.ElementalDamage = 0;
-//   this.Resists = {
-//     Light: 0,
-//     Shadow: 0,
-//     Dark : 0
-//   };
-//
-//   this.Luck = 0;
-//   this.DeadlyRate = 0;
-//
-//   this.Skills = {};
-//   this.AllSkills = 0;
-//
-//   return this;
-// };
-//
-// CharacterInfos.prototype.updateEquipmentByDefault = function(equipment_name){
-//   switch(equipment_name){
-//     case 'Weapon':
-//       this.Weapon.Damage = 0;
-//       this.Weapon.Mod = this.Modifiers.Damage[0];
-//
-//       this.Weapon.ElementalDamage = 0;
-//       this.Weapon.HitRate = 0;
-//       this.updateStat('StatStrength');
-//       this.updateStat('HitRate');
-//       // TODO: When skills are ready, appropriate level increment. Only applies to the weapons that has the benefits for the skills
-//     break;
-//
-//
-//     case 'Pet':
-//       // this.Pet.
-//       this.Pet = {
-//         HP: 0,
-//         Chi: 0,
-//         Damage: 0,
-//         Defense: 0,
-//         Skills: {},
-//         Dodge: 0,
-//         HitRate: 0,
-//         ElementalDamage: 0,
-//         ElementalDefense: 0
-//       };
-//
-//       this.updateStat('StatVitality');
-//       this.updateStat('StatChi');
-//       this.updateStat('Damage');
-//       this.updateStat('Defense');
-//       this.updateStat('Skills');
-//       this.updateStat('Dodge');
-//       this.updateStat('HitRate');
-//       this.updateStat('ElementalDamage');
-//       this.updateStat('Resists');
-//     break;
-//
-//
-//     case 'Outfit':
-//     this.Outfit.Defense = 0;
-//     this.Outfit.Vitality = 0;
-//     this.Outfit.Dodge = 0;
-//
-//     this.Outfit.Resists.Light = 0;
-//     this.Outfit.Resists.Shadow = 0;
-//     this.Outfit.Resists.Dark = 0;
-//
-//
-//     this.updateStat('Defense');
-//     this.updateStat('Dodge');
-//     break;
-//
-//     case 'Boots':
-//       this.Boots.Defense = 0;
-//       this.Boots.Dodge = 0;
-//
-//       this.updateStat('Defense');
-//       this.updateStat('Dodge');
-//     break;
-//
-//
-//     case 'Gloves':
-//       this.Gloves.Defense = 0;
-//       this.Gloves.HitRate = 0;
-//
-//       this.updateStat('Defense');
-//       this.updateStat('HitRate');
-//     break;
-//
-//     case 'Cape':
-//       this.Cape.Defense = 0;
-//
-//       this.Cape.Resists.Light = 0;
-//       this.Cape.Resists.Shadow = 0;
-//       this.Cape.Resists.Dark = 0;
-//
-//
-//       this.updateStat('Defense');
-//       this.updateStat('Resists');
-//     break;
-//
-//     case 'Amulet':
-//       this.Amulet.Chi = 0;
-//       this.Amulet.Resists.Light = 0;
-//       this.Amulet.Resists.Shadow = 0;
-//       this.Amulet.Resists.Dark = 0;
-//
-//       this.Amulet.Luck = 0;
-//
-//       this.updateStat('StatChi');
-//       this.updateStat('Resists');
-//     break;
-//
-//     case 'Ring':
-//       this.Ring.Luck = 0;
-//       this.Ring.Dexterity = 0;
-//       this.Ring.ElementalDamage = 0;
-//       this.Ring.DeadlyRate = 0;
-//
-//       this.updateStat('StatDexterity');
-//       this.updateStat('Luck');
-//       this.updateStat('ElementalDamage');
-//       this.updateStat('DeadlyRate');
-//     break;
-//
-//     default:
-//     process.log("CharacterInfos.prototype.updateEquipmentByDefault("+equipment_name+") not found in Switch");
-//     return false;
-//     break;
-//   }
-//   return true;
-// }
-//
-// CharacterInfos.prototype.updateEquipment = function(equipment_name, callback){
-//   // TODO: Callback once the calculation has finished so we can for example send an response for itemActions to wear an item.
-//
-//
-//   // Check if we have supplied the function with item name we want to take a look at
-//   if(!equipment_name){
-//     process.log("The item was not specified.")
-//     return;
-//   }
-//
-//   // Check if the character has the item equiped
-//   if(!this.client.character[equipment_name]){
-//     //TODO: Handle the updates of stats if necessary, like weapons do.
-//     if(!this.updateEquipmentByDefault(equipment_name))
-//       process.log("Trying to update the ["+equipment_name+"] but character does not have it, or the client.character.infos.updateEquipmentByDefault method cannot initialize default settings for item.");
-//     if(typeof callback === 'function')
-//       callback.call(this);
-//     return;
-//   }
-//
-//   // Get the item from character
-//   var item = this.client.character[equipment_name];
-//   if(!item.ID){
-//     if(!this.updateEquipmentByDefault(equipment_name))
-//       process.log("Trying to update the ["+equipment_name+"] but character does not have it, or the client.character.infos.updateEquipmentByDefault method cannot initialize default settings for item.");
-//     if(typeof callback === 'function')
-//       callback.call(this);
-//     return;
-//   }
-//
-//
-//   // Get the item info
-//   // var itemInfo = infos.Item[item.ID];
-//   // if(!itemInfo){
-//   //   process.log("infos.Item["+item.ID+"] has not been found");
-//   //   return;
-//   // }
-//
-//   var self = this;
-//   db.Item.getById(item.ID, function(err, itemInfo){
-//     if (err) {
-//       console.error(err);
-//     }
-//     console.log('GetItem '+item.ID);
-//     self.updateEquipment_OnItemInfo(err, itemInfo, equipment_name, item, callback);
-//   });
-// }
-//
-// CharacterInfos.prototype.updateEquipment_OnItemInfo = function(err, itemInfo, equipment_name, item, callback){
-//   if(err){
-//     process.log(err);
-//     return;
-//   }
-//
-//   if(!itemInfo){
-//     process.log("No item info found");
-//     return;
-//   }
-//
-//   // process.log("Item info", itemInfo);
-//
-//   // Get the defaults
-//   var enchant = item.Enchant*3 || 0;
-//   var combine = item.Combine || 0;
-//   var growth = item.Growth || 0;
-//
-//   console.log("EQ Update Called");
-//
-//   switch(equipment_name){
-//     case 'Weapon':
-//     console.log("Updating weapon");
-//       var combineTick = (itemInfo.Level > 95 && itemInfo.Level <= 145) ? 35 : (itemInfo.Level > 85 && itemInfo.Level <= 95) ? 25 : 15;
-//       var hitTick = (itemInfo.Level > 95 && itemInfo.Level <= 145) ? 5 : (itemInfo.Level > 85 && itemInfo.Level <= 95) ? 3 : 2;
-//
-//       this.Weapon.Damage = (combineTick*combine) + itemInfo.Damage;
-//
-//       this.Weapon.Damage += Math.floor(this.Weapon.Damage/100*enchant);
-//       switch(this.clan){
-//         case 0:
-//         this.Weapon.Mod = itemInfo.ItemType === 13 ? this.Modifiers.Damage[1] : itemInfo.ItemType === 14 ? this.Modifiers.Damage[2] : itemInfo.ItemType === 15 ? this.Modifiers.Damage[3] : this.Modifiers.Damage[0];
-//         break;
-//
-//         case 1:
-//         this.Weapon.Mod = itemInfo.ItemType === 16 ? this.Modifiers.Damage[1] : itemInfo.ItemType === 17 ? this.Modifiers.Damage[2] : itemInfo.ItemType === 18 ? this.Modifiers.Damage[3] : this.Modifiers.Damage[0];
-//         break;
-//
-//         case 2:
-//         this.Weapon.Mod = itemInfo.ItemType === 19 ? this.Modifiers.Damage[1] : itemInfo.ItemType === 20 ? this.Modifiers.Damage[2] : itemInfo.ItemType === 21 ? this.Modifiers.Damage[3] : this.Modifiers.Damage[0];
-//         break;
-//       }
-//
-//       this.Weapon.ElementalDamage = this.clan === 0 ? itemInfo.LightDamage : this.clan === 1 ? itemInfo.ShadowDamage : itemInfo.DarkDamage;
-//       this.Weapon.HitRate = (hitTick*combine) + itemInfo.ChancetoHit;
-//
-//       var deadlyRate = itemInfo.PercentToDeadlyBlow;
-//
-//       this.updateStat('StatStrength');
-//       this.updateStat('HitRate');
-//       // TODO: When skills are ready, appropriate level increment. Only applies to the weapons that has the benefits for the skills
-//     break;
-//
-//
-//     case 'Pet':
-//       var MAX_GROWTH = itemInfo.PetStats.MaxGrowth;
-//       var scale = item.Growth / MAX_GROWTH;
-//
-//       // process.log("Updating pet ["+item.ID+"]");
-//       // process.log("Pet growth: " + item.Growth);
-//       switch(item.ID){
-//         case 9800:
-//         this.Pet.Damage = (itemInfo.PetStats.Damage / 200) * (scale * 200) + (item.Growth >= MAX_GROWTH ? itemInfo.PetStats.Damage / 100 * 10 : 0);
-//         this.Pet.HitRate = (itemInfo.PetStats.HitRate / 200) * (scale * 200);
-//         this.Pet.ElementalDamage = (itemInfo.PetStats.ElementalDamage / 200) * (scale * 200);
-//         this.updateStat('Damage');
-//         this.updateStat('HitRate');
-//         this.updateStat('ElementalDamage');
-//         break;
-//
-//         case 9801:
-//         this.Pet.HP = (itemInfo.PetStats.HP / 200) * (scale * 200) + (item.Growth >= MAX_GROWTH ? itemInfo.PetStats.HP / 100 * 10 : 0);
-//         this.Pet.ElementalDefense = (itemInfo.PetStats.ElementalDefense / 200) * (scale * 200);
-//         this.Pet.ElementalDefense = this.Pet.ElementalDefense > 136 ? 136 : this.Pet.ElementalDefense;
-//         this.Pet.Dodge = (itemInfo.PetStats.Dodge / 200) * (scale * 200);
-//
-//         this.updateStat('Health');
-//         this.updateStat('Resists');
-//         this.updateStat('Dodge');
-//         break;
-//
-//         case 9802:
-//         this.Pet.Damage = (itemInfo.PetStats.Damage / 200) * (scale * 200) + (item.Growth >= MAX_GROWTH ? itemInfo.PetStats.Damage / 100 * 10 : 0);
-//         this.Pet.Defense = (itemInfo.PetStats.Defense / 200) * (scale * 200) + (item.Growth >= MAX_GROWTH ? itemInfo.PetStats.Defense / 100 * 10 : 0);
-//         this.Pet.HP = (itemInfo.PetStats.HP / 200) * (scale * 200) + (item.Growth >= MAX_GROWTH ? itemInfo.PetStats.HP / 100 * 10 : 0);
-//         this.Pet.HitRate = (itemInfo.PetStats.HitRate / 200) * (scale * 200);
-//         this.Pet.Dodge = (itemInfo.PetStats.Dodge / 200) * (scale * 200);
-//         this.updateStat('Health');
-//         this.updateStat('Defense');
-//         this.updateStat('Damage');
-//         this.updateStat('HitRate');
-//         this.updateStat('Dodge');
-//         break;
-//
-//         case 98999:
-//         this.Pet.HP = (itemInfo.PetStats.HP / 200) * (scale * 200) + (item.Growth >= MAX_GROWTH ? itemInfo.PetStats.HP / 100 * 10 : 0);
-//         this.updateStat('Health');
-//         break;
-//
-//         case 99000:
-//         this.Pet.Defense = (itemInfo.PetStats.Defense / 200) * (scale * 200) + (item.Growth >= MAX_GROWTH ? itemInfo.PetStats.Defense / 100 * 10 : 0);
-//         this.updateStat('Defense');
-//         break;
-//
-//         case 99001:
-//         this.Pet.Damage = (itemInfo.PetStats.Damage / 200) * (scale * 200) + (item.Growth >= MAX_GROWTH ? itemInfo.PetStats.Damage / 100 * 10 : 0);
-//         this.updateStat('Damage');
-//         break;
-//
-//         case 99226:
-//         this.Pet.Damage = (itemInfo.PetStats.Damage / 200) * (scale * 200) + (item.Growth >= MAX_GROWTH ? itemInfo.PetStats.Damage / 100 * 10 : 0);
-//         this.Pet.HP = (itemInfo.PetStats.HP / 200) * (scale * 200) + (item.Growth >= MAX_GROWTH ? itemInfo.PetStats.HP / 100 * 10 : 0);
-//         this.updateStat('Health');
-//         this.updateStat('Damage');
-//         break;
-//
-//         case 99227:
-//         this.Pet.Damage = (itemInfo.PetStats.Damage / 200) * (scale * 200) + (item.Growth >= MAX_GROWTH ? itemInfo.PetStats.Damage / 100 * 10 : 0);
-//         this.Pet.Defense = (itemInfo.PetStats.Defense / 200) * (scale * 200) + (item.Growth >= MAX_GROWTH ? itemInfo.PetStats.Defense / 100 * 10 : 0);
-//         this.updateStat('Damage');
-//         this.updateStat('Defense');
-//         break;
-//
-//         case 99228:
-//         this.Pet.Defense = (itemInfo.PetStats.Defense / 200) * (scale * 200) + (item.Growth >= MAX_GROWTH ? itemInfo.PetStats.Defense / 100 * 10 : 0);
-//         this.Pet.HP = (itemInfo.PetStats.HP / 200) * (scale * 200) + (item.Growth >= MAX_GROWTH ? itemInfo.PetStats.HP / 100 * 10 : 0);
-//         this.updateStat('Health');
-//         this.updateStat('Defense');
-//         break;
-//
-//         case 99229:
-//         this.Pet.HP = (itemInfo.PetStats.HP / 200) * (scale * 200) + (item.Growth >= MAX_GROWTH ? itemInfo.PetStats.HP / 100 * 10 : 0);
-//         this.Pet.Defense = (itemInfo.PetStats.Defense / 200) * (scale * 200) + (item.Growth >= MAX_GROWTH ? itemInfo.PetStats.Defense / 100 * 10 : 0);
-//         this.Pet.Damage = (itemInfo.PetStats.Damage / 200) * (scale * 200) + (item.Growth >= MAX_GROWTH ? itemInfo.PetStats.Damage / 100 * 10 : 0);
-//         this.updateStat('Health');
-//         this.updateStat('Defense');
-//         this.updateStat('Damage');
-//         break;
-//
-//         case 99267:
-//         case 99282:
-//         this.Pet.Defense = (itemInfo.PetStats.Defense / 200) * (scale * 200) + (item.Growth >= MAX_GROWTH ? itemInfo.PetStats.Defense / 100 * 10 : 0);
-//         this.Pet.Skills = itemInfo.PetStats.Skills;
-//         this.updateStat('Defense');
-//         this.updateSkills();
-//         break;
-//
-//         case 99268:
-//         case 99283:
-//         this.Pet.Damage = (itemInfo.PetStats.Damage / 200) * (scale * 200) + (item.Growth >= MAX_GROWTH ? itemInfo.PetStats.Damage / 100 * 10 : 0);
-//         this.Pet.Skills = itemInfo.PetStats.Skills;
-//         this.updateStat('Damage');
-//         this.updateSkills();
-//         break;
-//
-//         default:
-//         process.log("The ["+item.ID+"] item is not a PET!");
-//         break;
-//       }
-//     break;
-//
-//
-//     case 'Outfit':
-//     var DefenseTick = (itemInfo.Level > 95 && itemInfo.Level <= 145) ? 22 : 14;
-//     var dodgeTick = (itemInfo.Level > 95 && itemInfo.Level <= 145) ? 3 : 2;
-//
-//     this.Outfit.Defense = (DefenseTick * combine) + itemInfo.Defense;
-//     this.Outfit.Defense += (this.Outfit.Defense / 100 * enchant);
-//     this.Outfit.Vitality = itemInfo.Vitality;
-//     this.Outfit.Dodge = (dodgeTick * combine) + itemInfo.ChancetoDodge;
-//
-//     this.Outfit.Resists.Light = itemInfo.LightResistance;
-//     this.Outfit.Resists.Shadow = itemInfo.ShawdowResistance;
-//     this.Outfit.Resists.Dark = itemInfo.DarkResistance;
-//
-//
-//     this.updateStat('Defense');
-//     this.updateStat('Dodge');
-//     break;
-//
-//     case 'Boots':
-//       var DefenseTick = (itemInfo.Level > 95 && itemInfo.Level <= 145) ? 3 : 2;
-//       var dodgeTick = (itemInfo.Level > 95 && itemInfo.Level <= 145) ? 8 : 6;
-//
-//       this.Boots.Defense = (DefenseTick * combine) + itemInfo.Defense;
-//       this.Boots.Dodge = (dodgeTick * combine) + itemInfo.ChancetoDodge;
-//       this.Boots.Dodge += Math.floor(this.Boots.Dodge / 100 * enchant);
-//
-//       this.updateStat('Defense');
-//       this.updateStat('Dodge');
-//     break;
-//
-//
-//     case 'Gloves':
-//       var DefenseTick = (itemInfo.Level > 95 && itemInfo.Level <= 145) ? 8 : 5;
-//       // Todo: check values for this level ranges
-//       var hitTick = (itemInfo.Level > 95 && itemInfo.Level <= 145) ? 13 : 8;
-//
-//       this.Gloves.Defense = (DefenseTick * combine) + itemInfo.Defense;
-//
-//
-//       this.Gloves.HitRate = (hitTick * combine) + itemInfo.ChancetoHit;
-//       this.Gloves.HitRate += (this.Gloves.HitRate / 100) * enchant;
-//
-//       this.updateStat('Defense');
-//       this.updateStat('HitRate');
-//     break;
-//
-//     case 'Cape':
-//       this.Cape.Defense = itemInfo.Defense;
-//
-//       this.Cape.Resists.Light = itemInfo.LightResistance;
-//       this.Cape.Resists.Shadow = itemInfo.ShawdowResistance;
-//       this.Cape.Resists.Dark = itemInfo.DarkResistance;
-//
-//
-//       this.updateStat('Defense');
-//       this.updateStat('Resists');
-//     break;
-//
-//     case 'Amulet':
-//       this.Amulet.Chi = itemInfo.Chi;
-//       this.Amulet.Resists.Light = itemInfo.LightResistance;
-//       this.Amulet.Resists.Shadow = itemInfo.ShawdowResistance;
-//       this.Amulet.Resists.Dark = itemInfo.DarkResistance;
-//
-//       this.Cape.Luck = itemInfo.Luck;
-//
-//       this.updateStat('StatChi');
-//     break;
-//
-//     case 'Ring':
-//       this.Ring.Luck = itemInfo.Luck;
-//       this.Ring.Dexterity = itemInfo.Dexterity;
-//       this.Ring.ElementalDamage = this.clan === 0 ? itemInfo.LightDamage : this.clan === 1 ? itemInfo.ShadowDamage : itemInfo.DarkDamage;
-//       this.Ring.DeadlyRate = itemInfo.PercentToDeadlyBlow;
-//
-//       this.updateStat('StatDexterity');
-//       this.updateStat('Luck');
-//       this.updateStat('ElementalDamage');
-//       this.updateStat('DeadlyRate');
-//     break;
-//   }
-//
-//   if(typeof callback === 'function')
-//     callback.call(this);
-//   return this;
-// }
-//
-// CharacterInfos.prototype.updateAll = function(callback){
-//   var hasCallback = typeof callback === 'function';
-//   if(hasCallback){
-//     // console.log("We have callback");
-//     var total = 19;
-//     var totalCalled = 0;
-//     var updateCounter = function(){
-//       totalCalled++;
-//       // console.log(totalCalled);
-//       if(totalCalled === total)
-//         callback.call(this);
-//     };
-//   }
-//
-//   this.updateEquipment('Weapon',      (hasCallback ? updateCounter : null));
-//   this.updateEquipment('Outfit',       (hasCallback ? updateCounter : null));
-//   this.updateEquipment('Boots',        (hasCallback ? updateCounter : null));
-//   this.updateEquipment('Gloves',       (hasCallback ? updateCounter : null));
-//   this.updateEquipment('Cape',        (hasCallback ? updateCounter : null));
-//   this.updateEquipment('Amulet',      (hasCallback ? updateCounter : null));
-//   this.updateEquipment('Ring',        (hasCallback ? updateCounter : null));
-//   this.updateEquipment('Pet',         (hasCallback ? updateCounter : null));
-//
-//   this.updateStat('StatVitality',     (hasCallback ? updateCounter : null));
-//   this.updateStat('StatChi',          (hasCallback ? updateCounter : null));
-//   this.updateStat('StatDexterity',    (hasCallback ? updateCounter : null));
-//   this.updateStat('StatStrength',     (hasCallback ? updateCounter : null));
-//
-//   this.updateStat('Defense',          (hasCallback ? updateCounter : null));
-//   this.updateStat('HitRate',          (hasCallback ? updateCounter : null));
-//   this.updateStat('Dodge',            (hasCallback ? updateCounter : null));
-//   this.updateStat('DeadlyRate',       (hasCallback ? updateCounter : null));
-//   this.updateStat('Luck',             (hasCallback ? updateCounter : null));
-//   this.updateStat('Resists',          (hasCallback ? updateCounter : null));
-//   this.updateStat('ElementalDamage',  (hasCallback ? updateCounter : null));
-//
-//   // this.updateSkills();
-// }
-//
-// CharacterInfos.prototype.updateLevel = function(){
-//   // TODO: On level updates
-//   this.updateAll();
-// }
-//
-// CharacterInfos.prototype.updateSkills = function(){
-//
-// }
-//
-// CharacterInfos.prototype.updateStat = function(stat_name, callback){
-//   // if(
-//   //   (
-//   //     stat_name !== 'Defense' &&
-//   //     stat_name !== 'HitRate' &&
-//   //     stat_name !== 'Dodge' &&
-//   //     stat_name !== 'Luck' &&
-//   //     stat_name !== 'DeadlyRate' &&
-//   //     stat_name !== 'Resists' &&
-//   //     stat_name !== 'ElementalDamage'
-//   //   ) && Stat === undefined
-//   // ){
-//   //   process.log("Stat " + stat_name + " is undefined");
-//   //   return;
-//   // }
-//
-//   if(!this.Modifiers){
-//     process.log("No character modifiers");
-//     return;
-//   }
-//
-//   var self = this;
-//   var ExpInfo = db.Exp.getByLevel(this.client.character.Level, function(err, expInfo){
-//     self.updateStat_OnExpInfo(err, expInfo, stat_name, callback);
-//   });
-// }
-//
-// CharacterInfos.prototype.updateStat_OnExpInfo = function(err, ExpInfo, stat_name, callback){
-//   if(err){
-//     process.log("Could not find exp info for character:", this.client.character.Name);
-//     return;
-//   }
-//
-//   if(!ExpInfo){
-//     process.log("No exp info for level:", this.client.character.Level);
-//     return;
-//   }
-//
-//   switch(stat_name){
-//     case 'StatVitality':
-//     case 'Vitality':
-//     case 'HP':
-//     case 'Health':
-//     var baseHP = this.clan === 0 ? ExpInfo.GuanyinHP : this.clan === 1 ? ExpInfo.FujinHP : ExpInfo.JinongHP;
-//     var formula = baseHP + (this.Modifiers.HP * (this.client.character.StatVitality + this.Outfit.Vitality)) + this.Pet.HP;
-//     this.MaxHP = formula;
-//
-//     if(this.client.character.Health > this.MaxHP){
-//       this.client.character.Health = this.MaxHP;
-//       this.client.character.save();
-//     }
-//     break;
-//
-//     case 'StatChi':
-//     var baseCHI = this.clan === 0 ? ExpInfo.GuanyinChi : this.clan === 1 ? ExpInfo.FujinChi : ExpInfo.JinongChi;
-//     var formula = baseCHI + (this.Modifiers.Chi * (this.client.character.StatChi + this.Amulet.Chi));
-//     this.MaxChi = formula;
-//
-//     if(this.client.character.Chi > this.MaxChi){
-//       this.client.character.Chi = this.MaxChi;
-//       this.client.character.save();
-//     }
-//     break;
-//
-//     case 'StatDexterity':
-//     var baseDodge = this.clan === 0 ? ExpInfo.GuanyinDodge : this.clan === 1 ? ExpInfo.FujinDodge : ExpInfo.JinongDodge;
-//     var Stat = this.client.character.StatDexterity;
-//     Stat += this.Ring.Dexterity;
-//
-//     var dodgeFormula = baseDodge + (this.Modifiers.Dodge * Stat);
-//
-//     this.DexHitRate = (this.Modifiers.HitRate * Stat);
-//     this.DexDodge = (this.Modifiers.Dodge * Stat);
-//
-//     this.updateStat('HitRate');
-//     this.updateStat('Dodge');
-//     break;
-//
-//     case 'Strength':
-//     case 'Damage':
-//     var baseDamage = this.clan === 0 ? ExpInfo.GuanyinDamage : this.clan === 1 ? ExpInfo.FujinDamage : ExpInfo.JinongDamage;
-//     var damageFormula = (baseDamage + (this.Weapon.Mod * this.client.character.StatStrength)) + baseDamage + this.Weapon.Damage;
-//     this.Damage = damageFormula;
-//     this.Damage += this.Pet.Damage;
-//     break;
-//
-//     case 'Defense':
-//     var baseDefense = this.clan === 0 ? ExpInfo.GuanyinDefense : this.clan === 1 ? ExpInfo.FujinDefense : ExpInfo.JinongDefense;
-//     this.Defense = this.Outfit.Defense + this.Boots.Defense + this.Gloves.Defense + this.Cape.Defense + baseDefense;
-//     this.Defense += this.Pet.Defense;
-//     break;
-//
-//     case 'HitRate':
-//     this.HitRate = this.Weapon.HitRate + this.Gloves.HitRate + this.DexHitRate;
-//     this.HitRate += this.Pet.HitRate;
-//     break;
-//
-//     case 'Dodge':
-//     var baseDefense = this.clan === 0 ? ExpInfo.GuanyinDefense : this.clan === 1 ? ExpInfo.FujinDefense : ExpInfo.JinongDefense;
-//     this.Dodge = this.Boots.Dodge + this.Outfit.Dodge + this.DexDodge;
-//     this.Dodge += this.Pet.Dodge;
-//     break;
-//
-//     case 'Luck':
-//     this.Luck = this.Boots.Luck + this.Outfit.Luck + this.Gloves.Luck + this.Amulet.Luck + this.Ring.Luck;
-//     break;
-//
-//     case 'Resists':
-//     this.Resists.Light = this.Outfit.Resists.Light + this.Amulet.Resists.Light + this.Cape.Resists.Light;
-//     this.Resists.Shadow = this.Outfit.Resists.Shadow + this.Amulet.Resists.Shadow + this.Cape.Resists.Shadow;
-//     this.Resists.Dark = this.Outfit.Resists.Dark + this.Amulet.Resists.Dark + this.Cape.Resists.Dark;
-//
-//     this.Resists.Light += this.Resists.Light / 136 * this.Pet.ElementalDefense;
-//     this.Resists.Shadow += this.Resists.Shadow / 136 * this.Pet.ElementalDefense;
-//     this.Resists.Dark += this.Resists.Dark / 136 * this.Pet.ElementalDefense;
-//     break;
-//
-//     case 'ElementalDamage':
-//     var baseElementalDamage = this.clan === 0 ? ExpInfo.LightDamage : this.clan === 1 ? ExpInfo.ShadowDamage : ExpInfo.DarkDamage;
-//     this.ElementalDamage = this.Weapon.ElementalDamage + this.Ring.ElementalDamage + baseElementalDamage;
-//     break;
-//
-//     case 'DeadlyRate':
-//     this.DeadlyRate = this.Ring.DeadlyRate;
-//     break;
-//   }
-//
-//   if(typeof callback === 'function')
-//     callback();
-// }
-//
-// CharacterInfos.prototype.print = function(){
-//   process.log();
-//   process.log("Damage : " + this.Damage);
-//   process.log("Defense : " + this.Defense);
-//   process.log("Max HP : " + this.MaxHP);
-//   process.log("Max Chi : " + this.MaxChi);
-//   process.log("Hit Rate : " + this.HitRate);
-//   process.log("Dodge : " + this.Dodge);
-//   process.log("Luck : " + this.Luck);
-//   process.log("Resits : ", this.Resists);
-//   process.log("Deadly rate : ", this.DeadlyRate);
-//   process.log("ElementalDamage : ", this.ElementalDamage);
-// }

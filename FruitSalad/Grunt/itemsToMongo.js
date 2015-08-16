@@ -116,7 +116,99 @@ module.exports = function(grunt) {
 			  		record.Description1 = encoding.convert(record.Description1, 'UTF-8', 'EUC-KR').toString();
 			  		record.Description2 = encoding.convert(record.Description2, 'UTF-8', 'EUC-KR').toString();
 			  		record.Description3 = encoding.convert(record.Description3, 'UTF-8', 'EUC-KR').toString();
-			  		db.Item.create(record, function(err, doc) {
+
+            record.ElementalDefense.reverse();
+
+            record.Pet = {};
+            record.Pet.Mastery = {};
+            record.Pet.Damage = 0;
+            record.Pet.Defense = 0;
+            record.Pet.HP = 0;
+            record.Pet.DodgeRate = 0;
+            record.Pet.HitRate = 0;
+            record.Pet.MaxGrowth = 40000000;
+            record.Pet.ElementalDamage = 0;
+            record.Pet.ElementalDefense = 0;
+
+            switch(record._id){
+    					case 9800:
+    					record.Pet.Damage = 1000;
+    					record.Pet.HitRate = 1000;
+    					record.Pet.ElementalDamage = 600;
+    					record.Pet.MaxGrowth = 240000000;
+    					break;
+
+    					case 9801:
+    					record.Pet.HP = 2000;
+    					record.Pet.DodgeRate = 500;
+    					record.Pet.ElementalDefense = 500;
+    					record.Pet.MaxGrowth = 240000000;
+    					break;
+
+    					case 9802:
+    					record.Pet.Damage = 1000;
+    					record.Pet.Defense = 2000;
+    					record.Pet.HP = 2000;
+    					record.Pet.DodgeRate = 500;
+    					record.Pet.HitRate = 1000;
+    					record.Pet.MaxGrowth = 240000000;
+    					break;
+
+    					case 98999:
+    					record.Pet.HP = 2000;
+    					break;
+
+    					case 99000:
+    					record.Pet.Defense = 2000;
+    					break;
+
+    					case 99001:
+    					record.Pet.Damage = 1000;
+    					break;
+
+    					case 99226:
+    					record.Pet.Damage = 1000;
+    					record.Pet.HP = 2000;
+    					record.Pet.MaxGrowth = 120000000;
+    					break;
+
+    					case 99227:
+    					record.Pet.Damage = 1000;
+    					record.Pet.Defense = 2000;
+    					record.Pet.MaxGrowth = 120000000;
+    					break;
+
+    					case 99228:
+    					record.Pet.Damage = 1000;
+    					record.Pet.HP = 2000;
+    					record.Pet.MaxGrowth = 120000000;
+    					break;
+
+    					case 99229:
+    					record.Pet.Damage = 1000;
+    					record.Pet.Defense = 2000;
+    					record.Pet.HP = 2000;
+    					record.Pet.MaxGrowth = 240000000;
+    					break;
+
+    					case 99267:
+    					case 99282:
+    					record.Pet.Defense = 2000;
+    					record.Pet.Mastery[103] = 4;
+    					break;
+
+    					case 99268:
+    					case 99283:
+    					record.Pet.Damage = 1000;
+    					record.Pet.Mastery[82] = 4;
+    					break;
+
+              default:
+              record.Pet = null;
+              break;
+    				}
+
+            db.Item.create(record, function(err, doc) {
 			  			if (err) {
 			  				console.error(err);
 			  				return;
