@@ -44,16 +44,17 @@ prototype.render = function(){
       var item = this.getItem(x, y);
       var itemView = document.createElement('div');
 
-
-
       if(item){
         var itemEle = document.createElement('div');
+        itemEle.className = 'items';
+        itemEle.className += ' _'+item.info.DisplayItem2D;
         switch(item.info.Rareness){
-          case 1: itemEle.className = 'common'; break;
-    			case 2: itemEle.className = 'unique'; break;
-    			case 3: itemEle.className = 'rare'; break;
-    			case 4: itemEle.className = 'elite'; break;
+          case 1: itemEle.className += ' common'; break;
+          case 2: itemEle.className += ' unique'; break;
+          case 3: itemEle.className += ' rare'; break;
+          case 4: itemEle.className += ' elite'; break;
         }
+        
         itemEle.setAttribute('index', item.Index);
 
         itemEle.onclick = function(){

@@ -141,19 +141,19 @@ div.inventory .row .slot div{
 }
 
 div.common{
-  background: gray;
+  border: 2px solid gray;
 }
 
 div.unique{
-  background: orange;
+  border: 2px solid orange;
 }
 
 div.rare{
-  background: gold;
+  border: 2px solid gold;
 }
 
 div.elite{
-  background: purple;
+  border: 2px solid purple;
 }
 
 div.inventory .row .slot.noBorder{
