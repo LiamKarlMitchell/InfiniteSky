@@ -11,11 +11,11 @@ prototype.addItem = function(item){
     case 2:
     case 7:
     case 11:
-    item.Size = 0;
+    item.Size = 1;
     break;
 
     default:
-    item.Size = 1;
+    item.Size = 4;
     break;
   }
   this.items.push(item);
@@ -26,7 +26,8 @@ prototype.getItem = function(x, y){
     var item = this.items[i];
     if(item === undefined || item === null) continue;
     if(
-      (item.Row === x || item.Row+item.Size === x) && (item.Column === y || item.Column+item.Size === y)
+      //(item.Row === x || item.Row+item.Size === x) && (item.Column === y || item.Column+item.Size === y)
+      (item.Row === x) && (item.Column === y)
     ) return item;
   }
   return null;
@@ -54,7 +55,11 @@ prototype.render = function(){
           case 3: itemEle.className += ' rare'; break;
           case 4: itemEle.className += ' elite'; break;
         }
-        
+
+        if (item.Size === 4) {
+          itemEle.className += ' fourslot';
+        }
+
         itemEle.setAttribute('index', item.Index);
 
         itemEle.onclick = function(){

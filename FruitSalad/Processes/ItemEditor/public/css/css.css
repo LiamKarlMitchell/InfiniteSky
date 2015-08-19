@@ -114,7 +114,7 @@ div.selectedItem{
 
 div.inventory{
   border: 1px solid #000;
-  width: 519px;
+  width: 256px;
   margin-top: 10px;
 }
 
@@ -129,15 +129,21 @@ div.inventory .row.noBorder{
 }
 
 div.inventory .row .slot{
-  width: 64px;
-  height: 64px;
+  width: 32px;
+  height: 32px;
   float: left;
   border-right: 1px solid #000;
 }
 
-div.inventory .row .slot div{
+/*div.inventory .row .slot div{
   width: 64px;
   height: 64px;
+}*/
+
+.inventory div {
+  box-sizing:border-box;
+  -moz-box-sizing:border-box;
+  -webkit-box-sizing:border-box;
 }
 
 div.common{
@@ -201,4 +207,9 @@ div.inventory .row .slot.noBorder{
 
 #tooltip .quality{
   color: white;
+}
+
+
+.items .fourslot {
+  zoom: 2;
 }
