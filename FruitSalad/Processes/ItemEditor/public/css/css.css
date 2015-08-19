@@ -114,13 +114,13 @@ div.selectedItem{
 
 div.inventory{
   border: 1px solid #000;
-  width: 256px;
+  width: 200px;
   margin-top: 10px;
 }
 
 div.inventory .row{
   margin: 0;
-  border-bottom: 1px solid #000;
+  /*border-bottom: 1px solid #000;*/
 }
 
 div.inventory .row.noBorder{
@@ -129,10 +129,14 @@ div.inventory .row.noBorder{
 }
 
 div.inventory .row .slot{
-  width: 32px;
-  height: 32px;
+  width: 25px;
+  height: 25px;
   float: left;
-  border-right: 1px solid #000;
+  /*border-right: 1px solid #000;*/
+
+  -moz-box-shadow:    inset 0 0 10px lightblue;
+  -webkit-box-shadow: inset 0 0 10px lightblue;
+  box-shadow:         inset 0 0 10px lightblue;  
 }
 
 /*div.inventory .row .slot div{
@@ -144,22 +148,39 @@ div.inventory .row .slot{
   box-sizing:border-box;
   -moz-box-sizing:border-box;
   -webkit-box-sizing:border-box;
+  z-index: 1;
+}
+
+.inventory div .items {
+  z-index: 2;
+
+  position:relative;
+  top:0;
+  left:0;
 }
 
 div.common{
-  border: 2px solid gray;
+  -moz-box-shadow:    inset 0 0 10px lightgray;
+  -webkit-box-shadow: inset 0 0 10px lightgray;
+  box-shadow:         inset 0 0 10px lightgray;
 }
 
 div.unique{
-  border: 2px solid orange;
+  -moz-box-shadow:    inset 0 0 10px orange;
+  -webkit-box-shadow: inset 0 0 10px orange;
+  box-shadow:         inset 0 0 10px orange;
 }
 
 div.rare{
-  border: 2px solid gold;
+  -moz-box-shadow:    inset 0 0 10px gold;
+  -webkit-box-shadow: inset 0 0 10px gold;
+  box-shadow:         inset 0 0 10px gold;
 }
 
 div.elite{
-  border: 2px solid purple;
+  -moz-box-shadow:    inset 0 0 10px purple;
+  -webkit-box-shadow: inset 0 0 10px purple;
+  box-shadow:         inset 0 0 10px purple;
 }
 
 div.inventory .row .slot.noBorder{
@@ -195,6 +216,7 @@ div.inventory .row .slot.noBorder{
   color: white;
   padding: 10px;
   position: fixed;
+  z-index: 5;
 }
 
 #tooltip .title{
