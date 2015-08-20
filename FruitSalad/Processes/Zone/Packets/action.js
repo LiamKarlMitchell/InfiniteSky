@@ -206,6 +206,7 @@ ZonePC.Set(0x05, {
   Restruct: Zone.recv.Action,
 
   function: function ActionHandler(client, input) {
+		console.log("New action ("+input.Skill+")");
 
 		// TODO: Check if target exists and able to confirm the action against it.
 		client.character.state.TargetNodeID = input.TargetNodeID;
@@ -236,12 +237,7 @@ ZonePC.Set(0x05, {
     client.character.state.LocationNew.Z = input.LocationNew.Z;
 
     switch(input.Skill){
-        case 41:
-        case 32:
-        case 60:
         case 66:
-        case 44:
-        case 40:
         case 61:
         case 68:
         case 75:
@@ -250,7 +246,46 @@ ZonePC.Set(0x05, {
 				client.character.state.skillUsed = true;
         break;
 
+				// Fujin general skills
+				case 32:
+				Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
+				break;
+
+				// Fujin general buffs
+				case 40:
+				case 41:
+				Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
+				break;
+
+				// Fujin katana skills
+				case 42:
+				case 43:
+				case 44:
+				case 60:
+				Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
+				break;
+
+				// Weapon basic attacks.
+				// Attack when animation has finished.
+				case 5:
+				case 6:
+				case 7:
+				console.log("Target node:", input.TargetNodeID);
+				Zone.QuadTree.findNodeById(input.TargetNodeID, function(node){
+					console.log("Found target node", node.id);
+					client.character.DamageDealer.attack(node);
+					Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
+				});
+				break;
+
+				// Walking
+				case 2:
+				Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
+				break;
+
+
         default:
+				console.log("Unknown Action");
         client.node.update();
         Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
         break;
@@ -271,7 +306,7 @@ ZonePC.Set(0x15, {
 	function: function(client, input){
 		// TODO: Confirming if I actually was able to hit the target. Input contains attacker and the target.
 
-		console.log(input);
+		// console.log(input);
 	}
 })
 
@@ -288,7 +323,7 @@ ZonePC.Set(0x19, {
 		// TODO: Calculate chi usage.
 
 		console.log("Using skill: ", client.character.state.Skill);
-		console.log(input);
+		// console.log(input);
 
 		client.node.update();
     client.character.state.SkillID = input.SkillID;

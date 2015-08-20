@@ -82,8 +82,9 @@
 			{ "Column": 3, "Row": 0, "ID": 26, "Amount": 99 }
 		],
 
-		"Level": 145,
-		"Experience": 0
+		"Level": 1,
+		"Experience": 0,
+		"SkillPoints": 100
 	},
 	"Jinong": {
 		"Outfit": { "ID": 20, "Enchant": 0, "Combine": 0},

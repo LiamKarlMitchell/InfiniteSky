@@ -135,6 +135,20 @@ QuadTree.prototype.inBounds = function(node){
   return node.x >= this.bounds.left && node.x <= this.bounds.right && node.y >= this.bounds.top && node.y <= this.bounds.bottom;
 };
 
+QuadTree.prototype.findNodeById = function(id, callback){
+  if(this.hasLeafs){
+    for(var l=0; l<4; l++){
+      var leaf = this.leafs[l];
+      leaf.findNodeById(id, callback);
+    }
+  }else{
+    for(var i=0; i<this.nodes.length; i++){
+      var node = this.nodes[i];
+      if(node.id === id) return callback(node);
+    }
+  }
+};
+
 QuadTree.prototype.remove = function(node){
   if(this.hasLeafs){
     for(var i=0; i<4; i++){

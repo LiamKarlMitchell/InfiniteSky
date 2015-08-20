@@ -205,10 +205,10 @@ ItemAction[14] = function CharacterItem_Unequip(input){
           return;
       }
       self.character.infos.update(equipItem, function(){
+        self.character.state.update();
         self.character.state.setFromCharacter(self.character);
         Zone.send.itemAction.call(self, 0, input);
         Zone.sendToAllArea(self, false, self.character.state.getPacket(), config.network.viewable_action_distance);
-        self.character.infos.print();
       });
     });
   });
@@ -276,6 +276,7 @@ ItemAction[3] = function CharacterItem_Equip(input){
                 return;
             }
             self.character.infos.update(equipItem, function(){
+                self.character.state.update();
                 self.character.state.setFromCharacter(self.character);
                 Zone.send.itemAction.call(self, 0, input);
                 Zone.sendToAllArea(self, false, self.character.state.getPacket(), config.network.viewable_action_distance);
@@ -1172,11 +1173,13 @@ ItemAction[31] = function learnSkill(input){
     }
 
     if(!skill.isUsedByClan(self.character.Clan)){
+      console.log("Skill not used by clan");
       Zone.send.itemAction.call(self, 1, input);
       return;
     }
 
     if(skill.PointsToLearn > self.character.SkillPoints){
+      console.log("Not enough skill points to learn new skill");
       Zone.send.itemAction.call(self, 1, input);
       return;
     }
@@ -1203,19 +1206,20 @@ ItemAction[31] = function learnSkill(input){
         break;
       }
 
-      if(freeIndex === null && !charSkill){
+      if(freeIndex === null && !charSkill.ID){
         freeIndex = i;
       }
     }
 
-    console.log(freeIndex);
 
     if(!freeIndex){
+      console.log("Next free index could not be founded");
       Zone.send.itemAction.call(self, 1, input);
       return;
     }
 
     if(alreadyLearned){
+      console.log("Already know this skill")
       Zone.send.itemAction.call(self, 1, input);
       return;
     }

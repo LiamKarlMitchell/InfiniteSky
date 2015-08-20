@@ -211,7 +211,12 @@ vms( 'CharacterState', [ 'CVec3', 'Structs' ], function(){
 		this.infos = character.infos;
 	};
 
-	// CharacterState_Prototype.set
+	CharacterState_Prototype.update = function(){
+		this.MaxHP = this.infos.MaxHP;
+		this.MaxChi = this.infos.MaxChi;
+		if(this.MaxHP < this.CurrentHP) this.CurrentHP = this.MaxHP;
+		if(this.MaxChi < this.CurrentChi) this.CurrentChi = this.MaxChi;
+	};
 
 
 	// Returns a compressed packet for us to send to whomever
