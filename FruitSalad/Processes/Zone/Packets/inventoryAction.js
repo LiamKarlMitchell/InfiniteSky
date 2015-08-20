@@ -63,7 +63,6 @@ Zone.send.itemAction = function(result, input){
 var ItemAction = {};
 ItemAction[20] = function inventoryMoveItem(input){
   if(input.Amount > 99){
-      console.log("Amount higher than allowed");
       Zone.send.itemAction.call(this, 1, input);
       return;
   }
@@ -83,20 +82,18 @@ ItemAction[20] = function inventoryMoveItem(input){
     }
 
     if(!item){
-      console.log("No item founded");
+      Zone.send.itemAction.call(self, 1, input);
       return;
     }
 
     if(invItem.ID !== input.ItemID){
-      console.log("Inventory item dont match");
-      Zone.send.itemAction.call(this, 1, input);
+      Zone.send.itemAction.call(self, 1, input);
       return;
     }
 
     var nextInventoryIndex = self.character.nextInventoryIndex();
     if(nextInventoryIndex === null){
-      console.log("Theres no next inventoryIndex");
-      Zone.send.itemAction.call(this, 1, input);
+      Zone.send.itemAction.call(self, 1, input);
       return;
     }
 
@@ -160,14 +157,12 @@ ItemAction[14] = function CharacterItem_Unequip(input){
   }
 
   if(!equipItem){
-      console.log("Undefined item was tried to be removed of character");
       Zone.send.itemAction.call(self, 1, input);
       return;
   }
 
   var charItem = this.character[equipItem];
   if(!charItem && charItem.ID){
-      console.log("Character does not wear this item");
       Zone.send.itemAction.call(self, 1, input);
       return;
   }
@@ -193,7 +188,6 @@ ItemAction[14] = function CharacterItem_Unequip(input){
     var nextInventoryIndex = self.character.nextInventoryIndex();
 
     if(nextInventoryIndex === null){
-        console.log("No free space for item that has now being unequiped");
         Zone.send.itemAction.call(self, 1, input);
         return;
     }
@@ -214,6 +208,7 @@ ItemAction[14] = function CharacterItem_Unequip(input){
         self.character.state.setFromCharacter(self.character);
         Zone.send.itemAction.call(self, 0, input);
         Zone.sendToAllArea(self, false, self.character.state.getPacket(), config.network.viewable_action_distance);
+        self.character.infos.print();
       });
     });
   });
@@ -250,25 +245,21 @@ ItemAction[3] = function CharacterItem_Equip(input){
         }
 
         if(!item){
-            console.log("no such item in database");
             Zone.send.itemAction.call(self, 1, input);
             return;
         }
 
         if(item.getInventoryItemType() !== equipItem){
-            console.log("item has to fit the target type slot");
             Zone.send.itemAction.call(self, 1, input);
             return;
         }
 
         if(!item.isAllowedByClan(self.character.Clan)){
-            console.log("not allowed by clan");
             Zone.send.itemAction.call(self, 1, input);
             return;
         }
 
         if(item.LevelRequirement > self.character.Level){
-            console.log("cannot equip item with higher level than character");
             Zone.send.itemAction.call(self, 1, input);
             return;
         }
@@ -304,7 +295,6 @@ ItemAction[0] = function inventoryPickupItem(input){
 
     var invItem = node.object.obj;
     if(!invItem){
-        console.log("Node object does not exists");
         Zone.send.itemAction.call(this, 1, input);
         return;
     }
@@ -312,7 +302,6 @@ ItemAction[0] = function inventoryPickupItem(input){
     var self = this;
     if(invItem.ID === 1){
         if( (this.character.Silver + invItem.Amount) >  Zone.maxSilver){
-            console.log("Cannot pickup more silver than you can hold. Convert to gold.");
             Zone.send.itemAction.call(this, 1, input);
             return;
         }
@@ -332,13 +321,11 @@ ItemAction[0] = function inventoryPickupItem(input){
 
     db.Item.findById(invItem.ID, function(err, item){
         if(err){
-            console.log("Error in finding item in db");
             Zone.send.itemAction.call(self, 1, input);
             return;
         }
 
         if(!item){
-            console.log("No item in db");
             Zone.send.itemAction.call(self, 1, input);
             return;
         }
@@ -348,7 +335,6 @@ ItemAction[0] = function inventoryPickupItem(input){
         var total = intersected ? intersected.Amount + invItem.Amount : 0;
 
         if(isStackable && intersected && intersected.ID !== invItem.ID){
-            console.log("The intersected item is not the same");
             Zone.send.itemAction.call(self, 1, input);
             return;
         }
@@ -358,7 +344,6 @@ ItemAction[0] = function inventoryPickupItem(input){
         }else if(!intersected){
             var nextInventoryIndex = self.character.nextInventoryIndex();
             if(nextInventoryIndex === null){
-                console.log("Next inventory index was null");
                 Zone.send.itemAction.call(self, 1, input);
                 return;
             }
@@ -366,7 +351,6 @@ ItemAction[0] = function inventoryPickupItem(input){
             invItem.Row = input.PickupRow;
             self.character.Inventory[nextInventoryIndex] = invItem;
         }else{
-            console.log("Item intersected");
             Zone.send.itemAction.call(self, 1, input);
             return;
         }
@@ -376,7 +360,6 @@ ItemAction[0] = function inventoryPickupItem(input){
         self.character.markModified('Inventory');
         self.character.save(function(err){
             if(err){
-                console.log("error on saving on character");
                 Zone.send.itemAction.call(self, 1, input);
                 return;
             }
@@ -389,85 +372,85 @@ ItemAction[0] = function inventoryPickupItem(input){
 // Revised: 09/06/2015 11:14:09
 ItemAction[1] = function inventoryDropItem(input){
   if(Zone.addItem === undefined){
+  Zone.send.itemAction.call(this, 1, input);
+  return;
+  }
+
+  if(input.ItemID === 1){
+    if(input.Amount > this.character.Silver){
+      Zone.send.itemAction.call(this, 1, input);
+      return;
+    }
+
+    var obj = {ID: 1, Amount: input.Amount};
+    Zone.addItem(this, obj);
+
+    this.character.Silver -= input.Amount;
+    this.character.save();
+
+    Zone.send.itemAction.call(this, 0, input);
+    return;
+  }
+
+  if(input.Amount > 99){
     Zone.send.itemAction.call(this, 1, input);
     return;
   }
 
-    if(input.ItemID === 1){
-        if(input.Amount > this.character.Silver){
-            Zone.send.itemAction.call(this, 1, input);
-            return;
-        }
+  var invItem = this.character.Inventory[input.InventoryIndex];
+  if(!invItem){
+    Zone.send.itemAction.call(this, 1, input);
+    return;
+  }
 
-        var obj = {ID: 1, Amount: input.Amount};
-        Zone.addItem(this, obj);
 
-        this.character.Silver -= input.Amount;
-        this.character.save();
-
-        Zone.send.itemAction.call(this, 0, input);
-        return;
+  var self = this;
+  db.Item.findById(invItem.ID, function(err, item){
+    if(err){
+      Zone.send.itemAction.call(self, 1, input);
+      return;
     }
 
-    if(input.Amount > 99){
-        Zone.send.itemAction.call(this, 1, input);
-        return;
+    if(!item){
+      Zone.send.itemAction.call(self, 1, input);
+      return;
     }
 
-    var invItem = this.character.Inventory[input.InventoryIndex];
-    if(!invItem){
-        Zone.send.itemAction.call(this, 1, input);
-        return;
+    if(!item.isDroppable()){
+      Zone.send.itemAction.call(self, 1, input);
+      return;
     }
 
+    var reminder = invItem.Amount - input.Amount;
+    var isStackable = item.isStackable();
 
-    var self = this;
-    db.Item.findById(invItem.ID, function(err, item){
-        if(err){
-            Zone.send.itemAction.call(self, 1, input);
-            return;
-        }
+    if(isStackable && input.Amount > invItem.Amount){
+      Zone.send.itemAction.call(self, 1, input);
+      return;
+    }
 
-        if(!item){
-            Zone.send.itemAction.call(self, 1, input);
-            return;
-        }
+    if(isStackable && !reminder){
+      self.character.Inventory[input.InventoryIndex] = null;
+    }else if(isStackable && reminder){
+      invItem.Amount = reminder;
+    }else{
+      self.character.Inventory[input.InventoryIndex] = null;
+    }
 
-        if(!item.isDroppable()){
-            Zone.send.itemAction.call(self, 1, input);
-            return;
-        }
+    var dropItem = clone(invItem, false);
+    dropItem.Amount = input.Amount;
 
-        var reminder = invItem.Amount - input.Amount;
-        var isStackable = item.isStackable();
+    self.character.markModified('Inventory');
+    self.character.save(function(err){
+      if(err){
+        Zone.send.itemAction.call(self, 1, input);
+        return;
+      }
 
-        if(isStackable && input.Amount > invItem.Amount){
-            Zone.send.itemAction.call(self, 1, input);
-            return;
-        }
-
-        if(isStackable && !reminder){
-            self.character.Inventory[input.InventoryIndex] = null;
-        }else if(isStackable && reminder){
-            invItem.Amount = reminder;
-        }else{
-            self.character.Inventory[input.InventoryIndex] = null;
-        }
-
-        var dropItem = clone(invItem, false);
-        dropItem.Amount = input.Amount;
-
-        self.character.markModified('Inventory');
-        self.character.save(function(err){
-            if(err){
-                Zone.send.itemAction.call(self, 1, input);
-                return;
-            }
-
-            Zone.addItem(self, dropItem);
-            Zone.send.itemAction.call(self, 0, input);
-        });
+      Zone.addItem(self, dropItem);
+      Zone.send.itemAction.call(self, 0, input);
     });
+  });
 };
 
 // Revised: 09/06/2015 21:55:50
@@ -658,7 +641,6 @@ ItemAction[15] = function StorageTakeItem(input){
 
 // Revised: 10/06/2015 11:12:07
 ItemAction[4] = function StorageMoveItem(input){
-    console.log(input);
     if(input.Amount > 99){
         Zone.send.itemAction.call(this, 1, input);
         return;

@@ -136,21 +136,33 @@ QuadTree.prototype.inBounds = function(node){
 };
 
 QuadTree.prototype.remove = function(node){
-  
-  // this.nodes.splice(this.nodes.indexOf(node), 1);
-  // if(this.parent && this.parent.hasLeafs){
-  //   var totalNodes = 0;
-  //   for(var i=0; i<4; i++){
-  //     totalNodes += this.parent.leafs[i].nodes.length;
-  //   }
-  //
-  //   if(totalNodes < this.parent.leafSize){
-  //     this.parent.nodes = []; // This might be unecessary
-  //     for(var i=0; i<4; i++) this.parent.nodes = this.parent.nodes.concat(this.parent.leafs[i].nodes);
-  //     this.parent.hasLeafs = false;
-  //     this.parent.leafs = [];
-  //   }
-  // }
+  if(this.hasLeafs){
+    for(var i=0; i<4; i++){
+      process.nextTick((function(i){
+        this.leafs[i].remove(node);
+      }).bind(this, i));
+    }
+  }else{
+    for(var i=0; i<this.nodes.length; i++){
+      var n = this.nodes[i];
+      if(n === node){
+        this.nodes.splice(i, 1);
+        if(this.parent && this.parent.hasLeafs){
+          var totalNodes = 0;
+          for(var i=0; i<4; i++){
+            totalNodes += this.parent.leafs[i].nodes.length;
+          }
+
+          if(totalNodes < this.parent.leafSize){
+            this.parent.nodes.length = 0;
+            for(var i=0; i<4; i++) this.parent.nodes = this.parent.nodes.concat(this.parent.leafs[i].nodes);
+            this.parent.hasLeafs = false;
+            this.parent.leafs = [];
+          }
+        }
+      }
+    }
+  }
 };
 
 QuadTree.prototype.query = function(query){

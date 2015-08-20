@@ -71,9 +71,13 @@ vms('ItemInfo', [], function(){
 
 	    Description1: String,
 	    Description2: String,
-	    Description3: String
+	    Description3: String,
+			
+			Pet: {type: Object, default: null}
 
 	});
+
+
 
 	itemSchema.index({ Name: 1, ItemType: 1 });
 

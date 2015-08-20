@@ -22,8 +22,14 @@ GMCommands.AddCommand(new Command('t',60,function command_test(string, client){
 
 GMCommands.AddCommand(new Command('info',60,function command_test(string, client){
 	client.character.infos = new CharacterInfos(client);
-	client.character.infos.update('Weapon');
+	client.character.infos.updateAll(function(){
+		client.character.infos.print();
+	});
 	// console.log(client.character.infos.print());
+}));
+
+GMCommands.AddCommand(new Command('infos',60,function command_test(string, client){
+	client.character.infos.print();
 }));
 
 // Use the packet id 0x2C

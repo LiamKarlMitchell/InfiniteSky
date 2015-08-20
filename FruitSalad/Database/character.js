@@ -120,6 +120,9 @@ vms('Character', [], function(){
 		// Usable items table
 		Usable_ProtectionCharm: {type: Number, default: 0},
 		Usable_GuildInsignia: {type: Number, default: 0},
+		Usable_LuckyEnchanting: {type: Number, default: 0},
+		Usable_LuckyUpgrading: {type: Number, default: 0},
+		Usable_LuckyCombining: {type: Number, default: 0},
 		Usable_HermitValut: {type: Number, default: 0},
 		Usable_StorageValut: {type: Number, default: 0}
 

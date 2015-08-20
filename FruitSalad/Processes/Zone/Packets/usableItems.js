@@ -284,6 +284,57 @@ ZonePC.Set(0x43, {
         });
       break;
 
+      case 39: // Lucky Enchanting
+      if(invItem.ID !== 99243){
+        return;
+      }
+
+      client.character.Usable_LuckyEnchanting++;
+      client.character.Inventory[input.InventoryIndex] = null;
+      client.character.markModified('Inventory');
+      client.character.save(function(err){
+        if(err){
+          return;
+        }
+
+        Zone.send.use43.call(client, input, 0);
+      });
+      break;
+
+      case 40: // Lucky Upgrading
+      if(invItem.ID !== 99245){
+        return;
+      }
+
+      client.character.Usable_LuckyUpgrading++;
+      client.character.Inventory[input.InventoryIndex] = null;
+      client.character.markModified('Inventory');
+      client.character.save(function(err){
+        if(err){
+          return;
+        }
+
+        Zone.send.use43.call(client, input, 0);
+      });
+      break;
+
+      case 41: // Lucky Combining
+      if(invItem.ID !== 99244){
+        return;
+      }
+
+      client.character.Usable_LuckyCombining++;
+      client.character.Inventory[input.InventoryIndex] = null;
+      client.character.markModified('Inventory');
+      client.character.save(function(err){
+        if(err){
+          return;
+        }
+
+        Zone.send.use43.call(client, input, 0);
+      });
+      break;
+
       case 50: // Tresure box
       // Zone.send.use43.call(client, input, 0);
       break;

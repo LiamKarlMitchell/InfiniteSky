@@ -44,13 +44,13 @@ WorldPC.Set(0x61, {
 				})));
 				return;
 			} else {
-				var RandNumber = Math.floor((Math.random() * 100) + 1);
+				var RandNumber = Math.floor((Math.random() * 100));
 
 
 				// TODO: Check Combine value is correct.
 				// Combination rates
 				var CombineRate = 0;
-				if(Item2.Combine > 0 && Item2.Combine < 12) {
+				if(Item2.Combine >= 0 && Item2.Combine < 12) {
 					CombineRate = 90 - (5 * Item2.Combine);
 				} else {
 					throw new Error('Invalid Combine value: ' + Item2.Combine)
@@ -101,10 +101,10 @@ WorldPC.Set(0x61, {
 				
 				var result = 0;
 				if(RandNumber <= combineRate) {
-					if(client.character.Inventory[input.Item1].Combine === undefined) client.character.Inventory[input.Item1].Combine = 1;
-					else client.character.Inventory[input.Item1].Combine += 1;
+					if(client.character.Inventory[input.Item2].Combine === undefined) client.character.Inventory[input.Item2].Combine = 1;
+					else client.character.Inventory[input.Item2].Combine += 1;
 
-					client.character.Inventory[input.Item2] = null;
+					client.character.Inventory[input.Item1] = null;
 				} else {
 					result = 1;
 				}

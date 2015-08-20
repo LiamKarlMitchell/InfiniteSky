@@ -143,13 +143,13 @@ vms( 'CharacterState', [ 'CVec3', 'Structs' ], function(){
 		this.CharacterID = ID;
 	};
 
-	CharacterState_Prototype.setHP = function(HP) {
-		this.HP = HP;
-	};
-
-	CharacterState_Prototype.respawn = function() {
-
-	};
+	// CharacterState_Prototype.setHP = function(HP) {
+	// 	this.HP = HP;
+	// };
+	//
+	// CharacterState_Prototype.respawn = function() {
+	//
+	// };
 
 	CharacterState_Prototype.setFromCharacter = function(character) {
 		// character.updateInfos(true);
@@ -210,6 +210,8 @@ vms( 'CharacterState', [ 'CVec3', 'Structs' ], function(){
 		// Clone the infos reference for use in battle calculations
 		this.infos = character.infos;
 	};
+
+	// CharacterState_Prototype.set
 
 
 	// Returns a compressed packet for us to send to whomever
