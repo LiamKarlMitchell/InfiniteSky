@@ -526,6 +526,23 @@ zonePrototype.move = function zone_move_character_socket(socket, location, zoneI
 };
 
 
+zonePrototype.giveEXP = function zone_giveEXP(socket, value) {
+    var oldLocation = socket.character.state.Location.copy();
+    if(location) {
+        socket.character.state.Location.X = location.X;
+        socket.character.state.Location.Y = location.Y;
+        socket.character.state.Location.Z = location.Z;
+    }
+    // Send character update packet
+    socket.character.state.Skill = 0;
+    socket.character.state.Frame = 0;
+
+    var packet = socket.character.state.getPacket();
+    Zone.sendToAllAreaLocation(oldLocation, config.network.viewable_action_distance, packet);
+    Zone.sendToAllArea(socket, true, packet, config.network.viewable_action_distance);
+    return true;
+};
+
 zonePrototype.onProcessMessage = function(type, socket) {
 	if (socket) switch (type) {
 		case 'socket':
