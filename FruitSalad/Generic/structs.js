@@ -197,7 +197,7 @@ structs.Character = restruct.
 	struct('SkillList',structs.QuickUseSkill,30).
 	struct('SkillBar',structs.QuickUseSkill,24).
 	int32lu('QuestID').//Quest ID
-	int32lu('').//??
+	int32lu('UnknownQuestStuff').//??
 	int32lu('QuestStart').//Did you start the quest
 	int32lu('QuestComplete').//Did you complete the quest
 	pad(20).
