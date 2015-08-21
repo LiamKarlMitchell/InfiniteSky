@@ -40,7 +40,7 @@ module.exports = function(grunt) {
 		// Could wrap in try catch and remove infos.Item if failed load for some error in structure etc/
 		var Monsters = new GameInfoLoader('005_00004.IMG',
 			restruct.
-		        int32lu("_id"). // 0
+		        int32lu("id"). // 0
 		        string("Name",24). // 4
 		        int32ls("Unknown1C"). //2E
 		        int32ls("Unknown32"). // 32
@@ -73,13 +73,13 @@ module.exports = function(grunt) {
 		        int32ls("WalkSpeed"). // 140
 		        int32ls("RunSpeed"). // 144
 		        int32ls("DeathSpeed"). // 148
-		        int32ls("AttackPower"). // 152
-		        int32ls("DefensePower"). // 156
-		        int32ls("AttackSuccess"). // 160
-		        int32ls("AttackBlock"). // 164
-		        int32ls("ElementAttackPower"). // 168
-		        int32ls("ElementDefensePower"). // 172
-		        int32ls("Critical"). // 176
+		        int32ls("Damage"). // 152
+		        int32ls("Defense"). // 156
+		        int32ls("HitRate"). // 160
+		        int32ls("DodgeRate"). // 164
+		        int32ls("ElementalDefense", 3). // 168
+		        // int32ls("ElementDefensePower"). // 172
+		        // int32ls("Critical"). // 176
 		        int32ls("Unknown180"). // 180
 		        int32ls("Unknown184"). // 184
 		        int32ls("Unknown188"). // 188
@@ -117,9 +117,9 @@ module.exports = function(grunt) {
 		        int32ls("Unknown316"). // 316
 		        int32ls("Unknown320"). // 320
 		        int32ls("Unknown324"). // 324
-		        int32ls("LightATK"). // 328
-		        int32ls("ShadowATK"). // 332
-		        int32ls("DarkATK"). // 336
+		        int32ls("ElementalDamage", 3). // 328
+		        // int32ls("ShadowATK"). // 332
+		        // int32ls("DarkATK"). // 336
 		        int32ls("Unknown340"). // 340
 		        int32ls("Unknown344"). // 344
 		        int32ls("Unknown348"). // 348
@@ -262,16 +262,18 @@ module.exports = function(grunt) {
 		        int32ls("Unknown876"). // 876
 		        int32ls("Unknown880"), // 880
 			  function onRecordLoad(record) {
-			  	if (record._id) {
+			  	if (record.id) {
 					record.Name = encoding.convert(record.Name, 'UTF-8', 'EUC-KR').toString();
-			  		console.log(record._id, record.Name);
+			  		// console.log(record.id, record.Name);
+            // if(record.id === 1) console.log(record);
+            if(record.id === 12) console.log(record);
 			  		db.Monster.create(record, function(err, doc) {
 			  			if (err) {
 			  				console.error(err);
 			  				return;
 			  			}
 
-			  			console.log('Confirming save of '+doc._id);
+			  			// console.log('Confirming save of '+doc.id);
 			  		});
 			  	}
 			  }

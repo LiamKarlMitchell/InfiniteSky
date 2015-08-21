@@ -2,10 +2,14 @@
 
 vmscript.watch('Config/world.json');
 vmscript.watch('Config/network.json');
+vmscript.watch('Config/motion.json');
+vmscript.watch('Config/motion_monster.json');
 
 vms('Zone', [
 			'Config/world.json',
-			'Config/network.json'
+			'Config/network.json',
+			'Config/motion.json',
+			'Config/motion_monster.json'
 		], function() {
 
 global.api.zoneAlive = function(callback, client){
@@ -160,6 +164,8 @@ function ZoneInstance() {
 	this.clientNodeTable = {};
 	this.clientNameTable = {};
 	this.itemSlotSizes = {};
+
+	this.Monsters = [];
 
 	global.log = bunyan.createLogger({
 		name: 'InfiniteSky/Zone.' + parseInt(process.argv[2]),
@@ -355,7 +361,7 @@ zonePrototype.broadcastStates = function(client) {
 	var found = Zone.QuadTree.query({
 		CVec3: client.character.state.Location,
 		radius: config.network.viewable_action_distance,
-		type: ['npc', 'item']
+		type: ['npc', 'item', 'monster']
 	});
 	for (var i = 0; i < found.length; i++) {
 		var f = found[i];

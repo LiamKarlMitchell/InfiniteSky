@@ -136,7 +136,7 @@ div.inventory .row .slot{
 
   -moz-box-shadow:    inset 0 0 10px lightblue;
   -webkit-box-shadow: inset 0 0 10px lightblue;
-  box-shadow:         inset 0 0 10px lightblue;  
+  box-shadow:         inset 0 0 10px lightblue;
 }
 
 /*div.inventory .row .slot div{

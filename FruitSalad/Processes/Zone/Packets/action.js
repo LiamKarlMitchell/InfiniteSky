@@ -53,7 +53,7 @@ Zone.send.Action = restruct.
   int32lu(''). // 62
   int32lu('decHead'). // 66
   int32lu('GlowItems'). // 70
-	int8lu('test').
+	int8lu('').
 	int8lu('').
 	int8lu('').
   int8lu('').

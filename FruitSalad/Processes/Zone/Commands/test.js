@@ -1,24 +1,24 @@
 // Tests out attacking.
-GMCommands.AddCommand(new Command('t',60,function command_test(string, client){
-	var attackInfo = { actionValue: 1, Status: 0 };
-	processAttack(attackInfo, client.character.state, client.character.state.target_id);
-	console.log(attackInfo);
-
-
-	attackInfo.AttackerID = client.character.state.CharacterID;
-	// Have to see about sending NodeID as well in the action packet.
-	//attackInfo.AttackerIndex = client.character.state.NodeID;
-	attackInfo.DefenderID = client.character.state.CharacterID;
-	//attackInfo.DefenderIndex = 1;
-	attackInfo.TotalDamage = attackInfo.Damage;
-	attackInfo.DamageHP = attackInfo.Damage;
-
-	// TODO: Send attack packet to target location.
-	Zone.sendToAllArea(
-		client, true,
-		packets.makeCompressedPacket(0x2C, new Buffer(Zone.send.attack.pack(attackInfo))),
-		config.viewable_action_distance);
-}));
+// GMCommands.AddCommand(new Command('t',60,function command_test(string, client){
+// 	var attackInfo = { actionValue: 1, Status: 0 };
+// 	processAttack(attackInfo, client.character.state, client.character.state.target_id);
+// 	console.log(attackInfo);
+//
+//
+// 	attackInfo.AttackerID = client.character.state.CharacterID;
+// 	// Have to see about sending NodeID as well in the action packet.
+// 	//attackInfo.AttackerIndex = client.character.state.NodeID;
+// 	attackInfo.DefenderID = client.character.state.CharacterID;
+// 	//attackInfo.DefenderIndex = 1;
+// 	attackInfo.TotalDamage = attackInfo.Damage;
+// 	attackInfo.DamageHP = attackInfo.Damage;
+//
+// 	// TODO: Send attack packet to target location.
+// 	Zone.sendToAllArea(
+// 		client, true,
+// 		packets.makeCompressedPacket(0x2C, new Buffer(Zone.send.attack.pack(attackInfo))),
+// 		config.viewable_action_distance);
+// }));
 
 GMCommands.AddCommand(new Command('info',60,function command_test(string, client){
 	client.character.infos = new CharacterInfos(client);
@@ -46,9 +46,9 @@ Zone.send.attack = restruct.
     int32lu('Status'). // Depends on attacker or defender | hit or miss, block or not |
     int32lu('TotalDamage').
     int16lu('Deadly').
-    int16lu('Light').
-    int16lu('Shadow').
-    int16lu('Dark').
+    int16lu('ElementalDamage', 3).
+    // int16lu('Shadow').
+    // int16lu('Dark').
     int32ls('DamageHP');
 
 

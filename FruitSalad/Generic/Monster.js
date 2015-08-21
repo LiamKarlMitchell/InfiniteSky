@@ -2,78 +2,125 @@
 // They were not overwriting old objects prototypes.
 // https://www.youtube.com/watch?v=QigNwFntPSY
 
+
+// 0 = spawn
+// 1 - 3= idle
+// 4 = move
+// 5 - 7 = on dmg
+// 8 - 10 = on hit
+// 11 = stun
+// 12 - 15 = dead animation, and waits to be finished off
+// 16 = waits to be finished off, used when dead animation is done, on state update so there will be no glitches
+// 17 = dead animation I think, when hp 0 the mob is untargetable
+// 18 = dead animation, and waits to be finsihed off
+// 19 = despawn
+// 20 = underfloor
+
+if(typeof global.Zone !== 'undefined')
 vms('Monster', [
 	'Structs'
 ], function() {
-	if(typeof global.MonsterNextID === 'undefined') global.MonsterNextID = 0;
-		var Monster = function(ID) {
-		// this.info = infos.Monster[ID];
-		// if (!this.info) {
-		// 	dumpError(new Error('Monster ID '+ID+' does not exist in Monster Info.'));
-		// 	return null;
-		// }
+	Zone.send.MonsterStatePacket = restruct.
+	int32lu('UniqueID').
+  int32lu('NodeID').
+  int32lu('MonsterID').
+  int32lu('Life').
+  int32lu('Stance').
+  int32lu('Skill').
+  float32l('Frame').
+  struct('Location',structs.CVec3).
+  int32lu('Unknown3',3).
+  float32l('Direction').
+  float32l('TargetDirection').
+  int32ls('TargetObjectIndex').
+  int32lu('Unknown3',4).
+  struct('LocationTo',structs.CVec3).
+  float32l('FacingDirection').
+  int32lu('CurrentHP');
 
-		this.infos = {
-			Damage: this.info.Damage,
-			Defense: this.info.Defense,
-			LightDamage: 0,
-			ShadowDamage: 0,
-			DarkDamage: 0,
-		};
+	var Monster = function(id) {
+		if(typeof global.MonsterNextID === 'undefined') global.MonsterNextID = 0;
 
-		AIObject.call(this);
-		this.Attackers = new AttackerCollection();
-		this.WalkSpeed = this.info.WalkSpeed;
+		this.MonsterID = id;
 
-		this.RunSpeed = this.info.RunSpeed;
-		this.UniqueID = 0;
-		this.OtherID = this.info.ID;
+		this.CurrentHP = 0;
+		this.MaxHP = 0;
 
-		this.Life = 1;
 		this.Stance = 0;
 		this.Skill = 0;
 		this.Frame = 0;
 		this.Location = new CVec3();
 		this.LocationTo = new CVec3();
 		this.Direction = 0;
-		this.TargetDirection = 0;
-		this.TargetObjectIndex = -1;
 
+		this.NodeID = null;
+		this.UniqueID = ++global.MonsterNextID;
 		this.FacingDirection = 0;
-		this.MaxHP = this.info.Health;
-		this.HP = this.info.Health;
 
-		this.MonsterStatePacket = restruct.
-		    int32lu('ID').
-		    int32lu('UniqueID').
-		    int32lu('OtherID').
-		    int32lu('Life').
-		    int32lu('Stance').
-		    int32lu('Skill').
-		    float32l('Frame').
-		    struct('Location',structs.CVec3).
-		    int32lu('Unknown3',3).
-		    float32l('Direction').
-		    float32l('TargetDirection').
-		    int32ls('TargetObjectIndex').
-		    int32lu('Unknown3',4).
-		    struct('LocationTo',structs.CVec3).
-		    float32l('FacingDirection').
-		    int32lu('HP');
+		this.Target = null;
 
-		// console.log("Added Monster:", ID);
+		this.node = null;
+		this.info = null;
+		this.motion = null;
+		this.motionFrames = 0;
+
+		this.isAlive = true;
+
+		console.log("Created monster ("+id+")");
 	}
 
 	Monster.prototype.getPacket = function() {
-		return packets.makeCompressedPacket(0x1A, new Buffer(this.MonsterStatePacket.pack(this)));
+		if(this.motionFrames){
+			this.Frame = this.motionFrames / this.motion[this.Skill+1].length * (new Date().getTime() - this.motionStart);
+		}
+		return packets.makeCompressedPacket(0x1A, new Buffer(Zone.send.MonsterStatePacket.pack(this)));
 	};
 
 	Monster.prototype.setNode = function(node){
-		if(!node){
-			return;
-		}
-		this.UniqueID = node.id;
+		this.node = node;
+		this.NodeID = node.id;
 	};
 
-	global.Monster = Monster;
+	Monster.prototype.spawn = function(location){
+		this.Location = location.copy();
+		this.node.update();
+		this.isAlive = true;
+		var self = this;
+		this.transition(1);
+		Zone.sendToAllAreaLocation(this.Location, config.network.viewable_action_distance, this.getPacket());
+	};
+
+	Monster.prototype.transition = function(nextSkill, callback){
+		this.motionFrames = this.motion[this.Skill+1].frames;
+		this.motionStart = new Date().getTime();
+		setTimeout((function(nextSkill, callback){
+			this.Skill = nextSkill;
+			this.motionFrames = 0;
+			if(typeof callback === 'function') callback.call(this);
+
+		}).bind(this, nextSkill, callback), this.motion[this.Skill+1].length);
+	};
+
+	Monster.prototype.despawn = function(){
+		this.Skill = 19;
+		this.Frame = 0;
+		this.CurrentHP = 0;
+		this.isAlive = false;
+
+		this.transition(20, function(){
+			Zone.QuadTree.remove(this.node);
+		});
+		Zone.sendToAllAreaLocation(this.Location, config.network.viewable_action_distance, this.getPacket());
+	};
+
+	Monster.prototype.setInfos = function(info){
+		this.info = info;
+		console.log("Health:", info.Health);
+		this.CurrentHP = info.Health;
+		this.MaxHP = info.Health;
+		this.ModelID = info.ModelID;
+		this.motion = config.motion_monster[info.ModelID];
+	};
+
+	global.MonsterObj = Monster;
 });
