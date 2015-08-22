@@ -117,6 +117,11 @@ vms('Character', [], function(){
 		Health: Number,
 		Chi: Number,
 
+		QuestID: Number,
+		UnknownQuestStuff: Number,
+		QuestStart: Number,
+		QuestComplete: Number,
+
 		// Usable items table
 		Usable_ProtectionCharm: {type: Number, default: 0},
 		Usable_GuildInsignia: {type: Number, default: 0},

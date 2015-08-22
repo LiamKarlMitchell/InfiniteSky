@@ -3,6 +3,7 @@
 // For more information, see LICENCE in the main folder
 var fs = require('fs');
 var exceptionHandlerInitialized = false;
+var hexy = require('hexy').hexy;
 
 function dumpError(err) {
   if (err instanceof Error) {

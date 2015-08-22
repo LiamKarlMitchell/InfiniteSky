@@ -32,6 +32,10 @@ Zone.recv.quest2 = restruct.
   float32l('f');  // Who knows
 
 
+// 0x 7C
+// 00000000 4d656761 42797465 00000000 00004442 01004cc4 0180 
+
+
 ZonePC.Set(0x45, {
   Restruct: Zone.recv.quest,
   function: function(client, input){
@@ -66,6 +70,8 @@ ZonePC.Set(0x47, {
     //client.write(new Buffer(Zone.send.quest.pack(input)));
     
     // Quest monster is spawned with this packet.
+    // 
+    client.write(new Buffer("1A012F00000078DABBC9CEC060FDE6097B2B3303031F031A70A87701D30D1A471870822F4E20F23F1060935DA4C6C0000085CB0BF2", "hex"));
     // 1A 01 2F 00 00 00 78 DA BB C9 CE C0 60 FD E6 09
     // 7B 2B 33 03 03 1F 03 1A 70 A8 77 01 D3 0D 1A 47
     // 18 70 82 2F 4E 20 F2 3F 10 60 93 5D A4 C6 C0 00

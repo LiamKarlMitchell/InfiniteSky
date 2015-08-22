@@ -20,9 +20,9 @@
   "natTranslations": [
     {
       "mask": "255.255.255.0/24",
-      "ip": "192.168.0.7"
+      "ip": "10.1.1.10"
     }
   ],
-  "externalIP": "10.1.1.14",
+  "externalIP": "60.234.90.86",
   "viewable_action_distance": 700
 }
