@@ -171,10 +171,10 @@ structs.Character = restruct.
 	int32lu('SkillPoints'). // 176
 	int32lu('Honor'). // 180
 	int32lu('StatPoints'). // 184
+	int32lu('Stat_Vitality'). // 200
 	int32lu('Stat_Strength'). // 188
 	int32lu('Stat_Chi'). // 192
 	int32lu('Stat_Dexterity'). // 196
-	int32lu('Stat_Vitality'). // 200
 	pad(8). //Will add later // 208
 	//Equipt structs needed here, try find restruct's struct-in-struct example, or ask for one
 	struct('Amulet',structs.Equipt). // 220

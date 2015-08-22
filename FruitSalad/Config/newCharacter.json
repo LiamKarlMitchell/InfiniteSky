@@ -4,10 +4,10 @@
 		"Gloves": { "ID": 9, "Enchant": 0, "Combine": 0},
 		"Boots": { "ID": 10, "Enchant": 0, "Combine": 0},
 
-		"Vitality": 1,
-		"Strength": 1,
-		"Chi": 1,
-		"Dexterity": 1,
+		"Stat_Vitality": 1,
+		"Stat_Strength": 1,
+		"Stat_Chi": 1,
+		"Stat_Dexterity": 1,
 
 
 		"MapID": 1,
@@ -47,10 +47,10 @@
 		"Gloves": { "ID": 15, "Enchant": 0, "Combine": 0},
 		"Boots": { "ID": 16, "Enchant": 0, "Combine": 0},
 
-		"Vitality": 1,
-		"Strength": 1,
-		"Chi": 1,
-		"Dexterity": 1,
+		"Stat_Vitality": 1,
+		"Stat_Strength": 1,
+		"Stat_Chi": 1,
+		"Stat_Dexterity": 1,
 
 		"MapID": 6,
 		"RealX": -225,
@@ -84,17 +84,18 @@
 
 		"Level": 1,
 		"Experience": 0,
-		"SkillPoints": 100
+		"SkillPoints": 100,
+		"StatPoints": 100
 	},
 	"Jinong": {
 		"Outfit": { "ID": 20, "Enchant": 0, "Combine": 0},
 		"Gloves": { "ID": 21, "Enchant": 0, "Combine": 0},
 		"Boots": { "ID": 22, "Enchant": 0, "Combine": 0},
 
-		"Vitality": 1,
-		"Strength": 1,
-		"Chi": 1,
-		"Dexterity": 1,
+		"Stat_Vitality": 1,
+		"Stat_Strength": 1,
+		"Stat_Chi": 1,
+		"Stat_Dexterity": 1,
 
 		"MapID": 11,
 		"RealX": -743,

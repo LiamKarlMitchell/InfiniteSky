@@ -22,78 +22,56 @@ DamageDealer.prototype.attack = function(t){
   console.log(tState.info);
 
   var levelDifference = this.client.character.Level - tState.info.Level;
+  var missChance = 5;
   if(levelDifference <= -10){
+    missChance += Math.abs(levelDifference) * 5;
     console.log("Miss more rate to the client. -10");
   }else if(levelDifference <= -6){
-    console.log("Miss more rate to the client. -6");
+    missChance += Math.abs(levelDifference) * 2;
   }
 
-  var minDamage = this.roundDown(this.client.character.infos.Damage - (this.client.character.infos.Damage / 100 * 10));
-  var maxDamage = this.roundUp(this.client.character.infos.Damage + (this.client.character.infos.Damage / 100 * 20));
+  var minDamage = this.client.character.infos.Damage;
+  minDamage -= this.roundDown(this.client.character.infos.Damage * 0.11);
+  var maxDamage = this.client.character.infos.Damage;
+  maxDamage += this.roundUp(this.client.character.infos.Damage * 0.11);
 
-  minDamage -= Math.floor(tState.info.Defense/2);
-  maxDamage -= Math.floor(tState.info.Defense/2);
+  minDamage -= tState.info.Defense;
+  maxDamage -= tState.info.Defense;
+
+  // TODO: Add stone/formation dmg bonuses.
 
   var rawDamage = random.integer(minDamage, maxDamage);
 
+  var expDamage = rawDamage;
+  if(rawDamage > tState.CurrentHP) expDamage = tState.CurrentHP;
+
+  if(rawDamage < 0) rawDamage = 0;
+  if(expDamage < 0) expDamage = 0;
+
+  missChance += tState.info.Defense * 0.04;
+  missChance -= this.client.character.infos.HitRate * 0.02;
+
+  if(missChance < 0) missChance = 0;
+  else if(missChance > 100) missChance = 100;
+
+  var experienceGained = 0;
+  if(levelDifference < 10){
+    experienceGained = tState.info.Experience / tState.info.Health * expDamage;
+    experienceGained = experienceGained * config.world.general.rates.global.experience;
+  }
+
+  var missRoll = random.bool(Math.round(missChance), 100);
+  if(missRoll){
+    return;
+  }
+
+
+
   console.log("Damage (min, max):", minDamage, maxDamage);
   console.log("Raw damage:", rawDamage);
-
-  // if(!state.isAlive) return;
-  //
-  // console.log(this.client.character.infos.HitRate, state.infos.DodgeRate);
-  //
-  // var target = {
-  //   damage: {
-  //     min: this.client.character.infos.Damage - state.infos.Defense,
-  //     max: this.client.character.infos.Damage - state.infos.Defense
-  //   },
-  //   elemental_damage: {},
-  //   chance_dodge: this.client.character.infos.HitRate / state.infos.DodgeRate
-  // };
-  //
-  // target.elemental_damage[this.client.character.Clan] = this.client.character.infos.ElementalDamage - state.infos.ElementalDefense[this.client.character.Clan];
-  //
-  // var damageRange = target.damage.min / 100 * 5;
-  // target.damage.min -= damageRange;
-  // target.damage.max += damageRange;
-  // target.damage.min = this.roundDown(target.damage.min);
-  // target.damage.max = this.roundUp(target.damage.max);
-  //
-  // var damage = random.integer(target.damage.min, target.damage.max);
-  //
-  // console.log("Damage done:", damage, target.damage);
-  // console.log("Dodge %:", target.chance_dodge)
-  // console.log("Elemental damage:", target.elemental_damage);
-  // // int32lu('Action'). // 0 your attacking
-  // // int32lu('AttackerID').
-  // // int32lu('AttackerIndex').
-  // // int32lu('DefenderID').
-  // // int32lu('DefenderIndex').
-  // // int32lu('A'). // Skill ID?
-  // // int32lu('B').
-  // // int32lu('C').
-  // // int32lu('D').
-  // // int32lu('Status'). // Depends on attacker or defender | hit or miss, block or not |
-  // // int32lu('TotalDamage').
-  // // int16lu('Deadly').
-  // // int16lu('Light').
-  // // int16lu('Shadow').
-  // // int16lu('Dark').
-  // // int32ls('DamageHP');
-  //
-  // var totalDamage = target.elemental_damage + target.damage;
-  // this.client.write(packets.makeCompressedPacket(0x2C, new Buffer(Zone.send.attack.pack({
-  //   Action: 1,
-  //   DefenderID: this.client.character.state.CharacterID,
-  //   DefenderIndex: this.client.character.state.NodeID,
-  //   AttackerID: this.client.character.state.CharacterID,
-  //   AttackerIndex: this.client.character.state.NodeID,
-  //
-  //   TotalDamage: totalDamage,
-  //   ElementalDamage: target.elemental_damage,
-  //   Status: 1
-  // }))));
+  console.log("Chance to miss: ", missChance);
+  console.log("Missed?", missRoll);
+  console.log("Experience gained: ", experienceGained + " / " + this.client.character.infos.ExpInfo.EXPEnd, "("+(100 / this.client.character.infos.ExpInfo.EXPEnd * experienceGained)+"%)");
 };
 
 DamageDealer.prototype.roundUp = function(value){

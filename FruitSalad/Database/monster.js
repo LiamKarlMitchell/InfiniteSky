@@ -30,7 +30,7 @@ vms('Item', [], function(){
         // Unknown80: Number, // 80
         // Unknown84: Number, // 84
         Level: Number, // 88
-        // Unknown92: Number, // 92
+        Experience: Number, // 92
         Health: Number, // 96
         // Unknown100: Number, // 100
         // Unknown104: Number, // 104
@@ -49,7 +49,7 @@ vms('Item', [], function(){
         Defense: Number, // 156
         HitRate: Number, // 160
         DodgeRate: Number, // 164
-				ElementalDefense: Array,
+				// ElementalDefense: Array,
         // ElementAttackPower: Number, // 168
         // ElementDefensePower: Number, // 172
         // Critical: Number, // 176

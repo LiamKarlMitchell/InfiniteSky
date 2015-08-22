@@ -58,7 +58,7 @@ module.exports = function(grunt) {
 		        int32ls("Unknown80"). // 80
 		        int32ls("Unknown84"). // 84
 		        int32lu("Level"). // 88
-		        int32ls("Unknown92"). // 92
+		        int32ls("Experience"). // 92
 		        int32lu("Health"). // 96
 		        int32ls("Unknown100"). // 100
 		        int32ls("Unknown104"). // 104
@@ -76,10 +76,12 @@ module.exports = function(grunt) {
 		        int32ls("Damage"). // 152
 		        int32ls("Defense"). // 156
 		        int32ls("HitRate"). // 160
-		        int32ls("DodgeRate"). // 164
-		        int32ls("ElementalDefense", 3). // 168
-		        // int32ls("ElementDefensePower"). // 172
-		        // int32ls("Critical"). // 176
+            int32ls("DodgeRate"). // 164
+            int32ls("ElementalDamage", 3). // 164
+            // int32ls("Unknown177"). // 164
+            // int32ls("Unknown178"). // 164
+		        // int32ls("Unknown179"). // 164
+		        // int32ls("ElementalDefense", 3). // 168
 		        int32ls("Unknown180"). // 180
 		        int32ls("Unknown184"). // 184
 		        int32ls("Unknown188"). // 188
@@ -116,10 +118,10 @@ module.exports = function(grunt) {
 		        int32ls("Unknown312"). // 312
 		        int32ls("Unknown316"). // 316
 		        int32ls("Unknown320"). // 320
-		        int32ls("Unknown324"). // 324
-		        int32ls("ElementalDamage", 3). // 328
-		        // int32ls("ShadowATK"). // 332
-		        // int32ls("DarkATK"). // 336
+            int32ls("Unknown324"). // 324
+            int32ls("Unknown325"). // 324
+            int32ls("Unknown326"). // 324
+		        int32ls("Unknown327"). // 324
 		        int32ls("Unknown340"). // 340
 		        int32ls("Unknown344"). // 344
 		        int32ls("Unknown348"). // 348
@@ -266,7 +268,7 @@ module.exports = function(grunt) {
 					record.Name = encoding.convert(record.Name, 'UTF-8', 'EUC-KR').toString();
 			  		// console.log(record.id, record.Name);
             // if(record.id === 1) console.log(record);
-            if(record.id === 12) console.log(record);
+            if(record.id === 100) console.log(record);
 			  		db.Monster.create(record, function(err, doc) {
 			  			if (err) {
 			  				console.error(err);

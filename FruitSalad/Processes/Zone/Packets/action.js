@@ -235,6 +235,7 @@ ZonePC.Set(0x05, {
     client.character.state.LocationNew.X = input.LocationNew.X;
     client.character.state.LocationNew.Y = input.LocationNew.Y;
     client.character.state.LocationNew.Z = input.LocationNew.Z;
+		client.node.update();
 
     switch(input.Skill){
         case 66:
@@ -280,13 +281,13 @@ ZonePC.Set(0x05, {
 
 				// Walking
 				case 2:
+				console.log("test");
 				Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
 				break;
 
 
         default:
 				console.log("Unknown Action");
-        client.node.update();
         Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
         break;
     }

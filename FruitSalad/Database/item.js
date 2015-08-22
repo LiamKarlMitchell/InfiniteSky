@@ -13,7 +13,7 @@ vms('ItemInfo', [], function(){
 	    Clan: Number,
 	    // _4: Number,
 	    // _5: Number,
-	    // _6: Number,
+	    // _6: Number,,
 	    // _7: Number,
 	    // _8: Number,
 	    // _9: Number,
@@ -72,7 +72,7 @@ vms('ItemInfo', [], function(){
 	    Description1: String,
 	    Description2: String,
 	    Description3: String,
-			
+
 			Pet: {type: Object, default: null}
 
 	});
@@ -100,7 +100,7 @@ vms('ItemInfo', [], function(){
 			case 7: ItemType = 'Necklace'; break;
 			case 8: ItemType = 'Cape'; break;
 			case 9: ItemType = 'Outfit'; break; // Outfit
-			case 10: ItemType = 'Glovess'; break;
+			case 10: ItemType = 'Gloves'; break;
 			case 11: ItemType = 'Ring'; break;
 			case 12: ItemType = 'Boots'; break; // Bootss
 			case 13: ItemType = 'Sword'; break;

@@ -84,6 +84,7 @@ Modifiers.push(JinongModifiers);
 
 
 var calculation = {};
+
 calculation.Damage = function(item, enchant, combine, done){
   // Damage is missed by 1, some calculations are Math.floor'ed.
   this.Damage = this.ExpInfo.Damage[this.Clan] * 2;

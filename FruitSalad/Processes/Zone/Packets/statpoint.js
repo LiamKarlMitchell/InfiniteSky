@@ -9,103 +9,64 @@ ZonePC.Set(0x16, {
 
 	function: function SpendStatpoint(client, input) {
 		if(!client.character.StatPoints) return;
-		
 
-		//
-		// //if (input.Key==0x55)
-		// switch (input.Key) {
-		// case 0:
-		// case 1:
-		// case 2:
-		// case 3:
-		// 	input.Value = 1;
-		// 	break;
-		// case 4:
-		// case 5:
-		// case 6:
-		// case 7:
-		// 	input.Value = 5;
-		// 	break;
-		// }
-		//
-		// // Check that they have StatPoints to spend
-		// if (client.character.StatPoints < input.Value) return;
-		// // Vit 3
-		// // Chi 1
-		// // Str 0
-		// // Dex 2
-		// switch (input.Key) {
-		// case 0:
-		// 	// Str
-		// 	client.character.StatStrength += input.Value;
-		// 	//client.sendInfoMessage('Increment Str by ' + input.Value);
-		// 	client.character.infos.updateStat('StatStrength');
-		// 	break;
-		// case 1:
-		// 	// Chi
-		// 	client.character.StatChi += input.Value;
-		// 	//client.sendInfoMessage('Increment Chi by ' + input.Value);
-		// 	client.character.infos.updateStat('StatChi');
-		// 	break;
-		// case 2:
-		// 	// Dex
-		// 	client.character.StatDexterity += input.Value;
-		// 	//client.sendInfoMessage('Increment Dex by ' + input.Value);
-		// 	client.character.infos.updateStat('StatDexterity');
-		// 	break;
-		// case 3:
-		// 	// Vit
-		// 	client.character.StatVitality += input.Value;
-		// 	//client.sendInfoMessage('Increment Vit by ' + input.Value);
-		// 	client.character.infos.updateStat('StatVitality');
-		// 	break;
-		// case 4:
-		// 	// Str 5
-		// 	client.character.StatStrength += input.Value;
-		// 	//client.sendInfoMessage('Increment Str by ' + input.Value);
-		// 	client.character.infos.updateStat('StatStrength');
-		// 	break;
-		// case 5:
-		// 	// Chi 5
-		// 	client.character.StatChi += input.Value;
-		// 	//client.sendInfoMessage('Increment Chi by ' + input.Value);
-		// 	client.character.infos.updateStat('StatChi');
-		// 	break;
-		// case 6:
-		// 	// Dex 5
-		// 	client.character.StatDexterity += input.Value;
-		// 	//client.sendInfoMessage('Increment Dex by ' + input.Value);
-		// 	client.character.infos.updateStat('StatDexterity');
-		// 	break;
-		// case 7:
-		// 	// Vit 5
-		// 	client.character.StatVitality += input.Value;
-		// 	//client.sendInfoMessage('Increment Vit by ' + input.Value);
-		// 	client.character.infos.updateStat('StatVitality');
-		// 	break;
-		//
-		// default:
-		// 	//client.sendInfoMessage('Invalid statpoint allocation: ' + input.Key);
-		// 	return;
-		// 	break;
-		// }
-		//
-		// client.character.StatPoints -= input.Value;
-		//
-		// client.write(new Buffer(Zone.send.KeyValueUnsigned.pack({
-		// 	PacketID: 0x84,
-		// 	Key: 0x37,
-		// 	// Hur?? koreans.
-		// 	Value: input.Key
-		// })));
-		//
-		//
-		// // client.character.updateInfos(false);
-		// // Update character state
-		// client.character.state.setFromCharacter(client.character);
-		//
-		// client.character.save();
+		var spend;
+		if(input.Key === 0 || input.Key === 1 || input.Key === 2 || input.Key === 3) spend = 1;
+		if(input.Key === 4 || input.Key === 5 || input.Key === 6 || input.Key === 7) spend = 5;
 
+		if(!spend){
+			return;
+		}
+
+		if(spend > client.character.StatPoints){
+			return;
+		}
+
+		var update;
+		switch(input.Key){
+			case 0:
+			case 4:
+			update = 'Damage';
+			client.character.Stat_Strength += spend;
+			break;
+
+			case 1:
+			case 5:
+			update = 'MaxChi';
+			client.character.Stat_Chi += spend;
+			break;
+
+			case 2:
+			case 6:
+			update = ['DodgeRate', 'HitRate'];
+			client.character.Stat_Dexterity += spend;
+			break;
+
+			case 3:
+			case 7:
+			update = 'MaxHp';
+			client.character.Stat_Vitality += spend;
+			break;
+		}
+
+		if(!update){
+			return;
+		}
+
+		client.character.StatPoints -= spend;
+		client.character.infos.update(update, function(){
+			client.character.save(function(err){
+				if(err){
+					return;
+				}
+
+				client.write(new Buffer(Zone.send.KeyValueUnsigned.pack({
+					PacketID: 0x84,
+					Key: 0x37,
+					Value: input.Key
+				})));
+			});
+		});
 	}
 });
 
