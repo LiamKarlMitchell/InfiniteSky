@@ -279,15 +279,19 @@ ZonePC.Set(0x05, {
 				});
 				break;
 
+        // Spawning or /return
+        case 0:
+        Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
+        break;
+
 				// Walking
 				case 2:
-				console.log("test");
 				Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
 				break;
 
 
         default:
-				console.log("Unknown Action");
+				console.log("Unknown Action "+client.character.Name + ' '+input.Skill);
         Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
         break;
     }
