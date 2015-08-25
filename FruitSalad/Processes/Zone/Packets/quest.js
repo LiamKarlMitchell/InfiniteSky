@@ -1,9 +1,16 @@
+// These packets must contain some info about quests.
+// LastQuestID
+// CurrentQuestID
+// QuestPart
+// Quest Monster Kill Count
+
+
 
 // 0x45
 // 00000000 01000000 01000000 00000000 00000000 8ee871c4 b6cf89c4 
 Zone.recv.quest = restruct.
-  int32lu('a'). // Part of quest?
-  int32lu('b'). // Quest ID
+  int32lu('questChain'). // Part of quest?
+  int32lu('questID'). // Quest ID
   int32lu('c'). // NPC ID ?
   int32lu('d'). // 0
   int32lu('e'). // 0
@@ -14,8 +21,8 @@ Zone.recv.quest = restruct.
 // 00000000 01000000 01000000 00000000 00000000
 Zone.send.quest = restruct.
   int8lu("PacketID").
-  int32lu('a'). // Part of quest?
-  int32lu('b'). // Quest ID
+  int32lu('questChain'). // Part of quest?
+  int32lu('questID'). // Quest ID
   int32lu('c'). // NPC ID ?
   int32lu('d'). // 0
   int32lu('e'); // 0
@@ -32,6 +39,21 @@ Zone.recv.quest2 = restruct.
   float32l('f');  // Who knows
 
 
+
+// 0x49 Size: 32
+// 01000000 00000000 00000000 00000000 
+// 00000000 00000000 25199bc4 a183e2b8
+Zone.recv.quest3 = restruct.
+  int32lu('monsterID'). // Part of quest?
+  int32lu('questNumber'). // Quest ID
+  int32lu('c'). // NPC ID ?
+  int32lu('d'). // 0
+  int32lu('e'). // 0
+  float32l('f').
+  float32l('f').
+  float32l('f');  // Who knows
+
+
 // 0x 7C
 // 00000000 4d656761 42797465 00000000 00004442 01004cc4 0180 
 
@@ -40,6 +62,15 @@ ZonePC.Set(0x45, {
   Restruct: Zone.recv.quest,
   function: function(client, input){
     console.log(input);
+
+
+// { a: 1,
+//   b: 2,
+//   c: 1,
+//   d: 0,
+//   e: 0,
+//   y: 246.46063232421875,
+//   x: -975.2449340820312 }
 
     var questID = input.b;
     client.character.QuestID = questID;
@@ -71,7 +102,7 @@ ZonePC.Set(0x47, {
     
     // Quest monster is spawned with this packet.
     // 
-    client.write(new Buffer("1A012F00000078DABBC9CEC060FDE6097B2B3303031F031A70A87701D30D1A471870822F4E20F23F1060935DA4C6C0000085CB0BF2", "hex"));
+  client.write(new Buffer("1A012F00000078DABBC9CEC060FDE6097B2B3303031F031A70A87701D30D1A471870822F4E20F23F1060935DA4C6C0000085CB0BF2", "hex"));
     // 1A 01 2F 00 00 00 78 DA BB C9 CE C0 60 FD E6 09
     // 7B 2B 33 03 03 1F 03 1A 70 A8 77 01 D3 0D 1A 47
     // 18 70 82 2F 4E 20 F2 3F 10 60 93 5D A4 C6 C0 00

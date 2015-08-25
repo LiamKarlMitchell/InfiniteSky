@@ -33,7 +33,7 @@ module.exports = function(grunt) {
 
   	});
 
-  	vmscript.on(['Item'], function() {
+  	vmscript.on(['ItemInfo'], function() {
   		console.log('Clearing all existing Items in MongoDB.');
   		db.Item.remove().exec();
 

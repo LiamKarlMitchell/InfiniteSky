@@ -33,7 +33,7 @@ module.exports = function(grunt) {
 
   	});
 
-  	vmscript.on(['Skill'], function() {
+  	vmscript.on(['SkillInfo'], function() {
   		console.log('Clearing all existing Skills in MongoDB.');
   		db.Skill.remove().exec();
 

@@ -1,7 +1,7 @@
 // This file is part of InfiniteSky.
 // Copyright (c) InfiniteSky Dev Teams - Licensed under GNU GPL
 // For more information, see LICENCE in the main folder
-vms('Item', [], function(){
+vms('MonsterInfo', [], function(){
 	// Shorthand Types
 	//var String = db.mongoose.Schema.Types.String;
 	//var Number = db.mongoose.Schema.Types.Number;
@@ -80,8 +80,8 @@ vms('Item', [], function(){
         // Unknown276: Number, // 276
         // Unknown280: Number, // 280
         // Unknown284: Number, // 284
-        // Unknown288: Number, // 288
-        // Unknown292: Number, // 292
+        QuestDropChance: Number, // 288
+        QuestDropItem: Number, // 292
         // Unknown296: Number, // 296
         // Unknown300: Number, // 300
         // Unknown304: Number, // 304

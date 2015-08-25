@@ -1,7 +1,7 @@
 // This file is part of InfiniteSky.
 // Copyright (c) InfiniteSky Dev Teams - Licensed under GNU GPL
 // For more information, see LICENCE in the main folder
-vms('Skill', [], function(){
+vms('SkillInfo', [], function(){
   var skillSchema = mongoose.Schema({
     ID: { type: Number, unique: true, index: true, default: 0 },
     Name: String,

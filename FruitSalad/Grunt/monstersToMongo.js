@@ -32,7 +32,7 @@ module.exports = function(grunt) {
 
   	});
 
-  	vmscript.on(['Monster'], function() {
+  	vmscript.on(['MonsterInfo'], function() {
   		console.log('Clearing all existing Mosnters in MongoDB.');
   		db.Monster.remove().exec();
 
@@ -109,8 +109,8 @@ module.exports = function(grunt) {
 		        int32ls("Unknown276"). // 276
 		        int32ls("Unknown280"). // 280
 		        int32ls("Unknown284"). // 284
-		        int32ls("Unknown288"). // 288
-		        int32ls("Unknown292"). // 292
+		        int32ls("QuestDropChance"). // 288
+		        int32ls("QuestDropItem"). // 292
 		        int32ls("Unknown296"). // 296
 		        int32ls("Unknown300"). // 300
 		        int32ls("Unknown304"). // 304
