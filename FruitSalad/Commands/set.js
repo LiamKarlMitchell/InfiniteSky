@@ -327,12 +327,16 @@ GMCommands.AddCommand(new Command('set',60,function command_set(string,client){
 				sendCharUpdate = true;
 			break;
 			case 'quest':
-				client.character.QuestID = Value;
+				client.character.QuestPrevious = Math.max(Value-1, 0);
+				client.character.QuestCurrent = Value;
+				client.character.QuestPart = 0;
+				client.character.QuestCounter = 0;
 				client.character.save();
+				client.sendInfoMessage('Please relog to see change of quest.'); // TODO: Make this use load GM Command functionality.
 			break;
 			default:
 				client.sendInfoMessage(ValueName+' is not a valid value to set try one of these');
-				client.sendInfoMessage('silver, statpoints, skillpoints, gender, hair, face, clan, duel_win, duel_loose, name, skill, frame, stance, ap, ring, cape, armor, glove, amulet, boot, bottle, weapon, pet, map, disguise');
+				client.sendInfoMessage('silver, statpoints, skillpoints, gender, hair, face, clan, duel_win, duel_loose, name, skill, frame, stance, ap, ring, cape, armor, glove, amulet, boot, bottle, weapon, pet, map, disguise, quest');
 				break;
 			break;
 		}

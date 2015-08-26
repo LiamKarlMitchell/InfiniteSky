@@ -2,8 +2,13 @@
 // Copyright (c) InfiniteSky Dev Teams - Licensed under GNU GPL
 // For more information, see LICENCE in the main folder
 vms('QuestInfo', [], function(){
+    var questRewardTypeSchema = new mongoose.Schema({
+      type: Number,
+      value: Number,
+    },{ _id : false });
+
 	var questSchema = mongoose.Schema({
-		id: { type: Number, index: true, unique: true, default: 0},
+		id: { type: Number, index: true, unique: true },
         Clan: Number,
         QuestNumber: Number,  // 1 based number of quest for each clan.
         Level: Number,        // Can also be level of monster to drop item.
@@ -13,7 +18,7 @@ vms('QuestInfo', [], function(){
         InQuestDestPacket1: Number, // This is in the quest destination packet, that client sends to server when it is at the spot a monster should spawn. I have no idea what it is.
         Unknown7: Number,
         Unknown8: Number,
-        Name: String,
+        Name: { type: String, index: true },
         FromNPCID: Number,
         Unknown10: Number,
         Unknown11: Number,
@@ -25,16 +30,10 @@ vms('QuestInfo', [], function(){
         Value: Number,         // Used for item oramount to killl depending on quest type.
         Unknown17: Number,
         Unknown18: Number,
-        Unknown19: Number,
-        RewardItem: Number,
-        Unknown21: Number,
-        RewardExperience: Number,
-        Unknown23: Number,
-        Unknown24: Number,
-        InitalTextPageCount: Number,
+        Rewards: [questRewardTypeSchema],
+        NextQuest: Number,
         Texts: Array
 	});
-
 
     questSchema.toString = function(kind) {
 		switch (kind) {
@@ -46,7 +45,6 @@ vms('QuestInfo', [], function(){
 			break;
 		}
 	}
-
 
 	//Constructor
 	delete mongoose.models['quest'];
