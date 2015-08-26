@@ -117,10 +117,10 @@ vms('Character', [], function(){
 		Health: Number,
 		Chi: Number,
 
-		QuestID: Number,
-		UnknownQuestStuff: Number,
-		QuestStart: Number,
-		QuestComplete: Number,
+	    QuestPrevious: Number, // Holds the ID of the previous completed quest.
+	    QuestCurrent: Number, //  Holds the ID of the current quest.
+	    QuestPart: Number,  // Holds the value of the current quest part.
+	    QuestCounter: Number,  // Holds how many monsters were killed for the quest in progress.
 
 		// Usable items table
 		Usable_ProtectionCharm: {type: Number, default: 0},

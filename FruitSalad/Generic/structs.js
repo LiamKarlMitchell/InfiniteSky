@@ -190,16 +190,16 @@ structs.Character = restruct.
 	int32lu('Silver'). // here! // 324
 	// struct('Inventory',structs.StorageItem,64).
 	pad(1280). // Inventory space for working on the buffer
-	struct('QuickUseItems',structs.QuickUseItem,4).
-	int32lu('StorageSilver').
-	pad(1008).
+	struct('QuickUseItems',structs.QuickUseItem,4). // 1604
+	int32lu('StorageSilver'). // 1636                      
+	pad(1008). // 1640
 
-	struct('SkillList',structs.QuickUseSkill,30).
-	struct('SkillBar',structs.QuickUseSkill,24).
-	int32lu('QuestID').//Quest ID
-	int32lu('UnknownQuestStuff').//??
-	int32lu('QuestStart').//Did you start the quest
-	int32lu('QuestComplete').//Did you complete the quest
+	struct('SkillList',structs.QuickUseSkill,30). // 2648
+	struct('SkillBar',structs.QuickUseSkill,24). // 2888
+	int32lu('QuestPrevious').// Holds the ID of the previous completed quest.
+	int32lu('QuestCurrent').//  Holds the ID of the current quest.
+	int32lu('QuestPart'). // Holds the value of the current quest part.
+	int32lu('QuestCounter'). // Holds how many monsters were killed for the quest in progress.
 	pad(20).
 
 	string('Friends',13,10).

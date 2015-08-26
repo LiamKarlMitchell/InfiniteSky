@@ -61,7 +61,7 @@ Zone.recv.quest3 = restruct.
 ZonePC.Set(0x45, {
   Restruct: Zone.recv.quest,
   function: function(client, input){
-    console.log(input);
+    console.log('0x45',input);
 
 
 // { a: 1,
@@ -73,10 +73,19 @@ ZonePC.Set(0x45, {
 //   x: -975.2449340820312 }
 
     var questID = input.b;
-    client.character.QuestID = questID;
-    //UnknownQuestStuff
-    //QuestStart
-    //QuestComplete
+    db.Quest.findById(questID, function(err, quest){
+      if (err) {
+        console.error(err);
+      }
+      console.log(quest);
+    });
+    client.character.QuestCurrent = questID;
+
+// QuestPrevious
+// QuestCurrent
+// QuestPart
+// QuestCounter
+    
     client.character.save();
     input.PacketID = 0x60;
     client.write(new Buffer(Zone.send.quest.pack(input)));
@@ -87,7 +96,7 @@ ZonePC.Set(0x45, {
 ZonePC.Set(0x47, {
   Restruct: Zone.recv.quest2,
   function: function(client, input){
-    console.log(input);
+    console.log('0x47',input);
     console.log('Spawning quest monster not yet implemented.');
     client.sendInfoMessage('Spawning quest monster is not yet implemented.');
     //if (questNumber === input.questNumber)
@@ -100,7 +109,7 @@ ZonePC.Set(0x47, {
     //input.PacketID = 0x60;
     //client.write(new Buffer(Zone.send.quest.pack(input)));
     
-    // Quest monster is spawned with this packet.
+    // Quest 1 monster is spawned with this packet.
     // 
   client.write(new Buffer("1A012F00000078DABBC9CEC060FDE6097B2B3303031F031A70A87701D30D1A471870822F4E20F23F1060935DA4C6C0000085CB0BF2", "hex"));
     // 1A 01 2F 00 00 00 78 DA BB C9 CE C0 60 FD E6 09
