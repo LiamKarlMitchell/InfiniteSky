@@ -329,8 +329,8 @@ GMCommands.AddCommand(new Command('set',60,function command_set(string,client){
 			case 'quest':
 				client.character.QuestPrevious = Math.max(Value-1, 0);
 				client.character.QuestCurrent = Value;
-				client.character.QuestPart = 0;
-				client.character.QuestCounter = 0;
+				client.character.QuestPart = Value2;
+				client.character.QuestCounter = Value3;
 				client.character.save();
 				client.sendInfoMessage('Please relog to see change of quest.'); // TODO: Make this use load GM Command functionality.
 			break;

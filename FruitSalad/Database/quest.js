@@ -7,13 +7,27 @@ vms('QuestInfo', [], function(){
       value: Number,
     },{ _id : false });
 
+// Type:
+// 1 = [Monster] (1) Kill !
+// 2 = [Item]
+//     [Item]
+//     Bring Them!
+// 3 = [Item]
+//     [Item]
+//     [NPC]Deliver them to !
+// 4 = [Item]
+//     [Item]
+// 5 = [Monster] Kill!
+// 6 = [Item] <-> [Item]
+// 7 = Visit!
+
 	var questSchema = mongoose.Schema({
 		id: { type: Number, index: true, unique: true },
         Clan: Number,
         QuestNumber: Number,  // 1 based number of quest for each clan.
         Level: Number,        // Can also be level of monster to drop item.
         Unknown4: Number,
-        Unknown4a: Number,
+        Type: Number,
         Unknown5: Number,
         InQuestDestPacket1: Number, // This is in the quest destination packet, that client sends to server when it is at the spot a monster should spawn. I have no idea what it is.
         Unknown7: Number,
