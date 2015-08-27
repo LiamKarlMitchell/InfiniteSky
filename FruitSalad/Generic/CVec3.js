@@ -67,7 +67,7 @@ vms('CVec3', [], function(){
 		{
 		   angle *= deg2rad;
 		   this.X += distance * Math.cos(angle);
-           this.Y += distance * Math.sin(angle);
+           this.Z += distance * Math.sin(angle);
 		},
 
 		getDistance: function CVec3_getDistance(other) {

@@ -408,16 +408,15 @@ ZonePC.Set(0x19, {
         console.warn('CHI USAGE MISSMATCH Server: '+mods.ChiCost +' Client: '+ input.ChiUsage);
       }
 
-
+      var skillUsedSuccessfully = false;
       if (client.character.state.CurrentChi >= mods.ChiCost) {
         client.character.state.CurrentChi -= mods.ChiCost;
         client.sendInfoMessage('Chi at '+client.character.state.CurrentChi);
-        client.character.state.skillUsed = true;
+        skillUsedSuccessfully = true;
       } else {
         // Error not enough Chi to use skill.
         console.error('Unable to use Skill out of Chi: ' + client.character.state.CurrentChi +' requires '+mods.ChiCost);
         client.sendInfoMessage('Unable to use Skill out of Chi.');
-        client.character.state.skillUsed = false;
         return false;
       }
       
@@ -425,14 +424,16 @@ ZonePC.Set(0x19, {
       
       client.character.state.SkillID = input.SkillID;
       client.character.state.SkillLevel = input.SkillLevel;
-      if(client.character.state.skillUsed) {
+      if(skillUsedSuccessfully) {
         if (input.SkillID === 2) { // Walk in the Clouds skill makes the character run fast. It can be considered to go in a straight line until the client reaches the target location.
           client.sendInfoMessage('AirWalkDistance: '+mods.AirWalkDistance);
 
           // TODO Use recast for movement + check if can move to spot...
           // Direction
-          client.character.state.Location.moveInDirection(mods.AirWalkDistance, client.character.state.Direction);
-          client.sendInfoMessage(client.character.state.Location.toString());
+          setTimeout(function(){
+          client.character.state.Location.moveInDirection(mods.AirWalkDistance, client.character.state.FacingDirection);
+          client.sendInfoMessage(client.character.state.Location.toString() + ' D: '+client.character.state.Direction.toFixed(3) + ' F: '+client.character.state.FacingDirection.toFixed(3));
+          },1000);
         }
       } else {
         client.character.state.SkillID = 0;
@@ -441,8 +442,10 @@ ZonePC.Set(0x19, {
       }
 
       client.node.update();
-      Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
-      client.character.state.skillUsed = false;
+      if (client.character.state.skillUsed) {
+        Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);      
+        client.character.state.skillUsed = false;
+      }
     });
 
 
