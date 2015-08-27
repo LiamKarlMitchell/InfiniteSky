@@ -426,14 +426,14 @@ ZonePC.Set(0x19, {
       client.character.state.SkillLevel = input.SkillLevel;
       if(skillUsedSuccessfully) {
         if (input.SkillID === 2) { // Walk in the Clouds skill makes the character run fast. It can be considered to go in a straight line until the client reaches the target location.
-          client.sendInfoMessage('AirWalkDistance: '+mods.AirWalkDistance);
+          client.sendInfoMessage('AirWalkDistance: '+(mods.AirWalkDistance*100));
 
           // TODO Use recast for movement + check if can move to spot...
           // Direction
           setTimeout(function(){
           client.character.state.Location.moveInDirection(mods.AirWalkDistance, client.character.state.FacingDirection);
           client.sendInfoMessage(client.character.state.Location.toString() + ' D: '+client.character.state.Direction.toFixed(3) + ' F: '+client.character.state.FacingDirection.toFixed(3));
-          },1000);
+          },1500 - (mods.AirWalkDistance*100));
         }
       } else {
         client.character.state.SkillID = 0;
