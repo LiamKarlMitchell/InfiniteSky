@@ -376,15 +376,68 @@ ZonePC.Set(0x19, {
 	function: function useSkill(client, input){
 		// TODO: Calculate chi usage.
 
-		console.log("Using skill: ", client.character.state.Skill);
-		// console.log(input);
+		console.log("Using skill: " + client.character.state.Skill + " ID: "+input.SkillID + " Level: " + input.SkillLevel);
+    console.log(input);
+    
+    // TODO Check if caching works with the mongoose plugin Ane found, or cache this our selves on character login and on skill bar change. 
+    // We might only have to cache the skill mods per level that the character has on their bars :D
+    
+    // Ensure character has skill and the >= level requesting.
+    var skillIndex = -1;
+    for (var i=0;i<30;i++) {
+      var s = client.character.SkillList[i];
+      if (s && s.ID === input.SkillID && s.Level >= input.SkillLevel) {
+        skillIndex = i;
+      }
+    }
 
-		client.node.update();
-    client.character.state.SkillID = input.SkillID;
-		client.character.state.SkillLevel = input.SkillLevel;
-		if(client.character.state.skillUsed)
-		Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
-		client.character.state.skillUsed = false;
+    if (skillIndex === -1) {
+      console.log('Character does not have the skill.');
+      return;
+    }
+
+    db.Skill.findById(input.SkillID, function(err, skill){
+      if (err) {
+        console.error('Error looking up skill for character '+client.character.Name+' SkillID: '+input.SkillID);
+        return;
+      }
+
+      var mods = skill.getSkillMods(input.SkillLevel);
+      console.log(mods);
+      if (mods.ChiCost !== input.ChiUsage) {
+        console.warn('CHI USAGE MISSMATCH Server: '+mods.ChiCost +' Client: '+ input.ChiUsage);
+      }
+
+
+      if (client.character.state.CurrentChi >= mods.ChiCost) {
+        client.character.state.CurrentChi -= mods.ChiCost;
+        client.sendInfoMessage('Chi at '+client.character.state.CurrentChi);
+        client.character.state.skillUsed = true;
+      } else {
+        // Error not enough Chi to use skill.
+        console.error('Unable to use Skill out of Chi: ' + client.character.state.CurrentChi +' requires '+mods.ChiCost);
+        client.sendInfoMessage('Unable to use Skill out of Chi.');
+        client.character.state.skillUsed = false;
+        return false;
+      }
+      
+
+      client.node.update();
+      client.character.state.SkillID = input.SkillID;
+      client.character.state.SkillLevel = input.SkillLevel;
+
+      if(client.character.state.skillUsed) {
+        Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
+      } else {
+        client.character.state.SkillID = 0;
+        client.character.state.SkillLevel = 0;
+        client.character.state.Skill = 1;
+        Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
+      }
+      client.character.state.skillUsed = false;
+    });
+
+
 	}
 });
 

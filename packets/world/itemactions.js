@@ -1697,7 +1697,7 @@ WorldPC.Set(0x14, {
             }
         } else {
             console.log('Unhandled Item Action: ' + input.ActionType);
-            NotImplemented(input.ActionType);
+            NotImplemented(client, input.ActionType, input);
             client.sendInfoMessage('The inventory action ' + input.ActionType + ' has not been coded into the server. Please report this to a developer and tell them what you were doing at the time.');
         }
     }

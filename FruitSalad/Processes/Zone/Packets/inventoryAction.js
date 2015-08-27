@@ -1167,7 +1167,7 @@ ItemAction[31] = function learnSkill(input){
     }
 
     if(!skill){
-      console.log("Skill not founded")
+      console.log("Skill not found")
       Zone.send.itemAction.call(self, 1, input);
       return;
     }
@@ -1213,7 +1213,7 @@ ItemAction[31] = function learnSkill(input){
 
 
     if(!freeIndex){
-      console.log("Next free index could not be founded");
+      console.log("Next free index could not be found");
       Zone.send.itemAction.call(self, 1, input);
       return;
     }
@@ -1361,13 +1361,69 @@ ItemAction[12] = function useQuickItem(input){
   });
 };
 
+
+ItemAction[29] = function skillUp(input) {
+
+  if (this.character.SkillPoints < 1) {
+      console.log("Not enough skill points.")
+      Zone.send.itemAction.call(this, 1, input);
+      return;
+  }
+
+  if (input.InventoryIndex > 30) {
+    console.log('Invalid skill index.');
+    Zone.send.itemAction.call(this, 1, input);
+    return;
+  }
+
+    var player_skill = this.character.SkillList[input.InventoryIndex];
+    if (!player_skill) {
+      console.log("Skill not found at that index");
+      Zone.send.itemAction.call(this, 1, input);
+      return;
+    }
+
+  console.log("Leveling up skill");
+  console.log(input);
+  console.log(player_skill);
+  var self = this;
+  db.Skill.findById(player_skill.ID, function(err, skill){
+    if(err){
+      console.log("Error on finding skills")
+      Zone.send.itemAction.call(self, 1, input);
+      return;
+    }
+
+    if(!skill){
+      console.log("Skill not found");
+      Zone.send.itemAction.call(self, 1, input);
+      return;
+    }
+
+
+    if(player_skill.Level +1 > skill.MaxSkillLevel){
+      console.log("Skill at max already");
+      Zone.send.itemAction.call(self, 1, input);
+      return;
+    }
+
+    self.character.SkillPoints--;
+    player_skill.Level++;
+    self.character.markModified('SkillList');
+    self.character.save();
+    Zone.send.itemAction.call(self, 0, input);
+  });
+}
+
 ZonePC.Set(0x14, {
     Restruct: Zone.recv.itemAction,
     function: function handleItemActionPacket(client, input) {
         if(input.Amount === 0) input.Amount = 1;
 
         if(!ItemAction[input.ActionType]){
-            console.log("Inventory action:", input.ActionType, "is not supported");
+            var msg = "Inventory action: " +input.ActionType + " is not supported.";
+            console.log(msg);
+            client.sendInfoMessage(msg)
             Zone.send.itemAction.call(client, 1, input);
             return;
         }

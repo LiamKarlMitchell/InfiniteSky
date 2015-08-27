@@ -115,6 +115,97 @@ vms('SkillInfo', [], function(){
     return this.Clan === 1 || this.Clan === (clan+2);
   };
 
+  skillSchema.methods.getSkillMods = function(SkillLevel) {
+        var mods = { // See the grunt task skillsToMongo.js for these names since its neglected in the schema -_- TODO Put these names in the schema (See npc text schema for example)
+            ChiCost: 0,
+            DegreeOfDefensiveSkill: 0,
+            ChiRecovery: 0,
+            ChanceToAcupressure: 0,
+            ChanceToUnstun: 0,
+            AirWalkDistance: 0,
+            EnergyBall: 0,
+            DamageIncreased: 0,
+            Unk1: 0,
+            AttackRangeApplied: 0,
+            DamageApplied: 0,
+            OnlyForLightDamage: 0,
+            OnlyForShadowDamage: 0,
+            OnlyForDarkDamage: 0,
+            ChanceToHitApplied: 0,
+            EffectiveDuration: 0,
+            IncreasedDamage: 0,
+            IncreasedDefense: 0,
+            Unk2: 0,
+            CastTime: 0,
+            IncreasedLightResistance: 0,
+            IncreasedShadowResistance: 0,
+            IncreasedDarkResistance: 0,
+            IncreasedChanceToHit: 0,
+            IncreasedChanceToDodge: 0,
+            IncreasedMovementSpeed: 0,
+            IncreasedAttackSpeed: 0,
+            IncreasedLuck: 0,
+            EnchancedChanceToDeadlyBlow: 0,
+            ChanceToReturnDamage: 0,
+            IncreasedAcupressureDefense: 0,
+            ChanceToRemoveIncreaseEffect: 0,
+            HPRegenerationPoints: 0,
+            ChiRegenerationPoints: 0
+        };
+        if (SkillLevel < 1) {
+            return mods;
+        }
+        if (SkillLevel>this.MaxSkillLevel) {
+            throw new Error('Skill level too high.'+this.toString());
+        }
+
+        var Scale = SkillLevel/this.MaxSkillLevel;
+
+        // Old code.
+        //for (var name in this.ModifiersStart) {
+            //mods[name] = (this.ModifiersEnd[name] - this.ModifiersStart[name]) * Scale;
+        //}
+        
+        // Unwrapped for speed
+        
+        mods.ChiCost = Math.ceil(this.ModifiersStart.ChiCost + (this.ModifiersEnd.ChiCost - this.ModifiersStart.ChiCost) * Scale);
+        mods.DegreeOfDefensiveSkill = (this.ModifiersEnd.DegreeOfDefensiveSkill - this.ModifiersStart.DegreeOfDefensiveSkill) * Scale;
+        mods.ChiRecovery = (this.ModifiersEnd.ChiRecovery - this.ModifiersStart.ChiRecovery) * Scale;
+        mods.ChanceToAcupressure = (this.ModifiersEnd.ChanceToAcupressure - this.ModifiersStart.ChanceToAcupressure) * Scale;
+        mods.ChanceToUnstun = (this.ModifiersEnd.ChanceToUnstun - this.ModifiersStart.ChanceToUnstun) * Scale;
+        mods.AirWalkDistance = (this.ModifiersEnd.AirWalkDistance - this.ModifiersStart.AirWalkDistance) * Scale;
+        mods.EnergyBall = (this.ModifiersEnd.EnergyBall - this.ModifiersStart.EnergyBall) * Scale;
+        mods.DamageIncreased = (this.ModifiersEnd.DamageIncreased - this.ModifiersStart.DamageIncreased) * Scale;
+        mods.Unk1 = (this.ModifiersEnd.Unk1 - this.ModifiersStart.Unk1) * Scale;
+        mods.AttackRangeApplied = (this.ModifiersEnd.AttackRangeApplied - this.ModifiersStart.AttackRangeApplied) * Scale;
+        mods.DamageApplied = (this.ModifiersEnd.DamageApplied - this.ModifiersStart.DamageApplied) * Scale;
+        mods.OnlyForLightDamage = (this.ModifiersEnd.OnlyForLightDamage - this.ModifiersStart.OnlyForLightDamage) * Scale;
+        mods.OnlyForShadowDamage = (this.ModifiersEnd.OnlyForShadowDamage - this.ModifiersStart.OnlyForShadowDamage) * Scale;
+        mods.OnlyForDarkDamage = (this.ModifiersEnd.OnlyForDarkDamage - this.ModifiersStart.OnlyForDarkDamage) * Scale;
+        mods.ChanceToHitApplied = (this.ModifiersEnd.ChanceToHitApplied - this.ModifiersStart.ChanceToHitApplied) * Scale;
+        mods.EffectiveDuration = (this.ModifiersEnd.EffectiveDuration - this.ModifiersStart.EffectiveDuration) * Scale;
+        mods.IncreasedDamage = (this.ModifiersEnd.IncreasedDamage - this.ModifiersStart.IncreasedDamage) * Scale;
+        mods.IncreasedDefense = (this.ModifiersEnd.IncreasedDefense - this.ModifiersStart.IncreasedDefense) * Scale;
+        mods.Unk2 = (this.ModifiersEnd.Unk2 - this.ModifiersStart.Unk2) * Scale;
+        mods.CastTime = (this.ModifiersEnd.CastTime - this.ModifiersStart.CastTime) * Scale;
+        mods.IncreasedLightResistance = (this.ModifiersEnd.IncreasedLightResistance - this.ModifiersStart.IncreasedLightResistance) * Scale;
+        mods.IncreasedShadowResistance = (this.ModifiersEnd.IncreasedShadowResistance - this.ModifiersStart.IncreasedShadowResistance) * Scale;
+        mods.IncreasedDarkResistance = (this.ModifiersEnd.IncreasedDarkResistance - this.ModifiersStart.IncreasedDarkResistance) * Scale;
+        mods.IncreasedChanceToHit = (this.ModifiersEnd.IncreasedChanceToHit - this.ModifiersStart.IncreasedChanceToHit) * Scale;
+        mods.IncreasedChanceToDodge = (this.ModifiersEnd.IncreasedChanceToDodge - this.ModifiersStart.IncreasedChanceToDodge) * Scale;
+        mods.IncreasedMovementSpeed = (this.ModifiersEnd.IncreasedMovementSpeed - this.ModifiersStart.IncreasedMovementSpeed) * Scale;
+        mods.IncreasedAttackSpeed = (this.ModifiersEnd.IncreasedAttackSpeed - this.ModifiersStart.IncreasedAttackSpeed) * Scale;
+        mods.IncreasedLuck = (this.ModifiersEnd.IncreasedLuck - this.ModifiersStart.IncreasedLuck) * Scale;
+        mods.EnchancedChanceToDeadlyBlow = (this.ModifiersEnd.EnchancedChanceToDeadlyBlow - this.ModifiersStart.EnchancedChanceToDeadlyBlow) * Scale;
+        mods.ChanceToReturnDamage = (this.ModifiersEnd.ChanceToReturnDamage - this.ModifiersStart.ChanceToReturnDamage) * Scale;
+        mods.IncreasedAcupressureDefense = (this.ModifiersEnd.IncreasedAcupressureDefense - this.ModifiersStart.IncreasedAcupressureDefense) * Scale;
+        mods.ChanceToRemoveIncreaseEffect = (this.ModifiersEnd.ChanceToRemoveIncreaseEffect - this.ModifiersStart.ChanceToRemoveIncreaseEffect) * Scale;
+        mods.HPRegenerationPoints = (this.ModifiersEnd.HPRegenerationPoints - this.ModifiersStart.HPRegenerationPoints) * Scale;
+        mods.ChiRegenerationPoints = (this.ModifiersEnd.ChiRegenerationPoints - this.ModifiersStart.ChiRegenerationPoints) * Scale;
+
+        return mods;
+    }
+
   delete mongoose.models['skill'];
   var SkillInfo = db.mongoose.model('skill', skillSchema);
 
