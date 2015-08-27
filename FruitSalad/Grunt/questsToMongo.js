@@ -41,7 +41,7 @@ module.exports = function(grunt) {
 			if (makeCSV) {
 				var fs = require('fs');
 				csv = fs.createWriteStream('Quests.csv');
-				csv.write("id, Name, Level, Clan, QuestNumber, NextQuest, Unknown4, Type, Unknown5, InQuestDestPacket1, Unknown7, Unknown8, FromNPCID, Unknown10, Unknown11, Unknown12, Unknown13, Unknown14, ToNPCID, MonsterID, Value, Unknown17, Unknown18, RewardType, RewardValue, Text1, Text2, Text3, Text4, Text5, Text6, Text7, Text8, Text9, Text10\n");
+				csv.write("id, Name, Level, Clan, QuestNumber, NextQuest, Unknown4, Type, ZoneID, X, Y, Z, FromNPCID, Unknown10, Unknown11, Unknown12, Unknown13, Unknown14, ToNPCID, MonsterID, Value, Unknown17, Unknown18, RewardType, RewardValue, Text1, Text2, Text3, Text4, Text5, Text6, Text7, Text8, Text9, Text10\n");
 			}
 
 			var reward = restruct.
@@ -65,8 +65,8 @@ module.exports = function(grunt) {
 			var Quests = new GameInfoLoader('005_00007.IMG',
 				restruct.int32lu("id").int32lu("Clan").int32lu("QuestNumber"). // 1 based number of quest for each clan.
 				int32lu("Level"). // Can also be level of monster to drop item.
-				int32lu("Unknown4").int32lu("Type").int32lu("Unknown5").int32lu("InQuestDestPacket1"). // This is in the quest destination packet, that client sends to server when it is at the spot a monster should spawn. I have no idea what it is.
-				int32lu("Unknown7").int32lu("Unknown8").string("Name", 52).int32lu("FromNPCID").int32lu("Unknown10").int32lu("Unknown11").int32lu("Unknown12").int32lu("Unknown13").int32lu("Unknown14").int32lu("ToNPCID").int32lu("MonsterID"). // Can also be item that the monster of level will drop.
+				int32lu("Unknown4").int32lu("Type").int32lu("ZoneID").int32lu("X"). // This is in the quest destination packet, that client sends to server when it is at the spot a monster should spawn. I have no idea what it is.
+				int32lu("Y").int32lu("Z").string("Name", 52).int32lu("FromNPCID").int32lu("Unknown10").int32lu("Unknown11").int32lu("Unknown12").int32lu("Unknown13").int32lu("Unknown14").int32lu("ToNPCID").int32lu("MonsterID"). // Can also be item that the monster of level will drop.
 				int32lu("Value"). // Used for item oramount to killl depending on quest type.
 				int32lu("Unknown17").int32lu("Unknown18").struct("Rewards", reward, 3).int32lu("NextQuest").struct("Texts", textPage),
 				function onRecordLoad(record) {
@@ -97,10 +97,10 @@ module.exports = function(grunt) {
 								"NextQuest",
 								"Unknown4",
 								"Type",
-								"Unknown5",
-								"InQuestDestPacket1",
-								"Unknown7",
-								"Unknown8",
+								"ZoneID",
+								"X",
+								"Y",
+								"Z",
 								"FromNPCID",
 								"Unknown10",
 								"Unknown11",

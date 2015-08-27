@@ -20,6 +20,18 @@ vms('QuestInfo', [], function(){
 // 5 = [Monster] Kill!
 // 6 = [Item] <-> [Item]
 // 7 = Visit!
+ 
+ 
+ 
+// Reward type
+// 0 = Nothing
+// 1 = Nothing2
+// 2 = Unused2
+// 3 = Unused3
+// 4 = Unused4
+// 5 = is Skill point
+// 4 = is EXP
+// 6 = is Item
 
 	var questSchema = mongoose.Schema({
 		id: { type: Number, index: true, unique: true },
@@ -28,10 +40,10 @@ vms('QuestInfo', [], function(){
         Level: Number,        // Can also be level of monster to drop item.
         Unknown4: Number,
         Type: Number,
-        Unknown5: Number,
-        InQuestDestPacket1: Number, // This is in the quest destination packet, that client sends to server when it is at the spot a monster should spawn. I have no idea what it is.
-        Unknown7: Number,
-        Unknown8: Number,
+        ZoneID: Number,
+        X: Number, // The location of any spawned monster.
+        Y: Number, // Its a point to spawn a monster at when the client character is in range (100 units).
+        Z: Number,
         Name: { type: String, index: true },
         FromNPCID: Number,
         Unknown10: Number,
