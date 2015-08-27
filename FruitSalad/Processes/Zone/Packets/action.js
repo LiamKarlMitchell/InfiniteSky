@@ -17,7 +17,7 @@ Zone.AccountSecurityPinLength = 4;
 //Zone.VersionRequired 60221 a much older version dakk's client is this
 Zone.VersionRequired = 60322;
 Zone.AccountSecurityPinLength = 4;
-Zone.UserIDLength = 8 ;// a max length of 8 meens they are using unsigned long long or unsignedint64 a standard database entry for primary key :)
+Zone.UserIDLength = 8;// a max length of 8 meens they are using unsigned long long or unsignedint64 a standard database entry for primary key :)
 Zone.AvatarNameLength = 12;
 Zone.IPAddressLength = 15;
 Zone.GuildName_Length = 12;
@@ -158,6 +158,34 @@ Zone.recv.Action = restruct.
   float32l('FacingDirection').
   pad(8);
 
+Zone.send.attack = restruct.
+  int32lu('Action'). // 0 your attacking
+  int32ls('CharacterID').
+  int32ls('NodeID').
+  int32ls('tUniqueID').
+  int32ls('tNodeID').
+  int32lu('A'). // Skill ID?
+  int32lu('B').
+  int32lu('C').
+  int32lu('D').
+  int32lu('Successful'). // Depends on attacker or defender | hit or miss, block or not |
+  int32lu('Damage').
+  int16lu('isDeadly').
+  int16lu('ElementalDamage', 3).
+  int32ls('DamageHP');
+
+
+Zone.recv.attack = restruct.
+    int8lu('PacketID').
+    int8lu('Status').
+    int32lu('Action').
+    int32lu('CharID1').
+    int32lu('CharID2').
+    int32lu('TargetID').
+    int32lu('nodeID').
+    int32lu('skillID').
+    int8lu('Unk', 40);
+
 ZonePC.Set(0x03, {
   Restruct: Zone.recv.Action,
   function: function ActionHearthBeatHandler(client, input) {
@@ -174,6 +202,9 @@ ZonePC.Set(0x03, {
 ZonePC.Set(0x04, {
   Restruct: Zone.recv.Action,
   function: function HandleDuringAction(client, input) {
+		// console.log("DIfference:", new Date().getTime() - global.time, "ms");
+		// global.time = new Date().getTime();
+
     client.character.state.Frame = input.Frame;
     client.character.state.Stance = input.Stance;
     client.character.state.Skill = input.Skill;
@@ -195,8 +226,8 @@ ZonePC.Set(0x04, {
     // send their update packets to the client
     // store time this was done
 
-    client.node.update();
-    Zone.sendToAllArea(client, false, client.character.state.getPacket(), config.network.viewable_action_distance);
+    // client.node.update();
+    // Zone.sendToAllArea(client, false, client.character.state.getPacket(), config.network.viewable_action_distance);
 
 		client.character.save();
   }
@@ -249,7 +280,8 @@ ZonePC.Set(0x05, {
 
 				// Fujin general skills
 				case 32:
-				Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
+				client.character.state.skillUsed = true;
+				// Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
 				break;
 
 				// Fujin general buffs
@@ -271,6 +303,7 @@ ZonePC.Set(0x05, {
 				case 5:
 				case 6:
 				case 7:
+				console.log(input);
 				console.log("Target node:", input.TargetNodeID);
 				Zone.QuadTree.findNodeById(input.TargetNodeID, function(node){
 					console.log("Found target node", node.id);
@@ -286,6 +319,19 @@ ZonePC.Set(0x05, {
 
 				// Walking
 				case 2:
+				// var x = input.Location.X - input.LocationNew.X;
+				// var y = input.Location.Z - input.LocationNew.Z;
+
+				// var distance = Math.sqrt(x * x + y * y);
+				// console.log(input);
+				// var walkingSpeed = 60;
+				// console.log("Distance:", distance);
+				// var time = (distance / walkingSpeed) * 1000;
+				// console.log("Time:", time);
+				// setTimeout(function(){
+				// 	console.log("Reached");
+				// }, time);
+				// console.log(config.motion[client.character.Clan][input.Skill][input.Stance])
 				Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
 				break;
 
@@ -295,6 +341,9 @@ ZonePC.Set(0x05, {
         Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
         break;
     }
+
+		clearInterval(client.character.state.Intervals.BroadcastState);
+		client.character.state.Intervals.BroadcastState = setInterval(Zone.broadcastState.bind(Zone, client), 5000);
   }
 });
 
@@ -342,20 +391,21 @@ ZonePC.Set(0x19, {
 
 ZonePC.Set(0x8B, {
     function: function(client){
-			if(!client.character.state.sendPlayersAround){
-				client.character.state.sendPlayersAround = true;
-				var found = Zone.QuadTree.query({
-					CVec3: client.character.state.Location,
-					radius: config.network.viewable_action_distance,
-					type: ['client']
-				});
-
-				for (var i = 0; i < found.length; i++) {
-					var f = found[i];
-					if(f !== client) client.write(f.object.character.state.getPacket());
-				}
-			}
-
-      Zone.broadcastStates(client);
+			// if(!client.character.state.sendPlayersAround){
+			// 	client.character.state.sendPlayersAround = true;
+			// 	var found = Zone.QuadTree.query({
+			// 		CVec3: client.character.state.Location,
+			// 		radius: config.network.viewable_action_distance,
+			// 		type: ['client']
+			// 	});
+			//
+			// 	for (var i = 0; i < found.length; i++) {
+			// 		var f = found[i];
+			// 		if(f !== client) client.write(f.object.character.state.getPacket());
+			// 	}
+			// }
+			//
+      // Zone.broadcastStates(client);
+			//
     }
 });

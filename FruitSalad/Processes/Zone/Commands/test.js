@@ -29,39 +29,39 @@ GMCommands.AddCommand(new Command('info',60,function command_test(string, client
 }));
 
 GMCommands.AddCommand(new Command('infos',60,function command_test(string, client){
-	client.character.infos.print();
+
 }));
 
 // Use the packet id 0x2C
-Zone.send.attack = restruct.
-    int32lu('Action'). // 0 your attacking
-    int32lu('AttackerID').
-    int32lu('AttackerIndex').
-    int32lu('DefenderID').
-    int32lu('DefenderIndex').
-    int32lu('A'). // Skill ID?
-    int32lu('B').
-    int32lu('C').
-    int32lu('D').
-    int32lu('Status'). // Depends on attacker or defender | hit or miss, block or not |
-    int32lu('TotalDamage').
-    int16lu('Deadly').
-    int16lu('ElementalDamage', 3).
-    // int16lu('Shadow').
-    // int16lu('Dark').
-    int32ls('DamageHP');
+// Zone.send.attack = restruct.
+//     int32lu('Action'). // 0 your attacking
+//     int32lu('AttackerID').
+//     int32lu('AttackerIndex').
+//     int32lu('DefenderID').
+//     int32lu('DefenderIndex').
+//     int32lu('A'). // Skill ID?
+//     int32lu('B').
+//     int32lu('C').
+//     int32lu('D').
+//     int32lu('Status'). // Depends on attacker or defender | hit or miss, block or not |
+//     int32lu('TotalDamage').
+//     int16lu('Deadly').
+//     int16lu('ElementalDamage', 3).
+//     // int16lu('Shadow').
+//     // int16lu('Dark').
+//     int32ls('DamageHP');
 
 
-Zone.recv.attack = restruct.
-    int8lu('PacketID').
-    int8lu('Status').
-    int32lu('Action').
-    int32lu('CharID1').
-    int32lu('CharID2').
-    int32lu('TargetID').
-    int32lu('nodeID').
-    int32lu('skillID').
-    int8lu('Unk', 40);
+// Zone.recv.attack = restruct.
+//     int8lu('PacketID').
+//     int8lu('Status').
+//     int32lu('Action').
+//     int32lu('CharID1').
+//     int32lu('CharID2').
+//     int32lu('TargetID').
+//     int32lu('nodeID').
+//     int32lu('skillID').
+//     int8lu('Unk', 40);
 
 // Modes of attack:
 // 1 Player VS Player

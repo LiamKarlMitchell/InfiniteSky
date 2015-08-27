@@ -166,6 +166,8 @@ function ZoneInstance() {
 	this.itemSlotSizes = {};
 
 	this.Monsters = [];
+	this.UniqueID = 0;
+	this.ExpInfo = {};
 
 	global.log = bunyan.createLogger({
 		name: 'InfiniteSky/Zone.' + parseInt(process.argv[2]),
@@ -213,6 +215,27 @@ zonePrototype.init = function Zone__init() {
 			'Database',
 			'Generic'
 		], function() {
+			vmscript.on('Exp', function(){
+				db.Exp.find(null, 'Level EXPStart EXPEnd SkillPoint', function(err, exp){
+					if(err){
+						return;
+					}
+
+					if(!exp.length){
+						return;
+					}
+
+					for(var i=0; i<exp.length; i++){
+						var info = exp[i];
+						self.ExpInfo[info.Level] = {
+							Start: info.EXPStart,
+							End: info.EXPEnd,
+							SkillPoints: info.SkillPoint
+						};
+					}
+				});
+			});
+
 			vmscript.on('ItemInfo', function(){
 				db.Item.find(null, '_id ItemType', function(err, docs){
 					if(err){
@@ -357,15 +380,35 @@ zonePrototype.addSocket = function(socket) {
 	return true;
 };
 
-zonePrototype.broadcastStates = function(client) {
-	var found = Zone.QuadTree.query({
+zonePrototype.pullStates = function(client) {
+	var types = ['npc', 'item', 'monster'];
+	if(!client.character.state.hasPlayersAround){
+		client.character.state.hasPlayersAround = true;
+		types.push('client');
+	}
+	var found = this.QuadTree.query({
 		CVec3: client.character.state.Location,
 		radius: config.network.viewable_action_distance,
-		type: ['npc', 'item', 'monster']
+		type: types
 	});
 	for (var i = 0; i < found.length; i++) {
 		var f = found[i];
-		client.write(f.object.getPacket());
+
+		if(f.object !== client && f.type === 'client') client.write(f.object.character.state.getPacket());
+		else if(f.object !== client) client.write(f.object.getPacket());
+	}
+};
+
+zonePrototype.broadcastState = function(client){
+	var state = client.character.state.getPacket();
+	var found = this.QuadTree.query({
+		CVec3: client.character.state.Location,
+		radius: config.network.viewable_action_distance,
+		type: ['client']
+	});
+	for (var i = 0; i < found.length; i++) {
+		var f = found[i];
+		if(f.object !== client) f.object.write(state);
 	}
 };
 
@@ -532,21 +575,66 @@ zonePrototype.move = function zone_move_character_socket(socket, location, zoneI
 };
 
 
-zonePrototype.giveEXP = function zone_giveEXP(socket, value) {
-    var oldLocation = socket.character.state.Location.copy();
-    if(location) {
-        socket.character.state.Location.X = location.X;
-        socket.character.state.Location.Y = location.Y;
-        socket.character.state.Location.Z = location.Z;
-    }
-    // Send character update packet
-    socket.character.state.Skill = 0;
-    socket.character.state.Frame = 0;
+zonePrototype.giveEXP = function zone_giveEXP(client, value) {
+	if(value <= 0) return;
+	var expInfo = this.ExpInfo[client.character.Level];
 
-    var packet = socket.character.state.getPacket();
-    Zone.sendToAllAreaLocation(oldLocation, config.network.viewable_action_distance, packet);
-    Zone.sendToAllArea(socket, true, packet, config.network.viewable_action_distance);
-    return true;
+	client.character.Experience += value;
+
+	var reminder = expInfo.End - client.character.Experience;
+	var levelUp = 0;
+	while(reminder < 0){
+		levelUp++;
+		expInfo = this.ExpInfo[client.character.Level + levelUp];
+		if(!expInfo) break;
+
+		client.character.Experience++;
+		client.character.SkillPoints += expInfo.SkillPoints;
+		client.character.StatPoints += (client.character.Level + levelUp) > 99 && (client.character.Level + levelUp) <= 112 ? 0 : (client.character.Level + levelUp) > 112 ? 30 : 5;
+		if(client.character.Level + levelUp === 145) break;
+		reminder = (expInfo.End - expInfo.Start) + reminder;
+	}
+
+	var maxExperience = this.ExpInfo[145].End;
+	if(client.character.Level + levelUp >= 145 || client.character.Experience > maxExperience){
+		levelUp = 145 - client.character.Level;
+		client.character.Experience = maxExperience;
+		client.character.Level = 145;
+	}else{
+		client.character.Level += levelUp;
+	}
+
+	if(levelUp > 0){
+		client.character.infos.updateAll(function(){
+			client.character.Health = client.character.infos.MaxHP;
+			client.character.Chi = client.character.infos.MaxChi;
+
+			client.character.state.update();
+			client.character.state.setFromCharacter(client.character);
+
+			client.character.save(function(err){
+				if(err){
+					return;
+				}
+				Zone.sendToAllAreaLocation(client.character.state.Location, config.viewable_action_distance, new Buffer(structs.LevelUpPacket.pack({
+					PacketID: 0x2E,
+					LevelsGained: levelUp,
+					CharacterID: client.character.state.CharacterID,
+					NodeID: client.character.state.NodeID
+				})));
+
+				client.send2F();
+			});
+		});
+	}else{
+		client.character.save(function(err){
+			if(err){
+				return;
+			}
+
+			client.send2F();
+		});
+	}
 };
 
 zonePrototype.onProcessMessage = function(type, socket) {
@@ -558,7 +646,9 @@ zonePrototype.onProcessMessage = function(type, socket) {
 					console.log("Node removed");
 					Zone.QuadTree.remove(socket.node);
 					socket.node = null;
+					socket.character.state.clearIntervals();
 				}
+
 				// socket.character.save(function(){
 				// 	console.log("Saved");
 				// });
@@ -568,6 +658,7 @@ zonePrototype.onProcessMessage = function(type, socket) {
 					console.log("Node removed");
 					Zone.QuadTree.remove(socket.node);
 					socket.node = null;
+					socket.character.state.clearIntervals();
 				}
 				// socket.character.save(function(){
 				// 	console.log("Saved");
@@ -616,6 +707,7 @@ zonePrototype.onProcessMessage = function(type, socket) {
 					socket.character.state.setAccountID(socket.character.AccountID);
 					socket.character.state.setCharacterID(socket.character._id);
 					socket.character.state.setFromCharacter(socket.character);
+					socket.character.DamageDealer = new DamageDealer(socket);
 
 					self.addSocket(socket);
 
@@ -639,6 +731,13 @@ zonePrototype.onProcessMessage = function(type, socket) {
 
 					CachedBuffer.call(socket, self.packetCollection);
 					Zone.sendToAllArea(socket, true, socket.character.state.getPacket(), config.network.viewable_action_distance);
+					// global.time = new Date().getTime();
+					//TODO: broadcastStates
+					//Set interval/timeout for 2 seconds, todo so
+					Zone.pullStates.bind(self, socket);
+					socket.character.state.Intervals.PullStates = setInterval(Zone.pullStates.bind(self, socket), 2000);
+					socket.character.state.Intervals.BroadcastState = setInterval(Zone.broadcastState.bind(self, socket), 5000);
+					socket.character.state.Intervals.Regeneration = setInterval(socket.character.state.regenerate, 5000);
 				});
 			});
 

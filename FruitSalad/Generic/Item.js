@@ -3,10 +3,9 @@
 // https://www.youtube.com/watch?v=QigNwFntPSY
 
 vms('ItemObj', [], function() {
-	if(typeof global.ItemObjNextID === 'undefined') global.ItemObjNextID = 0;
 	global.ItemObj = function(){
 		this.NodeID = 0;
-		this.UniqueID = ++global.ItemObjNextID;
+		this.UniqueID = ++Zone.UniqueID;
 		this.Location = new CVec3();
 		this.OwnerName = '';
 		this.ItemObjID = 0;

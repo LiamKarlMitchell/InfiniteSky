@@ -23,9 +23,8 @@ vms('Npc', [
 		float32l('FacingDirection').
 		int32lu('HP');
 
-	if(typeof global.NpcNextID === 'undefined') global.NpcNextID = 0;
 	var Npc = function(data) {
-		this.UniqueID = ++global.NpcNextID;
+		this.UniqueID = ++Zone.UniqueID;
 		this.NodeID = 0;
 		this.NpcID = data.ID;
 

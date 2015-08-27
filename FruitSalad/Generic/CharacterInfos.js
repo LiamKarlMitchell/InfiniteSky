@@ -645,7 +645,6 @@ vms('CharacterInfo', [], function(){
       return;
     }
 
-
     var charItem = this.character[name];
     var self = this;
     if(charItem && charItem.ID){
@@ -675,7 +674,7 @@ vms('CharacterInfo', [], function(){
     for(var i=0; i<names.length; i++){
       var name = names[i];
       if(this.Level !== this.character.Level || this.ExpInfo === undefined){
-        db.Exp.getByLevel(this.character.Level, function(err, exp){
+        db.Exp.getByLevel(this.character.Level, (function(err, exp){
           if(err){
             return;
           }
@@ -685,8 +684,8 @@ vms('CharacterInfo', [], function(){
           }
 
           self.ExpInfo = exp;
-          self.onExpInfo.call(self, name, id);
-        });
+          self.onExpInfo.call(self, this.name, this.id);
+        }).bind({name: name, id: id}));
       }else{
         this.onExpInfo.call(self, name, id);
       }

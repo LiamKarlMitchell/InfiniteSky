@@ -25,7 +25,7 @@
 	"general": {
 		"rates": {
 			"global": {
-				"experience": 4,
+				"experience": 1,
 				"drop": 1,
 				"pet_experience": 1
 			}

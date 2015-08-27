@@ -86,6 +86,11 @@ structs.QuickUseSkill= restruct.
 	int32lu("ID").
 	int32lu("Level");
 
+structs.LevelUpPacket = restruct.
+  int8lu('PacketID').
+  int32lu('CharacterID').
+  int32lu('NodeID').
+  int8lu('LevelsGained');
 // 	structs. = restruct.REGION_MOVE_INFO
 // 	float mPlaneInfo[4];
 // 	float mSphereInfo[4];

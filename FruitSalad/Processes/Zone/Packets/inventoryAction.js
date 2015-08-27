@@ -205,6 +205,7 @@ ItemAction[14] = function CharacterItem_Unequip(input){
           return;
       }
       self.character.infos.update(equipItem, function(){
+        self.character.state.update(equipItem);
         self.character.state.setFromCharacter(self.character);
         Zone.send.itemAction.call(self, 0, input);
         Zone.sendToAllArea(self, false, self.character.state.getPacket(), config.network.viewable_action_distance);
@@ -275,6 +276,7 @@ ItemAction[3] = function CharacterItem_Equip(input){
                 return;
             }
             self.character.infos.update(equipItem, function(){
+                self.character.state.update();
                 self.character.state.setFromCharacter(self.character);
                 Zone.send.itemAction.call(self, 0, input);
                 Zone.sendToAllArea(self, false, self.character.state.getPacket(), config.network.viewable_action_distance);

@@ -2,6 +2,22 @@
 // Copyright (c) InfiniteSky Dev Teams - Licensed under GNU GPL
 // For more information, see LICENCE in the main folder
 
+STATE = {
+	isWalking: 0,
+	isRunning: 1,
+	isJumping: 2,
+	isInParty: 3,
+	isInTrade: 4,
+	isShopOpened: 5,
+	isStunned: 6,
+	isBusy: 7,
+	isPublicEnemy: 8,
+	isDead: 9,
+	isAlive: 10,
+	isDueling: 11
+};
+
+
 /**
  * Used to store the state of a character in world.
  * @class
@@ -9,13 +25,13 @@
  */
 
 vms( 'CharacterState', [ 'CVec3', 'Structs' ], function(){
-	EquipItem = function EquipItem() {
+	var EquipItem = function EquipItem() {
 		this.ID = 0;
 		this.Enchant = 0;
 		this.Combine = 0;
 	}
 
-	StorageItem = function StorageItem() {
+	var StorageItem = function StorageItem() {
 		this.ID = 0;
 		this.Column = 0;
 		this.Row = 0;
@@ -23,12 +39,12 @@ vms( 'CharacterState', [ 'CVec3', 'Structs' ], function(){
 		this.Enchant = 0;
 	}
 
-	QuickUseItem = function QuickUseItem() {
+	var QuickUseItem = function QuickUseItem() {
 		this.ID = 0;
 		this.Amount = 0;
 	}
 
-	SkillItem = function SkillItem() {
+	var SkillItem = function SkillItem() {
 		this.ID = 0;
 		this.Level = 0;
 	}
@@ -38,6 +54,8 @@ vms( 'CharacterState', [ 'CVec3', 'Structs' ], function(){
 	}
 
 	CharacterState = function CharacterState() {
+		this.Intervals = {};
+
 		// Varables here
 		this.AccountID = 1;
 		this.NodeID = 2; //?? // Account ID/Client Index??
@@ -224,6 +242,12 @@ vms( 'CharacterState', [ 'CVec3', 'Structs' ], function(){
 		return packets.makeCompressedPacket(0x18,new Buffer(Zone.send.Action.pack(this)));
 	};
 
+	CharacterState_Prototype.clearIntervals = function(){
+		for(var interval in this.Intervals) clearInterval(this.Intervals[interval]);
+	};
+	CharacterState_Prototype.regenerate = function(){
+		// console.log("Regenerating hp and chi");
+	};
 	CharacterState.prototype = CharacterState_Prototype;
 
 	global.CharacterState = CharacterState;

@@ -54,7 +54,7 @@ vms('Monster', [
 		this.Direction = 0;
 
 		this.NodeID = null;
-		this.UniqueID = ++global.MonsterNextID;
+		this.UniqueID = ++Zone.UniqueID;
 		this.FacingDirection = 0;
 
 		this.Target = null;
@@ -64,7 +64,7 @@ vms('Monster', [
 		this.motion = null;
 		this.motionFrames = 0;
 
-		this.isAlive = true;
+		this.isAlive = false;
 
 		console.log("Created monster ("+id+")");
 	}
@@ -84,9 +84,33 @@ vms('Monster', [
 	Monster.prototype.spawn = function(location){
 		this.Location = location.copy();
 		this.node.update();
-		this.isAlive = true;
-		var self = this;
-		this.transition(1);
+		this.CurrentHP = this.MaxHP;
+
+		this.transition(1, function(){
+			this.isAlive = true;
+		});
+		
+		Zone.sendToAllAreaLocation(this.Location, config.network.viewable_action_distance, this.getPacket());
+	};
+
+	Monster.prototype.hit = function(amount){
+		this.CurrentHP -= amount;
+		if(!this.CurrentHP){
+			this.die();
+		}
+	};
+
+	Monster.prototype.die = function(){
+		this.Skill = 12;
+		this.Frame = 0;
+		this.isAlive = false;
+		// TODO: Add drop items.
+
+		this.transition(13, function(){
+			Zone.QuadTree.remove(this.node);
+			Zone.Monsters.splice(Zone.Monsters.indexOf(this), 1);
+		});
+
 		Zone.sendToAllAreaLocation(this.Location, config.network.viewable_action_distance, this.getPacket());
 	};
 
@@ -116,7 +140,6 @@ vms('Monster', [
 	Monster.prototype.setInfos = function(info){
 		this.info = info;
 		console.log("Health:", info.Health);
-		this.CurrentHP = info.Health;
 		this.MaxHP = info.Health;
 		this.ModelID = info.ModelID;
 		this.motion = config.motion_monster[info.ModelID];

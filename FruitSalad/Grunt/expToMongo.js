@@ -80,7 +80,7 @@ module.exports = function(grunt) {
 			  // int32lu("JinongChi"),
 			  function onRecordLoad(record) {
 			  	if (record.Level) {
-			  		if(record.Level === 145) record.ExpEnd = 2000000000;
+			  		if(record.Level === 145) record.EXPEnd = 2000000000;
 			  		db.Exp.create(record, function(err, doc) {
 			  			if (err) {
 			  				console.error(err);

@@ -19,13 +19,11 @@ DamageDealer.prototype.attack = function(t){
   }
 
   if(!tState.isAlive) return;
-  console.log(tState.info);
 
   var levelDifference = this.client.character.Level - tState.info.Level;
   var missChance = 5;
   if(levelDifference <= -10){
     missChance += Math.abs(levelDifference) * 5;
-    console.log("Miss more rate to the client. -10");
   }else if(levelDifference <= -6){
     missChance += Math.abs(levelDifference) * 2;
   }
@@ -42,11 +40,6 @@ DamageDealer.prototype.attack = function(t){
 
   var rawDamage = random.integer(minDamage, maxDamage);
 
-  var expDamage = rawDamage;
-  if(rawDamage > tState.CurrentHP) expDamage = tState.CurrentHP;
-
-  if(rawDamage < 0) rawDamage = 0;
-  if(expDamage < 0) expDamage = 0;
 
   missChance += tState.info.Defense * 0.04;
   missChance -= this.client.character.infos.HitRate * 0.02;
@@ -55,23 +48,51 @@ DamageDealer.prototype.attack = function(t){
   else if(missChance > 100) missChance = 100;
 
   var experienceGained = 0;
+
+  var missRoll = random.bool(Math.round(missChance), 100);
+  var obj = {};
+  obj.Action = 1;
+  obj.CharacterID = this.client.character.state.CharacterID;
+  obj.NodeID = this.client.character.state.NodeID;
+
+  obj.tUniqueID = tState.UniqueID;
+  obj.tNodeID = tState.NodeID;
+
+  if(missRoll || !rawDamage){
+    obj.Successful = 0;
+    var buffer = new Buffer(packets.makeCompressedPacket(0x2C, new Buffer(Zone.send.attack.pack(obj))));
+  	Zone.sendToAllAreaLocation(this.client.character.state.Location, config.network.viewable_action_distance, buffer);
+    return;
+  }
+
+  var deadlyRoll = random.bool(this.client.character.infos.Chance_DeadlyBlow, 100);
+  if(deadlyRoll){
+    obj.isDeadly = 1;
+    rawDamage += tState.info.Defense;
+  }
+
+  var expDamage = rawDamage;
+  if(rawDamage > tState.CurrentHP) expDamage = tState.CurrentHP;
+
+  if(rawDamage < 0) rawDamage = 0;
+  if(expDamage < 0) expDamage = 0;
+
   if(levelDifference < 10){
     experienceGained = tState.info.Experience / tState.info.Health * expDamage;
     experienceGained = experienceGained * config.world.general.rates.global.experience;
   }
 
-  var missRoll = random.bool(Math.round(missChance), 100);
-  if(missRoll){
-    return;
-  }
+  Zone.giveEXP(this.client, experienceGained);
 
+  obj.Successful = 1;
 
+  obj.Damage = rawDamage;
+  obj.DamageHP = 10;
 
-  console.log("Damage (min, max):", minDamage, maxDamage);
-  console.log("Raw damage:", rawDamage);
-  console.log("Chance to miss: ", missChance);
-  console.log("Missed?", missRoll);
-  console.log("Experience gained: ", experienceGained + " / " + this.client.character.infos.ExpInfo.EXPEnd, "("+(100 / this.client.character.infos.ExpInfo.EXPEnd * experienceGained)+"%)");
+  t.object.hit(expDamage);
+
+  this.client.write(new Buffer(packets.makeCompressedPacket(0x2C, new Buffer(Zone.send.attack.pack(obj)))));
+  Zone.sendToAllAreaLocation(this.client.character.state.Location, config.network.viewable_action_distance, t.object.getPacket());
 };
 
 DamageDealer.prototype.roundUp = function(value){

@@ -77,7 +77,7 @@ module.exports = function(grunt) {
 		        int32ls("Defense"). // 156
 		        int32ls("HitRate"). // 160
             int32ls("DodgeRate"). // 164
-            int32ls("ElementalDamage", 3). // 164
+            int32ls("ElementalDefense", 3). // 164
             // int32ls("Unknown177"). // 164
             // int32ls("Unknown178"). // 164
 		        // int32ls("Unknown179"). // 164
