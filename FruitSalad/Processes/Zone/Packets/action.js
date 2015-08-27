@@ -422,18 +422,26 @@ ZonePC.Set(0x19, {
       }
       
 
-      client.node.update();
+      
       client.character.state.SkillID = input.SkillID;
       client.character.state.SkillLevel = input.SkillLevel;
-
       if(client.character.state.skillUsed) {
-        Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
+        if (input.SkillID === 2) { // Walk in the Clouds skill makes the character run fast. It can be considered to go in a straight line until the client reaches the target location.
+          client.sendInfoMessage('AirWalkDistance: '+mods.AirWalkDistance);
+
+          // TODO Use recast for movement + check if can move to spot...
+          // Direction
+          client.character.state.Location.moveInDirection(mods.AirWalkDistance, client.character.state.Direction);
+          client.sendInfoMessage(client.character.state.Location.toString());
+        }
       } else {
         client.character.state.SkillID = 0;
         client.character.state.SkillLevel = 0;
         client.character.state.Skill = 1;
-        Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
       }
+
+      client.node.update();
+      Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
       client.character.state.skillUsed = false;
     });
 

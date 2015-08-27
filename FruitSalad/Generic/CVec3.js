@@ -7,7 +7,8 @@ vms('CVec3', [], function(){
 		this.Y=Y || 0;
 		this.Z=Z || 0;
 	};
-
+	var deg2rad = Math.PI/180;
+	var rad2deg = 180/Math.PI;
 	CVec3.prototype = {
 		setN: function CVec3_setN(other) {
 			this.X=other;
@@ -61,20 +62,23 @@ vms('CVec3', [], function(){
 				);
 		},
 
+		// Takes distance and an angle in degrees and moves in that direction by the distance.
 		moveInDirection: function CVec3_moveInDirection( distance, angle )
 		{
-		   this.X += distance * cos(angle);
-           this.Y += distance * sin(angle);
+		   angle *= deg2rad;
+		   this.X += distance * Math.cos(angle);
+           this.Y += distance * Math.sin(angle);
 		},
 
 		getDistance: function CVec3_getDistance(other) {
 			return Math.abs(this.getDifference(other));
 		},
 
+		// Gets the 2D direction in degrees.
 		get2DDirection: function CVec3_get2DDirection(other)
 		{
 			// Uses Z because koreans..
-			return Math.atan2(other.X - this.X, other.Z - this.Z) * (180 / Math.PI);
+			return Math.atan2(other.X - this.X, other.Z - this.Z) * rad2deg;
 		},
 
 		apply3DVelocity: function CVec3_apply3DVelocity(velocity,delta)
