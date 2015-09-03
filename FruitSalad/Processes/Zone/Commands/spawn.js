@@ -8,7 +8,7 @@ GMCommands.AddCommand(new Command('spawn',60,function spawn_monster(string, clie
     if(!info){
       return;
     }
-
+    
     var mObj = new MonsterObj(monster_id);
     var nObj = new QuadTree.QuadTreeNode({
       object: mObj,

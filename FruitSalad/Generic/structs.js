@@ -205,7 +205,8 @@ structs.Character = restruct.
 	int32lu('QuestCurrent').//  Holds the ID of the current quest.
 	int32lu('QuestPart'). // Holds the value of the current quest part.
 	int32lu('QuestCounter'). // Holds how many monsters were killed for the quest in progress.
-	pad(20).
+	int32lu('QuestOther').   // Not sure...
+	pad(16).
 
 	string('Friends',13,10).
 

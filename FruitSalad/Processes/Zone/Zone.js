@@ -575,6 +575,14 @@ zonePrototype.move = function zone_move_character_socket(socket, location, zoneI
 };
 
 
+zonePrototype.giveSkillPoints = function zone_giveSkillPoints(client, value) {
+	client.character.SkillPoints += value;
+}
+
+zonePrototype.giveItem = function zone_giveItem(client, itemID, amount, combine, enchant) {
+	client.sendInfoMessage('Pretend you got Item '+itemID);
+}
+
 zonePrototype.giveEXP = function zone_giveEXP(client, value) {
 	if(value <= 0) return;
 	var expInfo = this.ExpInfo[client.character.Level];

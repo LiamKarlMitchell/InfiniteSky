@@ -22,21 +22,21 @@ vms('Monster', [
 ], function() {
 	Zone.send.MonsterStatePacket = restruct.
 	int32lu('UniqueID').
-  int32lu('NodeID').
-  int32lu('MonsterID').
-  int32lu('Life').
-  int32lu('Stance').
-  int32lu('Skill').
-  float32l('Frame').
-  struct('Location',structs.CVec3).
-  int32lu('Unknown3',3).
-  float32l('Direction').
-  float32l('TargetDirection').
-  int32ls('TargetObjectIndex').
-  int32lu('Unknown3',4).
-  struct('LocationTo',structs.CVec3).
-  float32l('FacingDirection').
-  int32lu('CurrentHP');
+    int32lu('NodeID').
+    int32lu('MonsterID').
+    int32lu('Life').
+    int32lu('Stance').
+    int32lu('Skill').
+    float32l('Frame').
+    struct('Location',structs.CVec3).
+    int32lu('Unknown3',3).
+    float32l('Direction').
+    float32l('TargetDirection').
+    int32ls('TargetObjectIndex').
+    int32lu('Unknown3',4).
+    struct('LocationTo',structs.CVec3).
+    float32l('FacingDirection').
+    int32lu('CurrentHP');
 
 	var Monster = function(id) {
 		if(typeof global.MonsterNextID === 'undefined') global.MonsterNextID = 0;

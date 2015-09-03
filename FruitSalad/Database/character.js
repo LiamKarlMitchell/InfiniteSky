@@ -117,10 +117,11 @@ vms('Character', [], function(){
 		Health: Number,
 		Chi: Number,
 
-	    QuestPrevious: Number, // Holds the ID of the previous completed quest.
-	    QuestCurrent: Number, //  Holds the ID of the current quest.
-	    QuestPart: Number,  // Holds the value of the current quest part.
-	    QuestCounter: Number,  // Holds how many monsters were killed for the quest in progress.
+	    QuestPrevious: { type: Number, default: 0 }, // Holds the ID of the previous completed quest.
+	    QuestCurrent: { type: Number, default: 0 }, //  Holds the ID of the current quest.
+	    QuestPart: { type: Number, default: 0 },  // Holds the value of the current quest part.
+	    QuestCounter: { type: Number, default: 0 },  // Holds how many monsters were killed for the quest in progress.
+	    QuestOther: { type: Number, default: 0 },    // I am not sure what this does but its sent in the quest packets and right next to the data in memory...
 
 		// Usable items table
 		Usable_ProtectionCharm: {type: Number, default: 0},

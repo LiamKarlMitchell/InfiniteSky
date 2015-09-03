@@ -13,6 +13,7 @@ GMCommands.AddCommand(new Command('set',60,function command_set(string,client){
 		var Value = 0;
 		var Value2 = 0;
 		var Value3 = 0;
+		var Value4 = 0;
 
 		if (s.length>=2)
 		{
@@ -25,6 +26,10 @@ GMCommands.AddCommand(new Command('set',60,function command_set(string,client){
 		if (s.length>=4)
 		{
 			Value3 = Number(s[3]);
+		}
+		if (s.length>=5)
+		{
+			Value4 = Number(s[4]);
 		}
 
 		if (isNaN(Value) || isNaN(Value2) || isNaN(Value3)) {
@@ -331,8 +336,17 @@ GMCommands.AddCommand(new Command('set',60,function command_set(string,client){
 				client.character.QuestCurrent = Value;
 				client.character.QuestPart = Value2;
 				client.character.QuestCounter = Value3;
+				client.character.QuestOther = Value4;
 				client.character.save();
-				client.sendInfoMessage('Please relog to see change of quest.'); // TODO: Make this use load GM Command functionality.
+
+				client.write(new Buffer(Zone.send.quest.pack({
+			      PacketID: 0x60,
+                  QuestPrevious: client.character.QuestPrevious,
+                  QuestCurrent: client.character.QuestCurrent,
+                  QuestPart: client.character.QuestPart,
+                  QuestCounter: client.character.QuestCounter,
+                  QuestOther: client.character.QuestOther
+			    })));
 			break;
 			default:
 				client.sendInfoMessage(ValueName+' is not a valid value to set try one of these');

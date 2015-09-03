@@ -55,7 +55,7 @@ vms( 'CharacterState', [ 'CVec3', 'Structs' ], function(){
 
 	CharacterState = function CharacterState() {
 		this.Intervals = {};
-
+		
 		// Varables here
 		this.AccountID = 1;
 		this.NodeID = 2; //?? // Account ID/Client Index??

@@ -1,3 +1,24 @@
+// The following combinations are possible:
+// Unique + Unique
+// Rare + Rare
+// Elite + Elite
+// 
+// 
+// Level must be the same.
+// Weapon type must be the same
+// Boot, Armor, Gloves can be from any faction but must be the same level and rareness.
+// 
+// Max +12 combine
+// Material can't be enchanted.
+// 
+// Combine level of material must be <= Item's one.
+// 
+// - Level of Item must be > 45
+// 
+// - I can't see a cost on ts1 just yet...
+// - Cost: NB: (Taken from a guide on TS2 Mayn)
+// - The fee for combining is 1 million + 500K per previous combined stage.
+// - 1000000 + 500000 * combine
 Zone.recv.combine = restruct.
   int32lu('InventoryIndex').
   int32lu('MaterialIndex').
@@ -12,12 +33,13 @@ Zone.send.combine = restruct.
   int32lu('Price').
   pad(4);
 
-Zone.send.combineItemInfo = function(info, input, invItem){
+Zone.send.combineItemInfo = function(info, input, invItem, materialCombine){
   if(info.item.Rareness < 2){
     console.log("Cannot combine items that are lower than unique.");
     return;
   }
   var combine = !invItem.Combine ? 0 : invItem.Combine;
+  combine += materialCombine-1; // Add the combine of what we are putting in -1 as that would be considered the combine to use for chance calaulation
 
   var materialRequirement = {Level: info.item.Level, Rareness: info.item.Rareness};
   if(info.item.Rareness === 4){
@@ -61,7 +83,9 @@ Zone.send.combineItemInfo = function(info, input, invItem){
     return;
   }
 
-  combine++;
+  // Add one more to the calculated combine value for a successfull combine.
+  combine ++;
+  console.log('Combine value is '+combine);
 
   invItem.Combine = combine;
   this.character.Inventory[input.MaterialIndex] = null;
@@ -96,7 +120,7 @@ ZonePC.Set(0x61, {
     var materialCombine = material.Combine ? material.Combine : 0;
     var invItemCombine = invItem.Combine ? invItem.Combine : 0;
 
-    if((material.Enchant || materialCombine) && (materialCombine > invItemCombine)){
+    if (material.Enchant || (materialCombine > invItemCombine)) {
       console.log("Material is not clean");
       return;
     }
@@ -104,6 +128,10 @@ ZonePC.Set(0x61, {
     if(invItem.Combine+1 > 12){
       console.log("Cannot combine any further");
       return;
+    }
+
+    if (invItem.Combine + materialCombine > 12) {
+      materialCombine -= 12 - invItem.Combine;
     }
 
     var info = {};
@@ -130,7 +158,7 @@ ZonePC.Set(0x61, {
 
         info.material = item_material;
 
-        Zone.send.combineItemInfo.call(client, info, input, invItem);
+        Zone.send.combineItemInfo.call(client, info, input, invItem, materialCombine);
       })
     });
   }
