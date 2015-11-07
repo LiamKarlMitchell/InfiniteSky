@@ -55,9 +55,9 @@ vms('MonsterInfo', [], function(){
         // Critical: Number, // 176
         // Unknown180: Number, // 180
         // Unknown184: Number, // 184
-        // Unknown188: Number, // 188
-        // Unknown192: Number, // 192
-        // Unknown196: Number, // 196
+        SilverDropChance: Number, // 188
+        SilverDropMin: Number, // 192
+        SilverDropMax: Number, // 196
         // Unknown200: Number, // 200
         // Unknown204: Number, // 204
         // Unknown208: Number, // 208

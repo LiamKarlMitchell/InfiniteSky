@@ -76,17 +76,17 @@ module.exports = function(grunt) {
 		        int32ls("Damage"). // 152
 		        int32ls("Defense"). // 156
 		        int32ls("HitRate"). // 160
-            int32ls("DodgeRate"). // 164
-            int32ls("ElementalDefense", 3). // 164
-            // int32ls("Unknown177"). // 164
-            // int32ls("Unknown178"). // 164
+	            int32ls("DodgeRate"). // 164
+	            int32ls("ElementalDefense", 3). // 164
+	            // int32ls("Unknown177"). // 164
+	            // int32ls("Unknown178"). // 164
 		        // int32ls("Unknown179"). // 164
 		        // int32ls("ElementalDefense", 3). // 168
 		        int32ls("Unknown180"). // 180
 		        int32ls("Unknown184"). // 184
-		        int32ls("Unknown188"). // 188
-		        int32ls("Unknown192"). // 192
-		        int32ls("Unknown196"). // 196
+		        int32ls("SilverDropChance"). // 188
+		        int32ls("SilverDropMin"). // 192
+		        int32ls("SilverDropMax"). // 196
 		        int32ls("Unknown200"). // 200
 		        int32ls("Unknown204"). // 204
 		        int32ls("Unknown208"). // 208
@@ -118,9 +118,9 @@ module.exports = function(grunt) {
 		        int32ls("Unknown312"). // 312
 		        int32ls("Unknown316"). // 316
 		        int32ls("Unknown320"). // 320
-            int32ls("Unknown324"). // 324
-            int32ls("Unknown325"). // 324
-            int32ls("Unknown326"). // 324
+	            int32ls("Unknown324"). // 324
+	            int32ls("Unknown325"). // 324
+	            int32ls("Unknown326"). // 324
 		        int32ls("Unknown327"). // 324
 		        int32ls("Unknown340"). // 340
 		        int32ls("Unknown344"). // 344

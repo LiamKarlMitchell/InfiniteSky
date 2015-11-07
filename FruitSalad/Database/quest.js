@@ -26,12 +26,11 @@ vms('QuestInfo', [], function(){
 // Reward type
 // 0 = Nothing
 // 1 = Nothing2
-// 2 = Unused2
-// 3 = Unused3
-// 4 = Unused4
-// 5 = is Skill point
-// 4 = is EXP
-// 6 = is Item
+// 2 = Silver Coins
+// 3 = Honor Points
+// 4 = EXP
+// 5 = Skill point
+// 6 = Item
 
 	var questSchema = mongoose.Schema({
 		id: { type: Number, index: true, unique: true },

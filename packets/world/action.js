@@ -560,7 +560,7 @@ function handleActionPacket(socket, action, update) {
                                 }
 
 
-// Don't need heads or tails do value chance after its decided if it will drop too also cant have ; then more maths and needs to be in ()
+                                // Don't need heads or tails do value chance after its decided if it will drop too also cant have ; then more maths and needs to be in ()
                                 // Unknown188 is Silver Drop Chance
                                 // Unknown192 is Silver Min
                                 // Unknown196 is Silver Max

@@ -351,7 +351,7 @@ ZonePC.Set(0x49, {
 
         // No idea what 2E is for yet.
         // 2E 03 00 00 00 CA 3E 5F 0A 01
-        // This was also sent but im not sure why.
+        // 2F is sent because Honor Points could be changed although I have not seen a quest with a reward of Honor Points or Silver Coins.
         // 2F 11 00 00 00 F5 3F 01 00 00 00 00 00 3F 05 00
         // 00 7F 00 00 00 00 00 00 00 00 00 00 00
         // Maybe this code will help but im not sure...
