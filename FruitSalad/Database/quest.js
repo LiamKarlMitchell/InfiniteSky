@@ -8,7 +8,7 @@ vms('QuestInfo', [], function(){
     },{ _id : false });
 
 // Type:
-// 1 = [Monster] (1) Kill !
+// 1 = [Monster] (1) Kill !   // Kill Amount of Monster
 // 2 = [Item]
 //     [Item]
 //     Bring Them!
@@ -17,7 +17,7 @@ vms('QuestInfo', [], function(){
 //     [NPC]Deliver them to !
 // 4 = [Item]
 //     [Item]
-// 5 = [Monster] Kill!
+// 5 = [Monster] Kill!       // Spawn monster and kill it.
 // 6 = [Item] <-> [Item]
 // 7 = Visit!
  
@@ -38,24 +38,31 @@ vms('QuestInfo', [], function(){
         Clan: Number,
         QuestNumber: Number,  // 1 based number of quest for each clan.
         Level: Number,        // Can also be level of monster to drop item.
-        Unknown4: Number,
+        Mandatory: Number,
         Type: Number,
-        ZoneID: Number,
+        Zone: Number,
         X: Number, // The location of any spawned monster.
         Y: Number, // Its a point to spawn a monster at when the client character is in range (100 units).
         Z: Number,
         Name: { type: String, index: true },
-        FromNPCID: Number,
-        Unknown10: Number,
-        Unknown11: Number,
-        Unknown12: Number,
-        Unknown13: Number,
-        Unknown14: Number,
-        ToNPCID: Number,
-        MonsterID: Number,     // Can also be item that the monster of level will drop.
-        Value: Number,         // Used for item oramount to killl depending on quest type.
-        Unknown17: Number,
-        Unknown18: Number,
+        FromNPC: Number,
+        NPC1: Number,
+        NPC2: Number,
+        NPC3: Number,
+        NPC4: Number,
+        NPC5: Number,
+        ToNPC: Number,
+        // These values can be Item ID or Monster Id for quest objectives depending on the quest type.
+        // 
+        // For type 1
+        // A is the MonsterID to kill.
+        // B is the amount to kill.
+        // 
+        // For type 2, 3, 4 it is the item id's to obtain for the npc.
+        A: Number, // Can also be item that the monster of level will drop.
+        B: Number, // Used for item oramount to killl depending on quest type.
+        C: Number,
+        D: Number,
         Rewards: [questRewardTypeSchema],
         NextQuest: Number,
         Texts: Array

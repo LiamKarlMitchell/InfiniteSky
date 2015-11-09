@@ -41,7 +41,7 @@ module.exports = function(grunt) {
 			if (makeCSV) {
 				var fs = require('fs');
 				csv = fs.createWriteStream('Quests.csv');
-				csv.write("id, Name, Level, Clan, QuestNumber, NextQuest, Unknown4, Type, ZoneID, X, Y, Z, FromNPCID, Unknown10, Unknown11, Unknown12, Unknown13, Unknown14, ToNPCID, MonsterID, Value, Unknown17, Unknown18, RewardType, RewardValue, Text1, Text2, Text3, Text4, Text5, Text6, Text7, Text8, Text9, Text10\n");
+				csv.write("id, Name, Level, Clan, QuestNumber, NextQuest, Mandatory, Type, ZoneID, X, Y, Z, FromNPC, NPC1, NPC2, NPC3, NPC4, NPC5, ToNPC, A, B, C, D, RewardType, RewardValue, Text1, Text2, Text3, Text4, Text5, Text6, Text7, Text8, Text9, Text10\n");
 			}
 
 			var reward = restruct.
@@ -65,26 +65,43 @@ module.exports = function(grunt) {
 			var Quests = new GameInfoLoader('005_00007.IMG',
 				restruct.int32lu("id").int32lu("Clan").int32lu("QuestNumber"). // 1 based number of quest for each clan.
 				int32lu("Level"). // Can also be level of monster to drop item.
-				int32lu("Unknown4").int32lu("Type").int32lu("ZoneID").int32lu("X"). // This is in the quest destination packet, that client sends to server when it is at the spot a monster should spawn. I have no idea what it is.
-				int32lu("Y").int32lu("Z").string("Name", 52).int32lu("FromNPCID").int32lu("Unknown10").int32lu("Unknown11").int32lu("Unknown12").int32lu("Unknown13").int32lu("Unknown14").int32lu("ToNPCID").int32lu("MonsterID"). // Can also be item that the monster of level will drop.
-				int32lu("Value"). // Used for item oramount to killl depending on quest type.
-				int32lu("Unknown17").int32lu("Unknown18").struct("Rewards", reward, 3).int32lu("NextQuest").struct("Texts", textPage),
+				int32lu("Mandatory").
+				int32lu("Type").
+				int32lu("Zone").
+				int32ls("X").
+				int32ls("Y").
+				int32ls("Z").
+				string("Name", 52).
+				int32lu("FromNPC").
+				int32lu("NPC1").
+				int32lu("NPC2").
+				int32lu("NPC3").
+				int32lu("NPC4").
+				int32lu("NPC5").
+				int32lu("ToNPC").
+				int32lu("A"). // Can also be item that the monster of level will drop.
+				int32lu("B"). // Used for item oramount to killl depending on quest type.
+				int32lu("C").
+				int32lu("D").
+				struct("Rewards", reward, 3).
+				int32lu("NextQuest").
+				struct("Texts", textPage),
 				function onRecordLoad(record) {
 					if (record.id !== undefined && record.id > 0) {
 						//record.Name = encoding.convert(record.Name, 'UTF-8', 'EUC-KR').toString();
-						
+
 						// Would have to trim if restruct did not do it already. .replace(/\0.*/,'')
-						
+
 						// Fix up record.Name problems
-						record.Name = record.Name.replace(/\]([A-Z])/,"] $1").    // Where there is no space after the closing ]
-						                          replace(/ \]/,"]").             // Where there is a space before the closing ]
-												  replace(/\[ ([A-Z])/,"[$1").    // Where there is a space after the opening [
-												  replace(/\[NOgeom/,"[Nogeom").  // Where NOgeom should be Nogeom
-												  replace(/^Pungun]/,"[Pungun]"). // Where Starting of Pungun should have a [
-												  replace(/\]  ([A-Z])/,"] $1").  // Where there is two spaces after the closing ]						
-												  replace(/^\s\s*/, '').		  // Trim Left
-												  replace(/\s\s*$/, ''); 		  // Trim Right
-						
+						record.Name = record.Name.replace(/\]([A-Z])/, "] $1"). // Where there is no space after the closing ]
+						replace(/ \]/, "]"). // Where there is a space before the closing ]
+						replace(/\[ ([A-Z])/, "[$1"). // Where there is a space after the opening [
+						replace(/\[NOgeom/, "[Nogeom"). // Where NOgeom should be Nogeom
+						replace(/^Pungun]/, "[Pungun]"). // Where Starting of Pungun should have a [
+						replace(/\]  ([A-Z])/, "] $1"). // Where there is two spaces after the closing ]						
+						replace(/^\s\s*/, ''). // Trim Left
+						replace(/\s\s*$/, ''); // Trim Right
+
 						console.log(record.id, record.Name);
 
 						if (makeCSV) {
@@ -95,23 +112,23 @@ module.exports = function(grunt) {
 								"Clan",
 								"QuestNumber",
 								"NextQuest",
-								"Unknown4",
+								"Mandatory",
 								"Type",
 								"ZoneID",
 								"X",
 								"Y",
 								"Z",
-								"FromNPCID",
-								"Unknown10",
-								"Unknown11",
-								"Unknown12",
-								"Unknown13",
-								"Unknown14",
-								"ToNPCID",
-								"MonsterID",
-								"Value",
-								"Unknown17",
-								"Unknown18"
+								"FromNPC",
+								"NPC1",
+								"NPC2",
+								"NPC3",
+								"NPC4",
+								"NPC5",
+								"ToNPC",
+								"A",
+								"B",
+								"C",
+								"D"
 							];
 
 							var blankFillToText = '';
