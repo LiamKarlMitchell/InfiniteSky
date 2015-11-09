@@ -575,6 +575,14 @@ zonePrototype.move = function zone_move_character_socket(socket, location, zoneI
 };
 
 
+zonePrototype.giveSkillPoints = function zone_giveSkillPoints(client, value) {
+	client.character.SkillPoints += value;
+}
+
+zonePrototype.giveItem = function zone_giveItem(client, itemID, amount, combine, enchant) {
+	client.sendInfoMessage('Pretend you got Item '+itemID);
+}
+
 zonePrototype.giveEXP = function zone_giveEXP(client, value) {
 	if(value <= 0) return;
 	var expInfo = this.ExpInfo[client.character.Level];
@@ -608,8 +616,6 @@ zonePrototype.giveEXP = function zone_giveEXP(client, value) {
 		client.character.infos.updateAll(function(){
 			client.character.Health = client.character.infos.MaxHP;
 			client.character.Chi = client.character.infos.MaxChi;
-			client.character.state.CurrentHP = client.character.infos.MaxHP;
-			client.character.state.CurrentChi = client.character.infos.MaxChi;
 
 			client.character.state.update();
 			client.character.state.setFromCharacter(client.character);
@@ -645,6 +651,7 @@ zonePrototype.onProcessMessage = function(type, socket) {
 			// console.log(socket);
 			socket.on('close', function(err) {
 				if(socket.node){
+					console.log("Node removed");
 					Zone.QuadTree.remove(socket.node);
 					socket.node = null;
 					socket.character.state.clearIntervals();
@@ -656,6 +663,7 @@ zonePrototype.onProcessMessage = function(type, socket) {
 			});
 			socket.on('error', function(err) {
 				if(socket.node){
+					console.log("Node removed");
 					Zone.QuadTree.remove(socket.node);
 					socket.node = null;
 					socket.character.state.clearIntervals();
@@ -683,14 +691,14 @@ zonePrototype.onProcessMessage = function(type, socket) {
 			}, function(err, character) {
 				console.log("got character");
 				if (err) {
-					console.log(err);
+					// console.log(err);
 					// TODO: Consider socket.disconnect
 					socket.destroy();
 					return;
 				}
 
 				if (!character) {
-					console.log("Character not found");
+					// console.log("Character not found");
 					socket.destroy();
 					return;
 				}

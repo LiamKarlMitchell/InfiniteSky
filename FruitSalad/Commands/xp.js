@@ -6,15 +6,15 @@
 // Command: xp
 // Gives you experience points
 var xp_ExampleUsage = "Example Usage: /xp 10";
-GMCommands.AddCommand(new Command('xp',0,function command_giveexp(string,client){
+GMCommands.AddCommand(new Command('xp',0,function command_giveexp(string, client){
 	if (string.length==0) { client.sendInfoMessage(xp_ExampleUsage); return;}
-	
+
 	// Get Amount from string
-	var Value = parseInt(string);
-	if (isNaN(Value)) {
+	var value = parseInt(string);
+	if (isNaN(value)) {
 		client.sendInfoMessage(xp_ExampleUsage);
 		return;
 	}
 
-	zone.giveEXP(client, value);
+	Zone.giveEXP(client, value);
 }));
