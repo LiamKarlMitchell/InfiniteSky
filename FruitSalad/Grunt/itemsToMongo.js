@@ -8,6 +8,7 @@ module.exports = function(grunt) {
 	var GameInfoLoader = require('../Modules/GameInfoLoader.js');
 	var restruct = require('../Modules/restruct');
 	var encoding = require("encoding");
+	var eb = require('msexcel-builder');
 
   	vmscript.on(['config'], function() {
   		console.log('Starting config check for itemsToMongo.');
@@ -32,6 +33,10 @@ module.exports = function(grunt) {
 		});
 
   	});
+
+	var XlsxWriter = require('node-simple-xlsx'),
+    writer = new XlsxWriter();
+    var addHeader = true;
 
   	vmscript.on(['ItemInfo'], function() {
   		console.log('Clearing all existing Items in MongoDB.');
@@ -117,102 +122,116 @@ module.exports = function(grunt) {
 			  		record.Description2 = encoding.convert(record.Description2, 'UTF-8', 'EUC-KR').toString();
 			  		record.Description3 = encoding.convert(record.Description3, 'UTF-8', 'EUC-KR').toString();
 
-            record.ElementalDefense.reverse();
+		            record.ElementalDefense.reverse();
 
-            record.Pet = {};
-            record.Pet.Mastery = {};
-            record.Pet.Damage = 0;
-            record.Pet.Defense = 0;
-            record.Pet.HP = 0;
-            record.Pet.DodgeRate = 0;
-            record.Pet.HitRate = 0;
-            record.Pet.MaxGrowth = 40000000;
-            record.Pet.ElementalDamage = 0;
-            record.Pet.ElementalDefense = 0;
+		            record.Pet = {};
+		            record.Pet.Mastery = {};
+		            record.Pet.Damage = 0;
+		            record.Pet.Defense = 0;
+		            record.Pet.HP = 0;
+		            record.Pet.DodgeRate = 0;
+		            record.Pet.HitRate = 0;
+		            record.Pet.MaxGrowth = 40000000;
+		            record.Pet.ElementalDamage = 0;
+		            record.Pet.ElementalDefense = 0;
 
-            switch(record._id){
-    					case 9800:
-    					record.Pet.Damage = 1000;
-    					record.Pet.HitRate = 1000;
-    					record.Pet.ElementalDamage = 600;
-    					record.Pet.MaxGrowth = 240000000;
-    					break;
+		            switch(record._id){
+		    					case 9800:
+		    					record.Pet.Damage = 1000;
+		    					record.Pet.HitRate = 1000;
+		    					record.Pet.ElementalDamage = 600;
+		    					record.Pet.MaxGrowth = 240000000;
+		    					break;
 
-    					case 9801:
-    					record.Pet.HP = 2000;
-    					record.Pet.DodgeRate = 500;
-    					record.Pet.ElementalDefense = 500;
-    					record.Pet.MaxGrowth = 240000000;
-    					break;
+		    					case 9801:
+		    					record.Pet.HP = 2000;
+		    					record.Pet.DodgeRate = 500;
+		    					record.Pet.ElementalDefense = 500;
+		    					record.Pet.MaxGrowth = 240000000;
+		    					break;
 
-    					case 9802:
-    					record.Pet.Damage = 1000;
-    					record.Pet.Defense = 2000;
-    					record.Pet.HP = 2000;
-    					record.Pet.DodgeRate = 500;
-    					record.Pet.HitRate = 1000;
-    					record.Pet.MaxGrowth = 240000000;
-    					break;
+		    					case 9802:
+		    					record.Pet.Damage = 1000;
+		    					record.Pet.Defense = 2000;
+		    					record.Pet.HP = 2000;
+		    					record.Pet.DodgeRate = 500;
+		    					record.Pet.HitRate = 1000;
+		    					record.Pet.MaxGrowth = 240000000;
+		    					break;
 
-    					case 98999:
-    					record.Pet.HP = 2000;
-    					break;
+		    					case 98999:
+		    					record.Pet.HP = 2000;
+		    					break;
 
-    					case 99000:
-    					record.Pet.Defense = 2000;
-    					break;
+		    					case 99000:
+		    					record.Pet.Defense = 2000;
+		    					break;
 
-    					case 99001:
-    					record.Pet.Damage = 1000;
-    					break;
+		    					case 99001:
+		    					record.Pet.Damage = 1000;
+		    					break;
 
-    					case 99226:
-    					record.Pet.Damage = 1000;
-    					record.Pet.HP = 2000;
-    					record.Pet.MaxGrowth = 120000000;
-    					break;
+		    					case 99226:
+		    					record.Pet.Damage = 1000;
+		    					record.Pet.HP = 2000;
+		    					record.Pet.MaxGrowth = 120000000;
+		    					break;
 
-    					case 99227:
-    					record.Pet.Damage = 1000;
-    					record.Pet.Defense = 2000;
-    					record.Pet.MaxGrowth = 120000000;
-    					break;
+		    					case 99227:
+		    					record.Pet.Damage = 1000;
+		    					record.Pet.Defense = 2000;
+		    					record.Pet.MaxGrowth = 120000000;
+		    					break;
 
-    					case 99228:
-    					record.Pet.Damage = 1000;
-    					record.Pet.HP = 2000;
-    					record.Pet.MaxGrowth = 120000000;
-    					break;
+		    					case 99228:
+		    					record.Pet.Damage = 1000;
+		    					record.Pet.HP = 2000;
+		    					record.Pet.MaxGrowth = 120000000;
+		    					break;
 
-    					case 99229:
-    					record.Pet.Damage = 1000;
-    					record.Pet.Defense = 2000;
-    					record.Pet.HP = 2000;
-    					record.Pet.MaxGrowth = 240000000;
-    					break;
+		    					case 99229:
+		    					record.Pet.Damage = 1000;
+		    					record.Pet.Defense = 2000;
+		    					record.Pet.HP = 2000;
+		    					record.Pet.MaxGrowth = 240000000;
+		    					break;
 
-    					case 99267:
-    					case 99282:
-    					record.Pet.Defense = 2000;
-    					record.Pet.Mastery[103] = 4;
-    					break;
+		    					case 99267:
+		    					case 99282:
+		    					record.Pet.Defense = 2000;
+		    					record.Pet.Mastery[103] = 4;
+		    					break;
 
-    					case 99268:
-    					case 99283:
-    					record.Pet.Damage = 1000;
-    					record.Pet.Mastery[82] = 4;
-    					break;
+		    					case 99268:
+		    					case 99283:
+		    					record.Pet.Damage = 1000;
+		    					record.Pet.Mastery[82] = 4;
+		    					break;
 
-              default:
-              record.Pet = null;
-              break;
-    				}
+		              default:
+		              record.Pet = null;
+		              break;
+		    		}
 
-            db.Item.create(record, function(err, doc) {
+		    		if(addHeader){
+		    			var header = [];
+		    			addHeader = false;
+		    			for(var h in record){
+		    				header.push(h);
+		    			}
+
+		    			writer.setHeaders(header);
+		    		}
+
+
+		    		writer.addRow(record);
+
+            		db.Item.create(record, function(err, doc) {
 			  			if (err) {
 			  				console.error(err);
 			  				return;
 			  			}
+
 
 			  			console.log('Confirming save of '+doc._id);
 			  		});
@@ -220,8 +239,13 @@ module.exports = function(grunt) {
 			  }
 			);
 
+		
+
 		Items.once('loaded', function(){
-			done(true);
+			writer.pack('./test.xlsx', function(err){
+				console.log(err);
+				done(true);
+			});
 		});
 
   	});

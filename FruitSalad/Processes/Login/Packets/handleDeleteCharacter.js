@@ -45,6 +45,8 @@ LoginPC.Set(0x07, {
 				return;
 			}
 
+			console.log(removed);
+
 			if(removed){
 				delete socket.characters[input.Slot];
 				Login.send.deleteCharacterReply.call(socket, 0);

@@ -933,7 +933,6 @@ ItemAction[7] = function ShopSellItem(input){
 
 // Revised: 12/06/2015 00:21:02
 ItemAction[2] = function MoveItemToHotbar(input){
-    console.log(input);
     if(input.Amount > 99){
         Zone.send.itemAction.call(this, 1, input);
         return;
@@ -1005,7 +1004,6 @@ ItemAction[2] = function MoveItemToHotbar(input){
 
 // Revised: 12/06/2015 00:20:54
 ItemAction[11] = function moveItemsFromHotbar(input){
-    console.log(input);
     if(input.Amount > 99){
       Zone.send.itemAction.call(this, 1, input);
       return;
@@ -1097,7 +1095,6 @@ ItemAction[11] = function moveItemsFromHotbar(input){
 
 
 ItemAction[27] = function attachSkillToSkillBar(input){
-  console.log(input);
   var charSkill = this.character.SkillList[input.InventoryIndex];
   if(!charSkill){
     Zone.send.itemAction.call(this, 1, input);
@@ -1156,8 +1153,6 @@ ItemAction[31] = function learnSkill(input){
   // 3 and 4 = Support
   // 2 = Attack
 
-  console.log("Learning skill");
-  console.log(input);
   var self = this;
   db.Skill.findById(input.ItemID, function(err, skill){
     if(err){
@@ -1206,7 +1201,7 @@ ItemAction[31] = function learnSkill(input){
         break;
       }
 
-      if(freeIndex === null && !charSkill.ID){
+      if(freeIndex === null && (!charSkill || !charSkill.ID)){
         freeIndex = i;
       }
     }
@@ -1244,8 +1239,6 @@ ItemAction[31] = function learnSkill(input){
 };
 
 ItemAction[12] = function useQuickItem(input){
-  console.log(input);
-
   var invItem = this.character.QuickUseItems[input.InventoryIndex];
   if(!invItem){
     Zone.send.itemAction.call(this, 1, input);
@@ -1363,8 +1356,7 @@ ItemAction[12] = function useQuickItem(input){
 
 
 ItemAction[29] = function skillUp(input) {
-
-  if (this.character.SkillPoints < 1) {
+  if (!this.character.SkillPoints) {
       console.log("Not enough skill points.")
       Zone.send.itemAction.call(this, 1, input);
       return;
@@ -1376,16 +1368,13 @@ ItemAction[29] = function skillUp(input) {
     return;
   }
 
-    var player_skill = this.character.SkillList[input.InventoryIndex];
-    if (!player_skill) {
-      console.log("Skill not found at that index");
-      Zone.send.itemAction.call(this, 1, input);
-      return;
-    }
+  var player_skill = this.character.SkillList[input.InventoryIndex];
+  if (!player_skill) {
+    console.log("Skill not found at that index");
+    Zone.send.itemAction.call(this, 1, input);
+    return;
+  }
 
-  console.log("Leveling up skill");
-  console.log(input);
-  console.log(player_skill);
   var self = this;
   db.Skill.findById(player_skill.ID, function(err, skill){
     if(err){
@@ -1416,37 +1405,30 @@ ItemAction[29] = function skillUp(input) {
 }
 
 ZonePC.Set(0x14, {
-    Restruct: Zone.recv.itemAction,
-    function: function handleItemActionPacket(client, input) {
-        if(input.Amount === 0) input.Amount = 1;
+  Restruct: Zone.recv.itemAction,
+  function: function handleItemActionPacket(client, input) {
+    if(input.Amount === 0) input.Amount = 1;
 
-        if(!ItemAction[input.ActionType]){
-            var msg = "Inventory action: " +input.ActionType + " is not supported.";
-            console.log(msg);
-            client.sendInfoMessage(msg)
-            Zone.send.itemAction.call(client, 1, input);
-            return;
-        }
-
-        try{
-            ItemAction[input.ActionType].call(client, input);
-        }catch(e){
-            console.log(e);
-            Zone.send.itemAction.call(client, 1, input);
-        }
+    if(!ItemAction[input.ActionType]){
+      var msg = "Inventory action: " +input.ActionType + " is not supported.";
+      console.log(msg);
+      client.sendInfoMessage(msg)
+      Zone.send.itemAction.call(client, 1, input);
+      return;
     }
+
+    try{
+      ItemAction[input.ActionType].call(client, input);
+    }catch(e){
+      console.log(e);
+      Zone.send.itemAction.call(client, 1, input);
+    }
+  }
 });
 
 ZonePC.Set(0x17, {
-    function: function onStateUpdateRequest(client){
-        // Confirming that we have actually removed item from a character, and resends the state of character, maybe char data also if we really removed the item.
-        // Zone.sendToAllArea(client, false, client.character.state.getPacket(), config.network.viewable_action_distance);
-    }
-});
-
-
-ZonePC.Set(0x18, {
-    function: function onResetWeaponBuffs(client){
-        // Fired when character deequipes a weapon. This might be used to remove character applied buffs as weapon is removed from character state.
-    }
+  function: function onStateUpdateRequest(client){
+    // Confirming that we have actually removed item from a character, and resends the state of character, maybe char data also if we really removed the item.
+    // Zone.sendToAllArea(client, false, client.character.state.getPacket(), config.network.viewable_action_distance);
+  }
 });

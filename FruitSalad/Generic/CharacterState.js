@@ -4,7 +4,7 @@
 
 STATE = {
 	isWalking: 0,
-	isRunning: 1,
+	isRunning: 32,
 	isJumping: 2,
 	isInParty: 3,
 	isInTrade: 4,
@@ -55,6 +55,8 @@ vms( 'CharacterState', [ 'CVec3', 'Structs' ], function(){
 
 	CharacterState = function CharacterState() {
 		this.Intervals = {};
+		this.States = {};
+		this.ActionTimeStamp = new Date().getTime();
 
 		// Varables here
 		this.AccountID = 1;
@@ -248,6 +250,21 @@ vms( 'CharacterState', [ 'CVec3', 'Structs' ], function(){
 	CharacterState_Prototype.regenerate = function(){
 		// console.log("Regenerating hp and chi");
 	};
+
+	CharacterState_Prototype.set = function(state, value){
+		this.States[state] = value;
+	};
+
+	CharacterState_Prototype.get = function(state){
+		return this.States[state];
+	};
+
+	CharacterState_Prototype.getActionTimeStamp = function(){
+		var previous = this.ActionTimeStamp;
+		this.ActionTimeStamp = new Date().getTime();
+		return previous;
+	};
+
 	CharacterState.prototype = CharacterState_Prototype;
 
 	global.CharacterState = CharacterState;

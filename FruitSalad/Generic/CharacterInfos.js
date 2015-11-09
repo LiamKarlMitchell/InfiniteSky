@@ -85,7 +85,7 @@ Modifiers.push(JinongModifiers);
 
 var calculation = {};
 
-calculation.Damage = function(item, enchant, combine, done){
+calculation.Damage = function(item, item, done){
   // Damage is missed by 1, some calculations are Math.floor'ed.
   this.Damage = this.ExpInfo.Damage[this.Clan] * 2;
   this.Damage += Math.floor(this.character.Stat_Strength * this.Weapon.Mod);
@@ -100,7 +100,7 @@ calculation.Damage = function(item, enchant, combine, done){
   done();
 };
 
-calculation.Defense = function(item, enchant, combine, done){
+calculation.Defense = function(item, item, done){
   // Damage is missed by 1, some calculations are Math.floor'ed.
   this.Defense = this.ExpInfo.Defense[this.Clan];
   this.Defense += this.Outfit.Defense;
@@ -119,7 +119,7 @@ calculation.Defense = function(item, enchant, combine, done){
   done();
 };
 
-calculation.Cape = function(item, enchant, combine, done){
+calculation.Cape = function(item, item, done){
   switch(typeof item){
     case 'object':
     this.Cape.Defense = item.Defense;
@@ -147,24 +147,24 @@ calculation.Cape = function(item, enchant, combine, done){
   this.update(['DodgeRate', 'Luck', 'Mastery', 'ElementalDefense', 'Defense', 'DodgeDeadlyBlow'], done);
 };
 
-calculation.Outfit = function(item, enchant, combine, done){
-  switch(typeof item){
+calculation.Outfit = function(itemInfo, item, done){
+  switch(typeof itemInfo){
     case 'object':
     var DefenseTick = (item.Level > 95 && item.Level <= 145) ? 22 : 14;
     var dodgeTick = (item.Level > 95 && item.Level <= 145) ? 3 : 2;
 
-    this.Outfit.Defense = item.Defense;
-    this.Outfit.Defense += (DefenseTick * combine);
-    this.Outfit.Defense += this.Outfit.Defense / 100 * enchant;
+    this.Outfit.Defense = itemInfo.Defense;
+    this.Outfit.Defense += (DefenseTick * item.Combine);
+    this.Outfit.Defense += this.Outfit.Defense / 100 * item.Enchant;
 
-    this.Outfit.DodgeRate = item.DodgeRate;
-    this.Outfit.DodgeRate += dodgeTick * combine;
+    this.Outfit.DodgeRate = itemInfo.DodgeRate;
+    this.Outfit.DodgeRate += dodgeTick * item.Combine;
 
-    this.Outfit.ElementalDefense = item.ElementalDefense;
-    this.Outfit.Mastery = this.getMasteryBonuses(item);
-    this.Outfit.AllMastery = item.IncreaseAllSkillMastery;
-    this.Outfit.Luck = item.Luck;
-    this.Outfit.Vitality = item.Vitality;
+    this.Outfit.ElementalDefense = itemInfo.ElementalDefense;
+    this.Outfit.Mastery = this.getMasteryBonuses(itemInfo);
+    this.Outfit.AllMastery = itemInfo.IncreaseAllSkillMastery;
+    this.Outfit.Luck = itemInfo.Luck;
+    this.Outfit.Vitality = itemInfo.Vitality;
     break;
 
     default:
@@ -185,26 +185,26 @@ calculation.Outfit = function(item, enchant, combine, done){
   this.update(['DodgeRate', 'Luck', 'Mastery', 'ElementalDefense', 'Defense', 'MaxHP'], done);
 };
 
-calculation.Weapon = function(item, enchant, combine, done){
+calculation.Weapon = function(itemInfo, item, done){
   switch(typeof item){
     case 'object':
-    var weaponModIndex = item ? item.getWeaponModIndex(this.Clan) : 0;
+    var weaponModIndex = itemInfo ? itemInfo.getWeaponModIndex(this.Clan) : 0;
     this.Weapon.Mod = this.Modifiers.Damage[weaponModIndex];
 
-    var combineTick = (item.Level > 95 && item.Level <= 145) ? 35 : (item.Level > 85 && item.Level <= 95) ? 25 : 15;
-    var hitTick = (item.Level > 95 && item.Level <= 145) ? 5 : (item.Level > 85 && item.Level <= 95) ? 3 : 2;
+    var combineTick = (itemInfo.Level > 95 && itemInfo.Level <= 145) ? 35 : (itemInfo.Level > 85 && itemInfo.Level <= 95) ? 25 : 15;
+    var hitTick = (itemInfo.Level > 95 && itemInfo.Level <= 145) ? 5 : (itemInfo.Level > 85 && itemInfo.Level <= 95) ? 3 : 2;
 
-    this.Weapon.Damage = item.Damage;
-    this.Weapon.Damage += combineTick * combine;
-    this.Weapon.Damage += this.Weapon.Damage / 100 * enchant;
+    this.Weapon.Damage = itemInfo.Damage;
+    this.Weapon.Damage += combineTick * item.Combine;
+    this.Weapon.Damage += this.Weapon.Damage / 100 * item.Enchant;
 
-    this.Weapon.HitRate = item.HitRate;
-    this.Weapon.HitRate += hitTick * combine;
+    this.Weapon.HitRate = itemInfo.HitRate;
+    this.Weapon.HitRate += hitTick * item.Combine;
 
-    this.Weapon.ElementalDamage = item.ElementalDamage[this.Clan];
+    this.Weapon.ElementalDamage = itemInfo.ElementalDamage[this.Clan];
 
-    this.Weapon.Mastery = this.getMasteryBonuses(item);
-    this.Weapon.AllMastery = item.IncreaseAllSkillMastery;
+    this.Weapon.Mastery = this.getMasteryBonuses(itemInfo);
+    this.Weapon.AllMastery = itemInfo.IncreaseAllSkillMastery;
     break;
 
     default:
@@ -220,7 +220,7 @@ calculation.Weapon = function(item, enchant, combine, done){
   this.update(['Damage', 'HitRate', 'ElementalDamage', 'Mastery'], done);
 };
 
-calculation.HitRate = function(item, enchant, combine, done){
+calculation.HitRate = function(itemInfo, item, done){
   this.HitRate = Math.floor(this.Modifiers.HitRate * this.character.Stat_Dexterity);
   this.HitRate += this.Gloves.HitRate;
   this.HitRate += this.Weapon.HitRate;
@@ -230,21 +230,21 @@ calculation.HitRate = function(item, enchant, combine, done){
   done();
 };
 
-calculation.Boots = function(item, enchant, combine, done){
+calculation.Boots = function(itemInfo, item, done){
   switch(typeof item){
     case 'object':
-    var DefenseTick = (item.Level > 95 && item.Level <= 145) ? 3 : 2;
-    var dodgeTick = (item.Level > 95 && item.Level <= 145) ? 8 : 6;
+    var DefenseTick = (itemInfo.Level > 95 && itemInfo.Level <= 145) ? 3 : 2;
+    var dodgeTick = (itemInfo.Level > 95 && itemInfo.Level <= 145) ? 8 : 6;
 
-    this.Boots.Defense = item.Defense;
-    this.Boots.Defense += DefenseTick * combine;
+    this.Boots.Defense = itemInfo.Defense;
+    this.Boots.Defense += DefenseTick * item.Combine;
 
-    this.Boots.DodgeRate = item.DodgeRate;
-    this.Boots.DodgeRate += dodgeTick * combine;
-    this.Boots.DodgeRate += this.Boots.DodgeRate / 100 * enchant;
+    this.Boots.DodgeRate = itemInfo.DodgeRate;
+    this.Boots.DodgeRate += dodgeTick * item.Combine;
+    this.Boots.DodgeRate += this.Boots.DodgeRate / 100 * item.Enchant;
 
-    this.Boots.Luck = item.Luck;
-    this.Boots.Mastery = this.getMasteryBonuses(item);
+    this.Boots.Luck = itemInfo.Luck;
+    this.Boots.Mastery = this.getMasteryBonuses(itemInfo);
     break;
 
     default:
@@ -258,21 +258,21 @@ calculation.Boots = function(item, enchant, combine, done){
   this.update(['DodgeRate', 'Luck', 'Defense', 'Mastery'], done);
 };
 
-calculation.Gloves = function(item, enchant, combine, done){
+calculation.Gloves = function(itemInfo, item, done){
   switch(typeof item){
     case 'object':
-    var DefenseTick = (item.Level > 95 && item.Level <= 145) ? 8 : 5;
-    var hitTick = (item.Level > 95 && item.Level <= 145) ? 13 : 8;
+    var DefenseTick = (itemInfo.Level > 95 && itemInfo.Level <= 145) ? 8 : 5;
+    var hitTick = (itemInfo.Level > 95 && itemInfo.Level <= 145) ? 13 : 8;
 
-    this.Gloves.Defense = item.Defense;
-    this.Gloves.Defense += DefenseTick * combine;
+    this.Gloves.Defense = itemInfo.Defense;
+    this.Gloves.Defense += DefenseTick * item.Combine;
 
-    this.Gloves.HitRate = item.HitRate;
-    this.Gloves.HitRate += hitTick * combine;
-    this.Gloves.HitRate += this.Gloves.HitRate / 100 * enchant;
+    this.Gloves.HitRate = itemInfo.HitRate;
+    this.Gloves.HitRate += hitTick * item.Combine;
+    this.Gloves.HitRate += this.Gloves.HitRate / 100 * item.Enchant;
 
-    this.Gloves.Luck = item.Luck;
-    this.Gloves.Mastery = this.getMasteryBonuses(item);
+    this.Gloves.Luck = itemInfo.Luck;
+    this.Gloves.Mastery = this.getMasteryBonuses(itemInfo);
     break;
 
     default:
@@ -286,7 +286,7 @@ calculation.Gloves = function(item, enchant, combine, done){
   this.update(['HitRate', 'Luck', 'Defense', 'Mastery'], done);
 };
 
-calculation.Luck = function(item, enchant, combine, done){
+calculation.Luck = function(itemInfo, item, done){
   this.Luck = this.Outfit.Luck;
   this.Luck += this.Boots.Luck;
   this.Luck += this.Ring.Luck;
@@ -296,11 +296,11 @@ calculation.Luck = function(item, enchant, combine, done){
   done();
 };
 
-calculation.DeadlyRate = function(item, enchant, combine, done){
+calculation.DeadlyRate = function(itemInfo, item, done){
   done();
 };
 
-calculation.DodgeRate = function(item, enchant, combine, done){
+calculation.DodgeRate = function(itemInfo, item, done){
   this.DodgeRate = this.ExpInfo.Dodge[this.Clan];
   this.DodgeRate += this.Outfit.DodgeRate;
   this.DodgeRate += this.Boots.DodgeRate;
@@ -315,7 +315,7 @@ calculation.DodgeRate = function(item, enchant, combine, done){
   done();
 };
 
-calculation.ElementalDamage = function(item, enchant, combine, done){
+calculation.ElementalDamage = function(itemInfo, item, done){
   this.ElementalDamage = this.ExpInfo.ElementalDamage[this.Clan];
   this.ElementalDamage += this.Weapon.ElementalDamage;
   this.ElementalDamage += this.Ring.ElementalDamage;
@@ -324,7 +324,7 @@ calculation.ElementalDamage = function(item, enchant, combine, done){
   done();
 };
 
-calculation.Mastery = function(item, enchant, combine, done){
+calculation.Mastery = function(itemInfo, item, done){
   this.SkillMastery = {};
   this.AllSkillsMastery = 0;
 
@@ -340,20 +340,24 @@ calculation.Mastery = function(item, enchant, combine, done){
   done();
 };
 
-calculation.MaxHP = function(item, enchant, combine, done){
+calculation.MaxHP = function(itemInfo, item, done){
+  console.log("Max hp test");
   this.MaxHP = this.ExpInfo.BaseHP[this.Clan];
-  this.MaxHP += Math.floor((this.character.Stat_Vitality + this.Outfit.Vitality) * this.Modifiers.HP);
+  console.log(this.MaxHP);
+  this.MaxHP += (this.character.Stat_Vitality + this.Outfit.Vitality) * this.Modifiers.HP;
+  console.log(this.MaxHP);
 
   if(this.MaxHP > this.Pet.HP){
     this.MaxHP += this.Pet.HP / 100 * this.Pet.Scale;
   }else{
     this.MaxHP += this.MaxHP;
   }
+  console.log(this.MaxHP);
 
   done();
 };
 
-calculation.MaxChi = function(item, enchant, combine, done){
+calculation.MaxChi = function(itemInfo, item, done){
   this.MaxChi = this.ExpInfo.BaseChi[this.Clan];
   this.MaxChi += Math.floor(
     (this.character.Stat_Chi + this.Amulet.Chi) * this.Modifiers.Chi
@@ -362,7 +366,7 @@ calculation.MaxChi = function(item, enchant, combine, done){
   done();
 };
 
-calculation.ElementalDefense = function(item, enchant, combine, done){
+calculation.ElementalDefense = function(itemInfo, item, done){
   this.ElementalDefense[0] = this.Outfit.ElementalDefense[0];
   this.ElementalDefense[1] = this.Outfit.ElementalDefense[1];
   this.ElementalDefense[2] = this.Outfit.ElementalDefense[2];
@@ -383,19 +387,19 @@ calculation.ElementalDefense = function(item, enchant, combine, done){
   done();
 };
 
-calculation.DodgeDeadlyBlow = function(item, enchant, combine, done){
+calculation.DodgeDeadlyBlow = function(itemInfo, item, done){
   done();
 };
 
-calculation.Ring = function(item, enchant, combine, done){
+calculation.Ring = function(itemInfo, item, done){
   switch(typeof item){
     case 'object':
-    this.Ring.ElementalDamage = item.ElementalDamage[this.Clan];
-    this.Ring.Dexterity = item.Dexterity;
-    this.Ring.DeadlyRate = item.DeadlyRate;
-    this.Ring.Luck = item.Luck;
-    this.Ring.Mastery = this.getMasteryBonuses(item);
-    this.Ring.AllMastery = item.IncreaseAllSkillMastery;
+    this.Ring.ElementalDamage = itemInfo.ElementalDamage[this.Clan];
+    this.Ring.Dexterity = itemInfo.Dexterity;
+    this.Ring.DeadlyRate = itemInfo.DeadlyRate;
+    this.Ring.Luck = itemInfo.Luck;
+    this.Ring.Mastery = this.getMasteryBonuses(itemInfo);
+    this.Ring.AllMastery = itemInfo.IncreaseAllSkillMastery;
     break;
 
     default:
@@ -411,14 +415,14 @@ calculation.Ring = function(item, enchant, combine, done){
   this.update(['DeadlyRate', 'DodgeRate', 'HitRate', 'Luck', 'ElementalDamage', 'Mastery'], done);
 };
 
-calculation.Amulet = function(item, enchant, combine, done){
+calculation.Amulet = function(itemInfo, item, done){
   switch(typeof item){
     case 'object':
-    this.Amulet.ElementalDefense = item.ElementalDefense;
-    this.Amulet.Chi = item.Chi;
-    this.Amulet.Luck = item.Luck;
-    this.Amulet.Mastery = this.getMasteryBonuses(item);
-    this.Amulet.AllMastery = item.IncreaseAllSkillMastery;
+    this.Amulet.ElementalDefense = itemInfo.ElementalDefense;
+    this.Amulet.Chi = itemInfo.Chi;
+    this.Amulet.Luck = itemInfo.Luck;
+    this.Amulet.Mastery = this.getMasteryBonuses(itemInfo);
+    this.Amulet.AllMastery = itemInfo.IncreaseAllSkillMastery;
     break;
 
     default:
@@ -433,34 +437,34 @@ calculation.Amulet = function(item, enchant, combine, done){
   this.update(['MaxChi', 'Luck', 'ElementalDefense', 'Mastery'], done);
 };
 
-calculation.Pet = function(item, enchant, combine, done){
+calculation.Pet = function(itemInfo, item, done){
   switch(typeof item){
     case 'object':
-    if(!item.Pet){
+    if(!itemInfo.Pet){
       return;
     }
 
     // If pet increases 100% of total damage and its > than their max, its then capped to the max Damage.
 
-    if(item.Pet.MaxGrowth < this.character.Pet.Growth) this.character.Pet.Growth = item.Pet.MaxGrowth;
+    if(itemInfo.Pet.MaxGrowth < item.Growth) item.Growth = itemInfo.Pet.MaxGrowth;
 
-    var isMaxed = this.character.Pet.Growth === item.Pet.MaxGrowth;
+    var isMaxed = item.Growth === itemInfo.Pet.MaxGrowth;
 
-    this.Pet.Scale = 100 / item.Pet.MaxGrowth * this.character.Pet.Growth;
+    this.Pet.Scale = 100 / itemInfo.Pet.MaxGrowth * item.Growth;
 
-    this.Pet.HP = item.Pet.HP;
-    this.Pet.HP += isMaxed ? item.Pet.HP / 100 * 10 : 0;
+    this.Pet.HP = itemInfo.Pet.HP;
+    this.Pet.HP += isMaxed ? itemInfo.Pet.HP / 100 * 10 : 0;
 
-    this.Pet.Damage = item.Pet.Damage;
-    this.Pet.Damage += isMaxed ? item.Pet.Damage / 100 * 10 : 0;
-    this.Pet.Defense = item.Pet.Defense;
-    this.Pet.Defense += isMaxed ? item.Pet.Defense / 100 * 10 : 0;
+    this.Pet.Damage = itemInfo.Pet.Damage;
+    this.Pet.Damage += isMaxed ? itemInfo.Pet.Damage / 100 * 10 : 0;
+    this.Pet.Defense = itemInfo.Pet.Defense;
+    this.Pet.Defense += isMaxed ? itemInfo.Pet.Defense / 100 * 10 : 0;
 
-    this.Pet.Mastery = item.Pet.Mastery;
-    this.Pet.DodgeRate = item.Pet.DodgeRate;
-    this.Pet.HitRate = item.Pet.HitRate;
-    this.Pet.ElementalDamage = item.Pet.ElementalDamage;
-    this.Pet.ElementalDefense = item.Pet.ElementalDefense;
+    this.Pet.Mastery = itemInfo.Pet.Mastery;
+    this.Pet.DodgeRate = itemInfo.Pet.DodgeRate;
+    this.Pet.HitRate = itemInfo.Pet.HitRate;
+    this.Pet.ElementalDamage = itemInfo.Pet.ElementalDamage;
+    this.Pet.ElementalDefense = itemInfo.Pet.ElementalDefense;
     break;
 
     default:
@@ -618,85 +622,93 @@ vms('CharacterInfo', [], function(){
     return result;
   };
 
-  CharacterInfos.prototype.onExpInfo = function(name, oncalc_callback){
-    if(typeof oncalc_callback !== 'function'){
-      var callback = (function(id){
-        var table = this.updateCalls[id];
-        if(!table){
+  CharacterInfos.prototype.update = function infos_Update(n, oncalc_callback){
+    var names = [];
+    if(typeof n === 'string') names.push(n); else names = n;
+
+    if(this.Level !== this.character.Level || this.ExpInfo === undefined){
+      db.Exp.getByLevel(this.character.Level, (function(err, exp){
+        if(err){
+          console.log("Error occured on getting exp info while updating character infos");
+          console.log(err);
           return;
         }
 
-        if(++table.counter === table.length){
-          if(typeof table.callback === 'function'){
-            this.updateCalls[id].callback.call(this);
-          }
-
-          delete this.updateCalls[id];
+        if(!exp){
+          console.log("Exp info not founded while updating character infos");
+          return;
         }
-      }).bind(this, oncalc_callback);
 
-      oncalc_callback = callback;
-    }
-
-    var func = calculation[name];
-    if(typeof func !== 'function'){
-      console.log("Calculation method of", name, "is not a function, found:", typeof func);
-      if(typeof oncalc_callback === 'function') oncalc_callback();
+        this.self.ExpInfo = exp;
+        this.self.updateAfterExpInfo.call(this.self, this.names, this.oncalc_callback);
+      }).bind({self: this, names: names, oncalc_callback: oncalc_callback}));
       return;
     }
 
-    var charItem = this.character[name];
-    var self = this;
-    if(charItem && charItem.ID){
-      db.Item.findById(charItem.ID, function(err, item_info){
-        if(err){
-          return;
-        }
-
-        if(!item_info){
-          return;
-        }
-
-        func.call(self, item_info, charItem.Enchant ? (charItem.Enchant * 3) : 0, charItem.Combine ? charItem.Combine : 0, oncalc_callback);
-      });
-    }else{
-      func.call(self, false, 0, 0, oncalc_callback);
-    }
+    this.updateAfterExpInfo.call(this, names, oncalc_callback);
   };
 
-  CharacterInfos.prototype.update = function infos_Update(n, oncalc_callback){
+  CharacterInfos.prototype.updateAfterExpInfo = function infos_UpdateAfterExpInfo(n, oncalc_callback){
     var id = uuid.v4();
-    var names = [];
-    if(typeof n === 'string') names.push(n); else names = n;
-    this.updateCalls[id] = {counter: 0, length: names.length, callback: oncalc_callback};
+
+    this.updateCalls[id] = {counter: 0, total: n.length, after: oncalc_callback};
+
+    var callback = (function(update_id){
+      var uCall = this.updateCalls[update_id];
+      if(!uCall){
+        console.log("No update call object");
+        return;
+      }
+
+      if(++uCall.counter === uCall.total && typeof uCall.after === 'function'){
+        uCall.after();
+        delete this.updateCalls[update_id];
+      }
+    }).bind(this, id);
 
     var self = this;
-    for(var i=0; i<names.length; i++){
-      var name = names[i];
-      if(this.Level !== this.character.Level || this.ExpInfo === undefined){
-        db.Exp.getByLevel(this.character.Level, (function(err, exp){
-          if(err){
-            return;
-          }
-
-          if(!exp){
-            return;
-          }
-
-          self.ExpInfo = exp;
-          self.onExpInfo.call(self, this.name, this.id);
-        }).bind({name: name, id: id}));
-      }else{
-        this.onExpInfo.call(self, name, id);
+    for(var i=0; i<n.length; i++){
+      var name = n[i];
+      var uFunc = calculation[name];
+      if(!uFunc){
+        console.log("No calculation method called:", name);
+        continue;
       }
+
+      var charObjItem = this.character[name];
+      if(!charObjItem) charObjItem = undefined;
+      else {
+        charObjItem.Enchant = charObjItem.Enchant === undefined ? 0 : charObjItem.Enchant;
+        charObjItem.Combine = charObjItem.Combine === undefined ? 0 : charObjItem.Combine;
+      }
+
+      if(charObjItem && charObjItem.ID){
+        db.Item.findById(charObjItem.ID, function(err, itemInfo){
+          if(err){
+            console.log("Error occoured on item info");
+            return;
+          }
+
+          if(!itemInfo){
+            console.log("Item info not founded", itemInfo, err);
+            return;
+          }
+
+          uFunc.call(self, itemInfo, charObjItem, callback);
+        });
+        continue;
+      }
+
+      uFunc.call(self, undefined, charObjItem, callback);
     }
   };
 
   CharacterInfos.prototype.updateAll = function infos_UpdateAll(onready_callback){
-    var equipment = ['Weapon', 'Outfit', 'Gloves', 'Boots', 'Cape', 'Amulet', 'Pet', 'Ring'];
-    var loaded = 0;
+    var equipment = ['Weapon', 'Outfit', 'Gloves', 'Cape', 'Ring', 'Amulet', 'Boots'];
+
+    var updatesCalled = 0;
     var callback = function(){
-      if(++loaded === equipment.length){
+      if(++updatesCalled === equipment.length){
         if(typeof onready_callback === 'function') onready_callback();
       }
     }

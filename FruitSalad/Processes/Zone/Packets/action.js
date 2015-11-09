@@ -266,6 +266,8 @@ ZonePC.Set(0x05, {
     client.character.state.LocationNew.X = input.LocationNew.X;
     client.character.state.LocationNew.Y = input.LocationNew.Y;
     client.character.state.LocationNew.Z = input.LocationNew.Z;
+
+		client.character.state.ActionTimeStamp = new Date().getTime();
 		client.node.update();
 
     switch(input.Skill){
@@ -280,6 +282,7 @@ ZonePC.Set(0x05, {
 
 				// Fujin general skills
 				case 32:
+				case 60:
 				client.character.state.skillUsed = true;
 				// Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
 				break;
@@ -294,7 +297,6 @@ ZonePC.Set(0x05, {
 				case 42:
 				case 43:
 				case 44:
-				case 60:
 				Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
 				break;
 
@@ -378,10 +380,10 @@ ZonePC.Set(0x19, {
 
 		console.log("Using skill: " + client.character.state.Skill + " ID: "+input.SkillID + " Level: " + input.SkillLevel);
     console.log(input);
-    
-    // TODO Check if caching works with the mongoose plugin Ane found, or cache this our selves on character login and on skill bar change. 
+
+    // TODO Check if caching works with the mongoose plugin Ane found, or cache this our selves on character login and on skill bar change.
     // We might only have to cache the skill mods per level that the character has on their bars :D
-    
+
     // Ensure character has skill and the >= level requesting.
     var skillIndex = -1;
     for (var i=0;i<30;i++) {
@@ -419,57 +421,68 @@ ZonePC.Set(0x19, {
         client.sendInfoMessage('Unable to use Skill out of Chi.');
         return false;
       }
-      
 
-      
+
+
       client.character.state.SkillID = input.SkillID;
       client.character.state.SkillLevel = input.SkillLevel;
-      if(skillUsedSuccessfully) {
-        if (input.SkillID === 2) { // Walk in the Clouds skill makes the character run fast. It can be considered to go in a straight line until the client reaches the target location.
-          client.sendInfoMessage('AirWalkDistance: '+(mods.AirWalkDistance*100));
 
-          // TODO Use recast for movement + check if can move to spot...
-          // Direction
-          setTimeout(function(){
-          client.character.state.Location.moveInDirection(mods.AirWalkDistance, client.character.state.FacingDirection);
-          client.sendInfoMessage(client.character.state.Location.toString() + ' D: '+client.character.state.Direction.toFixed(3) + ' F: '+client.character.state.FacingDirection.toFixed(3));
-          },1500 - (mods.AirWalkDistance*100));
-        }
+      if(skillUsedSuccessfully) {
+				characterUseSkill.call(client, input, skill, mods);
       } else {
         client.character.state.SkillID = 0;
         client.character.state.SkillLevel = 0;
         client.character.state.Skill = 1;
+				client.character.state.Frame = 0;
       }
 
-      client.node.update();
+			// Call the buffer before node update. We are gonna do the cos sin magic in getPacket
+			// then updating node will actually update it nice :D
       if (client.character.state.skillUsed) {
-        Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);      
+				client.character.state.Frame = 0;
+        Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
         client.character.state.skillUsed = false;
+      	client.node.update();
       }
     });
+	}
+});
 
+function characterUseSkill(input, skill, mods){
+	switch(this.character.Skill){
+		// case 2:
+		// case 21:
+		// // Consider actionTimeStamp to have lag compensation?
+		// // and also looking if hes updating to fast, warning about speed hack?
+		// var actionInterval = new Date().getTime() - this.character.state.getActionTimeStamp();
+		// if(actionInterval > 1100){
+		// 	console.warn("We've got too slow skill use updates, for character: ("+this.character.Name+")");
+		// }
+		//
+		//
+		// console.log(actionInterval);
+		// break;
 
+		case 60:
+		var motion = config.motion[this.character.Clan][this.character.state.Stance][this.character.state.Skill];
+		console.log(motion);
+		setTimeout(function(){
+			console.log("Apply now");
+		}, motion.length);
+		break;
+	}
+}
+
+ZonePC.Set(0x18, {
+	function: function confirmState(client){
+		// console.log("test");
+	  // Fired when character deequipes a weapon. This might be used to remove character applied buffs as weapon is removed from character state.
 	}
 });
 
 
 ZonePC.Set(0x8B, {
     function: function(client){
-			// if(!client.character.state.sendPlayersAround){
-			// 	client.character.state.sendPlayersAround = true;
-			// 	var found = Zone.QuadTree.query({
-			// 		CVec3: client.character.state.Location,
-			// 		radius: config.network.viewable_action_distance,
-			// 		type: ['client']
-			// 	});
-			//
-			// 	for (var i = 0; i < found.length; i++) {
-			// 		var f = found[i];
-			// 		if(f !== client) client.write(f.object.character.state.getPacket());
-			// 	}
-			// }
-			//
-      // Zone.broadcastStates(client);
-			//
-    }
+			// This was used to pull states for client
+		}
 });
