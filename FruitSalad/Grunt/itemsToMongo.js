@@ -8,7 +8,7 @@ module.exports = function(grunt) {
 	var GameInfoLoader = require('../Modules/GameInfoLoader.js');
 	var restruct = require('../Modules/restruct');
 	var encoding = require("encoding");
-	var eb = require('msexcel-builder');
+	// var eb = require('msexcel-builder');
 
   	vmscript.on(['config'], function() {
   		console.log('Starting config check for itemsToMongo.');
@@ -34,9 +34,9 @@ module.exports = function(grunt) {
 
   	});
 
-	var XlsxWriter = require('node-simple-xlsx'),
-    writer = new XlsxWriter();
-    var addHeader = true;
+	// var XlsxWriter = require('node-simple-xlsx'),
+  //   writer = new XlsxWriter();
+  //   var addHeader = true;
 
   	vmscript.on(['ItemInfo'], function() {
   		console.log('Clearing all existing Items in MongoDB.');
@@ -214,18 +214,18 @@ module.exports = function(grunt) {
 		              break;
 		    		}
 
-		    		if(addHeader){
-		    			var header = [];
-		    			addHeader = false;
-		    			for(var h in record){
-		    				header.push(h);
-		    			}
+		    		// if(addHeader){
+		    		// 	var header = [];
+		    		// 	addHeader = false;
+		    		// 	for(var h in record){
+		    		// 		header.push(h);
+		    		// 	}
+            //
+		    		// 	writer.setHeaders(header);
+		    		// }
 
-		    			writer.setHeaders(header);
-		    		}
 
-
-		    		writer.addRow(record);
+		    		// writer.addRow(record);
 
             		db.Item.create(record, function(err, doc) {
 			  			if (err) {
@@ -243,10 +243,10 @@ module.exports = function(grunt) {
 
 
 		Items.once('loaded', function(){
-			writer.pack('./test.xlsx', function(err){
-				console.log(err);
+			// writer.pack('./test.xlsx', function(err){
+				// console.log(err);
 				done(true);
-			});
+			// });
 		});
 
   	});
