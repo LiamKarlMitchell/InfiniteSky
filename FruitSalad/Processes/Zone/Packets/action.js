@@ -269,35 +269,63 @@ ZonePC.Set(0x05, {
 
 		client.character.state.ActionTimeStamp = new Date().getTime();
 		client.node.update();
+		
+		client.character.state.set(STATE.isRunning, false);
 
     switch(input.Skill){
-        case 66:
-        case 61:
-        case 68:
-        case 75:
-        case 67:
-        case 62:
-				client.character.state.skillUsed = true;
-        break;
-
+        // case 66:
+        // case 61:
+        // case 68:
+        // case 75:
+        // case 67:
+        // case 62:
+				// client.character.state.skillUsed = true;
+        // break;
+				//
 				// Fujin general skills
-				case 32:
-				case 60:
-				client.character.state.skillUsed = true;
+				// case 32: // Traceless Steps - Running skill
+				// case 60:
+				// client.character.state.SkillUsed = true;
+				// break;
+				//
+				// // Fujin general buffs
+				// case 40:
+				// case 41:
 				// Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
-				break;
+				// break;
+				//
+				// // Fujin katana skills
+				// case 42:
+				// case 43:
+				// case 44:
+				// Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
+				// break;
 
-				// Fujin general buffs
-				case 40:
-				case 41:
-				Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
+				// Fujin skills
+				case 41: // Hurricane Winds - Shadow damage buff
+				case 32: // Traceless Steps - Running skill
+				if(client.character.Clan !== 1){
+					console.log("The character was not fujin when using the skill");
+					return;
+				}
+
+				client.character.state.SkillUsed = true;
 				break;
 
 				// Fujin katana skills
 				case 42:
-				case 43:
-				case 44:
-				Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
+				case 43: // Assasin's Blade - Basic Multihit
+				if(client.character.Clan !== 1){
+					console.log("The character was not fujin when using the skill");
+					return;
+				}
+
+				if(client.character.infos.Weapon.ItemType !== 'Katana'){
+					console.log("Using skill requires Katana");
+					return;
+				}
+
+				client.character.state.SkillUsed = true;
 				break;
 
 				// Weapon basic attacks.
@@ -318,6 +346,23 @@ ZonePC.Set(0x05, {
         case 0:
         Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
         break;
+
+
+				// Character stops when theres lack of chi to continue running.
+				case 1:
+				Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
+				break;
+
+				case 3:
+				// NOTE: Your character walk and run slower.
+				console.log("Weapon Out");
+				Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
+				break;
+
+				case 4:
+				console.log("Weapon In");
+				Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
+				break;
 
 				// Walking
 				case 2:
@@ -361,31 +406,32 @@ ZonePC.Set(0x15, {
 	Restruct: Zone.recv.onHit,
 	function: function(client, input){
 		// TODO: Confirming if I actually was able to hit the target. Input contains attacker and the target.
-
+		console.log("onHit callback");
 		// console.log(input);
 	}
 })
 
 Zone.recv.useSkill = restruct.
-	int32lu('ChiUsage').
+	int32lu('ChiCost').
 	int32lu('SkillID').
 	int32lu('SkillLevel').
-	int32lu('ChiUsage2').
+	int32lu('ChiCost2').
 	pad(8);
 
 ZonePC.Set(0x19, {
 	Restruct: Zone.recv.useSkill,
 	function: function useSkill(client, input){
-		// TODO: Calculate chi usage.
+		if(client.character.state.get(STATE.isRunning)){
+			client.character.state.SkillUsed = true;
+		}
 
-		console.log("Using skill: " + client.character.state.Skill + " ID: "+input.SkillID + " Level: " + input.SkillLevel);
-    console.log(input);
+		if(!client.character.state.SkillUsed){
+			console.log("Failed to use the skill. Action was not permitted.");
+			return;
+		}
+		client.character.state.SkillUsed = false;
 
-    // TODO Check if caching works with the mongoose plugin Ane found, or cache this our selves on character login and on skill bar change.
-    // We might only have to cache the skill mods per level that the character has on their bars :D
-
-    // Ensure character has skill and the >= level requesting.
-    var skillIndex = -1;
+		var skillIndex = -1;
     for (var i=0;i<30;i++) {
       var s = client.character.SkillList[i];
       if (s && s.ID === input.SkillID && s.Level >= input.SkillLevel) {
@@ -398,79 +444,151 @@ ZonePC.Set(0x19, {
       return;
     }
 
-    db.Skill.findById(input.SkillID, function(err, skill){
-      if (err) {
-        console.error('Error looking up skill for character '+client.character.Name+' SkillID: '+input.SkillID);
-        return;
-      }
+		console.log("useSkill callback");
 
-      var mods = skill.getSkillMods(input.SkillLevel);
-      console.log(mods);
-      if (mods.ChiCost !== input.ChiUsage) {
-        console.warn('CHI USAGE MISSMATCH Server: '+mods.ChiCost +' Client: '+ input.ChiUsage);
-      }
+		console.log(input);
+		db.Skill.findById(input.SkillID, function(err, skill){
+			if(err){
+				console.log('Error occoured on finding skill', input.SkillID, 'for', client.character.Name);
+				return;
+			}
 
-      var skillUsedSuccessfully = false;
-      if (client.character.state.CurrentChi >= mods.ChiCost) {
-        client.character.state.CurrentChi -= mods.ChiCost;
-        client.sendInfoMessage('Chi at '+client.character.state.CurrentChi);
-        skillUsedSuccessfully = true;
-      } else {
-        // Error not enough Chi to use skill.
-        console.error('Unable to use Skill out of Chi: ' + client.character.state.CurrentChi +' requires '+mods.ChiCost);
-        client.sendInfoMessage('Unable to use Skill out of Chi.');
-        return false;
-      }
+			if(!skill){
+				console.log('Skill info', input.SkillID, 'not founded for', client.character.Name);
+				return;
+			}
+
+			if(!skill.isUsedByClan(client.character.Clan)){
+				console.log("This clan cannot use the skill");
+				return;
+			}
+
+			if(!skill.isUsedByWeapon(client.character.infos.Weapon.ItemType)){
+				console.log("This clan cannot use the skill");
+				return;
+			}
+
+			var modifiers = skill.getSkillMods(input.SkillLevel);
+			if(input.ChiCost !== modifiers.ChiCost){
+				console.log("Failed to use the skill. Unexpected difference in chi cost.");
+				return;
+			}
+
+			if(client.character.state.CurrentChi < modifiers.ChiCost){
+				console.log("Failed to use the skill due to lack of required chi.");
+				return;
+			}
 
 
+			client.character.state.CurrentChi -= modifiers.ChiCost;
+			client.character.state.SkillID = input.SkillID;
+	    client.character.state.SkillLevel = input.SkillLevel;
+			client.node.update();
 
-      client.character.state.SkillID = input.SkillID;
-      client.character.state.SkillLevel = input.SkillLevel;
+			Zone.sendToAllArea(client, !client.character.state.get(STATE.isRunning), client.character.state.getPacket(), config.network.viewable_action_distance);
 
-      if(skillUsedSuccessfully) {
-				characterUseSkill.call(client, input, skill, mods);
-      } else {
-        client.character.state.SkillID = 0;
-        client.character.state.SkillLevel = 0;
-        client.character.state.Skill = 1;
-				client.character.state.Frame = 0;
-      }
+			switch(input.SkillID){
+				case 21: // Fujin running skill
+				client.character.state.set(STATE.isRunning, true);
+				break;
+			}
+		});
 
-			// Call the buffer before node update. We are gonna do the cos sin magic in getPacket
-			// then updating node will actually update it nice :D
-      if (client.character.state.skillUsed) {
-				client.character.state.Frame = 0;
-        Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
-        client.character.state.skillUsed = false;
-      	client.node.update();
-      }
-    });
+		// TODO: Calculate chi usage.
+		//
+		// console.log("Using skill: " + client.character.state.Skill + " ID: "+input.SkillID + " Level: " + input.SkillLevel);
+    // console.log(input);
+		//
+    // // TODO Check if caching works with the mongoose plugin Ane found, or cache this our selves on character login and on skill bar change.
+    // // We might only have to cache the skill mods per level that the character has on their bars :D
+		//
+    // // Ensure character has skill and the >= level requesting.
+    // var skillIndex = -1;
+    // for (var i=0;i<30;i++) {
+    //   var s = client.character.SkillList[i];
+    //   if (s && s.ID === input.SkillID && s.Level >= input.SkillLevel) {
+    //     skillIndex = i;
+    //   }
+    // }
+		//
+    // if (skillIndex === -1) {
+    //   console.log('Character does not have the skill.');
+    //   return;
+    // }
+		//
+    // db.Skill.findById(input.SkillID, function(err, skill){
+    //   if (err) {
+    //     console.error('Error looking up skill for character '+client.character.Name+' SkillID: '+input.SkillID);
+    //     return;
+    //   }
+		//
+    //   var mods = skill.getSkillMods(input.SkillLevel);
+    //   console.log(mods);
+    //   if (mods.ChiCost !== input.ChiUsage) {
+    //     console.warn('CHI USAGE MISSMATCH Server: '+mods.ChiCost +' Client: '+ input.ChiUsage);
+    //   }
+		//
+    //   var skillUsedSuccessfully = false;
+    //   if (client.character.state.CurrentChi >= mods.ChiCost) {
+    //     client.character.state.CurrentChi -= mods.ChiCost;
+    //     client.sendInfoMessage('Chi at '+client.character.state.CurrentChi);
+    //     skillUsedSuccessfully = true;
+    //   } else {
+    //     // Error not enough Chi to use skill.
+    //     console.error('Unable to use Skill out of Chi: ' + client.character.state.CurrentChi +' requires '+mods.ChiCost);
+    //     client.sendInfoMessage('Unable to use Skill out of Chi.');
+    //     return false;
+    //   }
+		//
+		//
+		//
+    //   client.character.state.SkillID = input.SkillID;
+    //   client.character.state.SkillLevel = input.SkillLevel;
+		//
+    //   if(skillUsedSuccessfully) {
+		// 		characterUseSkill.call(client, input, skill, mods);
+    //   } else {
+    //     client.character.state.SkillID = 0;
+    //     client.character.state.SkillLevel = 0;
+    //     client.character.state.Skill = 1;
+		// 		client.character.state.Frame = 0;
+    //   }
+		//
+		// 	// Call the buffer before node update. We are gonna do the cos sin magic in getPacket
+		// 	// then updating node will actually update it nice :D
+    //   if (client.character.state.skillUsed) {
+		// 		client.character.state.Frame = 0;
+    //     Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
+    //     client.character.state.skillUsed = false;
+    //   	client.node.update();
+    //   }
+    // });
 	}
 });
 
 function characterUseSkill(input, skill, mods){
-	switch(this.character.Skill){
-		// case 2:
-		// case 21:
-		// // Consider actionTimeStamp to have lag compensation?
-		// // and also looking if hes updating to fast, warning about speed hack?
-		// var actionInterval = new Date().getTime() - this.character.state.getActionTimeStamp();
-		// if(actionInterval > 1100){
-		// 	console.warn("We've got too slow skill use updates, for character: ("+this.character.Name+")");
-		// }
-		//
-		//
-		// console.log(actionInterval);
-		// break;
-
-		case 60:
-		var motion = config.motion[this.character.Clan][this.character.state.Stance][this.character.state.Skill];
-		console.log(motion);
-		setTimeout(function(){
-			console.log("Apply now");
-		}, motion.length);
-		break;
-	}
+	// switch(this.character.Skill){
+	// 	// case 2:
+	// 	// case 21:
+	// 	// // Consider actionTimeStamp to have lag compensation?
+	// 	// // and also looking if hes updating to fast, warning about speed hack?
+	// 	// var actionInterval = new Date().getTime() - this.character.state.getActionTimeStamp();
+	// 	// if(actionInterval > 1100){
+	// 	// 	console.warn("We've got too slow skill use updates, for character: ("+this.character.Name+")");
+	// 	// }
+	// 	//
+	// 	//
+	// 	// console.log(actionInterval);
+	// 	// break;
+	//
+	// 	case 60:
+	// 	var motion = config.motion[this.character.Clan][this.character.state.Stance][this.character.state.Skill];
+	// 	console.log(motion);
+	// 	setTimeout(function(){
+	// 		console.log("Apply now");
+	// 	}, motion.length);
+	// 	break;
+	// }
 }
 
 ZonePC.Set(0x18, {

@@ -205,6 +205,8 @@ calculation.Weapon = function(itemInfo, item, done){
 
     this.Weapon.Mastery = this.getMasteryBonuses(itemInfo);
     this.Weapon.AllMastery = itemInfo.IncreaseAllSkillMastery;
+    this.Weapon.ItemType = itemInfo.getItemType();
+    console.log("Item type:", this.Weapon.ItemType);
     break;
 
     default:
@@ -214,6 +216,7 @@ calculation.Weapon = function(itemInfo, item, done){
     this.Weapon.HitRate = 0;
     this.Weapon.Mastery = {};
     this.Weapon.AllMastery = 0;
+    this.Weapon.ItemType = null;
     break;
   }
 
@@ -302,6 +305,7 @@ calculation.DeadlyRate = function(itemInfo, item, done){
 
 calculation.DodgeRate = function(itemInfo, item, done){
   this.DodgeRate = this.ExpInfo.Dodge[this.Clan];
+  this.DodgeRate += Math.floor(this.Modifiers.Dodge * this.character.Stat_Dexterity);
   this.DodgeRate += this.Outfit.DodgeRate;
   this.DodgeRate += this.Boots.DodgeRate;
   this.DodgeRate += this.Pet.DodgeRate;
@@ -341,18 +345,14 @@ calculation.Mastery = function(itemInfo, item, done){
 };
 
 calculation.MaxHP = function(itemInfo, item, done){
-  console.log("Max hp test");
   this.MaxHP = this.ExpInfo.BaseHP[this.Clan];
-  console.log(this.MaxHP);
-  this.MaxHP += (this.character.Stat_Vitality + this.Outfit.Vitality) * this.Modifiers.HP;
-  console.log(this.MaxHP);
+  this.MaxHP += Math.floor((this.character.Stat_Vitality + this.Outfit.Vitality) * this.Modifiers.HP);
 
   if(this.MaxHP > this.Pet.HP){
     this.MaxHP += this.Pet.HP / 100 * this.Pet.Scale;
   }else{
     this.MaxHP += this.MaxHP;
   }
-  console.log(this.MaxHP);
 
   done();
 };

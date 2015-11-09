@@ -274,6 +274,7 @@ vms('World Server', [
 	vmscript.watch('Database');
 	vmscript.watch('Generic');
 
+
 	vmscript.on([
 		'Database',
 		'Generic'

@@ -81,6 +81,14 @@ module.exports = function(grunt) {
 			  function onRecordLoad(record) {
 			  	if (record.Level) {
 			  		if(record.Level === 145) record.EXPEnd = 2000000000;
+            record.BaseHP.reverse();
+            record.BaseChi.reverse();
+            record.ElementalDamage.reverse();
+            record.Dodge.reverse();
+            record.HitRate.reverse();
+            record.Defense.reverse();
+            record.Damage.reverse();
+
 			  		db.Exp.create(record, function(err, doc) {
 			  			if (err) {
 			  				console.error(err);

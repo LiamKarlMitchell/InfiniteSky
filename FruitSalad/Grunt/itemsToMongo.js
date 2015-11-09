@@ -122,6 +122,7 @@ module.exports = function(grunt) {
 			  		record.Description2 = encoding.convert(record.Description2, 'UTF-8', 'EUC-KR').toString();
 			  		record.Description3 = encoding.convert(record.Description3, 'UTF-8', 'EUC-KR').toString();
 
+                record.ElementalDamage.reverse();
 		            record.ElementalDefense.reverse();
 
 		            record.Pet = {};
@@ -239,7 +240,7 @@ module.exports = function(grunt) {
 			  }
 			);
 
-		
+
 
 		Items.once('loaded', function(){
 			writer.pack('./test.xlsx', function(err){

@@ -115,6 +115,16 @@ vms('SkillInfo', [], function(){
     return this.Clan === 1 || this.Clan === (clan+2);
   };
 
+  skillSchema.methods.isUsedByWeapon = function(itemType){
+    switch(itemType){
+      case 'Katana':
+      itemType = 5;
+      break;
+    }
+
+    return this.Weapon === 1 || this.Weapon === itemType;
+  };
+
   skillSchema.methods.getSkillMods = function(SkillLevel) {
         var mods = { // See the grunt task skillsToMongo.js for these names since its neglected in the schema -_- TODO Put these names in the schema (See npc text schema for example)
             ChiCost: 0,
@@ -165,9 +175,9 @@ vms('SkillInfo', [], function(){
         //for (var name in this.ModifiersStart) {
             //mods[name] = (this.ModifiersEnd[name] - this.ModifiersStart[name]) * Scale;
         //}
-        
+
         // Unwrapped for speed
-        
+
         mods.ChiCost = Math.ceil(this.ModifiersStart.ChiCost + (this.ModifiersEnd.ChiCost - this.ModifiersStart.ChiCost) * Scale);
         mods.DegreeOfDefensiveSkill = this.ModifiersStart.DegreeOfDefensiveSkill + (this.ModifiersEnd.DegreeOfDefensiveSkill - this.ModifiersStart.DegreeOfDefensiveSkill) * Scale;
         mods.ChiRecovery = this.ModifiersStart.ChiRecovery + (this.ModifiersEnd.ChiRecovery - this.ModifiersStart.ChiRecovery) * Scale;
@@ -214,6 +224,7 @@ vms('SkillInfo', [], function(){
 			ID: id
 		}, callback);
 	};
+
 
   db.Skill = SkillInfo;
 });

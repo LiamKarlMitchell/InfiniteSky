@@ -4,11 +4,11 @@
 
 STATE = {
 	isWalking: 0,
-	isRunning: 32,
+	isRunning: 1,
 	isJumping: 2,
 	isInParty: 3,
 	isInTrade: 4,
-	isShopOpened: 5,
+	hasPersonalStore: 5,
 	isStunned: 6,
 	isBusy: 7,
 	isPublicEnemy: 8,

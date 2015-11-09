@@ -84,16 +84,20 @@ vms('Monster', [
 	Monster.prototype.spawn = function(location){
 		this.Location = location.copy();
 		this.node.update();
-		this.CurrentHP = this.MaxHP;
+		this.CurrentHP = 0;
 
 		this.transition(1, function(){
 			this.isAlive = true;
+			this.CurrentHP = this.MaxHP;
+			Zone.sendToAllAreaLocation(this.Location, config.network.viewable_action_distance, this.getPacket());
 		});
-		
+
 		Zone.sendToAllAreaLocation(this.Location, config.network.viewable_action_distance, this.getPacket());
 	};
 
 	Monster.prototype.hit = function(amount){
+		if(!this.isAlive) return;
+
 		this.CurrentHP -= amount;
 		if(!this.CurrentHP){
 			this.die();

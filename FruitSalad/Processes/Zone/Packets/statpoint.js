@@ -44,7 +44,7 @@ ZonePC.Set(0x16, {
 
 			case 3:
 			case 7:
-			update = 'MaxHp';
+			update = 'MaxHP';
 			client.character.Stat_Vitality += spend;
 			break;
 		}

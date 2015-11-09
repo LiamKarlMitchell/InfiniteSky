@@ -49,6 +49,7 @@ LoginPC.Set(0x07, {
 
 			if(removed){
 				delete socket.characters[input.Slot];
+				socket.characters.length--;
 				Login.send.deleteCharacterReply.call(socket, 0);
 			}
 		});
