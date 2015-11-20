@@ -14,7 +14,7 @@ FileTools.compress_flush = zlib.Z_FULL_FLUSH;
 // zlib.Z_TREES
 
 // Compression levels.
-FileTools.compress_level = zlib.Z_DEFAULT_COMPRESSION;
+FileTools.compress_level = zlib.Z_BEST_COMPRESSION;
 // zlib.Z_NO_COMPRESSION
 // zlib.Z_BEST_SPEED
 // zlib.Z_BEST_COMPRESSION
@@ -69,8 +69,8 @@ FileTools.uncompressBuffer = function uncompressBuffer(buffer, func) {
 		return func(null, new Buffer(0));
 	}
 
-	if (buffer.length !== compressedSize) {
-		return func('File size is not large enough to have that much data.', null);
+	if (buffer.length-8 !== compressedSize) {
+		return func('File size is not large enough to have that much data.\nCompressedSize: '+compressedSize+'\nBufferLength: '+buffer.length+'\nUncompressedSize: '+uncompressedSize, null);
 	}
 
 	zlib.unzip(buffer.slice(8), func);
@@ -98,7 +98,7 @@ FileTools.compressBuffer = function compressBuffer(buffer, func) {
 
 		var header = new Buffer(8);
 		header.writeUInt32LE(uncompressedSize, 0);
-		header.writeUInt32LE(8 + data.length, 4); // But OBJECT files not compressed with this padding... They have a strange -8 value somewhere else though.
+		header.writeUInt32LE(data.length, 4); // But OBJECT files not compressed with this padding... They have a strange -8 value somewhere else though.
 		func(null, Buffer.concat([header, data], 8 + data.length));
 	});
 };
