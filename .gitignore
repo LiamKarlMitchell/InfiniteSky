@@ -199,3 +199,6 @@ ehthumbs.db
 old files/itemactions-old.js
 *.sdf
 *.WREGION
+*.WG
+*.WM
+*.IMG
