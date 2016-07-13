@@ -19,6 +19,8 @@ var CachedBuffer = function(collection, opts){
     this.reminder = 0;
     this.packet = null;
 
+    this.setNoDelay(true);
+
     var self = this;
     this.onData = function(chunk){
         if(this.paused){
