@@ -148,6 +148,8 @@ calculation.Cape = function(item, item, done){
 };
 
 calculation.Outfit = function(itemInfo, item, done){
+  console.log('In calculation.outfit');
+  console.log('typeof iteminfo: ' +( typeof itemInfo));
   switch(typeof itemInfo){
     case 'object':
     var DefenseTick = (item.Level > 95 && item.Level <= 145) ? 22 : 14;
@@ -635,10 +637,9 @@ vms('CharacterInfo', [], function(){
         }
 
         if(!exp){
-          console.log("Exp info not founded while updating character infos");
+          console.log("Exp info not found while updating character infos");
           return;
         }
-
         this.self.ExpInfo = exp;
         this.self.updateAfterExpInfo.call(this.self, this.names, this.oncalc_callback);
       }).bind({self: this, names: names, oncalc_callback: oncalc_callback}));
@@ -648,72 +649,72 @@ vms('CharacterInfo', [], function(){
     this.updateAfterExpInfo.call(this, names, oncalc_callback);
   };
 
-  CharacterInfos.prototype.updateAfterExpInfo = function infos_UpdateAfterExpInfo(n, oncalc_callback){
+
+  function updateAfterExpInfo_handleItemLookup(uFunc, charObjItem, callback, err, itemInfo) {
+    if (err) {
+      console.log("Error occoured on item info", charObjItem);
+      return;
+    }
+
+    if (!itemInfo) {
+      console.log("Item info not found", itemInfo, err);
+      return;
+    }
+
+    uFunc.call(this, itemInfo, charObjItem, callback);
+  };
+
+  CharacterInfos.prototype.updateAfterExpInfo = function infos_UpdateAfterExpInfo(n, oncalc_callback) {
     var id = uuid.v4();
 
-    this.updateCalls[id] = {counter: 0, total: n.length, after: oncalc_callback};
+    this.updateCalls[id] = {
+      counter: 0,
+      total: n.length,
+      after: oncalc_callback
+    };
 
-    var callback = (function(update_id){
+    var callback = (function(update_id) {
       var uCall = this.updateCalls[update_id];
-      if(!uCall){
+      if (!uCall) {
         console.log("No update call object");
         return;
       }
 
-      if(++uCall.counter === uCall.total && typeof uCall.after === 'function'){
+      if (++uCall.counter === uCall.total && typeof uCall.after === 'function') {
         uCall.after();
         delete this.updateCalls[update_id];
       }
     }).bind(this, id);
 
     var self = this;
-    for(var i=0; i<n.length; i++){
+    for (var i = 0; i < n.length; i++) {
       var name = n[i];
       var uFunc = calculation[name];
-      if(!uFunc){
+      if (!uFunc) {
         console.log("No calculation method called:", name);
         continue;
       }
 
       var charObjItem = this.character[name];
-      if(!charObjItem) charObjItem = undefined;
-      else {
+      if (!charObjItem) {
+        charObjItem = undefined;
+      } else {
         charObjItem.Enchant = charObjItem.Enchant === undefined ? 0 : charObjItem.Enchant;
         charObjItem.Combine = charObjItem.Combine === undefined ? 0 : charObjItem.Combine;
       }
 
-      if(charObjItem && charObjItem.ID){
-        db.Item.findById(charObjItem.ID, function(err, itemInfo){
-          if(err){
-            console.log("Error occoured on item info");
-            return;
-          }
-
-          if(!itemInfo){
-            console.log("Item info not founded", itemInfo, err);
-            return;
-          }
-
-          uFunc.call(self, itemInfo, charObjItem, callback);
-        });
-        continue;
+      if (charObjItem && charObjItem.ID) {
+        db.Item.findById(charObjItem.ID, updateAfterExpInfo_handleItemLookup.bind(self, uFunc, charObjItem, callback));
+      } else {
+        uFunc.call(this, undefined, charObjItem, callback);
       }
-
-      uFunc.call(self, undefined, charObjItem, callback);
     }
   };
 
+
   CharacterInfos.prototype.updateAll = function infos_UpdateAll(onready_callback){
     var equipment = ['Weapon', 'Outfit', 'Gloves', 'Cape', 'Ring', 'Amulet', 'Boots'];
-
-    var updatesCalled = 0;
-    var callback = function(){
-      if(++updatesCalled === equipment.length){
-        if(typeof onready_callback === 'function') onready_callback();
-      }
-    }
-
-    for(var i=0; i<equipment.length; i++) this.update(equipment[i], callback);
+    this.update(equipment, onready_callback);
   };
 
   CharacterInfos.prototype.print = function(){

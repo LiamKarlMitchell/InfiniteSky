@@ -76,9 +76,9 @@ rpc.prototype.on = function(name, callback){
   this.EventEmitter.on(name, callback);
 }
 
-rpc.prototype.join = function(name, processPath, args){
+rpc.prototype.join = function(opts, processPath, args){
   // NOTE: args must be an array or leave it undefined.
-
+  var name = opts.name;
   if(this.children[name]){
     // TODO (Ane): Logging in appropriate format.
     this.EventEmitter.emit('warning', 'Children ' + name + ' is already in array of children.');
@@ -90,6 +90,19 @@ rpc.prototype.join = function(name, processPath, args){
   // TODO: Consider listetning to error and end events. And removal of children
   // from rpc.
   // TODO: Check if the path to the file exists.
+  
+  // If debug mode enabled then allow children processes to listen on a new debug port.
+  if (withDebug = process.execArgv.indexOf('--debug') > -1 || process.execArgv.indexOf('--debug-brk') > -1) {
+      var debugPortOffset = opts.debugPortOffset;
+      if (debugPortOffset === undefined) {
+        console.error('Debug Port offset not defined for child process '+name+'.');
+        debugPortOffset = 0;
+      }
+      var debugPort = (5858) + debugPortOffset;
+      console.log('Debug port for child process '+name+' is '+debugPort+'.');
+      process.execArgv.push('--debug=' + debugPort); 
+  }
+
   var childProcess = fork(processPath, args ? args : [name], {silent: true});
   this.hasChildren = true;
 

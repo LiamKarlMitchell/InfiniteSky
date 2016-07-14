@@ -454,7 +454,7 @@ ZonePC.Set(0x19, {
 			}
 
 			if(!skill){
-				console.log('Skill info', input.SkillID, 'not founded for', client.character.Name);
+				console.log('Skill info', input.SkillID, 'not found for', client.character.Name);
 				return;
 			}
 

@@ -36,7 +36,7 @@ global.api.onMoveRegions = function(callback, client, moveRegions){
 global.api.onCharacterZone = function(user_hash, zone, character_name, callback){
 	var c = Zone.clientHashTable[user_hash];
 	if(!c){
-		console.log("On character zone from world have not founded client with hash". user_hash);
+		console.log("On character zone from world have not found client with hash". user_hash);
 		return;
 	}
 

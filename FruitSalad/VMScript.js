@@ -58,7 +58,7 @@ function VMScriptObj(){
 	EventEmitter.on('file added', function(file_path){
 
 		var file_name = getFilename(path.parse(file_path));
-		// console.log(colors.orange("[VMS]"), colors.info("added:"), file_name);
+		console.log(colors.orange("[VMS]"), colors.info("added:"), file_name);
 
 		self.parse(file_path);
 	});
@@ -66,14 +66,14 @@ function VMScriptObj(){
 	EventEmitter.on('file changed', function(file_path){
 
 		var file_name = getFilename(path.parse(file_path));
-		// console.log(colors.orange("[VMS]"), colors.info("changed:"), file_name);
+		console.log(colors.orange("[VMS]"), colors.info("changed:"), file_name);
 
 		self.parse(file_path);
 	});
 
 	EventEmitter.on('file removed', function(file_path){
 		var file_name = getFilename(path.parse(file_path));
-		// console.log(colors.orange("[VMS]"), colors.orange("removed:"), file_name);
+		console.log(colors.orange("[VMS]"), colors.orange("removed:"), file_name);
 
 		self.parse(file_path);
 	});
@@ -231,7 +231,6 @@ VMScriptObj.prototype.parse = function(file_path){
 		        for (var i=0;i<jshint.errors.length;i++) {
 		          var e = jshint.errors[i];
 		          if (!e) { continue; }
-		          console.log(colors.orange("[VMS] jshint error #"+(i+1)) + colors.info(" Line: "+e.line+" Col: "+e.character+" "+e.reason));
 		        }
 		      }
 			}
@@ -293,7 +292,7 @@ VMScriptObj.prototype.watch = function(file_path, opts){
 							fileStats[files[i]] = stat;
 							EventEmitter.emit('file added', files[i]);
 						}catch(e){
-
+							dumpError(e);
 						}
 					}
 

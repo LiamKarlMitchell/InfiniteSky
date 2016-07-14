@@ -191,7 +191,7 @@ var ChildSpawner = function(api){
 }
 
 ChildSpawner.prototype.spawnChild = function(opts){
-	global.rpc.join(opts.name, './Processes/process.js');
+	global.rpc.join(opts.name, './Processes/process.js', null);
 };
 
 module.exports = {

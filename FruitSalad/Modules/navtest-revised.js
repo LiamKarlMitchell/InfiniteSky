@@ -391,7 +391,7 @@ map_mesh.prototype.findPath = function(from, to, radius, callback){
 		}
 
 		if(bestI === null){
-			console.log("Path not founded");
+			console.log("Path not found");
 			break;
 		}
 
@@ -399,7 +399,7 @@ map_mesh.prototype.findPath = function(from, to, radius, callback){
 		var currentNodeLocation = this.wVs[bestI];
 
 		if(target.pointIntersects(currentNodeLocation[0], currentNodeLocation[1], currentNodeLocation[2])){
-			console.log("Path founded");
+			console.log("Path found");
 			break;
 		}
 

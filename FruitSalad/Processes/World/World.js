@@ -249,7 +249,7 @@ worldPrototype.init = function(){
 			var zone = config.zones[id];
 			var parsedId = parseInt(id);
 			if(zone.Load && (!global.rpc.children[parsedId] || !global.rpc.children[parsedId].spawned) ){
-				global.rpc.join(parsedId, './Processes/process.js', [parsedId, zone.Name]);
+				global.rpc.join({ name: parsedId, debugPortOffset: 142 + parsedId }, './Processes/process.js', [parsedId, zone.Name]);
 			}
 		}
 	}

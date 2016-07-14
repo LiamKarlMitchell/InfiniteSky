@@ -34,7 +34,7 @@ module.exports = function(grunt) {
 	                files.push(items[i]);
 	            }
 	        }
-	    }
+	    });
 		// TODO: Turn them into OBJ.
 		// TODO: Feed into recast.
 		// var recast = new Recast();

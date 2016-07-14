@@ -272,7 +272,7 @@ ItemAction[3] = function CharacterItem_Equip(input){
         self.character.markModified('Inventory');
         self.character.save(function(err){
             if(err){
-
+                // TODO: On error revert changes. Log error, return a problem.
                 return;
             }
             self.character.infos.update(equipItem, function(){

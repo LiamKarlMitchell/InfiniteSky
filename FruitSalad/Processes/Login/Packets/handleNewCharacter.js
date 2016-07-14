@@ -171,13 +171,11 @@ LoginPC.Set(0x06, {
 				break;
 			}
 
-
-			// TODO (Ane): asd
-
 			socket.character = newCharacter;
 
 			var infos = new CharacterInfos(socket);
 			infos.updateAll(function(){
+				console.log('infos.updateAll returned with these arguments: ', arguments);
 				newCharacter.Health = infos.MaxHP;
 				newCharacter.Chi = infos.MaxChi;
 

@@ -259,7 +259,7 @@ vms('Spawn Logger', [
 			}
 
 			if(!item){
-				res.json({error: 'Item not founded'});
+				res.json({error: 'Item not found'});
 				return;
 			}
 

@@ -52,7 +52,7 @@ global.api.call = function(process_name, fn){
 // }
 
 for(var child in children){
-	global.rpc.join(child, './Processes/process.js');
+	global.rpc.join(children[child] , './Processes/process.js');
 }
 
 global.rpc.on('invalidated', function(child){

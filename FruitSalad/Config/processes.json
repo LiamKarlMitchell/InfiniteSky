@@ -1,22 +1,27 @@
 {
     "Login": {
         "name": "Login",
-        "script": "Processes/Login/Login.js"
+        "script": "Processes/Login/Login.js",
+        "debugPortOffset": 1
     },
     "World": {
         "name": "World",
-        "script": "Processes/World/World.js"
+        "script": "Processes/World/World.js",
+        "debugPortOffset": 2
     },
     "SpawnLogger": {
         "name": "SpawnLogger",
-        "script": "Processes/SpawnLogger/SpawnLogger.js"
+        "script": "Processes/SpawnLogger/SpawnLogger.js",
+        "debugPortOffset": 3
     },
     "SpawnEdit": {
         "name": "SpawnEdit",
-        "script": "Processes/SpawnEdit/SpawnEdit.js"
+        "script": "Processes/SpawnEdit/SpawnEdit.js",
+        "debugPortOffset": 4
     },
     "ItemEditor": {
         "name": "ItemEditor",
-        "script": "Processes/ItemEditor/ItemEditor.js"
+        "script": "Processes/ItemEditor/ItemEditor.js",
+        "debugPortOffset": 5
     }
 }
