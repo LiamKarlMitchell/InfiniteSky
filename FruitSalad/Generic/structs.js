@@ -6,6 +6,11 @@ if (typeof structs === 'undefined') {
     structs = {}; // Global Variable of main.js range
 }
 
+/**
+ * CVec3_Restruct
+ * @mixin
+ * @type {Restruct}
+ */
 structs.CVec3= restruct.
 	float32l('X').
 	float32l('Y').

@@ -1,28 +1,29 @@
 {
-    "tags": {
-        "allowUnknownTags": true,
-        "dictionaries": ["jsdoc", "closure"]
-    },
-    "source": {
-        "includePattern": ".+\\.js(doc)?$",
-        "excludePattern": "(^|\\/|\\\\)_"
-    },
-    "plugins": [],
-    "templates": {
-		"cleverLinks": false,
-        "monospaceLinks": false,
-        "systemName": "InfiniteSky",
-        "footer": "Woah Documentation",
-        "copyright": "InfiniteSky",
-        "navType": "vertical",
-        "theme": "superhero",
-        "linenums": true,
-        "collapseSymbols": false,
-        "inverseNav": false,
-        "outputSourceFiles": true,
-        "outputSourcePath": true,
-        "dateFormat": "DD/MM/YYYY",
-        "highlightTutorialCode": true,
-        "syntaxTheme": "sunlight-dark"
-    }
+  "tags": {
+    "allowUnknownTags": true
+  },
+  "plugins": ["plugins/markdown"],
+  "templates": {
+    "logoFile": "",
+    "cleverLinks": false,
+    "monospaceLinks": false,
+    "dateFormat": "ddd MMM Do YYYY",
+    "outputSourceFiles": true,
+    "outputSourcePath": true,
+    "systemName": "InfiniteSky",
+    "footer": "",
+    "copyright": "The contributors to the InfiniteSky project.",
+    "navType": "vertical",
+    "theme": "oblivion",
+    "linenums": true,
+    "collapseSymbols": false,
+    "inverseNav": true,
+    "highlightTutorialCode": true,
+    "protocol": "html://",
+    "methodHeadingReturns": false
+  },
+  "markdown": {
+    "parser": "gfm",
+    "hardwrap": true
+  }
 }

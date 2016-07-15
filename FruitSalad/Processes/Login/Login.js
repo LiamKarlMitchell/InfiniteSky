@@ -37,6 +37,10 @@ vms('Login Server', [
 
 	global.rpc.add(global.api);
 
+	/**
+	 * LoginInstance, there should only be 1.
+	 * @exports LoginInstance
+	 */
 	function LoginInstance(){
 		log = bunyan.createLogger({name: 'InfiniteSky/Login',
 		    streams: [{
@@ -46,39 +50,39 @@ vms('Login Server', [
 
 		console.log('Started');
 
-		/*
-			Array of current connected clients.
-		*/
+		/**
+		 * Array of current connected clients.
+		 */
 		this.clients = [];
 		this.nextID = 0;
 
-		/*
-			Boolean indicating that the server is running
-			and listening for incoming connections.
-		*/
+		/**
+		 * Boolean indicating that the server is running
+		 * and listening for incoming connections.
+	             */
 		this.listening = false;
 
-		/*
-			Used Later to see if config has to offer a new port to listen to.
-			If is different than currently listening, re-listen the tcp server,
-			to listen for the new port.
-		*/
+		/**
+		 * Used Later to see if config has to offer a new port to listen to.
+		 * If is different than currently listening, re-listen the tcp server,
+		 * to listen for the new port.
+		 */
 		this.listeningPort = null;
 
-		/*
-			A boolean variable to decide if we want to accept incoming connections.
-		*/
+		/**
+		 * A boolean variable to decide if we want to accept incoming connections.
+		 */
 		this.acceptConnections = false;
 
-		/*
-			A object of packet collection for this current instance.
-		*/
+		/**
+		 * A object of packet collection for this current instance.
+	   	 */
 		this.packetCollection = null;
 
 		var self = this;
-		/*
-			A TCP server instance.
-		*/
+		/**
+		 * A TCP server instance.
+		 */
 		this.instance = net.createServer(function (socket) { self.onConnection(socket); });
 		this.recv = {};
 		this.send = {};
@@ -87,6 +91,10 @@ vms('Login Server', [
 		this.characterTransfer = {};
 	}
 
+	/**
+	 * Action taken upon connection to the Login Server.
+	 * @param  {socket} socket The client socket.
+	 */
 	LoginInstance.prototype.onConnection = function(socket){
 		if(!this.acceptConnections) return;
 
@@ -135,6 +143,10 @@ vms('Login Server', [
 		});
 	};
 
+	/**
+	 * Action taken upon disconnection from the Login Server.
+	 * @param  {socket} socket The client socket.
+	 */
 	LoginInstance.prototype.onDisconnect = function(socket){
 		var index = this.clients.indexOf(socket);
 		if(index !== -1){
@@ -144,12 +156,21 @@ vms('Login Server', [
 		}
 	};
 
+	/**
+	 * Action taken upon connection to the Login Server.
+	 * @param {exception} err An error.
+	 * @param  {socket} socket The client socket.
+	 */
 	LoginInstance.prototype.onError = function(err, socket){
 		console.log(err);
 		this.clients.splice(this.clients.indexOf(socket), 1);
 		socket.destroy();
 	};
 
+	/**
+	 * Initalizes the Login Instance.
+	 * Loads up packets, database, structures etc.
+	 */
 	LoginInstance.prototype.init = function(){
 		if(this.listening) return;
 

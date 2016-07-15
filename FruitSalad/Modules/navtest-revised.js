@@ -73,9 +73,6 @@ map_mesh.prototype.parse = function(data){
 
 	this.worldFaces.reverse();
 	this.build();
-	delete newLines;
-	delete sData;
-	delete data;
 }
 
 map_mesh.prototype.build = function(){
@@ -96,8 +93,6 @@ map_mesh.prototype.build = function(){
 
 		this.worldTri.push(obj);
 	}
-
-	delete this.worldFaces;
 
 	for(var i=this.worldTri.length-1; i >= 0; i--){
 		var tri = this.worldTri[i];
@@ -122,10 +117,6 @@ map_mesh.prototype.build = function(){
 				tri.nodes.push(node);
 		}
 	}
-
-	delete pointA;
-	delete pointB;
-	delete pointC;
 
 	this.getMapEdges();
 
@@ -192,9 +183,6 @@ map_mesh.prototype.getMapEdges = function(){
 		this.edges.push([ this.ewVs[a], this.ewVs[b] ]);
 	}
 
-	delete this.ewVs;
-	delete map;
-	delete tris;
 }
 
 map_mesh.prototype.processEdge = function(aS, bS, map, tris, tri, index){

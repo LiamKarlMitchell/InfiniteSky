@@ -5,12 +5,21 @@
 var fs = require('fs');
 var vm = require('vm');
 var util = require('./util');
-// var vmscript = require('./vmscript');
 
+/**
+ * NOP function
+ * @param  {buffer} data The packet data.
+ */
 function defaultPacketFunction(data) {
 
 }
 
+/**
+ * PacketCollection is our way of storing which packet id's have which structure and which function to handle them with.
+ * @param {String} PacketCollectionName Name of the collection
+ * @exports PacketCollection
+ * @example
+ * 
 // Use Set to add a packet to the collection
 // Usage:
 // var p = new PacketCollection();
@@ -44,7 +53,7 @@ function defaultPacketFunction(data) {
 // // If you don't know the function or data structure yet and just want to add it for starts so server dosnt complain.
 // p.Set(0x03,{Size: 50});
 
-// PacketCollection can watch a directory and you can pass a scope to it such as this
+ */
 function PacketCollection(PacketCollectionName) {
 	this.LastAdded = null;
 
@@ -54,10 +63,20 @@ function PacketCollection(PacketCollectionName) {
 	return this;
 };
 
+/**
+ * Gets a PacketCollection info for a PacketID.
+ * @param {Integer} id The PacketID to look up.
+ * @returns {object|null} The PacketInfo object.
+ */
 PacketCollection.prototype.Get = function(id){
 	return this.Packets[id] || null;
 }
 
+/**
+ * Sets a PacketCollection info for a PacketID.
+ * @param {Integer} id The PacketID.
+ * @param {object} id The PacketInfo object.
+ */
 PacketCollection.prototype.Set = function(id, opts){
 	var p = {ID: id, function: defaultPacketFunction};
 	
@@ -72,6 +91,10 @@ PacketCollection.prototype.Set = function(id, opts){
 	this.LastAdded = id;
 }
 
+/**
+ * Removes a packet from the collection by ID.
+ * @param {Integer} id The packetID to remove.
+ */
 PacketCollection.prototype.Remove = function(id) {
 	delete this.Packets[id];
 }

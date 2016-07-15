@@ -2,16 +2,37 @@
 // Copyright (c) InfiniteSky Dev Teams - Licensed under GNU GPL
 // For more information, see LICENCE in the main folder
 
+/**
+ * Send Chat Packet Structure.
+ * @namespace  Zone/send
+ * @type {Restruct}
+ */
 Zone.send.chat = restruct.
 int8lu('PacketID').
 string('Name', 13).
 string('Message', 51);
 
+/**
+ * Zone recv chat.
+ * Can be received on multiple packetIDs.
+ * @namespace  Zone/recv
+ * @type {Restruct}
+ * @property {String} Name - The character name maximum length 12.
+ * @property {String} Message - The message maximum length 50.
+ */
 Zone.recv.chat = restruct.
 string('Name', 13).
 string('Message', 51).
 int32lu('Unknown', 2);
 
+/**
+ * Zone recv whisper chat.
+ * @namespace  Zone/recv
+ * @type {Restruct}
+ * @property {String} Name - The sender character name maximum length 12.
+ * @property {String} NameTo - The recipent character name maximum length 12.
+ * @property {String} Message - The message maximum length 50.
+ */
 Zone.recv.whisperChat = restruct.
 string('Name', 13).
 string('NameTo', 13).
@@ -19,6 +40,11 @@ string('Message', 51).
 int32ls('Unknown1').
 int32ls('Unknown2');
 
+/**
+ * Zone send whisperStatus.
+ * @type {Restruct}
+ * @instance
+ */
 Zone.send.whisperStatus = restruct.
 int8lu('PacketID').
 string('Name', 13).
@@ -43,6 +69,14 @@ int32ls('Unknown1');
 // 		//console.log('Type: Faction Message');
 // 	}
 // });
+// 
+
+/**
+ * Sends a chat message to a socket/client object.
+ * @param  {socket} socket  
+ * @param  {String} name    The character name max length 12.
+ * @param  {String} message The message max length 50.
+ */
 ZonePC.sendMessageToSocket = function(socket,name,message) {
 	socket.write(
 		new Buffer(

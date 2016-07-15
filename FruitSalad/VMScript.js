@@ -15,6 +15,13 @@
  *    along with vmscript.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * A singleton module for virtalized script loading.
+ * Watches scripts and reloads them at runtime.
+ * @module  vmscript
+ */
+
+
 // TODO: Fix a memory leak due to 11 > listeners warning.
 
 var fs = require('fs');
@@ -28,12 +35,16 @@ var jshint = require('jshint').JSHINT;
 var clc = require('cli-color');
 var colors = {orange: clc.xterm(202), info: clc.xterm(33)};
 
+/**
+ * A utility function to console log an error exception.
+ * @param  {Exception|String} err The error/exception.
+ * @deprecated We might remove this in the future.
+ */
 function dumpError(err) {
   if (typeof err === 'object') {
     if (err.message) {
       console.error('\n\r\x1b[31;1mException: ' + err.message+'\x1b[0m\n\r');
     }
-    // console.log(new Date());
 
     // if (err.stack) {
     //   console.error('\x1b[31;1mStacktrace:\x1b[0m','\n',err.stack.split('\n').splice(1).join('\n'));
@@ -41,13 +52,16 @@ function dumpError(err) {
   } else {
     console.error('\x1b[31;1m' + err+'\x1b[0m');
   }
-  // Push to redis if required for logging etc
 }
 
 var array = {};
 var fileStats = {};
 var dependencies = {};
 
+/**
+ * VMScript Object.
+ * @constructor
+ */
 function VMScriptObj(){
 	global.vms = this.vms;
 	// global.vmscript = this;
@@ -172,7 +186,12 @@ function VMScriptObj(){
 	});
 };
 
-/* Reading the file contents and runs the code in this context. */
+/**
+ * Reads the file contents and runs it in this context using node.js's vm.
+ * This is intended to be used internally. Can parse json and js files.
+ * Runs a jshint if there is a problem loading the file.
+ * @param  {String|Path} file_path The file path.
+ */
 VMScriptObj.prototype.parse = function(file_path){
 	fs.readFile(file_path, function(err, content){
 		if(err){
@@ -241,14 +260,22 @@ VMScriptObj.prototype.parse = function(file_path){
 	});
 };
 
-/* Function to return a file name based on directory and name. */
+/**
+ * Function to return a file name based on directory and name.
+ * @param  {object} infos Infos object.
+ * @return {String}       Filename.
+ */
 function getFilename(infos){
 	var split_dir = infos.dir.split(path.sep);
 	// TODO: Consider adding a __dirname check if we wont name the file outside project directory.
 	return split_dir[split_dir.length-1] + '/' + infos.name + infos.ext.toLowerCase();
 }
 
-/* Function used to watch the file or directory for changes. */
+/** 
+ * Function used to watch the file or directory for changes.
+ * @param  {String|Path} file_path The file path.
+ * @param  {Object} opts      Options.
+ */
 VMScriptObj.prototype.watch = function(file_path, opts){
 	file_path = path.resolve(file_path);
 	if(array[file_path]) return;
@@ -399,7 +426,12 @@ VMScriptObj.prototype.on = function(name, ready){
 	}
 };
 
-/* Exposed function to global scope for registering dependencies. */
+/**
+ * Exposes function to global scope for registering dependencies.
+ * @param  {String}   name     The name of this vmscript.
+ * @param  {String|Array}   depends  Dependencies.
+ * @param  {Function} callback Call Back function to execute when dependencies are met.
+ */
 VMScriptObj.prototype.vms = function(name, depends, callback){
 	// console.log(this.file_path);
 	// console.log(name);

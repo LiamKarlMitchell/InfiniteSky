@@ -5,12 +5,14 @@ vmscript.watch('Config/network.json');
 vmscript.watch('Config/motion.json');
 vmscript.watch('Config/motion_monster.json');
 
+/** @exports Zone */
 vms('Zone', [
 			'Config/world.json',
 			'Config/network.json',
 			'Config/motion.json',
 			'Config/motion_monster.json'
 		], function() {
+
 
 global.api.zoneAlive = function(callback, client){
 	console.log("Got zone alive callback", client);
@@ -51,7 +53,7 @@ global.api.invalidateGuildForClient = function(client){
 
 	if(c.writable && c.character.state.Guild){
 		c.character.state.Guild.invalidate(c.character.state, function(guild){
-			c.write(new Buffer(Zone.send.onGuildToClient.pack({
+	                c.write(new Buffer(Zone.send.onGuildToClient.pack({
 		    PacketID: 0x54,
 		    Switch: 0x42,
 		    InvitedBy: guild.name,
@@ -126,6 +128,11 @@ global.api.reloadCharacterData = function(name){
 
 global.rpc.add(global.api);
 
+/**
+ * Zone Instance, there should only be one per child zone process.
+ * @constructor
+ * @exports ZoneInstance
+ */
 function ZoneInstance() {
 	fs = require('fs');
 	util = require('./Modules/util.js');
@@ -137,7 +144,14 @@ function ZoneInstance() {
 	nav_mesh = require('./Modules/navtest-revised.js');
 	QuadTree = require('./Modules/QuadTree.js');
 	Random = require("random-js");
+
+	/**
+	 * A seedable random engine.
+	 * @type {Random}
+	 */
 	random = new Random(Random.engines.mt19937().autoSeed());
+
+	
 	clone = require('clone');
 	bunyan = require('bunyan');
 	uuid = require('node-uuid');
@@ -146,29 +160,103 @@ function ZoneInstance() {
 	vmscript.watch('./Helper/GMCommands.js');
 
 	this.initialized = false;
+
+	/**
+	 * The packet collection for the zone server.
+	 * @type {PacketCollection}
+	 */
 	this.packetCollection = null;
+
+	/**
+	 * Socket transfer queue.
+	 * This is used for zone transfers.
+	 * @type {Object}
+	 */
 	this.socketTransferQueue = {};
+
 	this.send = {};
 	this.recv = {};
+
+	/**
+	 * The zone ID.
+	 * @type {Integer}
+	 */
 	this.id = parseInt(process.argv[2]);
+
+	/**
+	 * The zone Name if possible.
+	 * @type {String}
+	 */
 	this.name = process.argv[3];
+
+	/**
+	 * The zones display name if possible.
+	 * Configured in Config/zones.json
+	 * @type {String}
+	 */
 	this.display_name = process.argv[4] || ''+this.id;
+
+	/**
+	 * A cleaned up name of the zones display name for some reason.
+	 * @type {String}
+	 */
 	this.clean_name = this.display_name.replace(/[\s#@]/gi, '');
+
+	/**
+	 * AI Object
+	 * @todo  AI is a work in progress.
+	 * @type {Object}
+	 */
 	this.AI = null;
+
+	/**
+	 * QuadTree used to search quickly for entities.
+	 * @type {QuadTree}
+	 */
 	this.QuadTree = null;
+
+	/**
+	 * An array of clients connected to the zone.
+	 * @type {Array}
+	 */
 	this.Clients = [];
+
+	/**
+	 * An array of NPC on the zone.
+	 * @type {Array}
+	 */
 	this.Npc = [];
+
+	/**
+	 * An array of Items on the zone. (On ground)
+	 * @type {Array}
+	 */
 	this.Items = [];
+
+	/**
+	 * An array of NPC on the zone.
+	 * @type {Array}
+	 */
 	this.NpcNodesHashTable = {};
 	this.clientHashTable = {};
 	this.clientNodeTable = {};
 	this.clientNameTable = {};
 	this.itemSlotSizes = {};
 
+	/**
+	 * An array of Monsters on the zone.
+	 * @type {Array}
+	 */
 	this.Monsters = [];
+
+
 	this.UniqueID = 0;
 	this.ExpInfo = {};
 
+	/**
+	 * An instance of a bunyan logger for the zone to use.
+	 * @type {Bunyan}
+	 */
 	global.log = bunyan.createLogger({
 		name: 'InfiniteSky/Zone.' + parseInt(process.argv[2]),
 		streams: [{
@@ -176,6 +264,10 @@ function ZoneInstance() {
 		}]
 	});
 
+
+	/**
+	 * An uncaught exception handler.
+	 */
 	util.setupUncaughtExceptionHandler(function(err){ log.error(err); });
 }
 
@@ -183,6 +275,10 @@ if (!global.zonePrototype) {
 	zonePrototype = ZoneInstance.prototype;
 };
 
+/**
+ * Add an instance of an NPC to the zone.
+ * @param {Object} element Information describing the NPC.
+ */
 zonePrototype.addNPC = function(element){
 	var npc = new Npc(element);
 	npc.setNode(this.QuadTree.addNode(new QuadTree.QuadTreeNode({
@@ -583,6 +679,13 @@ zonePrototype.giveItem = function zone_giveItem(client, itemID, amount, combine,
 	client.sendInfoMessage('Pretend you got Item '+itemID);
 }
 
+/**
+ * Gives experience to the character on a client socket.
+ * This method will also handle restoring HP and Chi upon level up, sending the exp notification out
+ * and any other experience/level related things.
+ * @param  {socket} client The client socket.
+ * @param  {Integer} value  The amount of experience points to give.
+ */
 zonePrototype.giveEXP = function zone_giveEXP(client, value) {
 	if(value <= 0) return;
 	var expInfo = this.ExpInfo[client.character.Level];

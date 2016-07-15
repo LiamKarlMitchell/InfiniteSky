@@ -54,6 +54,11 @@ vms('Exp', [], function(){
 	var Exp = db.mongoose.model('exp', expSchema);
 	db.Exp = Exp;
 
+	/**
+	 * Get Experience information per level.
+	 * @param  {Integer}   level    The level to look up.
+	 * @param  {Function} callback Call back function with err and document.
+	 */
 	Exp.getByLevel = function(level, callback){
 		db.Exp.findOne({
 			Level: level

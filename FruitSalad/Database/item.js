@@ -230,17 +230,27 @@ vms('ItemInfo', [], function(){
 	delete mongoose.models['item'];
 	var ItemInfo = db.mongoose.model('item', itemSchema);
 
+	/**
+	 * Find an Items info by ID
+	 * @deprecated use findById
+	 * @param {integer} ItemID.
+	 */
 	ItemInfo.getById = function(id, callback){
 		db.Item.findOne({
 			_id: id
 		}, callback);
 	};
 
-	ItemInfo.findById = function(id, callback){
+	/**
+	 * Find an Items info by ID
+	 * @param {integer} ItemID.
+	 */
+	ItemInfo.findById = function findById(id, callback){
 		db.Item.findOne({
 			_id: id
 		}, callback);
 	};
 
+	/** @constructor */
 	db.Item = ItemInfo;
 });

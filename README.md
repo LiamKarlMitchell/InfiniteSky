@@ -46,6 +46,9 @@ node-debug main
 Installation
 --------------
 
+Please Note: These Instructions are very out of date.
+Contact us for more information on how to develop on this project.
+
 [Video Guide](http://youtu.be/WH32P1i5DrQ)
 I will make another video when I can as this one has poor quality.
 

@@ -1,6 +1,12 @@
+
+/**
+ * DamageDealer is something that can be by client and monster.
+ * @param {socket} client The client socket.
+ */
 function DamageDealer(client){
   this.client = client;
 }
+
 
 DamageDealer.prototype.attack = function(t){
   var tState = null;

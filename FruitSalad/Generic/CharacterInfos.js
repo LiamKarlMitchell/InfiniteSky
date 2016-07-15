@@ -1,4 +1,3 @@
-
 // This file is part of InfiniteSky.
 // Copyright (c) InfiniteSky Dev Teams - Licensed under GNU GPL
 // For more information, see LICENCE in the main folder
@@ -39,6 +38,11 @@
 var uuid = require('node-uuid');
 
 var Modifiers = [];
+
+/**
+ * The base stat modifiers for Guanyin clan.
+ * @type {Object}
+ */
 var GuanyinModifiers = {
   HP: 15.31,
   Chi: 20,
@@ -52,6 +56,10 @@ var GuanyinModifiers = {
   ]
 };
 
+/**
+ * The base stat modifiers for Funin clan.
+ * @type {Object}
+ */
 var FujinModifiers = {
   HP: 14.29,
   Chi: 17.14,
@@ -65,6 +73,10 @@ var FujinModifiers = {
   ]
 };
 
+/**
+ * The base stat modifiers for Jinong clan.
+ * @type {Object}
+ */
 var JinongModifiers = {
   HP: 16.33,
   Chi: 22.29,
@@ -83,9 +95,16 @@ Modifiers.push(FujinModifiers);
 Modifiers.push(JinongModifiers);
 
 
+/**
+ * This object just stores calculation functions for use by CharacterInfos::update.
+ * @type {Object}
+ */
 var calculation = {};
 
-calculation.Damage = function(item, item, done){
+/** 
+ * Calculates character Damage.
+ */
+calculation.Damage = function(itemInfo, item, done){
   // Damage is missed by 1, some calculations are Math.floor'ed.
   this.Damage = this.ExpInfo.Damage[this.Clan] * 2;
   this.Damage += Math.floor(this.character.Stat_Strength * this.Weapon.Mod);
@@ -100,7 +119,10 @@ calculation.Damage = function(item, item, done){
   done();
 };
 
-calculation.Defense = function(item, item, done){
+/** 
+ * Calculates character Defense.
+ */
+calculation.Defense = function(itemInfo, item, done){
   // Damage is missed by 1, some calculations are Math.floor'ed.
   this.Defense = this.ExpInfo.Defense[this.Clan];
   this.Defense += this.Outfit.Defense;
@@ -119,15 +141,18 @@ calculation.Defense = function(item, item, done){
   done();
 };
 
-calculation.Cape = function(item, item, done){
-  switch(typeof item){
+/** 
+ * Applies characters Cape into the CharacterInfo stats.
+ */
+calculation.Cape = function(itemInfo, item, done){
+  switch(typeof itemInfo){
     case 'object':
-    this.Cape.Defense = item.Defense;
-    this.Cape.ElementalDefense = item.ElementalDefense;
-    this.Cape.Mastery = this.getMasteryBonuses(item);
-    this.Cape.AllMastery = item.IncreaseAllSkillMastery;
-    this.Cape.DecreasedChiConsumption = item.DecreaseChiConsumption;
-    this.Cape.DodgeDeadlyBlow = item.DodgeDeadlyBlow;
+    this.Cape.Defense = itemInfo.Defense;
+    this.Cape.ElementalDefense = itemInfo.ElementalDefense;
+    this.Cape.Mastery = this.getMasteryBonuses(itemInfo);
+    this.Cape.AllMastery = itemInfo.IncreaseAllSkillMastery;
+    this.Cape.DecreasedChiConsumption = itemInfo.DecreaseChiConsumption;
+    this.Cape.DodgeDeadlyBlow = itemInfo.DodgeDeadlyBlow;
     break;
 
     default:
@@ -147,6 +172,9 @@ calculation.Cape = function(item, item, done){
   this.update(['DodgeRate', 'Luck', 'Mastery', 'ElementalDefense', 'Defense', 'DodgeDeadlyBlow'], done);
 };
 
+/** 
+ * Applies characters Outfit into the CharacterInfo stats.
+ */
 calculation.Outfit = function(itemInfo, item, done){
   console.log('In calculation.outfit');
   console.log('typeof iteminfo: ' +( typeof itemInfo));
@@ -187,6 +215,9 @@ calculation.Outfit = function(itemInfo, item, done){
   this.update(['DodgeRate', 'Luck', 'Mastery', 'ElementalDefense', 'Defense', 'MaxHP'], done);
 };
 
+/** 
+ * Applies characters Weapon into the CharacterInfo stats.
+ */
 calculation.Weapon = function(itemInfo, item, done){
   switch(typeof item){
     case 'object':
@@ -225,6 +256,9 @@ calculation.Weapon = function(itemInfo, item, done){
   this.update(['Damage', 'HitRate', 'ElementalDamage', 'Mastery'], done);
 };
 
+/** 
+ * Applies characters HitRate into the CharacterInfo stats.
+ */
 calculation.HitRate = function(itemInfo, item, done){
   this.HitRate = Math.floor(this.Modifiers.HitRate * this.character.Stat_Dexterity);
   this.HitRate += this.Gloves.HitRate;
@@ -235,6 +269,9 @@ calculation.HitRate = function(itemInfo, item, done){
   done();
 };
 
+/** 
+ * Applies characters Boots into the CharacterInfo stats.
+ */
 calculation.Boots = function(itemInfo, item, done){
   switch(typeof item){
     case 'object':
@@ -263,6 +300,9 @@ calculation.Boots = function(itemInfo, item, done){
   this.update(['DodgeRate', 'Luck', 'Defense', 'Mastery'], done);
 };
 
+/** 
+ * Applies characters Gloves into the CharacterInfo stats.
+ */
 calculation.Gloves = function(itemInfo, item, done){
   switch(typeof item){
     case 'object':
@@ -291,6 +331,9 @@ calculation.Gloves = function(itemInfo, item, done){
   this.update(['HitRate', 'Luck', 'Defense', 'Mastery'], done);
 };
 
+/** 
+ * Applies characters Luck into the CharacterInfo stats.
+ */
 calculation.Luck = function(itemInfo, item, done){
   this.Luck = this.Outfit.Luck;
   this.Luck += this.Boots.Luck;
@@ -301,10 +344,17 @@ calculation.Luck = function(itemInfo, item, done){
   done();
 };
 
+/** 
+ * Applies characters DeadlyRate into the CharacterInfo stats.
+ * @todo Check this implementation.
+ */
 calculation.DeadlyRate = function(itemInfo, item, done){
   done();
 };
 
+/** 
+ * Applies characters DodgeRate into the CharacterInfo stats.
+ */
 calculation.DodgeRate = function(itemInfo, item, done){
   this.DodgeRate = this.ExpInfo.Dodge[this.Clan];
   this.DodgeRate += Math.floor(this.Modifiers.Dodge * this.character.Stat_Dexterity);
@@ -321,6 +371,9 @@ calculation.DodgeRate = function(itemInfo, item, done){
   done();
 };
 
+/** 
+ * Applies characters ElementalDamage into the CharacterInfo stats.
+ */
 calculation.ElementalDamage = function(itemInfo, item, done){
   this.ElementalDamage = this.ExpInfo.ElementalDamage[this.Clan];
   this.ElementalDamage += this.Weapon.ElementalDamage;
@@ -330,6 +383,9 @@ calculation.ElementalDamage = function(itemInfo, item, done){
   done();
 };
 
+/** 
+ * Applies characters Mastery into the CharacterInfo stats.
+ */
 calculation.Mastery = function(itemInfo, item, done){
   this.SkillMastery = {};
   this.AllSkillsMastery = 0;
@@ -346,6 +402,9 @@ calculation.Mastery = function(itemInfo, item, done){
   done();
 };
 
+/** 
+ * Applies characters MaxHP into the CharacterInfo stats.
+ */
 calculation.MaxHP = function(itemInfo, item, done){
   this.MaxHP = this.ExpInfo.BaseHP[this.Clan];
   this.MaxHP += Math.floor((this.character.Stat_Vitality + this.Outfit.Vitality) * this.Modifiers.HP);
@@ -359,6 +418,9 @@ calculation.MaxHP = function(itemInfo, item, done){
   done();
 };
 
+/** 
+ * Applies characters MaxChi into the CharacterInfo stats.
+ */
 calculation.MaxChi = function(itemInfo, item, done){
   this.MaxChi = this.ExpInfo.BaseChi[this.Clan];
   this.MaxChi += Math.floor(
@@ -368,6 +430,10 @@ calculation.MaxChi = function(itemInfo, item, done){
   done();
 };
 
+/** 
+ * Applies characters ElementalDefense into the CharacterInfo stats.
+ * @todo  Pet adding elemental defense.
+ */
 calculation.ElementalDefense = function(itemInfo, item, done){
   this.ElementalDefense[0] = this.Outfit.ElementalDefense[0];
   this.ElementalDefense[1] = this.Outfit.ElementalDefense[1];
@@ -389,10 +455,17 @@ calculation.ElementalDefense = function(itemInfo, item, done){
   done();
 };
 
+/** 
+ * Applies characters DodgeDeadlyBlow into the CharacterInfo stats.
+ * @todo Check this implementation.
+ */
 calculation.DodgeDeadlyBlow = function(itemInfo, item, done){
   done();
 };
 
+/** 
+ * Applies characters Ring into the CharacterInfo stats.
+ */
 calculation.Ring = function(itemInfo, item, done){
   switch(typeof item){
     case 'object':
@@ -417,6 +490,9 @@ calculation.Ring = function(itemInfo, item, done){
   this.update(['DeadlyRate', 'DodgeRate', 'HitRate', 'Luck', 'ElementalDamage', 'Mastery'], done);
 };
 
+/** 
+ * Applies Amulet Cape into the CharacterInfo stats.
+ */
 calculation.Amulet = function(itemInfo, item, done){
   switch(typeof item){
     case 'object':
@@ -439,6 +515,9 @@ calculation.Amulet = function(itemInfo, item, done){
   this.update(['MaxChi', 'Luck', 'ElementalDefense', 'Mastery'], done);
 };
 
+/** 
+ * Applies characters Pet into the CharacterInfo stats.
+ */
 calculation.Pet = function(itemInfo, item, done){
   switch(typeof item){
     case 'object':
@@ -485,7 +564,13 @@ calculation.Pet = function(itemInfo, item, done){
   this.update(['MaxHP', 'Damage', 'Defense', 'Mastery', 'DodgeRate', 'HitRate', 'ElementalDamage', 'ElementalDefense'], done);
 };
 
-vms('CharacterInfo', [], function(){
+//vms('CharacterInfo', [], function(){
+
+  /**
+   * A class to help calculate all of the stats for a Character.
+   * @constructor
+   * @param {socket} client A client socket.
+   */
   function CharacterInfos(client){
     this.character = client.character;
     this.Clan = client.character.Clan;
@@ -497,27 +582,58 @@ vms('CharacterInfo', [], function(){
       return;
     }
 
+    /** The maximum Health the character can have. */
     this.MaxHP = 0;
+
+    /** The maximum Chi the character can have. */
     this.MaxChi = 0;
+
+    /** The Damage the character does. */
     this.Damage = 0;
+
+    /** The Defense the character has. */
     this.Defense  = 0;
+
+    /** The DodgeRate the character has. */
     this.DodgeRate = 0;
+
+    /** The HitRate the character has. */
     this.HitRate  = 0;
+
+    /** The ElementalDamage the character has. */
     this.ElementalDamage = 0;
+
+    /** The ElementalDefenses the character has.
+     * Array has 3 indexes. Light, Shadow and Dark.
+     */
     this.ElementalDefense = [
       0,  // Light
       0,  // Shadow
       0   // Dark
     ];
 
+    /** The SkillMastery the character has. */
     this.SkillMastery = {};
+
+    /** The AllSkillsMastery value the character has. */
     this.AllSkillsMastery = 0;
+
+    /** The Chance to Return Damage that the character has. */
     this.Chance_ReturnDamage = 0;
+
+    /** The DeadlyBlow the character has. */
     this.Chance_DeadlyBlow = 0;
+
+    /** The AcupressureDefense the character has. */
     this.AcupressureDefense = 0;
+
+    /** The Chance of Acupressure the character has. */
     this.Chance_Acupressure = 0;
+
+    /** The Luck the character has. */
     this.Luck = 0;
 
+    /** Stats for the Characters Weapon. */
     this.Weapon = {
       Damage: 0,
       Mod: this.Modifiers.Damage[0],
@@ -527,6 +643,7 @@ vms('CharacterInfo', [], function(){
       AllMastery: 0
     };
 
+    /** Stats for the Characters Outfit. */
     this.Outfit = {
       Vitality: 0,
       Defense: 0,
@@ -541,6 +658,7 @@ vms('CharacterInfo', [], function(){
       AllSkills: 0
     };
 
+    /** Stats for the Characters Cape. */
     this.Cape = {
       Defense: 0,
       DodgeDeadlyBlow: 0,
@@ -554,6 +672,7 @@ vms('CharacterInfo', [], function(){
       AllMastery: 0
     };
 
+    /** Stats from the Characters Boots. */
     this.Boots = {
       Defense: 0,
       DodgeRate: 0,
@@ -561,6 +680,7 @@ vms('CharacterInfo', [], function(){
       Mastery: {}
     };
 
+    /** Stats from the Characters Gloves. */
     this.Gloves = {
       Defense: 0,
       HitRate: 0,
@@ -568,6 +688,7 @@ vms('CharacterInfo', [], function(){
       Mastery: {}
     };
 
+    /** Stats from the Characters Ring. */
     this.Ring = {
       Dexterity: 0,
       ElementalDamage: 0,
@@ -577,6 +698,7 @@ vms('CharacterInfo', [], function(){
       AllMastery: 0
     };
 
+    /** Stats from the Characters Amulet. */
     this.Amulet = {
       Chi: 0,
       ElementalDefense: [
@@ -589,6 +711,7 @@ vms('CharacterInfo', [], function(){
       AllMastery: 0
     };
 
+    /** Stats from the Characters pet. */
     this.Pet = {
       HP: 0,
       Chi: 0,
@@ -603,9 +726,17 @@ vms('CharacterInfo', [], function(){
       Scale: 0
     };
 
+    /**
+     * An internal object for handling the recursion that may happen on this object.
+     * @type {Object}
+     */
     this.updateCalls = {};
   }
 
+  /**
+   * Concatenates the Skill Masterys that the character has together.
+   * @param  {object} obj
+   */
   CharacterInfos.prototype.concatMastery = function(obj){
     for(var skillID in obj.Mastery)
       if(this.SkillMastery[skillID] === undefined)
@@ -616,6 +747,11 @@ vms('CharacterInfo', [], function(){
       if(obj.AllMastery) this.AllSkillsMastery += obj.AllMastery;
   };
 
+  /**
+   * Gets the Mastery Bonuses from an item.
+   * @param  {object} item The item to get the Mastery Bonuses from.
+   * @return {object}
+   */
   CharacterInfos.prototype.getMasteryBonuses = function(item){
     var result = {};
     if(item.Mastery1) result[item.Mastery1] = item.Mastery1_Amount;
@@ -624,6 +760,12 @@ vms('CharacterInfo', [], function(){
     return result;
   };
 
+  /**
+   * Updates the stats on the character info.
+   * This method may be called recursively by its self.
+   * @param  {String|Array} n A string of the type to update or an array of strings.
+   * @param  {Function} oncalc_callback
+   */
   CharacterInfos.prototype.update = function infos_Update(n, oncalc_callback){
     var names = [];
     if(typeof n === 'string') names.push(n); else names = n;
@@ -650,6 +792,15 @@ vms('CharacterInfo', [], function(){
   };
 
 
+  /**
+   * This method is for handling the response from the database when looking up an item during the method updateAfterExpInfo{@link updateAfterExpInfo}.
+   * @param  {Function}   uFunc       The calculation function to execute.
+   * @param  {object}   charObjItem The object on Character.
+   * @param  {Function} callback    The callback to execute when uFunc is finished.
+   * @param  {String}   err         An error message or null from the database lookup of ItemID.
+   * @param  {object}   itemInfo    The item info object returned from the database.
+   * @memberOf  CharacterInfos
+   */
   function updateAfterExpInfo_handleItemLookup(uFunc, charObjItem, callback, err, itemInfo) {
     if (err) {
       console.log("Error occoured on item info", charObjItem);
@@ -664,6 +815,11 @@ vms('CharacterInfo', [], function(){
     uFunc.call(this, itemInfo, charObjItem, callback);
   };
 
+  /**
+   * Updates after the ExpInfo has been looked up.
+   * @param  {Array} n               An array of calculations to preform an update for.
+   * @param  {Function} oncalc_callback The callback to call when done all calculations.
+   */
   CharacterInfos.prototype.updateAfterExpInfo = function infos_UpdateAfterExpInfo(n, oncalc_callback) {
     var id = uuid.v4();
 
@@ -712,11 +868,19 @@ vms('CharacterInfo', [], function(){
   };
 
 
+  /**
+   * Updates all character calculations.
+   * @param  {Function} onready_callback The function to call when done.
+   */
   CharacterInfos.prototype.updateAll = function infos_UpdateAll(onready_callback){
     var equipment = ['Weapon', 'Outfit', 'Gloves', 'Cape', 'Ring', 'Amulet', 'Boots'];
     this.update(equipment, onready_callback);
   };
 
+  /**
+   * A simple console logging debug function.
+   * @deprecated We will likely remove this in the future.
+   */
   CharacterInfos.prototype.print = function(){
     console.log("Character Infos:");
     console.log("MaxHP:", this.MaxHP);
@@ -736,5 +900,9 @@ vms('CharacterInfo', [], function(){
     console.log("Luck:", this.Luck);
   };
 
+  /**
+   * Constructor is exported into global.
+   * @type {CharacterInfos}
+   */
   global.CharacterInfos = CharacterInfos;
-});
+//});

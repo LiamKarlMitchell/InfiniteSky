@@ -2,266 +2,435 @@
 
 <html lang="en">
 <head>
-	<meta charset="utf-8">
-	<title>DocStrap Source: main.js</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=yes, width=device-width">
+  <title>InfiniteSky — Source: main.js</title>
+  <link rel="shortcut icon" href="/favicon.ico">
 
-	<!--[if lt IE 9]>
-	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-	<![endif]-->
-	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+  <!--[if lt IE 9]>
+  <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link type="text/css" rel="stylesheet" href="styles/sunlight.dark.css">
 
-	<link type="text/css" rel="stylesheet" href="styles/site.cosmo.css">
-
+  <link type="text/css" rel="stylesheet" href="styles/site.oblivion.css">
 </head>
-
 <body>
 <div class="container-fluid">
-	<div class="navbar navbar-fixed-top navbar-inverse">
-		<div class="navbar-inner">
-			<a class="brand" href="index.html">DocStrap</a>
-			<ul class="nav">
-				
-				<li class="dropdown">
-					<a href="namespaces.list.html" class="dropdown-toggle" data-toggle="dropdown">Namespaces<b
-						class="caret"></b></a>
+  <div class="navbar navbar-fixed-top navbar-inverse">
+    <div class="navbar-inner">
+      <a class="brand" href="index.html">InfiniteSky</a>
+      <ul class="nav">
+        
+        <li class="dropdown">
+          <a href="namespaces.list.html" class="dropdown-toggle" data-toggle="dropdown">Namespaces<b
+            class="caret"></b></a>
 
-					<ul class="dropdown-menu ">
-						
-						<li>
-							<a href="NangiTrack.html">NangiTrack</a>
-						</li>
-						
+          <ul class="dropdown-menu ">
+            
+            <li>
+              <a href="Zone_recv.html">Zone/recv</a>
+            </li>
+            
+            <li>
+              <a href="Zone_send.html">Zone/send</a>
+            </li>
+            
 
-					</ul>
-				</li>
-				
-				<li class="dropdown">
-					<a href="modules.list.html" class="dropdown-toggle" data-toggle="dropdown">Modules<b
-						class="caret"></b></a>
+          </ul>
+        </li>
+        
+        <li class="dropdown">
+          <a href="modules.list.html" class="dropdown-toggle" data-toggle="dropdown">Modules<b
+            class="caret"></b></a>
 
-					<ul class="dropdown-menu ">
-						
-						<li>
-							<a href="ChildProcessHost.html">Helper/ChildProcessHost</a>
-						</li>
-						
-						<li>
-							<a href="module-vmscript.html">vmscript</a>
-						</li>
-						
+          <ul class="dropdown-menu ">
+            
+            <li>
+              <a href="module-Helper_ChildProcessHost.html">Helper/ChildProcessHost</a>
+            </li>
+            
+            <li>
+              <a href="module-LoginInstance.html">LoginInstance</a>
+            </li>
+            
+            <li>
+              <a href="module-PacketCollection.html">PacketCollection</a>
+            </li>
+            
+            <li>
+              <a href="module-Restruct.html">Restruct</a>
+            </li>
+            
+            <li>
+              <a href="module-vmscript.html">vmscript</a>
+            </li>
+            
+            <li>
+              <a href="module-ZoneInstance.html">ZoneInstance</a>
+            </li>
+            
 
-					</ul>
-				</li>
-				
-				<li class="dropdown">
-					<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b
-						class="caret"></b></a>
+          </ul>
+        </li>
+        
+        <li class="dropdown">
+          <a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b
+            class="caret"></b></a>
 
-					<ul class="dropdown-menu ">
-						
-						<li>
-							<a href="Book.html">Book</a>
-						</li>
-						
-						<li>
-							<a href="Command.html">Command</a>
-						</li>
-						
-						<li>
-							<a href="ChildProcessHost-ChildProcessHost.html">Helper/ChildProcessHost~ChildProcessHost</a>
-						</li>
-						
+          <ul class="dropdown-menu ">
+            
+            <li>
+              <a href="CharacterInfos.html">CharacterInfos</a>
+            </li>
+            
+            <li>
+              <a href="Command.html">Command</a>
+            </li>
+            
+            <li>
+              <a href="CVec3.html">CVec3</a>
+            </li>
+            
+            <li>
+              <a href="db.Item.html">db.Item</a>
+            </li>
+            
+            <li>
+              <a href="module-Helper_ChildProcessHost-ChildProcessHost.html">Helper/ChildProcessHost~ChildProcessHost</a>
+            </li>
+            
+            <li>
+              <a href="module-vmscript-VMScriptObj.html">vmscript~VMScriptObj</a>
+            </li>
+            
 
-					</ul>
-				</li>
-				
-				<li class="dropdown">
-					<a href="tutorials.list.html" class="dropdown-toggle" data-toggle="dropdown">Tutorials<b
-						class="caret"></b></a>
+          </ul>
+        </li>
+        
+        <li class="dropdown">
+          <a href="mixins.list.html" class="dropdown-toggle" data-toggle="dropdown">Mixins<b
+            class="caret"></b></a>
 
-					<ul class="dropdown-menu ">
-						
-						<li>
-							<a href="tutorial-command_.html">command</a>
-						</li>
-						
+          <ul class="dropdown-menu ">
+            
+            <li>
+              <a href="-_anonymous_-structs.CVec3.html"><anonymous>~structs.CVec3</a>
+            </li>
+            
 
-					</ul>
-				</li>
-				
-			</ul>
-		</div>
-	</div>
+          </ul>
+        </li>
+        
+        <li class="dropdown">
+          <a href="tutorials.list.html" class="dropdown-toggle" data-toggle="dropdown">Tutorials<b
+            class="caret"></b></a>
 
-	<div class="row-fluid">
+          <ul class="dropdown-menu ">
+            
+            <li>
+              <a href="tutorial-command_.html">command</a>
+            </li>
+            
+            <li>
+              <a href="tutorial-Project Layout.html">Project Layout</a>
+            </li>
+            
 
-		
-			<div class="span12">
-				
-				<div id="main">
-					
+          </ul>
+        </li>
+        
+        <li class="dropdown">
+          <a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b
+            class="caret"></b></a>
+
+          <ul class="dropdown-menu ">
+            
+            <li>
+              <a href="global.html#autocomplete">autocomplete</a>
+            </li>
+            
+            <li>
+              <a href="global.html#calculation">calculation</a>
+            </li>
+            
+            <li>
+              <a href="global.html#DamageDealer">DamageDealer</a>
+            </li>
+            
+            <li>
+              <a href="global.html#defaultPacketFunction">defaultPacketFunction</a>
+            </li>
+            
+            <li>
+              <a href="global.html#deg2rad">deg2rad</a>
+            </li>
+            
+            <li>
+              <a href="global.html#FujinModifiers">FujinModifiers</a>
+            </li>
+            
+            <li>
+              <a href="global.html#GuanyinModifiers">GuanyinModifiers</a>
+            </li>
+            
+            <li>
+              <a href="global.html#JinongModifiers">JinongModifiers</a>
+            </li>
+            
+            <li>
+              <a href="global.html#NanginTrack_Countdown">NanginTrack_Countdown</a>
+            </li>
+            
+            <li>
+              <a href="global.html#NanginTrack_Finished">NanginTrack_Finished</a>
+            </li>
+            
+            <li>
+              <a href="global.html#NanginTrack_Init">NanginTrack_Init</a>
+            </li>
+            
+            <li>
+              <a href="global.html#NanginTrack_onLoad">NanginTrack_onLoad</a>
+            </li>
+            
+            <li>
+              <a href="global.html#NanginTrack_Start">NanginTrack_Start</a>
+            </li>
+            
+            <li>
+              <a href="global.html#ObjectId">ObjectId</a>
+            </li>
+            
+            <li>
+              <a href="global.html#rad2deg">rad2deg</a>
+            </li>
+            
+
+          </ul>
+        </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  <div class="row-fluid">
+
+    
+
+    
+      <div class="span12">
+        
+        <div id="main">
+          
 
 
 		<h1 class="page-title">Source: main.js</h1>
     
 <section>
-	<article>
-		<pre
-			class="sunlight-highlight-javascript linenums">// var winston = require('winston');
+  <article>
+    <pre
+      class="sunlight-highlight-javascript linenums">global.rpc = new (require('./Modules/rpc.js'))();
+global.rpc.topLevel = true; // This must be done for the very first process only so that child processes stdout which we piped to stderr goes to stdout of this process.
+bunyan = require('bunyan');
+log = bunyan.createLogger({name: 'InfiniteSky'});
 
-// var config = {};
+// winston.profile('Startup');
+path = require('path');
+var util = require('./Modules/util.js');
 
-// if (config.logFile) {
-// 	winston.add(winston.transports.File, { filename: config.logFile })
+// var startTime = new Date().getTime();
+// util.setupUncaughtExceptionHandler();
+util.outputHeaderText();
+
+// var ChildSpawner = require('./Helper/ChildSpawner.js');
+// var spawner = new ChildSpawner.Spawner({});
+
+//var repl = require("repl");
+var vm = require('vm');
+
+// Prevent the following warning about possible memory leak with the EventEmitters.
+// (node) warning: possible EventEmitter memory leak detected. 11 listeners added. Use emitter.setMaxListeners() to increase limit.
+// process.setMaxListeners(0);
+
+// spawner.spawnChild({name: 'Login', script: 'Processes/Login/Login.js'});
+// spawner.spawnChild({name: 'World', script: 'Processes/World/World.js'});
+// TODO Check existance of configs / have defaults?
+var children = require('./Config/processes.json');
+
+global.api = {};
+
+// NOTE: Anything after second param is consider as arguments called on function name.
+/**
+ * Calls a function on a child process by name.
+ * @param  {string}
+ * @param  {string} The function name to call
+ */
+global.api.call = function(process_name, fn){
+	// console.log("Calling function");
+	var p = global.rpc.children[process_name];
+	// TODO: Comment what this does behind the scenes.
+	if(p &amp;&amp; p.api[fn]){
+		// console.log(fn,"Calling", process_name);
+		var args = [];
+		for(var i=2; i&lt;arguments.length; i++){
+			args.push(arguments[i]);
+		}
+		p.api[fn].apply(global.rpc, args);
+	}
+};
+// global.api.test = function(){
+// 	console.log("calling test from child process");
 // }
 
-// // For information on Winston please see https://github.com/winstonjs/winston
-// winston.profile('Startup');
-// winston.info('Starting InfiniteSky', { datetime: new Date() });
-
-// //
-// // Configure CLI output on the default logger
-// //
-// winston.cli();
-
-
-
-// //
-// // Handle errors
-// //
-// // logger.on('error', function (err) { /* Do Something */ });
-
-
-/**
- * Represents a book.
- * @constructor
- */
-function Book(title, author) {
+for(var child in children){
+	global.rpc.join(children[child] , './Processes/process.js');
 }
 
-// winston.profile('Startup');
+global.rpc.on('invalidated', function(child){
+	if(!global.rpc.children[child].spawned){
+		global.rpc.children[child].api.spawnScript(children[child].script);
+		global.rpc.children[child].spawned = true;
+	}
+	global.rpc.add(global.api); // Need to have these children pipe stderr to stdout and stdout to stdout. They does xd
+});
 
-var ChildSpawner = require('./Helper/ChildSpawner.js');
-var spawner = new ChildSpawner.Spawner({});
-
-var readline = require('readline'),
-    rl = readline.createInterface(process.stdin, process.stdout);
-
-
-
-spawner.spawnChild({name: 'Login', script: 'Processes\\Login\\Login.js'});
-spawner.spawnChild({name: 'World', script: 'Processes\\World\\World.js'});
+// rpc.join('Login', 'Processes/Login/Login.js');
+// rpc.join('World', 'Processes/World/World.js');
 
 
-spawner.onReady(function(){
-	rl.setPrompt('> ');
-	rl.prompt();
+// TODO: Get this sorted, commit uncommented lines only when its ready and bugless.
 
-	rl.on('line', function(line) {
-	 	console.log(line.trim());
-		rl.prompt();
-	}).on('close', function() {
-		process.exit(0);
-	});
-});</pre>
-	</article>
+// vmscript = require('./VMScript.js');
+//
+// global.config = {};
+//
+// var v = new vmscript();
+// v.watch('Config/login.json');
+
+// spawner.onReady(function(){
+// 	console.log("Server loaded in", (new Date().getTime() - startTime), "ms");
+// });
+
+// repl_context = repl.start({
+// 	  prompt: "main> ",
+// 	  input: process.stdin,
+// 	  output: process.stdout
+// }).context;
+
+// // Expose things to the repl.
+// repl_context.vmscript = v;
+// repl_context.spawner = spawner;
+// repl_context.api = spawner.api;
+
+// // A function we can call once at runtime to grant REPL access to the database.
+// // It will load the scripts in the Database directory.
+// repl_context.loadDB = function loadDB() {
+// 	if (global.db !== undefined) {
+// 		return;
+// 	}
+// 	var Database = require('./Modules/db.js');
+// 	repl_context.db = Database(config.login.database.connection_string, function(){
+// 		console.log("Database connected @", config.login.database.connection_string);
+// 		v.watch('Database');
+// 	});
+// };
+</pre>
+  </article>
 </section>
 
 
 
 
 
-				</div>
+        </div>
 
-				<div class="clearfix"></div>
-				<footer>
-					
-					
-		<span class="copyright">
-		DocStrap Copyright © 2012-2014 The contributors to the JSDoc3 and DocStrap projects.
-		</span>
-					<br />
-					
-		<span class="jsdoc-message">
-		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a>
-		on Tue May 19th 2015 using the <a
-			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
-		</span>
-				</footer>
-			</div>
+        <div class="clearfix"></div>
+        <footer>
+          
+          
+    <span class="copyright">
+    The contributors to the InfiniteSky project.
+    </span>
+          <br />
+          
+    <span class="jsdoc-message">
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc" target="_blank">JSDoc 3.4.0</a>
+    on Fri Jul 15th 2016
+    </span>
+        </footer>
+      </div>
 
-			
-			<br clear="both">
-		</div>
+      <br clear="both">
+    </div>
 
-	</div>
-	<!--<script src="scripts/sunlight.js"></script>-->
-	<script src="scripts/docstrap.lib.js"></script>
-	<script src="scripts/bootstrap-dropdown.js"></script>
-	<script src="scripts/toc.js"></script>
+  </div>
+  <!--<script src="scripts/sunlight.js"></script>-->
+  <script src="scripts/docstrap.lib.js"></script>
+  <script src="scripts/bootstrap-dropdown.js"></script>
+  <script src="scripts/toc.js"></script>
 
-	<script>
-		$( function () {
-			$( "[id*='$']" ).each( function () {
-				var $this = $( this );
+  <script>
+    $( function () {
+      $( "[id*='$']" ).each( function () {
+        var $this = $( this );
 
-				$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
-			} );
+        $this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+      } );
 
-			$( "#toc" ).toc( {
-				anchorName  : function ( i, heading, prefix ) {
-					return $( heading ).attr( "id" ) || ( prefix + i );
-				},
-				selectors   : "h1,h2,h3,h4",
-				showAndHide : false,
-				scrollTo    : "100px"
-			} );
+      $( "#toc" ).toc( {
+        anchorName  : function ( i, heading, prefix ) {
+          return $( heading ).attr( "id" ) || ( prefix + i );
+        },
+        selectors   : "h1,h2,h3,h4",
+        showAndHide : false,
+        scrollTo    : "100px"
+      } );
 
-			$( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
-			$( "#main span[id^='toc']" ).addClass( "toc-shim" );
-			$( '.dropdown-toggle' ).dropdown();
-//			$( ".tutorial-section pre, .readme-section pre" ).addClass( "sunlight-highlight-javascript" ).addClass( "linenums" );
+      $( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
+      $( "#main span[id^='toc']" ).addClass( "toc-shim" );
+      $( '.dropdown-toggle' ).dropdown();
+//      $( ".tutorial-section pre, .readme-section pre" ).addClass( "sunlight-highlight-javascript" ).addClass( "linenums" );
 
-			$( ".tutorial-section pre, .readme-section pre" ).each( function () {
-				var $this = $( this );
+      $( ".tutorial-section pre, .readme-section pre" ).each( function () {
+        var $this = $( this );
 
-				var example = $this.find( "code" );
-				exampleText = example.html();
-				var lang = /{@lang (.*?)}/.exec( exampleText );
-				if ( lang && lang[1] ) {
-					exampleText = exampleText.replace( lang[0], "" );
-					example.html( exampleText );
-					lang = lang[1];
-				} else {
-					lang = "javascript";
-				}
+        var example = $this.find( "code" );
+        exampleText = example.html();
+        var lang = /{@lang (.*?)}/.exec( exampleText );
+        if ( lang && lang[1] ) {
+          exampleText = exampleText.replace( lang[0], "" );
+          example.html( exampleText );
+          lang = lang[1];
+        } else {
+          lang = "javascript";
+        }
 
-				if ( lang ) {
+        if ( lang ) {
 
-					$this
-						.addClass( "sunlight-highlight-" + lang )
-						.addClass( "linenums" )
-						.html( example.html() );
+          $this
+            .addClass( "sunlight-highlight-" + lang )
+            .addClass( "linenums" )
+            .html( example.html() );
 
-				}
-			} );
+        }
+      } );
 
-			Sunlight.highlightAll( {
-				lineNumbers : true,
-				showMenu : true,
-				enableDoclinks : true
-			} );
-		} );
-	 </script>
+      Sunlight.highlightAll( {
+        lineNumbers : true,
+        showMenu : true,
+        enableDoclinks : true
+      } );
+    } );
+   </script>
 
 
 
-	<!--Navigation and Symbol Display-->
-	
+  <!--Navigation and Symbol Display-->
+  
 
 
-	<!--Google Analytics-->
-	
+  <!--Google Analytics-->
+  
 
 </body>
 </html>

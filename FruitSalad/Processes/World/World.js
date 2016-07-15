@@ -265,6 +265,12 @@ vms('World Server', [
 	'Config/zones.json',
 	'Config/login.json'
 ], function(){
+
+	/**
+	 * World Server
+	 * @exports Processes/World
+	 */
+	
 	if(global.World === undefined){
 		global.World = new WorldInstance();
 	}else{

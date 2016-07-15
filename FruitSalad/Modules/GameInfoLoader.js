@@ -80,7 +80,6 @@ GameInfoLoader.prototype.load = function(filename, structure, onRecordFunction) 
 				queue.push({ index: i, data: data.slice(pos,pos+self.InfoStruct.size) });
 				pos+=self.InfoStruct.size;
 			}
-			delete data;
 
 			queue.pause();
 

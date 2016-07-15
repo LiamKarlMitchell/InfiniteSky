@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=yes, width=device-width">
+  <title>InfiniteSky — Source: Processes/Zone/Scripts/NanginTrack/NanginTrack.js</title>
+  <link rel="shortcut icon" href="/favicon.ico">
+
+  <!--[if lt IE 9]>
+  <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link type="text/css" rel="stylesheet" href="styles/sunlight.dark.css">
+
+  <link type="text/css" rel="stylesheet" href="styles/site.oblivion.css">
+</head>
+<body>
+<div class="container-fluid">
+  <div class="navbar navbar-fixed-top navbar-inverse">
+    <div class="navbar-inner">
+      <a class="brand" href="index.html">InfiniteSky</a>
+      <ul class="nav">
+        
+        <li class="dropdown">
+          <a href="namespaces.list.html" class="dropdown-toggle" data-toggle="dropdown">Namespaces<b
+            class="caret"></b></a>
+
+          <ul class="dropdown-menu ">
+            
+            <li>
+              <a href="Zone_recv.html">Zone/recv</a>
+            </li>
+            
+            <li>
+              <a href="Zone_send.html">Zone/send</a>
+            </li>
+            
+
+          </ul>
+        </li>
+        
+        <li class="dropdown">
+          <a href="modules.list.html" class="dropdown-toggle" data-toggle="dropdown">Modules<b
+            class="caret"></b></a>
+
+          <ul class="dropdown-menu ">
+            
+            <li>
+              <a href="module-Helper_ChildProcessHost.html">Helper/ChildProcessHost</a>
+            </li>
+            
+            <li>
+              <a href="module-LoginInstance.html">LoginInstance</a>
+            </li>
+            
+            <li>
+              <a href="module-PacketCollection.html">PacketCollection</a>
+            </li>
+            
+            <li>
+              <a href="module-Restruct.html">Restruct</a>
+            </li>
+            
+            <li>
+              <a href="module-vmscript.html">vmscript</a>
+            </li>
+            
+            <li>
+              <a href="module-ZoneInstance.html">ZoneInstance</a>
+            </li>
+            
+
+          </ul>
+        </li>
+        
+        <li class="dropdown">
+          <a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b
+            class="caret"></b></a>
+
+          <ul class="dropdown-menu ">
+            
+            <li>
+              <a href="CharacterInfos.html">CharacterInfos</a>
+            </li>
+            
+            <li>
+              <a href="Command.html">Command</a>
+            </li>
+            
+            <li>
+              <a href="CVec3.html">CVec3</a>
+            </li>
+            
+            <li>
+              <a href="db.Item.html">db.Item</a>
+            </li>
+            
+            <li>
+              <a href="module-Helper_ChildProcessHost-ChildProcessHost.html">Helper/ChildProcessHost~ChildProcessHost</a>
+            </li>
+            
+            <li>
+              <a href="module-vmscript-VMScriptObj.html">vmscript~VMScriptObj</a>
+            </li>
+            
+
+          </ul>
+        </li>
+        
+        <li class="dropdown">
+          <a href="mixins.list.html" class="dropdown-toggle" data-toggle="dropdown">Mixins<b
+            class="caret"></b></a>
+
+          <ul class="dropdown-menu ">
+            
+            <li>
+              <a href="-_anonymous_-structs.CVec3.html"><anonymous>~structs.CVec3</a>
+            </li>
+            
+
+          </ul>
+        </li>
+        
+        <li class="dropdown">
+          <a href="tutorials.list.html" class="dropdown-toggle" data-toggle="dropdown">Tutorials<b
+            class="caret"></b></a>
+
+          <ul class="dropdown-menu ">
+            
+            <li>
+              <a href="tutorial-command_.html">command</a>
+            </li>
+            
+            <li>
+              <a href="tutorial-Project Layout.html">Project Layout</a>
+            </li>
+            
+
+          </ul>
+        </li>
+        
+        <li class="dropdown">
+          <a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b
+            class="caret"></b></a>
+
+          <ul class="dropdown-menu ">
+            
+            <li>
+              <a href="global.html#autocomplete">autocomplete</a>
+            </li>
+            
+            <li>
+              <a href="global.html#calculation">calculation</a>
+            </li>
+            
+            <li>
+              <a href="global.html#DamageDealer">DamageDealer</a>
+            </li>
+            
+            <li>
+              <a href="global.html#defaultPacketFunction">defaultPacketFunction</a>
+            </li>
+            
+            <li>
+              <a href="global.html#deg2rad">deg2rad</a>
+            </li>
+            
+            <li>
+              <a href="global.html#FujinModifiers">FujinModifiers</a>
+            </li>
+            
+            <li>
+              <a href="global.html#GuanyinModifiers">GuanyinModifiers</a>
+            </li>
+            
+            <li>
+              <a href="global.html#JinongModifiers">JinongModifiers</a>
+            </li>
+            
+            <li>
+              <a href="global.html#NanginTrack_Countdown">NanginTrack_Countdown</a>
+            </li>
+            
+            <li>
+              <a href="global.html#NanginTrack_Finished">NanginTrack_Finished</a>
+            </li>
+            
+            <li>
+              <a href="global.html#NanginTrack_Init">NanginTrack_Init</a>
+            </li>
+            
+            <li>
+              <a href="global.html#NanginTrack_onLoad">NanginTrack_onLoad</a>
+            </li>
+            
+            <li>
+              <a href="global.html#NanginTrack_Start">NanginTrack_Start</a>
+            </li>
+            
+            <li>
+              <a href="global.html#ObjectId">ObjectId</a>
+            </li>
+            
+            <li>
+              <a href="global.html#rad2deg">rad2deg</a>
+            </li>
+            
+
+          </ul>
+        </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  <div class="row-fluid">
+
+    
+
+    
+      <div class="span12">
+        
+        <div id="main">
+          
+
+
+		<h1 class="page-title">Source: Processes/Zone/Scripts/NanginTrack/NanginTrack.js</h1>
+    
+<section>
+  <article>
+    <pre
+      class="sunlight-highlight-javascript linenums">// TODO Think of a way to say when config.json is reloaded if NanginTrack_Crontab has been modified then change it.
+
+
+// *
+//  * Nangin Track
+//  * @namespace
+ 
+// var NanginTrack = {
+
+/* @const The recommended crontab value */
+var crontab = "54 * * * *";
+
+// schedule({ 
+// 	name: "NanginTrack",
+// 	description: "The Nangin Racetrack should run every hour. It has a countdown before it starts for 6 minutes. Active on zone 119 only.",
+// 	crontab: config.NanginTrack_Crontab || crontab,
+// 	onLoad: NanginTrack_onLoad,
+// 	init: NanginTrack_Init
+// });
+
+/** Announcement Message Values
+
+````
+Type: 0x22
+
+| Value | Message |
+| - | - |
+| 1 | [Start the Nangin Track] The [Nangin Track] will begin in [5] minutes. |
+| 2 | [Start the Nangin Track] The [Nangin Track] will begin in [4] minutes. |
+| 3 | [Start the Nangin Track] The [Nangin Track] will begin in [3] minutes. |
+| 4 | [Start the Nangin Track] The [Nangin Track] will begin in [2] minutes. |
+| 5 | [Start the Nangin Track] The [Nangin Track] will begin in [1] minute. |
+| 6 | [Start the Nangin Track] The [Nangin Track] has begun. |
+| 8 | Boots character out of Nangin Track back to town map. |
+````
+
+**/
+log.warn('Nangin Track script not yet implemented.');
+var NanginCatRacePacket = restruct.
+int8lu('PacketID');
+
+if (typeof(NanginTrackData) === 'undefined') {
+	NanginTrackData = {};
+}
+
+
+
+/**
+* This is called when the schedule is loaded for the first time.
+* @param {Zone} The zone.
+* @param {Object} Data provided to schedule functions.
+*/
+function NanginTrack_onLoad(schedule, zone, data) {
+	data.status = 1;
+	
+	/* If the config NanginTrack_Crontab is updated we want to specify a new crontab for the scheduler */
+	//zone.on('config', function() {
+		//var old_crontab = schedule.crontab;
+        //
+		// if (config.NanginTrack_Crontab !== undefined) {
+		// 	schedule.crontab = config.NanginTrack_Crontab;
+		// } else {
+		// 	schedule.crontab = crontab;
+		// }
+
+		// if (schedule.crontab !== old_crontab) {
+
+		// }
+	//})
+}
+
+/**
+* Initalizes the NanginTrack countdown.
+* @param {Zone} The zone.
+* @param {Object} Data provided to schedule functions.
+*/
+function NanginTrack_Init(zone, data) {
+	data.status = 0;
+	data.countdown = 6;
+	world.announce({ type: 0x22, value: 0 });
+
+	// Contdown every minute.
+	data.countdownInterval = setInterval(NanginTrack_Countdown.bind(undefined, zone, data), 60000);
+}
+
+/**
+* Sends out a message for each minute of the countdown.
+* @param {Zone} The zone.
+* @param {Object} Data provided to schedule functions.
+*/
+function NanginTrack_Countdown(zone, data) {
+	data.countdown --;
+	world.announce({ type: 0x22, value: 6 - data.countdown })
+
+	if (data.countdown === 0) {
+		clearInterval(data.countdownInterval);
+		NanginTrack_Start(zone, data);
+		return;
+	}
+}
+
+/**
+* Starts off the NanginTrack race.
+* Makes the cats run.
+* @param {Zone} The zone.
+* @param {Object} Data provided to schedule functions.
+*/
+function NanginTrack_Start(zone, data) {
+	data.status = 2;
+
+	// Calculate speeds of Nangin Cats
+	var details = {
+		PacketID: 0x6A
+	};
+
+	details.winningSilver = 10000;
+	details.winningCat = 1;
+
+	// Send Nangin Cat packet to all in zone.
+	Zone.sendToAll(new Buffer( NanginCatRacePacket.pack( details ) ));
+
+	setTimeout(NanginTrack_Finished.bind(undefined, zone, data), 60000);
+}
+
+/**
+* Finishes the race.
+* Pays out bets to players.
+* @param {Zone} The zone.
+* @param {Object} Data provided to schedule functions.
+*/
+function NanginTrack_Finished(zone, data) {
+	data.status = 1;
+
+	// Get winning bets out to players.
+	// If player is not on the map then their bet is forfit.
+
+	// Calculate win based on the bets.
+	// character.silver += win;
+}
+</pre>
+  </article>
+</section>
+
+
+
+
+
+        </div>
+
+        <div class="clearfix"></div>
+        <footer>
+          
+          
+    <span class="copyright">
+    The contributors to the InfiniteSky project.
+    </span>
+          <br />
+          
+    <span class="jsdoc-message">
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc" target="_blank">JSDoc 3.4.0</a>
+    on Fri Jul 15th 2016
+    </span>
+        </footer>
+      </div>
+
+      <br clear="both">
+    </div>
+
+  </div>
+  <!--<script src="scripts/sunlight.js"></script>-->
+  <script src="scripts/docstrap.lib.js"></script>
+  <script src="scripts/bootstrap-dropdown.js"></script>
+  <script src="scripts/toc.js"></script>
+
+  <script>
+    $( function () {
+      $( "[id*='$']" ).each( function () {
+        var $this = $( this );
+
+        $this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+      } );
+
+      $( "#toc" ).toc( {
+        anchorName  : function ( i, heading, prefix ) {
+          return $( heading ).attr( "id" ) || ( prefix + i );
+        },
+        selectors   : "h1,h2,h3,h4",
+        showAndHide : false,
+        scrollTo    : "100px"
+      } );
+
+      $( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
+      $( "#main span[id^='toc']" ).addClass( "toc-shim" );
+      $( '.dropdown-toggle' ).dropdown();
+//      $( ".tutorial-section pre, .readme-section pre" ).addClass( "sunlight-highlight-javascript" ).addClass( "linenums" );
+
+      $( ".tutorial-section pre, .readme-section pre" ).each( function () {
+        var $this = $( this );
+
+        var example = $this.find( "code" );
+        exampleText = example.html();
+        var lang = /{@lang (.*?)}/.exec( exampleText );
+        if ( lang && lang[1] ) {
+          exampleText = exampleText.replace( lang[0], "" );
+          example.html( exampleText );
+          lang = lang[1];
+        } else {
+          lang = "javascript";
+        }
+
+        if ( lang ) {
+
+          $this
+            .addClass( "sunlight-highlight-" + lang )
+            .addClass( "linenums" )
+            .html( example.html() );
+
+        }
+      } );
+
+      Sunlight.highlightAll( {
+        lineNumbers : true,
+        showMenu : true,
+        enableDoclinks : true
+      } );
+    } );
+   </script>
+
+
+
+  <!--Navigation and Symbol Display-->
+  
+
+
+  <!--Google Analytics-->
+  
+
+</body>
+</html>

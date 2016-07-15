@@ -1,10 +1,23 @@
 (function() {
     // UTF-8 encode/decode routines.
+
+    /**
+     * Decodes a UTF8 String.
+     * @private
+     * @param  {structure} s
+     * @return {String}
+     */
     var decodeUTF8 = function(s) {
         return s;
         //return decodeURIComponent(escape(s));
     };
 
+    /**
+     * Encodes UTF8 String.
+     * @private
+     * @param  {Structure} s
+     * @return {String}   String
+     */
     var encodeUTF8 = function(s) {
         if (typeof(s) === "undefined") return '';
         return s;
@@ -12,16 +25,30 @@
     };
 
     // Boolean routines.
+
+    /**
+     * Unpacks a boolean from binary.
+     * @private
+     * @param  {Boolean} val    Value to unpack.
+     * @param  {binary} binary 
+     * @return {binary}        
+     */
     var unpackBoolean = function(binary) {
         var x = unpack8(binary);
-        return [!!(x & 1), !!(x & 2), !!(x & 4), !!(x & 8),
-                !!(x & 16), !!(x & 32), !!(x & 64), !!(x & 128)];
+        return [!!(x & 1), !!(x & 2), !!(x & 4), !!(x & 8), !!(x & 16), !!(x & 32), !!(x & 64), !!(x & 128)];
     };
 
+    /**
+     * Packs a boolean to binary.
+     * @private
+     * @param  {Boolean} val    Value to pack.
+     * @param  {binary} binary 
+     * @return {binary}        
+     */
     var packBoolean = function(val, binary) {
         pack8(val[0] | (val[1] << 1) | (val[2] << 2) | (val[3] << 3) |
-              (val[4] << 4) | (val[5] << 5) | (val[6] << 6) | (val[7] << 7),
-              binary);
+            (val[4] << 4) | (val[5] << 5) | (val[6] << 6) | (val[7] << 7),
+            binary);
     };
 
     // Nibble routines.
@@ -234,76 +261,92 @@
         binary.array[binary.offset++] = val & 0xff;
     };
 
-	// Float Routines
-	//Float to int
-	function FloatToIEEE(f)
-	{
-		var buf = new ArrayBuffer(4);
-		(new Float32Array(buf))[0] = f;
-		return (new Uint32Array(buf))[0];
-	};
+    // Float Routines
+    //Float to int
+    function FloatToIEEE(f) {
+        var buf = new ArrayBuffer(4);
+        (new Float32Array(buf))[0] = f;
+        return (new Uint32Array(buf))[0];
+    };
 
-	//int to float
-	function IEEEToFloat(i)
-	{
-		var buf = new ArrayBuffer(4);
-		(new Uint32Array(buf))[0] = i;
-		return (new Float32Array(buf))[0];
-	};
+    //int to float
+    function IEEEToFloat(i) {
+        var buf = new ArrayBuffer(4);
+        (new Uint32Array(buf))[0] = i;
+        return (new Float32Array(buf))[0];
+    };
 
-	//Float to hex array
-	function FloatToHex(f)
-	{
-	  return FloatToIEEE(f).toString(16)
-		.toUpperCase().match(/../g).reverse();
-	};
+    //Float to hex array
+    function FloatToHex(f) {
+        return FloatToIEEE(f).toString(16)
+            .toUpperCase().match(/../g).reverse();
+    };
 
-	//Hex string to float, eg 7F7FFFEE
-	function HexToFloat(h)
-	{
-	  return parseInt(h,16);
-	};
+    //Hex string to float, eg 7F7FFFEE
+    function HexToFloat(h) {
+        return parseInt(h, 16);
+    };
 
-	//Get array of each 8 bits in 32-bits of IEEEE
-	function IEEEToBits(i)
-	{
-	  return parseInt(i).toString(2);//.match(/..../g);//.reverse();
-	};
+    //Get array of each 8 bits in 32-bits of IEEEE
+    function IEEEToBits(i) {
+        return parseInt(i).toString(2); //.match(/..../g);//.reverse();
+    };
 
-	// Converts Hex Arary to Int Array
-	function HexArrayToIntArray(h)
-	{
-	  for(var ii = 0; ii < h.length; ii++)
-	  {
-		h[ii] = parseInt("0x"+h[ii]);
-	  }
-	  return h;
-	};
+    // Converts Hex Arary to Int Array
+    function HexArrayToIntArray(h) {
+        for (var ii = 0; ii < h.length; ii++) {
+            h[ii] = parseInt("0x" + h[ii]);
+        }
+        return h;
+    };
 
-	// Converts Int Array to Hex Array
-	function IntArrayToHexArray(ia)
-	{
-	  for(var ii = 0; ii < ia.length; ii++)
-	  {
-		ia[ii] = ia[ii].toString(16).toUpperCase();
-	  }
-	  return ia;
-	};
+    // Converts Int Array to Hex Array
+    function IntArrayToHexArray(ia) {
+        for (var ii = 0; ii < ia.length; ii++) {
+            ia[ii] = ia[ii].toString(16).toUpperCase();
+        }
+        return ia;
+    };
 
-	//Convert int array back to float
-	function intArrayToFloat(ia)
-	{
-	  ia = ia.reverse();
-	  ia = IntArrayToHexArray(ia);
-	  ia = ia.join("");
-	  ia = HexToFloat(ia);
-	  return IEEEToFloat(ia);
-	}
-	// End of Float routines
+    //Convert int array back to float
+    function intArrayToFloat(ia) {
+        ia = ia.reverse();
+        ia = IntArrayToHexArray(ia);
+        ia = ia.join("");
+        ia = HexToFloat(ia);
+        return IEEEToFloat(ia);
+    }
+    // End of Float routines
 
-    // Restruct class.
+    /**
+     * Restruct class.
+     *
+     * A JavaScript binary data library.
+     * 
+     * restruct.js performs conversion to and from binary data types. It utilizes an intuitive declarative API to define formats for binary structure parsers and emitters. It works in both the browser and on Node.
+     * restruct.js is freely distributable under the terms of the MIT license.
+     *
+     * This class has chainable methods and is used to define a structure.
+     * Can be used to convert between JSON and buffer of bytes.
+     * 
+     *It should be noted that this library has had some modifications done to it by InfiniteSky contributors.
+     *But the initial library is by another person.
+     *
+     * @author  Tony Young <tony@rfw.name>
+     * @see  https://rfw.name/restruct.js/
+     *
+     * @see  ../restruct/README.md
+     *
+     * @deprecated We really should rewrite this some time into code that compiles at runtime into native functions. Or just use google protobuf or something?
+     * 
+     * @param {Restruct} parent Can be undefined, is only used for nested structures.
+     * @param {Integer} size   Undefined by default. Used in nested structures.
+     * @param {String} format The format of this Restruct. (Who knows what this is)
+     * @exports Restruct
+     * @license  MIT
+     */
     var Restruct = function(parent, size, format) {
-        if(typeof parent === 'undefined') {
+        if (typeof parent === 'undefined') {
             this.size = 0;
             this.formats = [];
         } else {
@@ -313,64 +356,82 @@
     };
 
     Restruct.prototype = {
+
+        /**
+         * An attempt to output documentation about a Restruct structure definition.
+         * @deprecated We may not ever use this it was just Liam toying around with the concept. Ideally a plugin could be made for jsdoc which would add more information about all structures we make (in namespace or markdown format maybe...).
+         * @return {String} Output.
+         */
         generateDocumentation: function() {
             // Generate type, name\n
             var result = '';
-            for(var i=0;i<this.formats.length;i++)
-            {
-                result+=this.formats[i].type
-                if (this.formats[i].name) {result+=this.formats[i].name+' '};
-                result+='\n';
+            for (var i = 0; i < this.formats.length; i++) {
+                result += this.formats[i].type
+                if (this.formats[i].name) {
+                    result += this.formats[i].name + ' '
+                };
+                result += '\n';
             }
             return result;
         },
-        // Pad NUL bytes.
+
+        /**
+         * Pad NUL bytes.
+         * @param  {Integer} n The amount of bytes to pad null.
+         * @return {Restruct}   this, chainable
+         */
         pad: function(n) {
-            if(typeof n === 'undefined') n = 1;
+            if (typeof n === 'undefined') n = 1;
 
             return new Restruct(this, n, {
-                type: 'pad['+n+']',
+                type: 'pad[' + n + ']',
                 unpack: function(binary, struct) {
                     binary.offset += n;
                 },
 
                 pack: function(struct, binary) {
-                    for(var i = 0; i < n; ++i) {
+                    for (var i = 0; i < n; ++i) {
                         pack8(0, binary);
                     }
                 }
             });
         },
 
-        // Booleans.
+        /**
+         * Boolean (1 byte)
+         * @param  {Integer} n The amount of bytes to pad null.
+         * @return {Restruct}   this, chainable
+         */
         boolean: function(k, n) {
-            if(typeof n === "undefined") {
+            if (typeof n === "undefined") {
                 return new Restruct(this, 1, {
-                    name: k, type: 'boolean',
+                    name: k,
+                    type: 'boolean',
                     unpack: function(binary, struct) {
                         struct[k] = unpackBoolean(binary);
                     },
 
                     pack: function(struct, binary) {
-						if (typeof struct[k] === "undefined") struct[k]={};
+                        if (typeof struct[k] === "undefined") struct[k] = {};
                         packBoolean(struct[k], binary);
                     }
                 });
             }
 
             return new Restruct(this, 6 * n, {
-                name: k, type: 'boolean['+n+']',
+                name: k,
+                type: 'boolean[' + n + ']',
                 unpack: function(binary, struct) {
                     struct[k] = [];
-                    for(var i = 0; i < n; ++i) {
+                    for (var i = 0; i < n; ++i) {
                         struct[k][i] = unpackBoolean(binary);
                     }
                 },
 
                 pack: function(struct, binary) {
-					if (typeof struct[k] === "undefined") struct[k]={};
-                    for(var i = 0; i < n; ++i) {
-					if (typeof struct[k][i] === "undefined") struct[k][i]={};
+                    if (typeof struct[k] === "undefined") struct[k] = {};
+                    for (var i = 0; i < n; ++i) {
+                        if (typeof struct[k][i] === "undefined") struct[k][i] = {};
                         packBoolean(struct[k][i], binary);
                     }
                 }
@@ -378,1108 +439,1333 @@
         },
 
         // Nibbles.
+
+        /**
+         * Nibble
+         * @param  {String} k The name of this element of the structure.
+         * @param  {Integer} n Number of nibbles.
+         * @return {Restruct}   this, chainable
+         */
         nibble: function(k, n) {
-            if(typeof n === "undefined") {
+            if (typeof n === "undefined") {
                 return new Restruct(this, 1, {
-                    name: k, type: 'nibble',
+                    name: k,
+                    type: 'nibble',
                     unpack: function(binary, struct) {
                         struct[k] = unpackNibble(binary);
                     },
 
                     pack: function(struct, binary) {
-					if (typeof struct[k] === "undefined") struct[k]={};
+                        if (typeof struct[k] === "undefined") struct[k] = {};
                         packNibble(struct[k], binary);
                     }
                 });
             }
 
             return new Restruct(this, 6 * n, {
-                name: k, type: 'nibble['+n+']',
+                name: k,
+                type: 'nibble[' + n + ']',
                 unpack: function(binary, struct) {
                     struct[k] = [];
-                    for(var i = 0; i < n; ++i) {
+                    for (var i = 0; i < n; ++i) {
                         struct[k][i] = unpackNibble(binary);
                     }
                 },
 
                 pack: function(struct, binary) {
-				if (typeof struct[k] === "undefined") struct[k]={};
-                    for(var i = 0; i < n; ++i) {
-						if (typeof struct[k][i] === "undefined") struct[k][i]={};
+                    if (typeof struct[k] === "undefined") struct[k] = {};
+                    for (var i = 0; i < n; ++i) {
+                        if (typeof struct[k][i] === "undefined") struct[k][i] = {};
                         packNibble(struct[k][i], binary);
                     }
                 }
             });
         },
 
-        // 8-bit signed little-endian integer.
+        /**
+         * 8-bit signed little-endian integer.
+         * @param  {String} k   The name of this element of the structure.
+         * @param  {Integer} n   Number of elements if this is an array.
+         * @param  {buffer} buf 
+         * @return {Restruct}     this, chainable
+         */
         int8ls: function(k, n, buf) {
-            if(typeof n === "undefined") {
+            if (typeof n === "undefined") {
                 return new Restruct(this, 1, {
-                    name: k, type: 'int8ls',
+                    name: k,
+                    type: 'int8ls',
                     unpack: function(binary, struct) {
                         struct[k] = sign8(unpack8(binary));
                     },
 
                     pack: function(struct, binary) {
-					if (typeof struct[k] === "undefined") struct[k]={};
+                        if (typeof struct[k] === "undefined") struct[k] = {};
                         pack8(struct[k], binary);
                     }
                 });
             }
 
             return new Restruct(this, 1 * n, {
-                name: k, type: 'int8ls['+n+']',
+                name: k,
+                type: 'int8ls[' + n + ']',
                 unpack: function(binary, struct) {
-                    if(typeof buf !== "undefined") {
+                    if (typeof buf !== "undefined") {
                         struct[k] = buf;
                     } else {
                         struct[k] = [];
                     }
 
-                    for(var i = n - 1; i >= 0; --i) {
+                    for (var i = n - 1; i >= 0; --i) {
                         struct[k][i] = sign8(unpack8(binary));
                     }
                 },
 
                 pack: function(struct, binary) {
-				if (typeof struct[k] === "undefined") struct[k]={};
-                    for(var i = n - 1; i >= 0; --i) {
-					if (typeof struct[k][i] === "undefined") struct[k][i]={};
+                    if (typeof struct[k] === "undefined") struct[k] = {};
+                    for (var i = n - 1; i >= 0; --i) {
+                        if (typeof struct[k][i] === "undefined") struct[k][i] = {};
                         pack8(struct[k][i] || 0, binary);
                     }
                 }
             });
         },
 
-        // 8-bit unsigned little-endian integer.
+        /**
+         * 8-bit unsigned little-endian integer.
+         * @param  {String} k   The name of this element of the structure.
+         * @param  {Integer} n   Number of elements if this is an array.
+         * @param  {buffer} buf 
+         * @return {Restruct}     this, chainable
+         */
         int8lu: function(k, n, buf) {
-            if(typeof n === "undefined") {
+            if (typeof n === "undefined") {
                 return new Restruct(this, 1, {
-                    name: k, type: 'int8lu',
+                    name: k,
+                    type: 'int8lu',
                     unpack: function(binary, struct) {
                         struct[k] = unpack8(binary);
                     },
 
                     pack: function(struct, binary) {
-                        if (struct==null) { pack8(0,binary); return; }
-						//if (typeof struct[k] === "undefined") struct[k]={};
+                        if (struct == null) {
+                            pack8(0, binary);
+                            return;
+                        }
+                        //if (typeof struct[k] === "undefined") struct[k]={};
                         pack8(struct[k], binary);
                     }
                 });
             }
 
             return new Restruct(this, 1 * n, {
-                name: k, type: 'int8lu['+n+']',
+                name: k,
+                type: 'int8lu[' + n + ']',
                 unpack: function(binary, struct) {
-                    if(typeof buf !== "undefined") {
+                    if (typeof buf !== "undefined") {
                         struct[k] = buf;
                     } else {
                         struct[k] = [];
                     }
 
-                    for(var i = n - 1; i >= 0; --i) {
+                    for (var i = n - 1; i >= 0; --i) {
                         struct[k][i] = unpack8(binary);
                     }
                 },
 
                 pack: function(struct, binary) {
-					if (typeof struct[k] === "undefined") struct[k]={};
-                    for(var i = n - 1; i >= 0; --i) {
-						if (typeof struct[k][i] === "undefined") struct[k][i]={};
+                    if (typeof struct[k] === "undefined") struct[k] = {};
+                    for (var i = n - 1; i >= 0; --i) {
+                        if (typeof struct[k][i] === "undefined") struct[k][i] = {};
                         pack8(struct[k][i] || 0, binary);
                     }
                 }
             });
         },
 
-        // 8-bit signed big-endian integer.
+        /**
+         * 8-bit signed big-endian integer.
+         * @param  {String} k   The name of this element of the structure.
+         * @param  {Integer} n   Number of elements if this is an array.
+         * @param  {buffer} buf 
+         * @return {Restruct}     this, chainable
+         */
         int8bs: function(k, n, buf) {
-            if(typeof n === "undefined") {
+            if (typeof n === "undefined") {
                 return new Restruct(this, 1, {
-                    name: k, type: 'int8bs',
+                    name: k,
+                    type: 'int8bs',
                     unpack: function(binary, struct) {
                         struct[k] = sign8(unpack8(binary));
                     },
 
                     pack: function(struct, binary) {
-						if (typeof struct[k] === "undefined") struct[k]={};
+                        if (typeof struct[k] === "undefined") struct[k] = {};
                         pack8(struct[k], binary);
                     }
                 });
             }
 
             return new Restruct(this, 1 * n, {
-                name: k, type: 'int8bs['+n+']',
+                name: k,
+                type: 'int8bs[' + n + ']',
                 unpack: function(binary, struct) {
-                    if(typeof buf !== "undefined") {
+                    if (typeof buf !== "undefined") {
                         struct[k] = buf;
                     } else {
                         struct[k] = [];
                     }
 
-                    for(var i = 0; i < n; ++i) {
+                    for (var i = 0; i < n; ++i) {
                         struct[k][i] = sign8(unpack8(binary));
                     }
                 },
 
                 pack: function(struct, binary) {
-					if (typeof struct[k] === "undefined") struct[k]={};
-                    for(var i = 0; i < n; ++i) {
-						if (typeof struct[k][i] === "undefined") struct[k][i]={};
+                    if (typeof struct[k] === "undefined") struct[k] = {};
+                    for (var i = 0; i < n; ++i) {
+                        if (typeof struct[k][i] === "undefined") struct[k][i] = {};
                         pack8(struct[k][i] || 0, binary);
                     }
                 }
             });
         },
 
-        // 8-bit unsigned big-endian integer.
+
+        /**
+         * 8-bit unsigned big-endian integer.
+         * @param  {String} k   The name of this element of the structure.
+         * @param  {Integer} n   Number of elements if this is an array.
+         * @param  {buffer} buf 
+         * @return {Restruct}     this, chainable
+         */
         int8bu: function(k, n, buf) {
-            if(typeof n === "undefined") {
+            if (typeof n === "undefined") {
                 return new Restruct(this, 1, {
-                    name: k, type: 'int8bu',
+                    name: k,
+                    type: 'int8bu',
                     unpack: function(binary, struct) {
                         struct[k] = unpack8(binary);
                     },
 
                     pack: function(struct, binary) {
-						if (typeof struct[k] === "undefined") struct[k]={};
+                        if (typeof struct[k] === "undefined") struct[k] = {};
                         pack8(struct[k], binary);
                     }
                 });
             }
 
             return new Restruct(this, 1 * n, {
-                name: k, type: 'int8bu['+n+']',
+                name: k,
+                type: 'int8bu[' + n + ']',
                 unpack: function(binary, struct) {
-                    if(typeof buf !== "undefined") {
+                    if (typeof buf !== "undefined") {
                         struct[k] = buf;
                     } else {
                         struct[k] = [];
                     }
 
-                    for(var i = 0; i < n; ++i) {
+                    for (var i = 0; i < n; ++i) {
                         struct[k][i] = unpack8(binary);
                     }
                 },
 
                 pack: function(struct, binary) {
-					if (typeof struct[k] === "undefined") struct[k]={};
-                    for(var i = 0; i < n; ++i) {
-						if (typeof struct[k][i] === "undefined") struct[k][i]={};
+                    if (typeof struct[k] === "undefined") struct[k] = {};
+                    for (var i = 0; i < n; ++i) {
+                        if (typeof struct[k][i] === "undefined") struct[k][i] = {};
                         pack8(struct[k][i] || 0, binary);
                     }
                 }
             });
         },
 
-        // 16-bit signed little-endian integer.
+        /**
+         * 16-bit signed little-endian integer.
+         * @param  {String} k   The name of this element of the structure.
+         * @param  {Integer} n   Number of elements if this is an array.
+         * @param  {buffer} buf 
+         * @return {Restruct}     this, chainable
+         */
         int16ls: function(k, n, buf) {
-            if(typeof n === "undefined") {
+            if (typeof n === "undefined") {
                 return new Restruct(this, 2, {
-                    name: k, type: 'int16ls',
+                    name: k,
+                    type: 'int16ls',
                     unpack: function(binary, struct) {
                         struct[k] = sign16(unpack16l(binary));
                     },
 
                     pack: function(struct, binary) {
-						if (typeof struct[k] === "undefined") struct[k]={};
+                        if (typeof struct[k] === "undefined") struct[k] = {};
                         pack16l(struct[k], binary);
                     }
                 });
             }
 
             return new Restruct(this, 2 * n, {
-                name: k, type: 'int16ls['+n+']',
+                name: k,
+                type: 'int16ls[' + n + ']',
                 unpack: function(binary, struct) {
-                    if(typeof buf !== "undefined") {
+                    if (typeof buf !== "undefined") {
                         struct[k] = buf;
                     } else {
                         struct[k] = [];
                     }
 
-                    for(var i = n - 1; i >= 0; --i) {
+                    for (var i = n - 1; i >= 0; --i) {
                         struct[k][i] = sign16(unpack16l(binary));
                     }
                 },
 
                 pack: function(struct, binary) {
-					if (typeof struct[k] === "undefined") struct[k]={};
-                    for(var i = n - 1; i >= 0; --i) {
-						if (typeof struct[k][i] === "undefined") struct[k][i]={};
+                    if (typeof struct[k] === "undefined") struct[k] = {};
+                    for (var i = n - 1; i >= 0; --i) {
+                        if (typeof struct[k][i] === "undefined") struct[k][i] = {};
                         pack16l(struct[k][i] || 0, binary);
                     }
                 }
             });
         },
 
-        // 16-bit unsigned little-endian integer.
+        /**
+         * 16-bit unsigned little-endian integer.
+         * @param  {String} k   The name of this element of the structure.
+         * @param  {Integer} n   Number of elements if this is an array.
+         * @param  {buffer} buf 
+         * @return {Restruct}     this, chainable
+         */
         int16lu: function(k, n, buf) {
-            if(typeof n === "undefined") {
+            if (typeof n === "undefined") {
                 return new Restruct(this, 2, {
-                    name: k, type: 'int16lu',
+                    name: k,
+                    type: 'int16lu',
                     unpack: function(binary, struct) {
                         struct[k] = unpack16l(binary);
                     },
 
                     pack: function(struct, binary) {
-                        if (struct==null) { pack16l(0,binary); return; }
+                        if (struct == null) {
+                            pack16l(0, binary);
+                            return;
+                        }
                         pack16l(struct[k], binary);
-						// if (typeof struct[k] === "undefined") struct[k]={};
-      //                   pack16l(struct[k], binary);
+                        // if (typeof struct[k] === "undefined") struct[k]={};
+                        // pack16l(struct[k], binary);
                     }
                 });
             }
 
             return new Restruct(this, 2 * n, {
-                name: k, type: 'int16lu['+n+']',
+                name: k,
+                type: 'int16lu[' + n + ']',
                 unpack: function(binary, struct) {
-                    if(typeof buf !== "undefined") {
+                    if (typeof buf !== "undefined") {
                         struct[k] = buf;
                     } else {
                         struct[k] = [];
                     }
 
-                    for(var i = n - 1; i >= 0; --i) {
+                    for (var i = n - 1; i >= 0; --i) {
                         struct[k][i] = unpack16l(binary);
                     }
                 },
 
                 pack: function(struct, binary) {
-					if (typeof struct[k] === "undefined") struct[k]={};
-                    for(var i = n - 1; i >= 0; --i) {
-                        if (struct==null) { pack16l(0,binary); return; }
+                    if (typeof struct[k] === "undefined") struct[k] = {};
+                    for (var i = n - 1; i >= 0; --i) {
+                        if (struct == null) {
+                            pack16l(0, binary);
+                            return;
+                        }
                         pack16l(struct[k][i] || 0, binary);
                     }
                 }
             });
         },
 
-        // 16-bit signed big-endian integer.
+        /**
+         * 16-bit signed big-endian integer.
+         * @param  {String} k   The name of this element of the structure.
+         * @param  {Integer} n   Number of elements if this is an array.
+         * @param  {buffer} buf 
+         * @return {Restruct}     this, chainable
+         */
         int16bs: function(k, n, buf) {
-            if(typeof n === "undefined") {
+            if (typeof n === "undefined") {
                 return new Restruct(this, 2, {
-                    name: k, type: 'int16bs',
+                    name: k,
+                    type: 'int16bs',
                     unpack: function(binary, struct) {
                         struct[k] = sign16(unpack16b(binary));
                     },
 
                     pack: function(struct, binary) {
-						if (typeof struct[k] === "undefined") struct[k]={};
+                        if (typeof struct[k] === "undefined") struct[k] = {};
                         pack16b(struct[k], binary);
                     }
                 });
             }
 
             return new Restruct(this, 2 * n, {
-                name: k, type: 'int16bs['+n+']',
+                name: k,
+                type: 'int16bs[' + n + ']',
                 unpack: function(binary, struct) {
-                    if(typeof buf !== "undefined") {
+                    if (typeof buf !== "undefined") {
                         struct[k] = buf;
                     } else {
                         struct[k] = [];
                     }
 
-                    for(var i = 0; i < n; ++i) {
+                    for (var i = 0; i < n; ++i) {
                         struct[k][i] = sign16(unpack16b(binary));
                     }
                 },
 
                 pack: function(struct, binary) {
-					if (typeof struct[k] === "undefined") struct[k]={};
-                    for(var i = 0; i < n; ++i) {
-						if (typeof struct[k][i] === "undefined") struct[k][i]={};
+                    if (typeof struct[k] === "undefined") struct[k] = {};
+                    for (var i = 0; i < n; ++i) {
+                        if (typeof struct[k][i] === "undefined") struct[k][i] = {};
                         pack16b(struct[k][i] || 0, binary);
                     }
                 }
             });
         },
 
-        // 16-bit unsigned big-endian integer.
+        /**
+         * 16-bit unsigned big-endian integer.
+         * @param  {String} k   The name of this element of the structure.
+         * @param  {Integer} n   Number of elements if this is an array.
+         * @param  {buffer} buf 
+         * @return {Restruct}     this, chainable
+         */
         int16bu: function(k, n, buf) {
-            if(typeof n === "undefined") {
+            if (typeof n === "undefined") {
                 return new Restruct(this, 2, {
-                    name: k, type: 'int16bu',
+                    name: k,
+                    type: 'int16bu',
                     unpack: function(binary, struct) {
                         struct[k] = unpack16b(binary);
                     },
 
                     pack: function(struct, binary) {
-						if (typeof struct[k] === "undefined") struct[k]={};
+                        if (typeof struct[k] === "undefined") struct[k] = {};
                         pack16b(struct[k], binary);
                     }
                 });
             }
 
             return new Restruct(this, 2 * n, {
-                name: k, type: 'int16bu['+n+']',
+                name: k,
+                type: 'int16bu[' + n + ']',
                 unpack: function(binary, struct) {
-                    if(typeof buf !== "undefined") {
+                    if (typeof buf !== "undefined") {
                         struct[k] = buf;
                     } else {
                         struct[k] = [];
                     }
 
-                    for(var i = 0; i < n; ++i) {
+                    for (var i = 0; i < n; ++i) {
                         struct[k][i] = unpack16b(binary);
                     }
                 },
 
                 pack: function(struct, binary) {
-					if (typeof struct[k] === "undefined") struct[k]={};
-                    for(var i = 0; i < n; ++i) {
-						if (typeof struct[k][i] === "undefined") struct[k][i]={};
+                    if (typeof struct[k] === "undefined") struct[k] = {};
+                    for (var i = 0; i < n; ++i) {
+                        if (typeof struct[k][i] === "undefined") struct[k][i] = {};
                         pack16b(struct[k][i] || 0, binary);
                     }
                 }
             });
         },
 
-        // 24-bit signed little-endian integer.
+        /**
+         * 24-bit signed little-endian integer.
+         * @param  {String} k   The name of this element of the structure.
+         * @param  {Integer} n   Number of elements if this is an array.
+         * @param  {buffer} buf 
+         * @return {Restruct}     this, chainable
+         */
         int24ls: function(k, n, buf) {
-            if(typeof n === "undefined") {
+            if (typeof n === "undefined") {
                 return new Restruct(this, 3, {
-                    name: k, type: 'int24ls',
+                    name: k,
+                    type: 'int24ls',
                     unpack: function(binary, struct) {
                         struct[k] = sign24(unpack24l(binary));
                     },
 
                     pack: function(struct, binary) {
-						if (typeof struct[k] === "undefined") struct[k]={};
+                        if (typeof struct[k] === "undefined") struct[k] = {};
                         pack24l(struct[k], binary);
                     }
                 });
             }
 
             return new Restruct(this, 3 * n, {
-                name: k, type: 'int24ls['+n+']',
+                name: k,
+                type: 'int24ls[' + n + ']',
                 unpack: function(binary, struct) {
-                    if(typeof buf !== "undefined") {
+                    if (typeof buf !== "undefined") {
                         struct[k] = buf;
                     } else {
                         struct[k] = [];
                     }
 
-                    for(var i = n - 1; i >= 0; --i) {
+                    for (var i = n - 1; i >= 0; --i) {
                         struct[k][i] = sign24(unpack24l(binary));
                     }
                 },
 
                 pack: function(struct, binary) {
-				if (typeof struct[k] === "undefined") struct[k]={};
-                    for(var i = n - 1; i >= 0; --i) {
-					if (typeof struct[k][i] === "undefined") struct[k][i]={};
+                    if (typeof struct[k] === "undefined") struct[k] = {};
+                    for (var i = n - 1; i >= 0; --i) {
+                        if (typeof struct[k][i] === "undefined") struct[k][i] = {};
                         pack24l(struct[k][i] || 0, binary);
                     }
                 }
             });
         },
 
-        // 24-bit unsigned little-endian integer.
+        /**
+         * 24-bit unsigned little-endian integer.
+         * @param  {String} k   The name of this element of the structure.
+         * @param  {Integer} n   Number of elements if this is an array.
+         * @param  {buffer} buf 
+         * @return {Restruct}     this, chainable
+         */
         int24lu: function(k, n, buf) {
-            if(typeof n === "undefined") {
+            if (typeof n === "undefined") {
                 return new Restruct(this, 3, {
-                    name: k, type: 'int24lu',
+                    name: k,
+                    type: 'int24lu',
                     unpack: function(binary, struct) {
                         struct[k] = unpack24l(binary);
                     },
 
                     pack: function(struct, binary) {
-						if (typeof struct[k] === "undefined") struct[k]={};
+                        if (typeof struct[k] === "undefined") struct[k] = {};
                         pack24l(struct[k], binary);
                     }
                 });
             }
 
             return new Restruct(this, 3 * n, {
-                name: k, type: 'int24lu['+n+']',
+                name: k,
+                type: 'int24lu[' + n + ']',
                 unpack: function(binary, struct) {
-                    if(typeof buf !== "undefined") {
+                    if (typeof buf !== "undefined") {
                         struct[k] = buf;
                     } else {
                         struct[k] = [];
                     }
 
-                    for(var i = n - 1; i >= 0; --i) {
+                    for (var i = n - 1; i >= 0; --i) {
                         struct[k][i] = unpack24l(binary);
                     }
                 },
 
                 pack: function(struct, binary) {
-				if (typeof struct[k] === "undefined") struct[k]={};
-                    for(var i = n - 1; i >= 0; --i) {
-					if (typeof struct[k][i] === "undefined") struct[k][i]={};
+                    if (typeof struct[k] === "undefined") struct[k] = {};
+                    for (var i = n - 1; i >= 0; --i) {
+                        if (typeof struct[k][i] === "undefined") struct[k][i] = {};
                         pack24l(struct[k][i] || 0, binary);
                     }
                 }
             });
         },
 
-        // 24-bit signed big-endian integer.
+        /**
+         * 24-bit signed big-endian integer.
+         * @param  {String} k   The name of this element of the structure.
+         * @param  {Integer} n   Number of elements if this is an array.
+         * @param  {buffer} buf 
+         * @return {Restruct}     this, chainable
+         */
         int24bs: function(k, n, buf) {
-            if(typeof n === "undefined") {
+            if (typeof n === "undefined") {
                 return new Restruct(this, 3, {
-                    name: k, type: 'int24bs',
+                    name: k,
+                    type: 'int24bs',
                     unpack: function(binary, struct) {
                         struct[k] = sign24(unpack24b(binary));
                     },
 
                     pack: function(struct, binary) {
-					if (typeof struct[k] === "undefined") struct[k]={};
+                        if (typeof struct[k] === "undefined") struct[k] = {};
                         pack24b(struct[k], binary);
                     }
                 });
             }
 
             return new Restruct(this, 3 * n, {
-                name: k, type: 'int24bs['+n+']',
+                name: k,
+                type: 'int24bs[' + n + ']',
                 unpack: function(binary, struct) {
-                    if(typeof buf !== "undefined") {
+                    if (typeof buf !== "undefined") {
                         struct[k] = buf;
                     } else {
                         struct[k] = [];
                     }
 
-                    for(var i = 0; i < n; ++i) {
+                    for (var i = 0; i < n; ++i) {
                         struct[k][i] = sign24(unpack24b(binary));
                     }
                 },
 
                 pack: function(struct, binary) {
-				if (typeof struct[k] === "undefined") struct[k]={};
-                    for(var i = 0; i < n; ++i) {
-					if (typeof struct[k][i] === "undefined") struct[k][i]={};
+                    if (typeof struct[k] === "undefined") struct[k] = {};
+                    for (var i = 0; i < n; ++i) {
+                        if (typeof struct[k][i] === "undefined") struct[k][i] = {};
                         pack24b(struct[k][i] || 0, binary);
                     }
                 }
             });
         },
 
-        // 24-bit unsigned big-endian integer.
+        /**
+         * 24-bit unsigned big-endian integer.
+         * @param  {String} k   The name of this element of the structure.
+         * @param  {Integer} n   Number of elements if this is an array.
+         * @param  {buffer} buf 
+         * @return {Restruct}     this, chainable
+         */
         int24bu: function(k, n, buf) {
-            if(typeof n === "undefined") {
+            if (typeof n === "undefined") {
                 return new Restruct(this, 3, {
-                    name: k, type: 'int24bu',
+                    name: k,
+                    type: 'int24bu',
                     unpack: function(binary, struct) {
                         struct[k] = unpack24b(binary);
                     },
 
                     pack: function(struct, binary) {
-					if (typeof struct[k] === "undefined") struct[k]={};
+                        if (typeof struct[k] === "undefined") struct[k] = {};
                         pack24b(struct[k], binary);
                     }
                 });
             }
 
             return new Restruct(this, 3 * n, {
-                name: k, type: 'int24bu['+n+']',
+                name: k,
+                type: 'int24bu[' + n + ']',
                 unpack: function(binary, struct) {
-                    if(typeof buf !== "undefined") {
+                    if (typeof buf !== "undefined") {
                         struct[k] = buf;
                     } else {
                         struct[k] = [];
                     }
 
-                    for(var i = 0; i < n; ++i) {
+                    for (var i = 0; i < n; ++i) {
                         struct[k][i] = unpack24b(binary);
                     }
                 },
 
                 pack: function(struct, binary) {
-				if (typeof struct[k] === "undefined") struct[k]={};
-                    for(var i = 0; i < n; ++i) {
-					if(typeof struct[k][i] === "undefined") struct[k][i]={};
+                    if (typeof struct[k] === "undefined") struct[k] = {};
+                    for (var i = 0; i < n; ++i) {
+                        if (typeof struct[k][i] === "undefined") struct[k][i] = {};
                         pack24b(struct[k][i] || 0, binary);
                     }
                 }
             });
         },
 
-        // 32-bit signed little-endian integer.
+        /**
+         * 32-bit signed little-endian integer.
+         * @param  {String} k   The name of this element of the structure.
+         * @param  {Integer} n   Number of elements if this is an array.
+         * @param  {buffer} buf 
+         * @return {Restruct}     this, chainable
+         */
         int32ls: function(k, n, buf) {
-            if(typeof n === "undefined") {
+            if (typeof n === "undefined") {
                 return new Restruct(this, 4, {
-                    name: k, type: 'int32ls',
+                    name: k,
+                    type: 'int32ls',
                     unpack: function(binary, struct) {
                         struct[k] = sign32(unpack32l(binary));
                     },
 
                     pack: function(struct, binary) {
-					if (typeof struct[k] === "undefined") struct[k]={};
+                        if (typeof struct[k] === "undefined") struct[k] = {};
                         pack32l(struct[k], binary);
                     }
                 });
             }
 
             return new Restruct(this, 4 * n, {
-                name: k, type: 'int32ls['+n+']',
+                name: k,
+                type: 'int32ls[' + n + ']',
                 unpack: function(binary, struct) {
-                    if(typeof buf !== "undefined") {
+                    if (typeof buf !== "undefined") {
                         struct[k] = buf;
                     } else {
                         struct[k] = [];
                     }
 
-                    for(var i = n - 1; i >= 0; --i) {
+                    for (var i = n - 1; i >= 0; --i) {
                         struct[k][i] = sign32(unpack32l(binary));
                     }
                 },
 
                 pack: function(struct, binary) {
-				if (typeof struct[k] === "undefined") struct[k]={};
-                    for(var i = n - 1; i >= 0; --i) {
-					if(typeof struct[k][i] === "undefined") struct[k][i]={};
+                    if (typeof struct[k] === "undefined") struct[k] = {};
+                    for (var i = n - 1; i >= 0; --i) {
+                        if (typeof struct[k][i] === "undefined") struct[k][i] = {};
                         pack32l(struct[k][i] || 0, binary);
                     }
                 }
             });
         },
-        debug: function(){
+        debug: function() {
             console.log("SIZE: " + this.size);
             return new Restruct(this, 0, []);
         },
-        // 32-bit unsigned little-endian integer.
+
+        /**
+         * 32-bit unsigned little-endian integer.
+         * @param  {String} k   The name of this element of the structure.
+         * @param  {Integer} n   Number of elements if this is an array.
+         * @param  {buffer} buf 
+         * @return {Restruct}     this, chainable
+         */
         int32lu: function(k, n, buf) {
-            if(typeof n === "undefined") {
+            if (typeof n === "undefined") {
                 return new Restruct(this, 4, {
-                    name: k, type: 'int32lu',
+                    name: k,
+                    type: 'int32lu',
                     unpack: function(binary, struct) {
                         struct[k] = unpack32l(binary);
                     },
 
                     pack: function(struct, binary) {
-						//if (typeof(struct) == "undefined") struct = [];
+                        //if (typeof(struct) == "undefined") struct = [];
                         //if (struct==null) struct={};
-						//if (typeof(struct[k]) == "undefined") struct[k]={};
-
-						//if (struct==null) { console.log('Errors here'); debugger; }
-                        if (struct==null) { pack32l(0,binary); return; }
+                        //if (typeof(struct[k]) == "undefined") struct[k]={};
+                        //if (struct==null) { console.log('Errors here'); debugger; }
+                        if (struct == null) {
+                            pack32l(0, binary);
+                            return;
+                        }
                         pack32l(struct[k], binary);
                     }
                 });
             }
 
             return new Restruct(this, 4 * n, {
-                name: k, type: 'int32lu['+n+']',
+                name: k,
+                type: 'int32lu[' + n + ']',
                 unpack: function(binary, struct) {
-                    if(typeof buf !== "undefined") {
+                    if (typeof buf !== "undefined") {
                         struct[k] = buf;
                     } else {
                         struct[k] = [];
                     }
 
-                    for(var i = n - 1; i >= 0; --i) {
+                    for (var i = n - 1; i >= 0; --i) {
                         struct[k][i] = unpack32l(binary);
                     }
                 },
 
                 pack: function(struct, binary) {
-                    for(var i = n - 1; i >= 0; --i) {
-                            pack32l(struct[k] === undefined || struct[k][i] === undefined ? 0 : struct[k][i], binary);
+                    for (var i = n - 1; i >= 0; --i) {
+                        pack32l(struct[k] === undefined || struct[k][i] === undefined ? 0 : struct[k][i], binary);
                     }
                 }
             });
         },
 
-        // 32-bit signed big-endian integer.
+        /**
+         * 32-bit signed big-endian integer.
+         * @param  {String} k   The name of this element of the structure.
+         * @param  {Integer} n   Number of elements if this is an array.
+         * @param  {buffer} buf 
+         * @return {Restruct}     this, chainable
+         */
         int32bs: function(k, n, buf) {
-            if(typeof n === "undefined") {
+            if (typeof n === "undefined") {
                 return new Restruct(this, 4, {
-                    name: k, type: 'int32bs',
+                    name: k,
+                    type: 'int32bs',
                     unpack: function(binary, struct) {
                         struct[k] = sign32(unpack32b(binary));
                     },
 
                     pack: function(struct, binary) {
-						if (typeof struct[k] === "undefined") struct[k]={};
+                        if (typeof struct[k] === "undefined") struct[k] = {};
                         pack32b(struct[k], binary);
                     }
                 });
             }
 
             return new Restruct(this, 4 * n, {
-                name: k, type: 'int32bs['+n+']',
+                name: k,
+                type: 'int32bs[' + n + ']',
                 unpack: function(binary, struct) {
-                    if(typeof buf !== "undefined") {
+                    if (typeof buf !== "undefined") {
                         struct[k] = buf;
                     } else {
                         struct[k] = [];
                     }
 
-                    for(var i = 0; i < n; ++i) {
+                    for (var i = 0; i < n; ++i) {
                         struct[k][i] = sign32(unpack32b(binary));
                     }
                 },
 
                 pack: function(struct, binary) {
-				if (typeof struct[k] === "undefined") struct[k]={};
-                    for(var i = 0; i < n; ++i) {
-					if (typeof struct[k][i] === "undefined") struct[k][i]={};
+                    if (typeof struct[k] === "undefined") struct[k] = {};
+                    for (var i = 0; i < n; ++i) {
+                        if (typeof struct[k][i] === "undefined") struct[k][i] = {};
                         pack32b(struct[k][i] || 0, binary);
                     }
                 }
             });
         },
 
-        // 32-bit unsigned big-endian integer.
+        /**
+         * 32-bit unsigned big-endian integer.
+         * @param  {String} k   The name of this element of the structure.
+         * @param  {Integer} n   Number of elements if this is an array.
+         * @param  {buffer} buf 
+         * @return {Restruct}     this, chainable
+         */
         int32bu: function(k, n, buf) {
-            if(typeof n === "undefined") {
+            if (typeof n === "undefined") {
                 return new Restruct(this, 4, {
-                    name: k, type: 'int32bu',
+                    name: k,
+                    type: 'int32bu',
                     unpack: function(binary, struct) {
                         struct[k] = unpack32b(binary);
                     },
 
                     pack: function(struct, binary) {
-					if (typeof struct[k][i] === "undefined") struct[k][i]={};
+                        if (typeof struct[k][i] === "undefined") struct[k][i] = {};
                         pack32b(struct[k], binary);
                     }
                 });
             }
 
             return new Restruct(this, 4 * n, {
-                name: k, type: 'int32bu['+n+']',
+                name: k,
+                type: 'int32bu[' + n + ']',
                 unpack: function(binary, struct) {
-                    if(typeof buf !== "undefined") {
+                    if (typeof buf !== "undefined") {
                         struct[k] = buf;
                     } else {
                         struct[k] = [];
                     }
 
-                    for(var i = 0; i < n; ++i) {
+                    for (var i = 0; i < n; ++i) {
                         struct[k][i] = unpack32b(binary);
                     }
                 },
 
                 pack: function(struct, binary) {
-				if (typeof struct[k][i] === "undefined") struct[k][i]={};
-                    for(var i = 0; i < n; ++i) {
-					if(typeof struct[k][i] === "undefined") struct[k][i]={};
+                    if (typeof struct[k][i] === "undefined") struct[k][i] = {};
+                    for (var i = 0; i < n; ++i) {
+                        if (typeof struct[k][i] === "undefined") struct[k][i] = {};
                         pack32b(struct[k][i] || 0, binary);
                     }
                 }
             });
         },
 
-        // 40-bit signed little-endian integer.
+        /**
+         * 40-bit signed little-endian integer.
+         * @param  {String} k   The name of this element of the structure.
+         * @param  {Integer} n   Number of elements if this is an array.
+         * @param  {buffer} buf 
+         * @return {Restruct}     this, chainable
+         */
         int40ls: function(k, n, buf) {
-            if(typeof n === "undefined") {
+            if (typeof n === "undefined") {
                 return new Restruct(this, 5, {
-                    name: k, type: 'int40ls',
+                    name: k,
+                    type: 'int40ls',
                     unpack: function(binary, struct) {
                         struct[k] = sign40(unpack40l(binary));
                     },
 
                     pack: function(struct, binary) {
-					if (typeof struct[k][i] === "undefined") struct[k][i]={};
+                        if (typeof struct[k][i] === "undefined") struct[k][i] = {};
                         pack40l(struct[k], binary);
                     }
                 });
             }
 
             return new Restruct(this, 5 * n, {
-                name: k, type: 'int40ls['+n+']',
+                name: k,
+                type: 'int40ls[' + n + ']',
                 unpack: function(binary, struct) {
-                    if(typeof buf !== "undefined") {
+                    if (typeof buf !== "undefined") {
                         struct[k] = buf;
                     } else {
                         struct[k] = [];
                     }
 
-                    for(var i = n - 1; i >= 0; --i) {
+                    for (var i = n - 1; i >= 0; --i) {
                         struct[k][i] = sign40(unpack40l(binary));
                     }
                 },
 
                 pack: function(struct, binary) {
-				if (typeof struct[k][i] === "undefined") struct[k][i]={};
-                    for(var i = n - 1; i >= 0; --i) {
-					if(typeof struct[k][i] === "undefined") struct[k][i]={};
+                    if (typeof struct[k][i] === "undefined") struct[k][i] = {};
+                    for (var i = n - 1; i >= 0; --i) {
+                        if (typeof struct[k][i] === "undefined") struct[k][i] = {};
                         pack40l(struct[k][i] || 0, binary);
                     }
                 }
             });
         },
 
-        // 40-bit unsigned little-endian integer.
+        /**
+         * 40-bit unsigned little-endian integer.
+         * @param  {String} k   The name of this element of the structure.
+         * @param  {Integer} n   Number of elements if this is an array.
+         * @param  {buffer} buf 
+         * @return {Restruct}     this, chainable
+         */
         int40lu: function(k, n, buf) {
-            if(typeof n === "undefined") {
+            if (typeof n === "undefined") {
                 return new Restruct(this, 5, {
-                    name: k, type: 'int40lu',
+                    name: k,
+                    type: 'int40lu',
                     unpack: function(binary, struct) {
                         struct[k] = unpack40l(binary);
                     },
 
                     pack: function(struct, binary) {
-					if (typeof struct[k][i] === "undefined") struct[k][i]={};
+                        if (typeof struct[k][i] === "undefined") struct[k][i] = {};
                         pack40l(struct[k], binary);
                     }
                 });
             }
 
             return new Restruct(this, 5 * n, {
-                name: k, type: 'int40lu['+n+']',
+                name: k,
+                type: 'int40lu[' + n + ']',
                 unpack: function(binary, struct) {
-                    if(typeof buf !== "undefined") {
+                    if (typeof buf !== "undefined") {
                         struct[k] = buf;
                     } else {
                         struct[k] = [];
                     }
 
-                    for(var i = n - 1; i >= 0; --i) {
+                    for (var i = n - 1; i >= 0; --i) {
                         struct[k][i] = unpack40l(binary);
                     }
                 },
 
                 pack: function(struct, binary) {
-				if (typeof struct[k][i] === "undefined") struct[k][i]={};
-                    for(var i = n - 1; i >= 0; --i) {
-					if(typeof struct[k][i] === "undefined") struct[k][i]={};
+                    if (typeof struct[k][i] === "undefined") struct[k][i] = {};
+                    for (var i = n - 1; i >= 0; --i) {
+                        if (typeof struct[k][i] === "undefined") struct[k][i] = {};
                         pack40l(struct[k][i] || 0, binary);
                     }
                 }
             });
         },
 
-        // 40-bit signed big-endian integer.
+        /**
+         * 40-bit signed big-endian integer.
+         * @param  {String} k   The name of this element of the structure.
+         * @param  {Integer} n   Number of elements if this is an array.
+         * @param  {buffer} buf 
+         * @return {Restruct}     this, chainable
+         */
         int40bs: function(k, n, buf) {
-            if(typeof n === "undefined") {
+            if (typeof n === "undefined") {
                 return new Restruct(this, 5, {
-                    name: k, type: 'int40bs',
+                    name: k,
+                    type: 'int40bs',
                     unpack: function(binary, struct) {
                         struct[k] = sign40(unpack40b(binary));
                     },
 
                     pack: function(struct, binary) {
-					if (typeof struct[k][i] === "undefined") struct[k][i]={};
+                        if (typeof struct[k][i] === "undefined") struct[k][i] = {};
                         pack40b(struct[k], binary);
                     }
                 });
             }
 
             return new Restruct(this, 5 * n, {
-                name: k, type: 'int40bs['+n+']',
+                name: k,
+                type: 'int40bs[' + n + ']',
                 unpack: function(binary, struct) {
-                    if(typeof buf !== "undefined") {
+                    if (typeof buf !== "undefined") {
                         struct[k] = buf;
                     } else {
                         struct[k] = [];
                     }
 
-                    for(var i = 0; i < n; ++i) {
+                    for (var i = 0; i < n; ++i) {
                         struct[k][i] = sign40(unpack40b(binary));
                     }
                 },
 
                 pack: function(struct, binary) {
-				if (typeof struct[k][i] === "undefined") struct[k][i]={};
-                    for(var i = 0; i < n; ++i) {
-					if(typeof struct[k][i] === "undefined") struct[k][i]={};
+                    if (typeof struct[k][i] === "undefined") struct[k][i] = {};
+                    for (var i = 0; i < n; ++i) {
+                        if (typeof struct[k][i] === "undefined") struct[k][i] = {};
                         pack40b(struct[k][i] || 0, binary);
                     }
                 }
             });
         },
 
-        // 40-bit unsigned big-endian integer.
+        /**
+         * 40-bit unsigned big-endian integer.
+         * @param  {String} k   The name of this element of the structure.
+         * @param  {Integer} n   Number of elements if this is an array.
+         * @param  {buffer} buf 
+         * @return {Restruct}     this, chainable
+         */
         int40bu: function(k, n, buf) {
-            if(typeof n === "undefined") {
+            if (typeof n === "undefined") {
                 return new Restruct(this, 5, {
-                    name: k, type: 'int40bu',
+                    name: k,
+                    type: 'int40bu',
                     unpack: function(binary, struct) {
                         struct[k] = unpack40b(binary);
                     },
 
                     pack: function(struct, binary) {
-					if (typeof struct[k][i] === "undefined") struct[k][i]={};
+                        if (typeof struct[k][i] === "undefined") struct[k][i] = {};
                         pack40b(struct[k], binary);
                     }
                 });
             }
 
             return new Restruct(this, 5 * n, {
-                name: k, type: 'int40bu['+n+']',
+                name: k,
+                type: 'int40bu[' + n + ']',
                 unpack: function(binary, struct) {
-                    if(typeof buf !== "undefined") {
+                    if (typeof buf !== "undefined") {
                         struct[k] = buf;
                     } else {
                         struct[k] = [];
                     }
 
-                    for(var i = 0; i < n; ++i) {
+                    for (var i = 0; i < n; ++i) {
                         struct[k][i] = unpack40b(binary);
                     }
                 },
 
                 pack: function(struct, binary) {
-				if (typeof struct[k][i] === "undefined") struct[k][i]={};
-                    for(var i = 0; i < n; ++i) {
-					if(typeof struct[k][i] === "undefined") struct[k][i]={};
+                    if (typeof struct[k][i] === "undefined") struct[k][i] = {};
+                    for (var i = 0; i < n; ++i) {
+                        if (typeof struct[k][i] === "undefined") struct[k][i] = {};
                         pack40b(struct[k][i] || 0, binary);
                     }
                 }
             });
         },
 
-        // 48-bit signed little-endian integer.
+        /**
+         * 48-bit signed little-endian integer.
+         * @param  {String} k   The name of this element of the structure.
+         * @param  {Integer} n   Number of elements if this is an array.
+         * @param  {buffer} buf 
+         * @return {Restruct}     this, chainable
+         */
         int48ls: function(k, n, buf) {
-            if(typeof n === "undefined") {
+            if (typeof n === "undefined") {
                 return new Restruct(this, 6, {
-                    name: k, type: 'int48ls',
+                    name: k,
+                    type: 'int48ls',
                     unpack: function(binary, struct) {
                         struct[k] = sign48(unpack48l(binary));
                     },
 
                     pack: function(struct, binary) {
-					if (typeof struct[k][i] === "undefined") struct[k][i]={};
+                        if (typeof struct[k][i] === "undefined") struct[k][i] = {};
                         pack48l(struct[k], binary);
                     }
                 });
             }
 
             return new Restruct(this, 6 * n, {
-                name: k, type: 'int48ls['+n+']',
+                name: k,
+                type: 'int48ls[' + n + ']',
                 unpack: function(binary, struct) {
-                    if(typeof buf !== "undefined") {
+                    if (typeof buf !== "undefined") {
                         struct[k] = buf;
                     } else {
                         struct[k] = [];
                     }
 
-                    for(var i = n - 1; i >= 0; --i) {
+                    for (var i = n - 1; i >= 0; --i) {
                         struct[k][i] = sign48(unpack48l(binary));
                     }
                 },
 
                 pack: function(struct, binary) {
-				if (typeof struct[k][i] === "undefined") struct[k][i]={};
-                    for(var i = n - 1; i >= 0; --i) {
-					if(typeof struct[k][i] === "undefined") struct[k][i]={};
+                    if (typeof struct[k][i] === "undefined") struct[k][i] = {};
+                    for (var i = n - 1; i >= 0; --i) {
+                        if (typeof struct[k][i] === "undefined") struct[k][i] = {};
                         pack48l(struct[k][i] || 0, binary);
                     }
                 }
             });
         },
 
-        // 48-bit unsigned little-endian integer.
+        /**
+         * 48-bit unsigned little-endian integer.
+         * @param  {String} k   The name of this element of the structure.
+         * @param  {Integer} n   Number of elements if this is an array.
+         * @param  {buffer} buf 
+         * @return {Restruct}     this, chainable
+         */
         int48lu: function(k, n, buf) {
-            if(typeof n === "undefined") {
+            if (typeof n === "undefined") {
                 return new Restruct(this, 6, {
-                    name: k, type: 'int48lu',
+                    name: k,
+                    type: 'int48lu',
                     unpack: function(binary, struct) {
                         struct[k] = unpack48l(binary);
                     },
 
                     pack: function(struct, binary) {
-					if (typeof struct[k][i] === "undefined") struct[k][i]={};
+                        if (typeof struct[k][i] === "undefined") struct[k][i] = {};
                         pack48l(struct[k], binary);
                     }
                 });
             }
 
             return new Restruct(this, 6 * n, {
-                name: k, type: 'int48lu['+n+']',
+                name: k,
+                type: 'int48lu[' + n + ']',
                 unpack: function(binary, struct) {
-                    if(typeof buf !== "undefined") {
+                    if (typeof buf !== "undefined") {
                         struct[k] = buf;
                     } else {
                         struct[k] = [];
                     }
 
-                    for(var i = n - 1; i >= 0; --i) {
+                    for (var i = n - 1; i >= 0; --i) {
                         struct[k][i] = unpack48l(binary);
                     }
                 },
 
                 pack: function(struct, binary) {
-				if (typeof struct[k][i] === "undefined") struct[k][i]={};
-                    for(var i = n - 1; i >= 0; --i) {
-					if(typeof struct[k][i] === "undefined") struct[k][i]={};
+                    if (typeof struct[k][i] === "undefined") struct[k][i] = {};
+                    for (var i = n - 1; i >= 0; --i) {
+                        if (typeof struct[k][i] === "undefined") struct[k][i] = {};
                         pack48l(struct[k][i] || 0, binary);
                     }
                 }
             });
         },
 
-        // 48-bit signed big-endian integer.
+        /**
+         * 48-bit signed big-endian integer.
+         * @param  {String} k   The name of this element of the structure.
+         * @param  {Integer} n   Number of elements if this is an array.
+         * @param  {buffer} buf 
+         * @return {Restruct}     this, chainable
+         */
         int48bs: function(k, n, buf) {
-            if(typeof n === "undefined") {
+            if (typeof n === "undefined") {
                 return new Restruct(this, 6, {
-                    name: k, type: 'int48bs',
+                    name: k,
+                    type: 'int48bs',
                     unpack: function(binary, struct) {
                         struct[k] = sign48(unpack48b(binary));
                     },
 
                     pack: function(struct, binary) {
-					if (typeof struct[k][i] === "undefined") struct[k][i]={};
+                        if (typeof struct[k][i] === "undefined") struct[k][i] = {};
                         pack48b(struct[k], binary);
                     }
                 });
             }
 
             return new Restruct(this, 6 * n, {
-                name: k, type: 'int48bs['+n+']',
+                name: k,
+                type: 'int48bs[' + n + ']',
                 unpack: function(binary, struct) {
-                    if(typeof buf !== "undefined") {
+                    if (typeof buf !== "undefined") {
                         struct[k] = buf;
                     } else {
                         struct[k] = [];
                     }
 
-                    for(var i = 0; i < n; ++i) {
+                    for (var i = 0; i < n; ++i) {
                         struct[k][i] = sign48(unpack48b(binary));
                     }
                 },
 
                 pack: function(struct, binary) {
-				if (typeof struct[k][i] === "undefined") struct[k][i]={};
-                    for(var i = 0; i < n; ++i) {
-					if(typeof struct[k][i] === "undefined") struct[k][i]={};
+                    if (typeof struct[k][i] === "undefined") struct[k][i] = {};
+                    for (var i = 0; i < n; ++i) {
+                        if (typeof struct[k][i] === "undefined") struct[k][i] = {};
                         pack48b(struct[k][i] || 0, binary);
                     }
                 }
             });
         },
 
-        // 48-bit unsigned big-endian integer.
+        /**
+         * 48-bit unsigned big-endian integer.
+         * @param  {String} k   The name of this element of the structure.
+         * @param  {Integer} n   Number of elements if this is an array.
+         * @param  {buffer} buf 
+         * @return {Restruct}     this, chainable
+         */
         int48bu: function(k, n, buf) {
-            if(typeof n === "undefined") {
+            if (typeof n === "undefined") {
                 return new Restruct(this, 6, {
-                    name: k, type: 'int48bu',
+                    name: k,
+                    type: 'int48bu',
                     unpack: function(binary, struct) {
                         struct[k] = unpack48b(binary);
                     },
 
                     pack: function(struct, binary) {
-					if (typeof struct[k][i] === "undefined") struct[k][i]={};
+                        if (typeof struct[k][i] === "undefined") struct[k][i] = {};
                         pack48b(struct[k], binary);
                     }
                 });
             }
 
             return new Restruct(this, 6 * n, {
-                name: k, type: 'int48bu['+n+']',
+                name: k,
+                type: 'int48bu[' + n + ']',
                 unpack: function(binary, struct) {
-                    if(typeof buf !== "undefined") {
+                    if (typeof buf !== "undefined") {
                         struct[k] = buf;
                     } else {
                         struct[k] = [];
                     }
 
-                    for(var i = 0; i < n; ++i) {
+                    for (var i = 0; i < n; ++i) {
                         struct[k][i] = unpack48b(binary);
                     }
                 },
 
                 pack: function(struct, binary) {
-				if (typeof struct[k][i] === "undefined") struct[k][i]={};
-                    for(var i = 0; i < n; ++i) {
-					if(typeof struct[k][i] === "undefined") struct[k][i]={};
+                    if (typeof struct[k][i] === "undefined") struct[k][i] = {};
+                    for (var i = 0; i < n; ++i) {
+                        if (typeof struct[k][i] === "undefined") struct[k][i] = {};
                         pack48b(struct[k][i] || 0, binary);
                     }
                 }
             });
         },
 
-        // UTF-8 string.
+        /**
+         * UTF-8 string.
+         * @param  {String} k   The name of this element of the structure.
+         * @param  {Integer} n   Number of elements if this is an array.
+         * @param  {buffer} buf 
+         * @return {Restruct}     this, chainable
+         */
         string: function(k, n, a) { // k is name of string, n is length of string, a is length of array
-                if (typeof a === "undefined")
-                    {
-                        return new Restruct(this, n, {
-                        name: k, type: 'string['+n+']',
-                        // Not Array of string
-                        unpack: function(binary, struct) {
-                            var bytes = [];
-                            var eos = false;
-                            for(var i = 0; i < n; ++i) {
-                                var byte = unpack8(binary);
-                                if(byte === 0) eos = true;
-
-                                if(!eos) bytes.push(byte);
-                            }
-
-                            struct[k] = decodeUTF8(String.fromCharCode.apply(String, bytes));
-                        },
-
-                        pack: function(struct, binary) {
-        					if (struct==null) struct={};
-                            if (typeof struct[k] === "undefined")
-                            {
-                                struct[k]='';
-                            }
-
-                            if(struct[k] === null) struct[k] = "";
-
-                            var str = encodeUTF8(struct[k]);
-                            var len = Math.min(str.length, n);
-
-                            for(var i = 0; i < len; ++i) {
-                                pack8(str.charCodeAt(i), binary);
-                            }
-
-                            for(; len < n; ++len) {
-                                pack8(0, binary);
-                            }
-                        }
-                        });
-            }
-            else
-            { // Array of string
-                return new Restruct(this, n * a, {
-                name: k, type: 'string['+n+']['+a+']',
-                unpack: function(binary, struct) {
-                    struct[k] = [];
-
-                    for(var i = 0; i < a; ++i) {
+            if (typeof a === "undefined") {
+                return new Restruct(this, n, {
+                    name: k,
+                    type: 'string[' + n + ']',
+                    // Not Array of string
+                    unpack: function(binary, struct) {
                         var bytes = [];
                         var eos = false;
-                        for(var x = 0; x < n; ++x) {
+                        for (var i = 0; i < n; ++i) {
                             var byte = unpack8(binary);
-                            if(byte === 0) eos = true;
+                            if (byte === 0) eos = true;
 
-                            if(!eos) bytes.push(byte);
+                            if (!eos) bytes.push(byte);
                         }
 
-                        struct[k][i] = decodeUTF8(String.fromCharCode.apply(String, bytes));
-                    }
-                },
+                        struct[k] = decodeUTF8(String.fromCharCode.apply(String, bytes));
+                    },
 
-                pack: function(struct, binary) {
-                if (typeof struct[k] === "undefined") struct[k]=[];
+                    pack: function(struct, binary) {
+                        if (struct == null) struct = {};
+                        if (typeof struct[k] === "undefined") {
+                            struct[k] = '';
+                        }
 
-                    for(var i = 0; i < a; ++i) {
-                        if (typeof struct[k][i] === "undefined") struct[k][i]='';
-                        if (struct[k][i]==null) struct[k][i]='';
+                        if (struct[k] === null) struct[k] = "";
 
-                        var str = encodeUTF8(struct[k][i]);
+                        var str = encodeUTF8(struct[k]);
                         var len = Math.min(str.length, n);
 
-                        for(var x = 0; x < len; ++x) {
-                            pack8(str.charCodeAt(x), binary);
+                        for (var i = 0; i < len; ++i) {
+                            pack8(str.charCodeAt(i), binary);
                         }
 
-                        for(; len < n; ++len) {
+                        for (; len < n; ++len) {
                             pack8(0, binary);
                         }
                     }
-                }
-            });
+                });
+            } else { // Array of string
+                return new Restruct(this, n * a, {
+                    name: k,
+                    type: 'string[' + n + '][' + a + ']',
+                    unpack: function(binary, struct) {
+                        struct[k] = [];
+
+                        for (var i = 0; i < a; ++i) {
+                            var bytes = [];
+                            var eos = false;
+                            for (var x = 0; x < n; ++x) {
+                                var byte = unpack8(binary);
+                                if (byte === 0) eos = true;
+
+                                if (!eos) bytes.push(byte);
+                            }
+
+                            struct[k][i] = decodeUTF8(String.fromCharCode.apply(String, bytes));
+                        }
+                    },
+
+                    pack: function(struct, binary) {
+                        if (typeof struct[k] === "undefined") struct[k] = [];
+
+                        for (var i = 0; i < a; ++i) {
+                            if (typeof struct[k][i] === "undefined") struct[k][i] = '';
+                            if (struct[k][i] == null) struct[k][i] = '';
+
+                            var str = encodeUTF8(struct[k][i]);
+                            var len = Math.min(str.length, n);
+
+                            for (var x = 0; x < len; ++x) {
+                                pack8(str.charCodeAt(x), binary);
+                            }
+
+                            for (; len < n; ++len) {
+                                pack8(0, binary);
+                            }
+                        }
+                    }
+                });
             }
         },
 
-        // Another struct.
+        /**
+         * Nested structure.
+         * @param  {String} k   The name of this element of the structure.
+         * @param  {Restruct} s   Another structure.
+         * @param  {Integer} n   Number of elements if this is an array.
+         * @return {Restruct}     this, chainable
+         */
         struct: function(k, s, n) {
-            if(typeof n === "undefined") {
+            if (typeof n === "undefined") {
                 //return new Restruct(this, 1, { <-- This was reporting wrong sizes for struct-in-struct!
-				return new Restruct(this, s.size, {
-                    name: k, type: s,
+                return new Restruct(this, s.size, {
+                    name: k,
+                    type: s,
                     unpack: function(binary, struct) {
                         struct[k] = s.unpack(binary.array, binary.offset);
                         binary.offset += s.size;
                     },
 
                     pack: function(struct, binary) {
-						if (typeof struct[k] === "undefined") struct[k]={};
+                        if (typeof struct[k] === "undefined") struct[k] = {};
                         s.pack(struct[k], binary.array, binary.offset);
                         binary.offset += s.size;
                     }
@@ -1487,19 +1773,20 @@
             }
 
             return new Restruct(this, n * s.size, {
-                name: k, type: s+'['+n+']',
+                name: k,
+                type: s + '[' + n + ']',
                 unpack: function(binary, struct) {
                     struct[k] = [];
-                    for(var i = 0; i < n; ++i) {
+                    for (var i = 0; i < n; ++i) {
                         struct[k][i] = s.unpack(binary.array, binary.offset);
                         binary.offset += s.size;
                     }
                 },
 
                 pack: function(struct, binary) {
-					if (typeof struct[k] === "undefined") struct[k]={};
-                    for(var i = 0; i < n; ++i) {
-						if (typeof struct[k][i] === "undefined") struct[k][i]={};
+                    if (typeof struct[k] === "undefined") struct[k] = {};
+                    for (var i = 0; i < n; ++i) {
+                        if (typeof struct[k][i] === "undefined") struct[k][i] = {};
                         s.pack(struct[k][i], binary.array, binary.offset);
                         binary.offset += s.size;
                     }
@@ -1507,70 +1794,84 @@
             });
         },
 
-		// Floats
-        // 32-bit signed little-endian float.
+        // Floats
+
+        /**
+         * 32-bit signed little-endian float.
+         * @param  {String} k   The name of this element of the structure.
+         * @param  {Integer} n   Number of elements if this is an array.
+         * @param  {buffer} buf 
+         * @return {Restruct}     this, chainable
+         */
         float32l: function(k, n, buf) {
-            if(typeof n === "undefined") {
+            if (typeof n === "undefined") {
                 return new Restruct(this, 4, {
-                    name: k, type: 'float32l',
+                    name: k,
+                    type: 'float32l',
                     unpack: function(binary, struct) {
 
-						var buf = new ArrayBuffer(4);
-						(new Uint32Array(buf))[0] = unpack32l(binary);
-						var res = (new Float32Array(buf))[0];
+                        var buf = new ArrayBuffer(4);
+                        (new Uint32Array(buf))[0] = unpack32l(binary);
+                        var res = (new Float32Array(buf))[0];
 
-						struct[k] = res;
+                        struct[k] = res;
                     },
 
                     pack: function(struct, binary) {
-					if (typeof struct[k] === "undefined") struct[k]={};
+                        if (typeof struct[k] === "undefined") struct[k] = {};
 
-						var buf = new ArrayBuffer(4);
-						(new Float32Array(buf))[0] = struct[k];
-						var res = (new Uint32Array(buf))[0];
+                        var buf = new ArrayBuffer(4);
+                        (new Float32Array(buf))[0] = struct[k];
+                        var res = (new Uint32Array(buf))[0];
 
-						pack32l(res+1, binary);
-				}
+                        pack32l(res + 1, binary);
+                    }
                 });
             }
 
             return new Restruct(this, 4 * n, {
-                name: k, type: 'float32l['+n+']',
+                name: k,
+                type: 'float32l[' + n + ']',
                 unpack: function(binary, struct) {
-                    if(typeof buf !== "undefined") {
+                    if (typeof buf !== "undefined") {
                         struct[k] = buf;
                     } else {
                         struct[k] = [];
                     }
 
-                    for(var i = n - 1; i >= 0; --i) {
+                    for (var i = n - 1; i >= 0; --i) {
 
-						var buf = new ArrayBuffer(4);
-						(new Uint32Array(buf))[0] = unpack32l(binary);
-						var res = (new Float32Array(buf))[0];
+                        var buf = new ArrayBuffer(4);
+                        (new Uint32Array(buf))[0] = unpack32l(binary);
+                        var res = (new Float32Array(buf))[0];
 
-						struct[k][i] = res;
+                        struct[k][i] = res;
                     }
                 },
 
                 pack: function(struct, binary) {
-				if (typeof struct[k] === "undefined") struct[k]={};
-                    for(var i = n - 1; i >= 0; --i) {
-					if(typeof struct[k][i] === "undefined") struct[k][i]={};
-						var buf = new ArrayBuffer(4);
-						(new Float32Array(buf))[0] = struct[k];
-						var res = (new Uint32Array(buf))[0];
+                    if (typeof struct[k] === "undefined") struct[k] = {};
+                    for (var i = n - 1; i >= 0; --i) {
+                        if (typeof struct[k][i] === "undefined") struct[k][i] = {};
+                        var buf = new ArrayBuffer(4);
+                        (new Float32Array(buf))[0] = struct[k];
+                        var res = (new Uint32Array(buf))[0];
 
-						pack32l(res, binary);
+                        pack32l(res, binary);
                     }
                 }
             });
         },
 
-        // Unpack an array to a struct.
+        /**
+         * Unpacks a structure type.
+         * This will return a JS object.
+         * @param {binary} array The data to unpack.
+         * @returns {object}
+         */
         unpack: function(array, offset) {
-            if(typeof offset === 'undefined') offset = 0;
-			if(typeof array === 'undefined') array = [this.length];
+            if (typeof offset === 'undefined') offset = 0;
+            if (typeof array === 'undefined') array = [this.length];
 
             var binary = {
                 offset: offset,
@@ -1579,41 +1880,43 @@
 
             var struct = {};
 
-            for(var i = 0; i < this.formats.length; ++i) {
+            for (var i = 0; i < this.formats.length; ++i) {
                 this.formats[i].unpack(binary, struct);
             }
 
             return struct;
         },
 
-        // Create js Object with undef keys.
+        /**
+         * Create js Object with undef keys.
+         * @return {object} 
+         */
         objectify: function() {
-            if(typeof offset === 'undefined') offset = 0;
-            if(typeof array === 'undefined') array = [this.length];
+            if (typeof offset === 'undefined') offset = 0;
+            if (typeof array === 'undefined') array = [this.length];
 
-            function objectify_formats(formats){
-                for(var i = 0; i < formats.length; ++i) {
+            function objectify_formats(formats) {
+                for (var i = 0; i < formats.length; ++i) {
                     var struct = {};
                     if (typeof(formats[i].type) === 'string') {
                         var objcheck = formats[i].type.indexOf('[object Object]');
-                        if (objcheck===0){
+                        if (objcheck === 0) {
                             formats[i].type = formats[i].type.substr(15);
-                            objcheck=1;
+                            objcheck = 1;
                         }
 
                         var lb = formats[i].type.indexOf('[');
                         var rb = formats[i].type.indexOf(']');
 
-                        if (lb>-1 && rb>-1) {
+                        if (lb > -1 && rb > -1) {
                             lb++;
                             rb--;
 
                             if (objcheck) {
-                                struct[formats[i].name] = new Array(Number(formats[i].type.substr(lb,rb-lb)));
+                                struct[formats[i].name] = new Array(Number(formats[i].type.substr(lb, rb - lb)));
                                 throw new Error('Array of struct not yet supported in objectify.');
-                            }
-                            else {
-                                struct[formats[i].name] = new Array(Number(formats[i].type.substr(lb,rb-lb)));
+                            } else {
+                                struct[formats[i].name] = new Array(Number(formats[i].type.substr(lb, rb - lb)));
                             }
                         } else {
                             struct[formats[i].name] = undefined;
@@ -1631,17 +1934,22 @@
             return struct;
         },
 
-        // Pack an array to a struct.
+        /**
+         * Packs a structure type.
+         * This will return buffer/binary.
+         * @param {object} struct The object to pack.
+         * @returns {binary}
+         */
         pack: function(struct, array, offset) {
-            if(typeof offset === 'undefined') offset = 0;
-            if(typeof array === 'undefined') array = [];
+            if (typeof offset === 'undefined') offset = 0;
+            if (typeof array === 'undefined') array = [];
 
             var binary = {
                 offset: offset,
                 array: array
             };
 
-            for(var i = 0; i < this.formats.length; ++i) {
+            for (var i = 0; i < this.formats.length; ++i) {
                 this.formats[i].pack(struct, binary);
             }
 
@@ -1651,10 +1959,10 @@
 
     var restruct = new Restruct();
 
-    if(typeof module !== "undefined" && module.exports) {
+    if (typeof module !== "undefined" && module.exports) {
         module.exports = restruct;
     }
-    if(typeof window !== "undefined") {
+    if (typeof window !== "undefined") {
         window.restruct = restruct;
     }
 })();
