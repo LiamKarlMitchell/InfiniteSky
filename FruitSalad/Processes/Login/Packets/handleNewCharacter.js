@@ -174,10 +174,11 @@ LoginPC.Set(0x06, {
 			socket.character = newCharacter;
 
 			var infos = new CharacterInfos(socket);
+			console.log(infos);
 			infos.updateAll(function(){
-				console.log('infos.updateAll returned with these arguments: ', arguments);
 				newCharacter.Health = infos.MaxHP;
 				newCharacter.Chi = infos.MaxChi;
+				infos.print();
 
 				db.getNextSequence('characterid', function(id){
 					newCharacter._id = id;

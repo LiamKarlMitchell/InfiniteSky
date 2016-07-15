@@ -176,8 +176,6 @@ calculation.Cape = function(itemInfo, item, done){
  * Applies characters Outfit into the CharacterInfo stats.
  */
 calculation.Outfit = function(itemInfo, item, done){
-  console.log('In calculation.outfit');
-  console.log('typeof iteminfo: ' +( typeof itemInfo));
   switch(typeof itemInfo){
     case 'object':
     var DefenseTick = (item.Level > 95 && item.Level <= 145) ? 22 : 14;

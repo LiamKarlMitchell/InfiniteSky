@@ -1,11 +1,20 @@
 // This file is part of InfiniteSky.
 // Copyright (c) InfiniteSky Dev Teams - Licensed under GNU GPL
 // For more information, see LICENCE in the main folder
+
+/**
+ * Schema for a user account.
+ * @class db.Account
+ */
 vms('Account', [], function(){
 	var Mixed = db.mongoose.Schema.Types.Mixed;
 	var characterIndi = {};
 
 	db.accountSchema = mongoose.Schema({
+		/**
+		 * [_id description]
+		 * @type {Number}
+		 */
 		_id: { type: Number, unique: true, index: true },
 		Username: { type: String, unique: true, index: true },
 		Password: String,
