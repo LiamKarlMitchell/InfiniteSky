@@ -233,7 +233,7 @@ VMScriptObj.prototype.parse = function(file_path){
 								return new Array(match.split('\n').length).join('\n');
 							}));
 					}catch(e){
-						dumpError(e);
+						dumpError('File: '+file_name+'\n'+e);
 					}
 				}
 			}

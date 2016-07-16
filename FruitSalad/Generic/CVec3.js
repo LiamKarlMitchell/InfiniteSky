@@ -7,7 +7,7 @@
  * @exports Generic/CVec3
  */
 
-//vms('CVec3', [], function(){
+vms('CVec3', [], function(){
 
 /**
  * [CVec3 description]
@@ -191,4 +191,4 @@ CVec3.prototype = {
 }
 
 global.CVec3 = CVec3;
-//});
+});

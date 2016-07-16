@@ -791,7 +791,7 @@ zonePrototype.onProcessMessage = function(type, socket) {
 			db.Character.findOne({
 				_id: characterData.id,
 				AccountID: characterData.accountID
-			}, function(err, character) {
+			}, function zone_loaded_character_record(err, character) {
 				console.log("got character");
 				if (err) {
 					// console.log(err);
@@ -807,13 +807,13 @@ zonePrototype.onProcessMessage = function(type, socket) {
 				}
 
 				// Get account details
-				db.Account.findOne({_id: characterData.accountID},function(err, account) {
+				db.Account.findOne({_id: characterData.accountID}, function zone_loaded_account_info(err, account) {
 					return self.onFindAccount(socket, err, account);
 				});
 
 				socket.character = character;
 				socket.character.infos = new CharacterInfos(socket);
-				socket.character.infos.updateAll(function() {
+				socket.character.infos.updateAll(function zone_loaded_character_infos() {
 					socket.character.state = new CharacterState();
 					socket.character.state.setAccountID(socket.character.AccountID);
 					socket.character.state.setCharacterID(socket.character._id);

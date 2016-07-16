@@ -289,7 +289,15 @@ ZonePC.Set(0x05, {
 				// break;
 				//
 				// // Fujin general buffs
-				// case 40:
+				/* case 40:
+         if(client.character.Clan !== 3){
+          console.log("The character was not fujin when using the skill");
+          return;
+        }
+
+        client.character.state.SkillUsed = true;
+        break;
+        */
 				// case 41:
 				// Zone.sendToAllArea(client, true, client.character.state.getPacket(), config.network.viewable_action_distance);
 				// break;

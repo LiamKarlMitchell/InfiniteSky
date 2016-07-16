@@ -12,7 +12,7 @@ require('mongoose-cache').install(mongoose, cacheOpts);
 //Constructor
 // Handles connecting to the database
 function DB(connectString, callback) {
-	global.db = this;
+	global.db = this; // TODO: Set the global.db and global.mongoose external to this constructor.
 	this.mongoose = mongoose;
 	global.mongoose = mongoose;
 	mongoose.connect(connectString);

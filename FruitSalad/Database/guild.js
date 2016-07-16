@@ -11,7 +11,7 @@ vms('Guild', [], function(){
 
 	guildSchema.index({name: 1});
 
-  guildSchema.methods.getMembersList = function(){
+  guildSchema.methods.getMembersList = function guildSchema_getMembersList(){
     var unsortedList = [];
     for(var name in this.members) unsortedList.push([this.members[name].index, name]);
     unsortedList.sort(function(a, b){ return a[0] - b[0]; });
@@ -20,7 +20,7 @@ vms('Guild', [], function(){
     return list;
   };
 
-  guildSchema.methods.getPrivilegesList = function(){
+  guildSchema.methods.getPrivilegesList = function guildSchema_getPrivilegesList(){
     var unsortedList = [];
     for(var name in this.members) unsortedList.push([this.members[name].index,
       this.members[name].privileges === 2 ? 0 : this.members[name].privileges === 0 ? 2 : 1]);
@@ -30,7 +30,7 @@ vms('Guild', [], function(){
     return list;
   };
 
-  guildSchema.methods.getUpgradeCost = function(){
+  guildSchema.methods.getUpgradeCost = function guildSchema_getUpgradeCost(){
     switch(this.level){
       case 1:
       return {
@@ -62,7 +62,7 @@ vms('Guild', [], function(){
     }
   };
 
-  guildSchema.methods.invalidate = function(state, callback){
+  guildSchema.methods.invalidate = function guildSchema_invalidate(state, callback){
     var self = this;
     db.Guild.findByName(this.name, function(err, guild){
       if(err){
@@ -84,13 +84,13 @@ vms('Guild', [], function(){
 	var Guild = db.mongoose.model('guild', guildSchema);
 	db.Guild = Guild;
 
-  db.Guild.findByName = function(name, callback){
+  db.Guild.findByName = function db_Guild_findByName(name, callback){
     db.Guild.findOne({
 			name: name
 		}, callback);
   };
 
-  db.Guild.findByLeader = function(name, callback){
+  db.Guild.findByLeader = function db_Guild_findByLeader(name, callback){
     db.Guild.findOne({
 			leader: name
 		}, callback);

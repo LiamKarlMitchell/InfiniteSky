@@ -7,7 +7,7 @@ World.recv.Handshake = restruct.
 WorldPC.Set(0x01, {
 	Restruct: World.recv.Handshake,
 	Size: 27,
-	function: function(socket, input){
+	function: function World_onRecvHandshake(socket, input){
 		// TODO: Add IP validation?
 		// var username = buffer.slice(0, 13);
 
@@ -23,7 +23,7 @@ WorldPC.Set(0x01, {
 		db.Character.findOne({
 			_id: transferObj.character,
 			AccountID: transferObj.accountID
-		}, function(err, character) {
+		}, function World_findCharacterByIdResponse(err, character) {
 			if(err) {
 				console.log(err);
 				// Login.send.onLoginReply.call(socket, Login.LoginStatus.CannotAuthenticate);
@@ -35,7 +35,7 @@ WorldPC.Set(0x01, {
 				return;
 			}
 
-			db.Guild.findByName(character.GuildName, function(err, guild){
+			db.Guild.findByName(character.GuildName, function World_findGuildByNameResponse(err, guild){
 				if(err){
 					console.log("Error on finding the guild on world handshake");
 					return;

@@ -197,7 +197,7 @@ module.exports = function(grunt) {
 			);
 
 		Skills.once('loaded', function(){
-			done(true);
+			//done(true);
 		});
 
   	});

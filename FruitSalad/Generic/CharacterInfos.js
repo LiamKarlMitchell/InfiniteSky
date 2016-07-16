@@ -769,7 +769,8 @@ calculation.Pet = function(itemInfo, item, done){
     if(typeof n === 'string') names.push(n); else names = n;
 
     if(this.Level !== this.character.Level || this.ExpInfo === undefined){
-      db.Exp.getByLevel(this.character.Level, (function(err, exp){
+      console.log('Looking up experience for level: '+this.character.Level);
+      db.Exp.getByLevel(this.character.Level, (function infos_Update_ExpInfoResponse(err, exp){
         if(err){
           console.log("Error occured on getting exp info while updating character infos");
           console.log(err);

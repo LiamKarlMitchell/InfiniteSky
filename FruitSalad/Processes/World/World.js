@@ -197,11 +197,12 @@ worldPrototype.init = function(){
 		});
 
 
-	if(!this.databaseConnected)
+	if(!this.databaseConnected) {
 		Database(config.world.database.connection_string, function World__onDatabaseConnected(){
 			console.log("Database connected @", config.world.database.connection_string);
 			self.databaseConnected = true;
 
+			    vmscript.watch('Database');
 				vmscript.watch('./Processes/World/Packets').on([
 						'Packets'
 					], function(){
@@ -209,6 +210,7 @@ worldPrototype.init = function(){
 						self.acceptConnections = true;
 				});
 		});
+	}
 
 	// TODO: Add loading zones in async.
 	//
@@ -263,7 +265,7 @@ vms('World Server', [
 	'Config/network.json',
 	'Config/world.json',
 	'Config/zones.json',
-	'Config/login.json'
+	'Config/login.json',
 ], function(){
 
 	/**
@@ -277,13 +279,11 @@ vms('World Server', [
 		global.World.__proto__ = worldPrototype;
 	}
 
-	vmscript.watch('Database');
 	vmscript.watch('Generic');
 
-
 	vmscript.on([
-		'Database',
-		'Generic'
+		'Generic',
+		'CharacterState'
 	], function(){
 		global.World.init();
 	});

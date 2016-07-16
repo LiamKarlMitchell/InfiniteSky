@@ -83,9 +83,7 @@
 		],
 
 		"Level": 1,
-		"Experience": 0,
-		"SkillPoints": 100,
-		"StatPoints": 0
+		"Experience": 0
 	},
 	"Jinong": {
 		"Outfit": { "ID": 20, "Enchant": 0, "Combine": 0},
