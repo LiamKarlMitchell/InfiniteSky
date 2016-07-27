@@ -12,5 +12,5 @@ GMCommands.AddCommand(new Command('clear',20,function command_clearinventory(str
 		}
 		client.character.markModified('Inventory');
 		client.character.save();
-        client.sendInfoMessage('Please log out and back in for changes to apply or type /load.');
+        GMCommands.getCommand('reload').Execute.call(this,'',client);
 }));
