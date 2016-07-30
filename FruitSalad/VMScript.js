@@ -396,6 +396,12 @@ VMScriptObj.prototype.watch = function(file_path, opts){
 	return this;
 };
 
+/**
+ * When dependencies have been loaded call the ready function.
+ * @param  {String|Array} name  A string or array of strings for dependencies needed to run the ready function.
+ * @param  {Function} ready The ready function to call when dependencies are loaded.
+ * @deprecated Please use once to be similar to other Modules in node.js which use on to repeditively do something based on events and once to do something only once.
+ */
 VMScriptObj.prototype.on = function(name, ready){
 	if(typeof name === 'object'){
 		var obj = {
@@ -425,6 +431,13 @@ VMScriptObj.prototype.on = function(name, ready){
 		}
 	}
 };
+
+/**
+ * When dependencies have been loaded call the ready function.
+ * @param  {String|Array} name  A string or array of strings for dependencies needed to run the ready function.
+ * @param  {Function} ready The ready function to call when dependencies are loaded.
+ */
+VMScriptObj.prototype.once = VMScriptObj.prototype.on;
 
 /**
  * Exposes function to global scope for registering dependencies.
