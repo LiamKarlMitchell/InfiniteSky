@@ -8,25 +8,25 @@ vms('ItemInfo', [], function(){
 	    Rareness: Number,
 	    ItemType: Number,
 	    DisplayItem2D: Number,
-	    // _1: Number,
+	    _1: Number,
 	    Level: Number, // Level Requirement
 	    Clan: Number,
-	    // _4: Number,
-	    // _5: Number,
-	    // _6: Number,,
-	    // _7: Number,
-	    // _8: Number,
-	    // _9: Number,
-	    // _10: Number,
-	    // _11: Number,
-	    // _12: Number,
+	    _4: Number,
+	    _5: Number,
+	    _6: Number,
+	    _7: Number,
+	    _8: Number,
+	    _9: Number,
+	    _10: Number,
+	    _11: Number,
+	    _12: Number,
 	    PurchasePrice: Number,
 	    SalePrice: Number,
-	    // _13: Number,
+	    _13: Number,
 	    Capacity: Number,
 	    LevelRequirement: Number,
 	    HonorPointReq: Number,
-	    // _15a: Number,
+	    _15a: Number,
 	    Strength: Number,
 	    Dexterity: Number,
 	    Vitality: Number,
@@ -34,12 +34,12 @@ vms('ItemInfo', [], function(){
 	    Luck: Number,
 	    Damage: Number,
 	    Defense: Number,
-			ElementalDamage: Array,
+		ElementalDamage: Array,
 	    // LightDamage: Number,
 	    // ShadowDamage: Number,
 	    // DarkDamage: Number,
 	    ElementalDefense: Array,
-			// LightResistance: Number,
+		// LightResistance: Number,
 	    // ShawdowResistance: Number,
 	    // DarkResistance: Number,
 	    HitRate: Number,
@@ -51,29 +51,29 @@ vms('ItemInfo', [], function(){
 	    Mastery1_Amount: Number,
 	    Mastery2_Amount: Number,
 	    Mastery3_Amount: Number,
-	    // _14: Number,
+	    _14: Number,
 	    ValueType: Number,
 	    Value1: Number,
-	    // _16: Number,
-	    // _17: Number,
+	    _16: Number,
+	    _17: Number,
 	    Refinement: Number,
 	    ChancetoEarnExperiencePointsfromFinalhit: Number,
 	    ExperiencePointEarnedfromFinalhit_PERCENTBONUS_: Number,
-	    // _18: Number,
-	    // _19: Number,
+	    _18: Number,
+	    _19: Number,
 	    DecreaseChiConsumption: Number,
 	    DodgeDeadlyBlow: Number,
 	    IncreaseAllSkillMastery: Number,
-	    // _20: Number,
-	    // _21: Number,
-	    // _22: Number,
-	    // _23: Number,
+	    _20: Number,
+	    _21: Number,
+	    _22: Number,
+	    _23: Number,
 
 	    Description1: String,
 	    Description2: String,
 	    Description3: String,
 
-			Pet: {type: Object, default: null}
+		Pet: {type: Object, default: null}
 
 	});
 
@@ -196,6 +196,12 @@ vms('ItemInfo', [], function(){
 		var weaponMod = this.ItemType - baseClan;
 		return weaponMod < 0 || weaponMod > 2 ? 0 : weaponMod;
 	};
+
+	itemSchema.methods.getSkillID = function() {
+		if (this.ItemType === ItemType.SkillBook) {
+			return this.Capacity;
+		}
+	}
 
 	global.ItemType = {
 		SilverCoins: 1,

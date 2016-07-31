@@ -77,11 +77,11 @@ module.exports = function(grunt) {
 			  int32ls("Luck").
 			  int32ls("Damage").
 			  int32ls("Defense").
-        int32ls('ElementalDamage', 3).
+        	  int32ls('ElementalDamage', 3).
 			  // int32ls("LightDamage").
 			  // int32ls("ShadowDamage").
 			  // int32ls("DarkDamage").
-        int32ls('ElementalDefense', 3).
+              int32ls('ElementalDefense', 3).
 			  // int32ls("LightResistance").
 			  // int32ls("ShawdowResistance").
 			  // int32ls("DarkResistance").
