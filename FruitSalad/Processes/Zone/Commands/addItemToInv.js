@@ -8,7 +8,7 @@
 
 //todo find out why it bugs the inventory
 
-	GMCommands.AddCommand(new Command('t',20,function command_clearinventory(string,client){
+	GMCommands.AddCommand(new Command('give',20,function command_clearinventory(string,client){
 	
 		s =  string.split(' ');
 		client.character.Inventory = {ID: s,}
