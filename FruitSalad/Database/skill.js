@@ -220,10 +220,16 @@ vms('SkillInfo', [], function(){
   var SkillInfo = db.mongoose.model('skill', skillSchema);
 
   SkillInfo.findById = function(id, callback){
-		db.Skill.findOne({
-			ID: id
-		}, callback);
-	};
+        db.Skill.findOne({
+            ID: id
+        }, callback);
+    };
+
+    SkillInfo.findByName = function(Name, callback){
+        db.Skill.findOne({
+            Name: Name
+        }, callback);
+    };
 
 
   db.Skill = SkillInfo;

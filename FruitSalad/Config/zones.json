@@ -35,7 +35,7 @@
 	"34":  { "Name": "Z034", "Load": false, "DisplayName": "Hangma Battlefield Guanyin" },
 	"35":  { "Name": "Z035", "Load": false, "DisplayName": "Hangma Battlefield Fujin" },
 	"36":  { "Name": "Z036", "Load": false, "DisplayName": "Hangma Battlefield Jinong" },
-	"37":  { "Name": "Z037", "Load": false, "DisplayName": "Yongu" },
+	"37":  { "Name": "Z037", "Load": true, "DisplayName": "Yongu" },
 	"38":  { "Name": "Z038", "Load": false, "DisplayName": "Yanggok Valley" },
 	"39":  { "Name": "Z039", "Load": false, "DisplayName": "Yanggok Valley Cave" },
 	"40":  { "Name": "Z040", "Load": false, "DisplayName": "Guyu Cave" },
