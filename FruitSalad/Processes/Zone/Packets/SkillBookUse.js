@@ -124,6 +124,10 @@ ZonePC.Set(0x30, {
                 client.character.Inventory[input.unk1] = null;
                 client.character.markModified('Inventory');
                 client.character.save();
+                //subtration of skill poins in the db
+                client.character.SkillPoints= client.character.SkillPoints - SkillName.PointsToLearn;
+            client.character.markModified('SkillPoints');
+            client.character.save();
             });
         });
     }
