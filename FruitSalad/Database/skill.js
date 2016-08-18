@@ -117,8 +117,32 @@ vms('SkillInfo', [], function(){
 
   skillSchema.methods.isUsedByWeapon = function(itemType){
     switch(itemType){
+      case 'Sword':
+      itemType = 2;
+      break;
+      case 'Blade':
+      itemType = 3;
+      break;
+      case 'Marble':
+      itemType = 4;
+      break;
       case 'Katana':
       itemType = 5;
+      break;
+      case 'DoubleBlade':
+      itemType = 6;
+      break;
+      case 'Lute':
+      itemType = 7;
+      break;
+      case 'LightBlade':
+      itemType = 8;
+      break;
+      case 'LongSpear':
+      itemType = 9;
+      break;
+      case 'Scepter':
+      itemType = 10;
       break;
     }
 
