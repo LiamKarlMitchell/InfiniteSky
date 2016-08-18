@@ -96,7 +96,7 @@ ZonePC.Set(0x30, {
                     return Zone.send.replyLearnSkillBook(client, 2, 0);
                 }
                 if (client.character.Honor < SkillBook.HonorPointReq) {
-                    return Zone.send.replyLearnSkillBook(client, 0, 3);
+                    return Zone.send.replyLearnSkillBook(client, 3, 0);
                 }
                 if (alreadyLearned) {
                     client.sendInfoMessage("Already know this skill")
