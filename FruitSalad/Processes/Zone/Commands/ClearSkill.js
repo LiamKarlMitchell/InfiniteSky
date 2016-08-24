@@ -5,5 +5,11 @@ GMCommands.AddCommand(new Command('skill',20,function command_clearinventory(str
 		}
 		client.character.markModified('SkillList');
 	    client.character.save();
-        GMCommands.getCommand('reload').Execute.call(this,'',client);	
+        
+        client.character.SkillPoints = 610
+        client.character.markModified('SkillPoints');
+	    client.character.save();
+
+	    GMCommands.getCommand('reload').Execute.call(this,'',client);	
+
 }));
