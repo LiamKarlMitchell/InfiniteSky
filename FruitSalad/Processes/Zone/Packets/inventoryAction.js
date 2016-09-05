@@ -814,11 +814,11 @@ ItemAction[17] = function ShopBuyItem(input){
             return;
         }
 
-        if(npc.Clan !== self.character.Clan+2){
+    /*    if(npc.Clan !== self.character.Clan+2){
             console.log("This shop buy was from restricted clan");
             Zone.send.itemAction.call(self, 1, input);
             return;
-        }
+        }*/
 
         db.Item.findById(input.ItemID, function(err, item){
             if(err){
