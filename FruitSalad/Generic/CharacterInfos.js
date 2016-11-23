@@ -872,7 +872,7 @@ calculation.Pet = function(itemInfo, item, done){
    * @param  {Function} onready_callback The function to call when done.
    */
   CharacterInfos.prototype.updateAll = function infos_UpdateAll(onready_callback){
-    var equipment = ['Weapon', 'Outfit', 'Gloves', 'Cape', 'Ring', 'Amulet', 'Boots'];
+    var equipment = ['Weapon', 'Outfit', 'Gloves', 'Cape', 'Ring', 'Amulet', 'Boots', 'Pet'];
     this.update(equipment, onready_callback);
   };
 

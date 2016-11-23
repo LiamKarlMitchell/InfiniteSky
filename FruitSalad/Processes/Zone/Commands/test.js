@@ -20,7 +20,7 @@
 // 		config.viewable_action_distance);
 // }));
 
-GMCommands.AddCommand(new Command('info',60,function command_test(string, client){
+GMCommands.AddCommand(new Command('info',60,function command_info(string, client){
 	client.character.infos = new CharacterInfos(client);
 	client.character.infos.updateAll(function(){
 		client.character.infos.print();
@@ -28,9 +28,14 @@ GMCommands.AddCommand(new Command('info',60,function command_test(string, client
 	// console.log(client.character.infos.print());
 }));
 
-GMCommands.AddCommand(new Command('infos',60,function command_test(string, client){
 
+GMCommands.AddCommand(new Command('indexes',60,function command_indexes(string, client){
+	client.sendInfoMessage('AccountID: '+client.character.state.AccountID);
+	client.sendInfoMessage('CharacterID: '+client.character.state.CharacterID);
+	client.sendInfoMessage('NodeID: '+client.character.state.NodeID);
+    
 }));
+
 
 // Use the packet id 0x2C
 // Zone.send.attack = restruct.

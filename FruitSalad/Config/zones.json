@@ -90,6 +90,7 @@
 	"96":  { "Name": "Z096", "Load": false, "DisplayName": "" },
 	"97":  { "Name": "Z097", "Load": false, "DisplayName": "" },
 	"98":  { "Name": "Z098", "Load": false, "DisplayName": "" },
+	"99":  { "Name": "Z099", "Load": false, "DisplayName": "" },
     "101": { "Name": "Z101", "Load": false, "DisplayName": "Hogenye (Transending Charm)" },
     "102": { "Name": "Z102", "Load": false, "DisplayName": "Hogenye (Transending Charm)" },
     "103": { "Name": "Z103", "Load": false, "DisplayName": "Hogenye (Transending Charm)" },
