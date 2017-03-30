@@ -133,7 +133,7 @@ Main Documentation in docs/index.html
 [Restruct Documentation](https://github.com/LiamKarlMitchell/InfiniteSky/blob/master/docs/gitsetup.md)
 [Scripting Documentation](https://github.com/LiamKarlMitchell/InfiniteSky/blob/master/docs/scripting.md)
 
-## Create Game Accounts
+## Create account
 You will want to create some game accounts too use.
 To make a GM account use
 ````
