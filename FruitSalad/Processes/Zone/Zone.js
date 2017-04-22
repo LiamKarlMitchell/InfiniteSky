@@ -144,7 +144,7 @@ function ZoneInstance() {
 	nav_mesh = require('./Modules/navtest-revised.js');
 	QuadTree = require('./Modules/QuadTree.js');
 	Random = require("random-js");
-
+	hexy = require('hexy').hexy;
 	/**
 	 * A seedable random engine.
 	 * @type {Random}

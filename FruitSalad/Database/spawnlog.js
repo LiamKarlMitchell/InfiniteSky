@@ -37,4 +37,9 @@ vms('SpawnLog', [], function(){
 			uniqueID2: uniqueID2
 		}, values, {multi: true}, callback);
 	};
+	 db.SpawnLog.zoneID = function(zoneID, callback){
+        db.SpawnLog.find({
+            zoneID: zoneID
+        }, callback);
+    };
 });
