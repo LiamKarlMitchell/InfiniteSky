@@ -3,7 +3,7 @@ InfiniteSky
 
 [![Join the chat at https://gitter.im/LiamKarlMitchell/InfiniteSky](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/LiamKarlMitchell/InfiniteSky?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-InfiniteSky is an open-source project, emulating a Twelve Sky Server. It is written in Node.JS
+InfiniteSky is an open-source project, based on public functionality of Twelve Sky. It is written in Node.JS
 
   - We have reloadable code. This means less need to reset the server when developing.
   - Currently the world server part is being re-intergrated into the code base.
@@ -105,17 +105,10 @@ db.createCollection("ts1")
 db.createUser({user: "ts1", pwd: "ts1", roles: ["readWrite"]})
 ```
 
-## Copy game files to data directorys you made
+## Get files to data directorys you made
 
 for more information on these see [Directory Documentation](https://github.com/LiamKarlMitchell/InfiniteSky/blob/master/docs/directorys.md)
 
-data/infos:
-* G03_GDATA/D01_GIMAGE2D/005/*.IMG
-
-data/world:
-* G03_GDATA/D07_GWORLD/*.WM
-* G03_GDATA/D07_GWORLD/*.WREGION
-*
 ## Configure. Instructions in
 copy the config.json-dist file and rename it to config.json and edit it accordingly
 
@@ -143,21 +136,7 @@ Main Documentation in docs/index.html
 [Restruct Documentation](https://github.com/LiamKarlMitchell/InfiniteSky/blob/master/docs/gitsetup.md)
 [Scripting Documentation](https://github.com/LiamKarlMitchell/InfiniteSky/blob/master/docs/scripting.md)
 
-## Game Launcher and TSX Client DLL
-
-Compile the launcher and dll and package them together.
-The PrivateServer.ini should look like this
-```ini
-[PrivateServer]
-BypassGameGuard = 1
-MultiClient = 1
-ChangeIP = 1
-ServerIP = 127.0.0.1
-HookFileLoading = 1
-DevButtons = 1
-```
-
-## Create Game Accounts
+## Create account
 You will want to create some game accounts too use.
 To make a GM account use
 ````
