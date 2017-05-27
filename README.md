@@ -1,5 +1,7 @@
 NOTE: This readme is not too helpful in setting up the server anymore.
 
+[Documentation](https://rawgit.com/LiamKarlMitchell/InfiniteSky/InfiniteSky_FruitSalad/FruitSalad/Documentation/index.html)
+
 InfiniteSky
 =========
 
