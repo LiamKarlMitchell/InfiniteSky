@@ -1,3 +1,5 @@
+NOTE: This readme is not too helpful in setting up the server anymore.
+
 InfiniteSky
 =========
 
