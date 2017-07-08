@@ -1,0 +1,28 @@
+{
+  "ports": {
+    "login": 11091,
+    "world": 11092,
+    "spawnlogger": 13191,
+    "spawnedit": 8473,
+    "itemeditor": 8474
+  },
+  "interfaces": {
+    "regular": "0.0.0.0",
+    "lan": "0.0.0.0"
+  },
+  // "max_clients": "10",
+  "max_login_attempt": "5",
+  "zoneTransferLogoutTimer": 300000,
+  "systemAdminIP": [
+    "127.0.0.1",
+    "192.168.0.7"
+  ],
+  "natTranslations": [
+    {
+      "mask": "255.255.255.0/24",
+      "ip": "10.1.1.10"
+    }
+  ],
+  "externalIP": "60.234.90.86",
+  "viewable_action_distance": 700
+}

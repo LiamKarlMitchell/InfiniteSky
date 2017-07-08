@@ -6,7 +6,7 @@
 // Command: expinfo
 // Tells you info about expinfo
 GMCommands.AddCommand(new Command('expinfo',0,function command_expinfo(string,client){
-	if (string.length==0) return;
+	if (string.length===0) return;
 
 	var Level = parseInt(string,10)
 	if (Level)

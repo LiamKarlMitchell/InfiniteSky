@@ -1,0 +1,346 @@
+<!doctype html>
+<html>
+    <head>
+        <title>restruct.js</title>
+        <meta charset="utf-8">
+        <style type="text/css">
+            /* shamelessly stolen from http://jashkenas.github.com/docco/ */
+            body {
+                font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, FreeSerif, serif;
+                font-size: 15px;
+                line-height: 22px;
+                color: #252519;
+                margin: 0 auto;
+                padding: 0;
+
+                width: 960px;
+            }
+
+            .toc {
+                float: left;
+                margin: 10px 0;
+                padding: 0;
+                padding-top: 20px;
+                width: 300px;
+            }
+
+            .toc ul {
+                padding: 0;
+                margin-left: 20px;
+            }
+
+            .toc li {
+                padding: 0;
+            }
+
+            .toc li.title {
+                font-weight: bold;
+                list-style: none;
+                margin-left: -20px;
+            }
+
+            .content {
+                float: left;
+                margin: 10px 0;
+                padding-top: 20px;
+                width: 620px;
+            }
+
+            a {
+                color: #261a3b;
+            }
+
+            a:visited {
+                color: #261a3b;
+            }
+
+            p {
+                margin: 0 0 15px 0;
+            }
+
+            h1, h2, h3, h4, h5, h6 {
+                margin: 15px 0 15px 0;
+            }
+
+            pre, tt, code {
+                font-size: 12px;
+                line-height: 18px;
+                font-family: Monaco, Consolas, "Lucida Console", monospace;
+                margin: 0 0 15px 0;
+                padding: 0;
+            }
+
+            .footer {
+                clear: both;
+                padding: 20px 0;
+                text-align: right;
+                font-style: italic;
+            }
+        </style>
+    </head>
+    <body>
+    <ul class="toc">
+        <li class="title">Table of Contents</li>
+
+
+    
+        <li>
+        
+            <a href="#restructjs">restruct.js</a>
+        
+        
+            <ul>
+                
+    
+        <li>
+        
+            <a href="#Usage">Usage</a>
+        
+        
+            <ul>
+                
+    
+        <li>
+        
+            <a href="#Initializing">Initializing</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#Unpacking">Unpacking</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#Packing">Packing</a>
+        
+        
+        </li>
+    
+
+            </ul>
+        
+        </li>
+    
+        <li>
+        
+            <a href="#Size">Size</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#Data-Types">Data Types</a>
+        
+        
+            <ul>
+                
+    
+        <li>
+        
+            <a href="#pad">pad</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#boolean">boolean</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#nibble">nibble</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#int81624324048lbsu">int{8,16,24,32,40,48}{l,b}{s,u}</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#string">string</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#struct">struct</a>
+        
+        
+        </li>
+    
+
+            </ul>
+        
+        </li>
+    
+
+            </ul>
+        
+        </li>
+    
+
+    </ul>
+    <div class="content">
+<p><a href="https://github.com/rfw/restruct.js"><img style="position: fixed; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"/></a></p>
+
+<h1 id="restructjs">restruct.js</h1>
+
+<p><em>A JavaScript binary data library.</em></p>
+
+<p><code>restruct.js</code> performs conversion to and from binary data types. It utilizes an
+intuitive declarative API to define formats for binary structure parsers and
+emitters. It works in both the browser and on Node.</p>
+
+<p><code>restruct.js</code> is freely distributable under the terms of the MIT license.</p>
+
+<p>Example:</p>
+
+<pre><code>&gt; struct = restruct.
+... int8lu('opcode').
+... int8lu('version').
+... string('username', 20);
+
+&gt; packet = struct.pack({opcode: 1, version: 1, username: "test"});
+[ 1, 1, 116, 101, 115, 116, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+
+&gt; struct.unpack(packet);
+{ opcode: 1,
+  version: 1,
+  username: 'test' }
+</code></pre>
+
+<p><code>restruct.js</code> has support for typed arrays, where available.</p>
+
+<h2 id="Usage">Usage</h2>
+
+<h3 id="Initializing">Initializing</h3>
+
+<p>A <code>restruct.js</code> structure can be defined by using the <code>restruct</code> object, e.g.:</p>
+
+<pre><code>restruct.type(k[, n[, buf]])
+</code></pre>
+
+<p>The <code>type</code> is specified by one of the types in the <a href="#Data-Types">data types</a>
+section.</p>
+
+<p>The parameter <code>k</code> specifies the name of the field in the resulting struct.</p>
+
+<p>The parameter <code>n</code> is optional and, if supplied, will unpack the field into an
+array rather than a scalar value — this is useful for array values in structs.
+The array will be unpacked according to the endianness of the data type. If the
+supplied array during packing is shorter than <code>n</code>, the result will be padded
+with null bytes.</p>
+
+<p>The parameter <code>buf</code> is also optional and, if supplied, specifies the array
+the field will be unpacked into, which can be useful for using typed arrays
+as buffers.</p>
+
+<p>An example of a structure:</p>
+
+<pre><code>struct = restruct.
+    int32bu('start_time').
+    int32bu('end_time').
+    int8bu('keys', 10);
+</code></pre>
+
+<h3 id="Unpacking">Unpacking</h3>
+
+<p>Once a structure has been initialized, the <code>unpack</code> method can be used on any
+object that supports indexing (both normal and typed arrays):</p>
+
+<pre><code>struct.unpack([ 0, 0, 0, 1, 73, 150, 2, 210, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0 ]);
+</code></pre>
+
+<p>This will return the parsed structure:</p>
+
+<pre><code>{ start_time: 1, end_time: 1234567890, keys: [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 0 ]}
+</code></pre>
+
+<h3 id="Packing">Packing</h3>
+
+<p><code>restruct.js</code> also supports packing structures back to series of bytes:</p>
+
+<pre><code>struct.pack({ start_time: 1, end_time: 1234567890, keys: [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 0 ]});
+</code></pre>
+
+<p>This will return an array of bytes:</p>
+
+<pre><code>[ 0, 0, 0, 1, 73, 150, 2, 210, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0 ]
+</code></pre>
+
+<p>Optionally, the <code>struct.pack</code> function takes a second argument which specifies
+an array to use for packing into. This can be a typed array:</p>
+
+<pre><code>var arr = new Uint8Array(1);
+struct.pack({...}, arr);
+</code></pre>
+
+<h2 id="Size">Size</h2>
+
+<p>The size of the structure can be obtained via <code>struct.size</code>, e.g.:</p>
+
+<pre><code>&gt; struct.size
+18
+</code></pre>
+
+<h2 id="Data-Types">Data Types</h2>
+
+<h3 id="pad">pad</h3>
+
+<p>A <code>pad</code> is the null byte, used for empty fields of a struct.</p>
+
+<h3 id="boolean">boolean</h3>
+
+<p>A <code>boolean</code> unpacks a 8-bit field into an array of eight boolean values, in
+order of least significant bit to most significant bit, e.g. <code>37</code> unpacks to:</p>
+
+<pre><code>[true, false, true, false, false, true, false, false]
+ 1     2      4     8      16     32    64     128
+</code></pre>
+
+<h3 id="nibble">nibble</h3>
+
+<p>A <code>nibble</code> unpacks a 8-bit field into an array of low and high nibbles. The
+array is ordered <code>[0xL, 0xH]</code>.</p>
+
+<h3 id="int81624324048lbsu">int{8,16,24,32,40,48}{l,b}{s,u}</h3>
+
+<p>These types specify various integer types. The number is indicative of the
+bit size of the integer, the <code>l</code> and <code>b</code> indicative of little- and
+big-endianness respectively, and <code>s</code> and <code>u</code> are indicative of signedness and
+unsignedness.</p>
+
+<p>As a side note about endianness with regards to the <code>int8</code> data type, this only
+affects the packing/unpacking of arrays.</p>
+
+<h3 id="string">string</h3>
+
+<p>A <code>string</code> is a string of variable length. On packing, it will encode the
+string to UTF-8 and on unpacking will decode the string from UTF-8 (i.e.
+conversion of native JavaScript strings to/from byte sequences, respectively).</p>
+
+<h3 id="struct">struct</h3>
+
+<p>A <code>struct</code> is another <code>Restruct</code> instance. This enables structs to be packed
+inside of each other, as simple compositions or as arrays of structs.</p>
+    </div>
+    <div class="footer">
+        Generated by <a href="http://rfw.github.com/owldoc">Owldoc</a> — a hooting good time!
+    </div>
+    </body>
+</html>

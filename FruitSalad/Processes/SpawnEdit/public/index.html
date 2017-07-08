@@ -1,0 +1,51 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Spawn Editor</title>
+  <meta name="description" content="Infinite Sky Spawn Editor">
+  <link rel="stylesheet" href="css/autocomplete.css"/>
+  <link rel="stylesheet" href="css/SpawnEdit.css">
+
+  <script type="text/javascript" src="js/d3.min.js"></script>
+  <script type="text/javascript" src="js/ObjectId.js"></script>
+  <script type="text/javascript" src="js/autocomplete.js"></script>
+  <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+</head>
+
+<body>
+
+  Zone: <select id="selZone"></select>
+  <button>Reset</button>
+
+  <div class="panel">
+	  <div class="title">
+	  	<h1>Spawn Groups:</h1>
+	  </div>
+
+	  <div class="box_vscroll" id="boxSpawnGroups">
+	  <table id="tblMonsterSpawns">
+	  <thead>
+	  	<tr><th>Monster</th><th>Amount</th></tr>
+	  </thead>
+	  <tbody>
+	  	<tr><td>Use select 2 for monster id - name</td><td><input type="number" value="0"/></td></tr>
+	  </tbody>
+	  </table>
+	  </div>
+  	
+  	<!--<div id="test" style="width:100%; height:100%;" class="selMonster"></div>
+  	<div id="test" style="width:100%; height:100%;" class="selMonster"></div>-->
+  </div>
+
+  <div id="zone_spawn_graph"></div>
+  <script src="js/SpawnGraph.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Item Editor</title>
+  <meta name="description" content="Infinite Sky Item Editor">
+
+  <link rel="stylesheet" href="css/autocomplete.css"/>
+  <link rel="stylesheet" href="css/css.css">
+  <link rel="stylesheet" href="items/items.css"/>
+
+  <script type="text/javascript">
+  function getSync(url, data){
+    return jQuery.ajax(url, {
+      async: false,
+      data: data
+    }).responseJSON;
+  }
+
+  window.nextTick = (function () {
+      var canSetImmediate = typeof window !== 'undefined'
+      && window.setImmediate;
+      var canPost = typeof window !== 'undefined'
+      && window.postMessage && window.addEventListener;
+      if (canSetImmediate) {
+          return function (f) { return window.setImmediate(f) };
+      }
+      if (canPost) {
+          var queue = [];
+          window.addEventListener('message', function (ev) {
+              var source = ev.source;
+              if ((source === window || source === null) && ev.data === 'process-tick') {
+                  ev.stopPropagation();
+                  if (queue.length > 0) {
+                      var fn = queue.shift();
+                      fn();
+                  }
+              }
+          }, true);
+          return function nextTick(fn) {
+              queue.push(fn);
+              window.postMessage('process-tick', '*');
+          };
+      }
+      return function nextTick(fn) {
+          setTimeout(fn, 0);
+      };
+  })();
+  </script>
+
+  <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+  <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+
+  <script type="text/javascript" src="js/d3.min.js"></script>
+  <script type="text/javascript" src="js/autocomplete.js"></script>
+  <script type="text/javascript" src="js/characterInventoryView.js"></script>
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <script type="text/javascript">
+  function app(){
+    this.connected = false;
+    this.socket = null;
+    this.characters = [];
+    this.container = {};
+    this.view = null;
+    this.items = [];
+    this.character = null;
+  }
+
+  app.prototype.connect = function(ready_callback){
+    var socket = io();
+    var self = this;
+    socket.on('connect', function(){
+      self.socket = socket;
+      self.connected = true;
+      if(typeof ready_callback === 'function') ready_callback.call(self);
+    });
+
+    socket.on('character data', function(character){
+      window.app.container.characterActions.show();
+      window.app.container.characterView.show();
+      window.app.character = character;
+      self.view.items = [];
+      for(var i=0; i<character.Inventory.length; i++){
+        var inventoryItem = character.Inventory[i];
+        if(!inventoryItem) continue;
+        inventoryItem.Index = i;
+        var itemInfo = getSync('/item', {id: inventoryItem.ID});
+        inventoryItem.info = itemInfo;
+        self.view.addItem(inventoryItem);
+      }
+      self.view.render();
+    });
+
+    socket.on('items', function(items){
+      for(var i=0; i<items.length; i++){
+        var item = items[i];
+        window.app.items.push({id: item._id, name: item._id + " - " + item.Name});
+      }
+      self.container.loading.hide();
+    });
+
+    socket.on('characters', function(characters){
+      window.app.characters.length = 0;
+      for(var i=0; i<characters.length; i++){
+        var character = characters[i];
+        window.app.characters.push({id: character._id, name: character.Name});
+      }
+    });
+  };
+
+  window.app = new app();
+
+  $(document).ready(function(){
+    window.app.connect(function(){
+      this.container.loading.show();
+      this.socket.emit('get items');
+      this.socket.emit('get characters');
+    });
+
+    window.app.view = new characterInventoryView();
+
+    function onCharacterSelect(character){
+      this.socket.emit('character data', character.name);
+    }
+
+    function onItemSelect(item){
+      window.app.itemAction = item;
+      var container = this.container.selectedItem;
+      container.show();
+    }
+
+    autocomplete('.selCharacter')
+            .keys(window.app.characters)
+            .dataField("name")
+            .placeHolder("Start typing their name here")
+            .onSelected(onCharacterSelect.bind(window.app))
+            .render();
+    autocomplete('.selItem')
+            .keys(window.app.items)
+            .dataField("name")
+            .placeHolder("Type item name or id")
+            .onSelected(onItemSelect.bind(window.app))
+            .render();
+
+    window.app.container.selectedItem = $('.selectedItem');
+    window.app.container.characterView = $('.character.view');
+    window.app.container.itemView = $('.item.view');
+    window.app.container.inventory = $('.character.view .inventory');
+    window.app.container.loading = $('#loading');
+    window.app.container.tooltip = $('#tooltip');
+    window.app.container.itemActions = $('#itemActions');
+    window.app.container.itemActionsContainer = $('.item.view.actions');
+    window.app.container.characterActions = $('.item.view.character');
+
+    window.app.container.itemActions.find('input').each(function(){
+      $(this).bind('input', function(){
+        var valSelector = $(this).parent().parent().find('.value');
+        valSelector.html($(this).val());
+      });
+
+      $(this).parent().parent().find('button').click((function(){
+        var val = parseInt(this.ele.val());
+
+        if(this.name === 'Enchant'){
+          val /= 3;
+        }
+
+        var obj = {};
+        obj[this.name] = val;
+
+        window.app.socket.emit('set', window.app.character.Name, window.app.selectedItem, obj);
+      }).bind({name: $(this).attr('name'), ele: $(this)}));
+    });
+
+    window.app.container.tooltip.on('mouseover', function(){
+      clearTimeout(window.app.tooltipHideTimer);
+    });
+
+    window.app.container.tooltip.on('mouseout', function(){
+      window.app.tooltipHideTimer = setTimeout(function(){
+        window.app.container.tooltip.hide();
+      }, 1000);
+    });
+
+    $('#reload-characters').click(function(){
+      window.app.socket.emit('get characters');
+    });
+    $('#reload-inventory').click(function(){
+      window.app.socket.emit('character data', window.app.character.Name);
+    });
+    $('#save-inventory').click(function(){
+      window.app.socket.emit('character data', window.app.character.Name);
+    });
+    $('#clear-inventory').click(function(){
+      window.app.socket.emit('clear inventory', window.app.character.Name);
+    });
+    $('#add-to-inventory').click(function(){
+      window.app.socket.emit('add item', window.app.character.Name, window.app.itemAction.id);
+    });
+    $('#remove-item').click(function(){
+      window.app.socket.emit('remove item', window.app.character.Name, window.app.selectedItem);
+    });
+  });
+  </script>
+</head>
+
+<body>
+  <div id="loading" class="hidden"></div>
+  <div id="tooltip" class="hidden"></div>
+
+  <div class="header color0">
+    InfiniteSky Item Editor
+  </div>
+
+  <div class="select">
+    <div class="title"><span class="left">Select character</span><button type="button" class="right" id="reload-characters">Reload characters</button><div class="clear"></div></div>
+    <div class="selCharacter"></div>
+  </div>
+
+  <div class="container left w65">
+    <div class="character view hidden">
+      <div class="title">
+        Character view
+      </div>
+      <div class="inventory"></div>
+    </div>
+    <div class="clear"></div>
+  </div>
+
+  <div class="container left w35">
+    <div class="item view">
+      <div class="title">
+        Item Search
+      </div>
+      <div class="selItem"></div>
+      <div class="selectedItem hidden">
+        <button type="button" name="button" id="add-to-inventory">Add to inventory</button>
+        <button type="button" name="button" class="bank">Add to bank</button>
+        <button type="button" name="button" class="storage">Add to storage</button>
+      </div>
+    </div>
+    <div class="clear"></div>
+    <div class="item view character hidden">
+      <div class="title">
+        Character actions
+      </div>
+      <div class="marginTop10">
+        <button type="button" id="reload-inventory">Reload inventory</button>
+        <button type="button" id="save-inventory">Save inventory</button>
+        <button type="button" id="clear-inventory">Clear inventory</button>
+      </div>
+    </div>
+    <div class="clear"></div>
+    <div class="item view actions hidden">
+      <div class="title">
+        Item actions
+      </div>
+      <div class="marginTop10">
+        <div>
+          <!-- <button type="button" id="reload-inventory">Split</button> -->
+          <button type="button" id="remove-item">Remove</button>
+        </div>
+        <table class="marginTop10" id="itemActions">
+          <thead>
+            <tr><td>Amount</td> <td><input name="Amount" type="range" min="0" max="99" value="0"></td> <td class="value"></td> <td><button type="button" id="set-inventory">Set</button></td></tr>
+            <tr><td>Combine</td> <td><input name="Combine" type="range" min="0" max="12" value="0"></td> <td class="value"></td> <td><button type="button" id="set-inventory">Set</button></td></tr>
+            <tr><td>Enchant</td> <td><input name="Enchant" type="range" min="0" max="120" value="0" step="3"></td> <td class="value"></td> <td><button type="button" id="set-inventory">Set</button></td></tr>
+            <!-- <tr><td>Activity</td> <td><input name="Activity" type="range" min="0" max="100" value="0"></td> <td class="value"></td> <td><button type="button" id="set-inventory">Set</button></td></tr> -->
+            <!-- <tr><td>Growth</td> <td><input name="Growth" type="range" min="0" max="1000" value="0"></td> <td class="value"></td> <td><button type="button" id="set-inventory">Set</button></td></tr> -->
+          </thead>
+        </table>
+      </div>
+    </div>
+    <div class="clear"></div>
+  </div>
+</body>
+</html>

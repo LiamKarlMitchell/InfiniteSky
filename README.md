@@ -1,4 +1,7 @@
-NOTE! THIS IS NOT THE RIGHT BRANCH PLEASE USE FruitSalad branch.
+NOTE: This readme is not too helpful in setting up the server anymore.
+Someone needs to update it.
+
+[Documentation](https://rawgit.com/LiamKarlMitchell/InfiniteSky/InfiniteSky_FruitSalad/FruitSalad/Documentation/index.html)
 
 InfiniteSky
 =========
@@ -22,7 +25,7 @@ Donations will be used to further improve the project or for server expenses.
 Version
 ----
 
-1.0.05 - Tomato Soup
+1.1.00 - Fruit Salad
 
 Tech
 -----------
@@ -47,6 +50,9 @@ node-debug main
 
 Installation
 --------------
+
+Please Note: These Instructions are very out of date.
+Contact us for more information on how to develop on this project.
 
 [Video Guide](http://youtu.be/WH32P1i5DrQ)
 I will make another video when I can as this one has poor quality.

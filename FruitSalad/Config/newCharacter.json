@@ -1,0 +1,130 @@
+{
+	"Guanyin": {
+		"Outfit": { "ID": 8, "Enchant": 0, "Combine": 0},
+		"Gloves": { "ID": 9, "Enchant": 0, "Combine": 0},
+		"Boots": { "ID": 10, "Enchant": 0, "Combine": 0},
+
+		"Stat_Vitality": 1,
+		"Stat_Strength": 1,
+		"Stat_Chi": 1,
+		"Stat_Dexterity": 1,
+
+
+		"MapID": 1,
+		"RealX": -630,
+		"RealY": 50,
+		"RealZ": -815,
+
+		"Silver": 50000,
+
+		"SkillBar": [
+			{ "ID": 1, "Level": 1 },
+			{ "ID": 2, "Level": 1 }
+		],
+
+		"SkillList": [
+			{ "ID": 1, "Level": 1 },
+			{ "ID": 2, "Level": 1 }
+		],
+
+		"QuickUseItems": [
+			{ "Column": 0, "ID": 2, "Amount": 99 },
+			{ "Column": 2, "ID": 26, "Amount": 99 }
+		],
+
+		"Inventory": [
+			{ "Column": 0, "Row": 0, "ID": 2, "Amount": 99},
+			{ "Column": 1, "Row": 0, "ID": 2, "Amount": 99 },
+			{ "Column": 2, "Row": 0, "ID": 26, "Amount": 99 },
+			{ "Column": 3, "Row": 0, "ID": 26, "Amount": 99 }
+		],
+
+		"Level": 1,
+		"Experience": 0
+	},
+	"Fujin": {
+		"Outfit": { "ID": 14, "Enchant": 0, "Combine": 0},
+		"Gloves": { "ID": 15, "Enchant": 0, "Combine": 0},
+		"Boots": { "ID": 16, "Enchant": 0, "Combine": 0},
+
+		"Stat_Vitality": 1,
+		"Stat_Strength": 1,
+		"Stat_Chi": 1,
+		"Stat_Dexterity": 1,
+
+		"MapID": 6,
+		"RealX": -225,
+		"RealY": 412,
+		"RealZ": 1575,
+
+		"Silver": 50000,
+		"StackedSilver": 100,
+
+		"SkillBar": [
+			{ "ID": 20, "Level": 20 },
+			{ "ID": 21, "Level": 20 }
+		],
+
+		"SkillList": [
+			{ "ID": 20, "Level": 20 },
+			{ "ID": 21, "Level": 20 }
+		],
+
+		"QuickUseItems": [
+			{ "Column": 0, "ID": 2, "Amount": 99 },
+			{ "Column": 2, "ID": 26, "Amount": 99 }
+		],
+
+		"Inventory": [
+			{ "Column": 0, "Row": 0, "ID": 2, "Amount": 99},
+			{ "Column": 1, "Row": 0, "ID": 2, "Amount": 99 },
+			{ "Column": 2, "Row": 0, "ID": 26, "Amount": 99 },
+			{ "Column": 3, "Row": 0, "ID": 26, "Amount": 99 }
+		],
+
+		"Level": 1,
+		"Experience": 0
+	},
+	"Jinong": {
+		"Outfit": { "ID": 20, "Enchant": 0, "Combine": 0},
+		"Gloves": { "ID": 21, "Enchant": 0, "Combine": 0},
+		"Boots": { "ID": 22, "Enchant": 0, "Combine": 0},
+
+		"Stat_Vitality": 1,
+		"Stat_Strength": 1,
+		"Stat_Chi": 1,
+		"Stat_Dexterity": 1,
+
+		"MapID": 11,
+		"RealX": -743,
+		"RealY": -388,
+		"RealZ": 2719,
+
+		"Silver": 50000,
+
+		"SkillBar": [
+			{ "ID": 39, "Level": 1 },
+			{ "ID": 40, "Level": 1 }
+		],
+
+		"SkillList": [
+			{ "ID": 39, "Level": 1 },
+			{ "ID": 40, "Level": 1 }
+		],
+
+		"QuickUseItems": [
+			{ "Column": 0, "ID": 2, "Amount": 99 },
+			{ "Column": 2, "ID": 26, "Amount": 99 }
+		],
+
+		"Inventory": [
+			{ "Column": 0, "Row": 0, "ID": 2, "Amount": 99},
+			{ "Column": 1, "Row": 0, "ID": 2, "Amount": 99 },
+			{ "Column": 2, "Row": 0, "ID": 26, "Amount": 99 },
+			{ "Column": 3, "Row": 0, "ID": 26, "Amount": 99 }
+		],
+
+		"Level": 1,
+		"Experience": 0
+	}
+}

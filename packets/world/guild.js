@@ -36,7 +36,7 @@
 // PacketCollection.Set(0x74,{
 // 	Restruct: ,
 // function: function RequestCreateGuild(socket, data) {
-  
+
 // }
 // });
 
@@ -117,7 +117,7 @@ WorldPC.Set(0x51, {
 // Also sent when activating a costume to bind it to the character
 
 //5E 33 00 11 00 00 00 E9 78 33 01 00 00 00 00 D1
-//07 00 00 00 00 00 00 00 00 00 00               
+//07 00 00 00 00 00 00 00 00 00 00
 
 // Dressing in clothes
 // 91 0300 0000 0000 0000
@@ -137,7 +137,7 @@ WorldPC.Set(0x91, {
 			case 3:
 			console.log('Dress');
 			break;
-			default: 
+			default:
 			console.log('Unknown Key: '+input.Key);
 			break;
 		}
@@ -150,7 +150,7 @@ WorldPC.Set(0x91, {
 // 07 00 00 00 00 00 00 00 00 00 00
 // PacketID
 // Type
-// 
+//
 
 // Fortune Cookie used
 // 5E 35 00 00 00 00 00 00 00 00 00 00 00 00 00 00
@@ -159,7 +159,7 @@ WorldPC.Set(0x91, {
 
 // Obtained silver coins Date is the amount :(
 // 5E 01 00 00 00 00 00 D9 27 00 00 00 00 00 00 D1
-// 07 00 00 00 00 00 00 00 00 00 00i 
+// 07 00 00 00 00 00 00 00 00 00 00i
 
 
 var itemRegisterUse = restruct.
@@ -196,6 +196,8 @@ var ResultFail = function(client, input){
 WorldPC.Set(0x74, {
 	Restruct: packets.GuildPacket,
 	function: function RequestCreateGuild(client, input){
+    console.log(input);
+    
 		switch(input.Action){
 
 			// Create guild request
@@ -256,7 +258,7 @@ WorldPC.Set(0x74, {
 				return;
 			}
 
-			
+
 			var memberArray = [];
 			var privilegesArray = [];
 			var leaderName = null;

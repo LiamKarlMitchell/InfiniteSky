@@ -1,0 +1,39 @@
+{
+	/*
+		Runtime settings
+	*/
+	"server_name": "Development",
+	"data_path": "./Data/",
+
+	/*
+		Database settings
+	*/
+	"database": {
+		"connection_string": "localhost:27017/ts1"
+	},
+
+	/*
+		Zone settings
+	*/
+	"zone": {
+		"transfer_timeout_time": 30000
+	},
+
+	/*
+		World configuration
+	*/
+	"general": {
+		"rates": {
+			"global": {
+				"experience": 10,
+				"drop": 1,
+				"pet_experience": 1
+			}
+		},
+		"maxClients": 10
+	},
+
+	"info_directory": "C:\\Users\\Paulo\\Desktop\\game here\\G03_GDATA\\D01_GIMAGE2D\\005",
+	"world_directory": "C:\\Users\\Paulo\\Desktop\\game here\\G03_GDATA\\D07_GWORLD",
+	"translation_directory": "../data\\translation"
+}

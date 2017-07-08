@@ -1,0 +1,67 @@
+{
+  "name": "InfiniteSky",
+  "version": "1.1.05",
+  "version_name": "Fruit Salad",
+  "description": "A serverside emulation project for the game Twelve Sky.",
+  "main": "main.js",
+  "dependencies": {
+    "async": "^1.3.0",
+    "body-parser": "^1.13.3",
+    "bson": "^0.2.22",
+    "bunyan": "^1.4.0",
+    "cli-color": "^1.0.0",
+    "clone": "^1.0.2",
+    "coffee-script": "^1.9.3",
+    "encoding": "^0.1.11",
+    "express": "^4.13.2",
+    "fast-csv": "^0.6.0",
+    "hexy": "^0.2.7",
+    "iconv": "^2.1.7",
+    "js-yaml": "^3.3.1",
+    "jshint": "^2.7.0",
+    "jsonlint": "^1.6.2",
+    "mongoose": "^4.0.6",
+    "mongoose-cache": "^0.1.4",
+    "netmask": "^1.0.5",
+    "node-uuid": "^1.4.3",
+    "nopt": "^3.0.3",
+    "pcap-parser": "^0.2.1",
+    "random-js": "^1.0.4",
+    "rimraf": "^2.4.2",
+    "smith": "^0.1.22",
+    "socket.io": "^1.3.6",
+    "tabletop": "^1.4.2",
+    "which": "^1.1.1",
+    "winston": "^1.0.1"
+  },
+  "devDependencies": {
+    "grunt-cli": "^0.1.13",
+    "grunt-gss": "^1.0.4",
+    "grunt-jsdoc": "^2.1.0",
+    "jsdoc-oblivion": "0.0.4",
+    "grunt-mkdir": "^0.1.2",
+    "grunt-text-replace": "^0.4.0",
+    "grunt-todo": "^0.5.0",
+    "hexy": "^0.2.7",
+    "mongobackup": "^0.1.8",
+    "pcap-parser": "^0.2.1",
+    "tabletop": "^1.3.5"
+  },
+  "scripts": {
+    "test": "grunt test",
+    "run": "node main | bunyan"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/liamkarlmitchell/InfiniteSky"
+  },
+  "keywords": [
+    "TwelveSky"
+  ],
+  "author": "Liam Karl Mitchell <liamkarlmitchell@gmail.com> (https://github.com/LiamKarlMitchell)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/liamkarlmitchell/InfiniteSky/issues"
+  },
+  "homepage": "https://github.com/liamkarlmitchell/InfiniteSky"
+}

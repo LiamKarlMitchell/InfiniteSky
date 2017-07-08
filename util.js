@@ -2,6 +2,7 @@
 // Copyright (c) InfiniteSky Dev Teams - Licensed under GNU GPL
 // For more information, see LICENCE in the main folder
 var fs = require('fs');
+var hexy = require('hexy');
 
 function dumpError(err) {
     if (typeof err === 'object') {

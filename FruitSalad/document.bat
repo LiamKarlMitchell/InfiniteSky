@@ -1,0 +1,1 @@
+jsdoc . -r -u Tutorials -d Documentation -c Config\jsdoc.json -t E:\Source\InfiniteSkyNew\node_modules\ink-docstrap\themes\superhero --verbose

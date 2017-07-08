@@ -1,0 +1,6 @@
+{
+	"singleClanOnly": false,
+	"database":{
+		"connection_string": "ts1:ts1@localhost:27017/ts1"
+	}
+}

@@ -72,7 +72,7 @@ WorldPC.Set(0x13, {
 			GMCommands.Execute(input.Message.substr(1), socket); // Need to remove the / so everything after it.
 			return;
 		}
-		console.log("[Normal] " + socket.character.Name + ": " + input.Message);
+		log.debug("[Normal] " + socket.character.Name + ": " + input.Message);
 
 		socket.Zone.sendToAllClan(
 		new Buffer(

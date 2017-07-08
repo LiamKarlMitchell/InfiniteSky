@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=yes, width=device-width">
+  <title>InfiniteSky — Source: Generic/CVec3.js</title>
+  <link rel="shortcut icon" href="/favicon.ico">
+
+  <!--[if lt IE 9]>
+  <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link type="text/css" rel="stylesheet" href="styles/sunlight.dark.css">
+
+  <link type="text/css" rel="stylesheet" href="styles/site.oblivion.css">
+</head>
+<body>
+<div class="container-fluid">
+  <div class="navbar navbar-fixed-top navbar-inverse">
+    <div class="navbar-inner">
+      <a class="brand" href="index.html">InfiniteSky</a>
+      <ul class="nav">
+        
+        <li class="dropdown">
+          <a href="namespaces.list.html" class="dropdown-toggle" data-toggle="dropdown">Namespaces<b
+            class="caret"></b></a>
+
+          <ul class="dropdown-menu ">
+            
+            <li>
+              <a href="Zone_recv.html">Zone/recv</a>
+            </li>
+            
+            <li>
+              <a href="Zone_send.html">Zone/send</a>
+            </li>
+            
+
+          </ul>
+        </li>
+        
+        <li class="dropdown">
+          <a href="modules.list.html" class="dropdown-toggle" data-toggle="dropdown">Modules<b
+            class="caret"></b></a>
+
+          <ul class="dropdown-menu ">
+            
+            <li>
+              <a href="module-Helper_ChildProcessHost.html">Helper/ChildProcessHost</a>
+            </li>
+            
+            <li>
+              <a href="module-LoginInstance.html">LoginInstance</a>
+            </li>
+            
+            <li>
+              <a href="module-PacketCollection.html">PacketCollection</a>
+            </li>
+            
+            <li>
+              <a href="module-Restruct.html">Restruct</a>
+            </li>
+            
+            <li>
+              <a href="module-vmscript.html">vmscript</a>
+            </li>
+            
+            <li>
+              <a href="module-ZoneInstance.html">ZoneInstance</a>
+            </li>
+            
+
+          </ul>
+        </li>
+        
+        <li class="dropdown">
+          <a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b
+            class="caret"></b></a>
+
+          <ul class="dropdown-menu ">
+            
+            <li>
+              <a href="CharacterInfos.html">CharacterInfos</a>
+            </li>
+            
+            <li>
+              <a href="Command.html">Command</a>
+            </li>
+            
+            <li>
+              <a href="CVec3.html">CVec3</a>
+            </li>
+            
+            <li>
+              <a href="db.Account.html">db.Account</a>
+            </li>
+            
+            <li>
+              <a href="db.Item.html">db.Item</a>
+            </li>
+            
+            <li>
+              <a href="module-Helper_ChildProcessHost-ChildProcessHost.html">Helper/ChildProcessHost~ChildProcessHost</a>
+            </li>
+            
+            <li>
+              <a href="module-vmscript-VMScriptObj.html">vmscript~VMScriptObj</a>
+            </li>
+            
+
+          </ul>
+        </li>
+        
+        <li class="dropdown">
+          <a href="mixins.list.html" class="dropdown-toggle" data-toggle="dropdown">Mixins<b
+            class="caret"></b></a>
+
+          <ul class="dropdown-menu ">
+            
+            <li>
+              <a href="-_anonymous_-structs.CVec3.html"><anonymous>~structs.CVec3</a>
+            </li>
+            
+
+          </ul>
+        </li>
+        
+        <li class="dropdown">
+          <a href="tutorials.list.html" class="dropdown-toggle" data-toggle="dropdown">Tutorials<b
+            class="caret"></b></a>
+
+          <ul class="dropdown-menu ">
+            
+            <li>
+              <a href="tutorial-command_.html">command</a>
+            </li>
+            
+            <li>
+              <a href="tutorial-Project Layout.html">Project Layout</a>
+            </li>
+            
+
+          </ul>
+        </li>
+        
+        <li class="dropdown">
+          <a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b
+            class="caret"></b></a>
+
+          <ul class="dropdown-menu ">
+            
+            <li>
+              <a href="global.html#_id">_id</a>
+            </li>
+            
+            <li>
+              <a href="global.html#autocomplete">autocomplete</a>
+            </li>
+            
+            <li>
+              <a href="global.html#calculation">calculation</a>
+            </li>
+            
+            <li>
+              <a href="global.html#DamageDealer">DamageDealer</a>
+            </li>
+            
+            <li>
+              <a href="global.html#defaultPacketFunction">defaultPacketFunction</a>
+            </li>
+            
+            <li>
+              <a href="global.html#deg2rad">deg2rad</a>
+            </li>
+            
+            <li>
+              <a href="global.html#FujinModifiers">FujinModifiers</a>
+            </li>
+            
+            <li>
+              <a href="global.html#GuanyinModifiers">GuanyinModifiers</a>
+            </li>
+            
+            <li>
+              <a href="global.html#JinongModifiers">JinongModifiers</a>
+            </li>
+            
+            <li>
+              <a href="global.html#NanginTrack_Countdown">NanginTrack_Countdown</a>
+            </li>
+            
+            <li>
+              <a href="global.html#NanginTrack_Finished">NanginTrack_Finished</a>
+            </li>
+            
+            <li>
+              <a href="global.html#NanginTrack_Init">NanginTrack_Init</a>
+            </li>
+            
+            <li>
+              <a href="global.html#NanginTrack_onLoad">NanginTrack_onLoad</a>
+            </li>
+            
+            <li>
+              <a href="global.html#NanginTrack_Start">NanginTrack_Start</a>
+            </li>
+            
+            <li>
+              <a href="global.html#ObjectId">ObjectId</a>
+            </li>
+            
+            <li>
+              <a href="global.html#rad2deg">rad2deg</a>
+            </li>
+            
+
+          </ul>
+        </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  <div class="row-fluid">
+
+    
+
+    
+      <div class="span12">
+        
+        <div id="main">
+          
+
+
+		<h1 class="page-title">Source: Generic/CVec3.js</h1>
+    
+<section>
+  <article>
+    <pre
+      class="sunlight-highlight-javascript linenums">// This file is part of InfiniteSky.
+// Copyright (c) InfiniteSky Dev Teams - Licensed under GNU GPL
+// For more information, see LICENCE in the main folder
+
+/**
+ * CVec3 Module
+ * @exports Generic/CVec3
+ */
+
+//vms('CVec3', [], function(){
+
+/**
+ * [CVec3 description]
+ * @param {Number} X
+ * @param {Number} Y
+ * @param {Number} Z
+ * @constructor
+ */
+function CVec3(X,Y,Z) {
+	this.X=X || 0;
+	this.Y=Y || 0;
+	this.Z=Z || 0;
+};
+
+/**
+ * A cached value to assist in converting degrees to radians.
+ */
+var deg2rad = Math.PI/180;
+
+/**
+ * A cached value to assist in converting radians to degrees.
+ */
+var rad2deg = 180/Math.PI;
+
+CVec3.prototype = {
+
+	/**
+	 * Sets the XYZ to the same value.
+	 * @param {Number} n The number to set them to.
+	 */
+	setN: function CVec3_setN(n) {
+		this.X=n;
+		this.Y=n;
+		this.Z=n;
+	},
+
+	/**
+	 * Set the XYZ to another objects XYZ.
+	 * @param {CVec3|object} other The other object.
+	 */
+	set: function CVec3_set(other) {
+		this.X=other.X;
+		this.Y=other.Y;
+		this.Z=other.Z;
+	},
+
+	/**
+	 * Return a clone of the CVec3 Object.
+	 * @return {CVec3} A copy.
+	 */
+	copy: function CVec3_copy() {
+		return new CVec3(this.X,this.Y,this.Z);
+	},
+
+	/**
+	 * Divide this CVec3 by another CVec3.
+	 * @param  {CVec3} other The other CVec3.
+	 */
+	divide: function CVec3_divide(other){
+		this.X = this.X/other.X;
+		this.Y = this.Y/other.Y;
+		this.Z = this.Z/other.Z;
+	},
+
+	/**
+	 * Add the other into this.
+	 * @param  {CVec3} other The other CVec3.
+	 */
+	add: function CVec3_add(other) {
+		this.X+=other.X;
+		this.Y+=other.Y;
+		this.Z+=other.Z;
+	},
+
+	/**
+	 * Subtract the other from this.
+	 * @param  {CVec3} other The other CVec3.
+	 */
+	subtract: function CVec3_subtract(other) {
+		this.X-=other.X;
+		this.Y-=other.Y;
+		this.Z-=other.Z;
+	},
+
+	/**
+	 * Return a vector of the difference between this and another CVec3.
+	 * @param  {CVec3} other The other CVec3.
+	 * @return {CVec3} The result.
+	 */
+	getVectorDifference: function CVec3_getVectorDifference(other) {
+		var n = new CVec3();
+		n.X = this.X-other.X;
+		n.Y = this.Y-other.Y;
+		n.Z = this.Z-other.Z;
+		return n;
+	},
+
+	/**
+	 * Return the distance between this and another CVec3 as a number..
+	 * @param  {CVec3} other The other CVec3.
+	 * @return {Number} The result.
+	 */
+	getDifference: function CVec3_getDifference(other) {
+		return Math.sqrt(
+			((other.X - this.X)*(other.X - this.X)) +
+			((other.Y - this.Y)*(other.Y - this.Y)) +
+			((other.Z - this.Z)*(other.Z - this.Z))
+			);
+	},
+
+	/**
+	 * Takes distance and an angle in degrees and moves in that direction by the distance.
+	 * @param  {Number} distance The length to move.
+	 * @param  {Number} angle    The angle to move on (in degrees).
+	 */
+	moveInDirection: function CVec3_moveInDirection( distance, angle )
+	{
+	   angle *= deg2rad;
+	   this.X += distance * Math.cos(angle);
+		   this.Z += distance * Math.sin(angle);
+	},
+
+	/**
+	 * Return the absolute distance between this and another CVec3 as a number..
+	 * This will always be a positive value.
+	 * @param  {CVec3} other The other CVec3.
+	 * @return {Number} The result.
+	 */
+	getDistance: function CVec3_getDistance(other) {
+		return Math.abs(this.getDifference(other));
+	},
+
+	/**
+	 * Gets the 2D direction in degrees. Ignores the Y value.
+	 * @param  {CVec3} other The other CVec3.
+	 * @return {Number}       The 2D direction between the vectors.
+	 */
+	get2DDirection: function CVec3_get2DDirection(other)
+	{
+		return Math.atan2(other.X - this.X, other.Z - this.Z) * rad2deg;
+	},
+
+	/**
+	 * Applys a 3D Velocity to this vector with the time delta.
+	 * @param  {CVec3} velocity The velocity vector. This should probably be normalized.
+	 * @param  {Number} delta    The amount of time to move by.
+	 */
+	apply3DVelocity: function CVec3_apply3DVelocity(velocity,delta)
+	{
+		this.X += velocity.X*delta;
+		this.Y += velocity.Y*delta;
+		this.Z += velocity.Z*delta;
+	},
+
+	/**
+	 * Applys a 2D Velocity to this vector with the time delta. Ignores the Y value.
+	 * @param  {CVec3} velocity The velocity vector. This should probably be normalized.
+	 * @param  {Number} delta    The amount of time to move by.
+	 */
+	apply2DVelocity: function CVec3_apply2DVelocity(velocity,delta)
+	{
+		this.X += velocity.X*delta;
+		this.Z += velocity.Z*delta;
+	},
+
+	/**
+	 * Returns a string of the CVec3.
+	 * @return {String} To two DP for each coordinate seperated with ', '.
+	 */
+	toString: function CVec3_toString() {
+		return this.X.toFixed(2)+', '+this.Y.toFixed(2)+', '+this.Z.toFixed(2);
+	},
+
+	/**
+	 * Calls the toString method, to help with console.inspect.
+	 * @return {String}
+	 */
+	inspect: function() {
+		return this.toString();
+	}
+}
+
+global.CVec3 = CVec3;
+//});
+</pre>
+  </article>
+</section>
+
+
+
+
+
+        </div>
+
+        <div class="clearfix"></div>
+        <footer>
+          
+          
+    <span class="copyright">
+    The contributors to the InfiniteSky project.
+    </span>
+          <br />
+          
+    <span class="jsdoc-message">
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc" target="_blank">JSDoc 3.4.0</a>
+    on Sat Jul 16th 2016
+    </span>
+        </footer>
+      </div>
+
+      <br clear="both">
+    </div>
+
+  </div>
+  <!--<script src="scripts/sunlight.js"></script>-->
+  <script src="scripts/docstrap.lib.js"></script>
+  <script src="scripts/bootstrap-dropdown.js"></script>
+  <script src="scripts/toc.js"></script>
+
+  <script>
+    $( function () {
+      $( "[id*='$']" ).each( function () {
+        var $this = $( this );
+
+        $this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+      } );
+
+      $( "#toc" ).toc( {
+        anchorName  : function ( i, heading, prefix ) {
+          return $( heading ).attr( "id" ) || ( prefix + i );
+        },
+        selectors   : "h1,h2,h3,h4",
+        showAndHide : false,
+        scrollTo    : "100px"
+      } );
+
+      $( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
+      $( "#main span[id^='toc']" ).addClass( "toc-shim" );
+      $( '.dropdown-toggle' ).dropdown();
+//      $( ".tutorial-section pre, .readme-section pre" ).addClass( "sunlight-highlight-javascript" ).addClass( "linenums" );
+
+      $( ".tutorial-section pre, .readme-section pre" ).each( function () {
+        var $this = $( this );
+
+        var example = $this.find( "code" );
+        exampleText = example.html();
+        var lang = /{@lang (.*?)}/.exec( exampleText );
+        if ( lang && lang[1] ) {
+          exampleText = exampleText.replace( lang[0], "" );
+          example.html( exampleText );
+          lang = lang[1];
+        } else {
+          lang = "javascript";
+        }
+
+        if ( lang ) {
+
+          $this
+            .addClass( "sunlight-highlight-" + lang )
+            .addClass( "linenums" )
+            .html( example.html() );
+
+        }
+      } );
+
+      Sunlight.highlightAll( {
+        lineNumbers : true,
+        showMenu : true,
+        enableDoclinks : true
+      } );
+    } );
+   </script>
+
+
+
+  <!--Navigation and Symbol Display-->
+  
+
+
+  <!--Google Analytics-->
+  
+
+</body>
+</html>
