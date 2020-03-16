@@ -34,9 +34,9 @@
 	"34":  { "Name": "Z034", "Load": false, "DisplayName": "Hangma Battlefield Guanyin" }, OLD ID
 	"35":  { "Name": "Z035", "Load": false, "DisplayName": "Hangma Battlefield Fujin" }, OLD ID
 	"36":  { "Name": "Z036", "Load": false, "DisplayName": "Hangma Battlefield Jinong" }, OLD ID
-	"37":  { "Name": "Z037", "Load": true, "DisplayName": "Yongu" },
+	"37":  { "Name": "Z037", "Load": true,  "DisplayName": "Yongu" },
 	"38":  { "Name": "Z038", "Load": false, "DisplayName": "Yanggok Valley" },
-	"39":  { "Name": "Z039", "Load": false, "DisplayName": "Yanggok Valley Cave" },
+	"39":  { "Name": "Z039", "Load": false, "DisplayName": "Gyuwan Dungeon" }, ("Yanggok Y-Form Cave" },
 	"40":  { "Name": "Z040", "Load": false, "DisplayName": "Guyu Cave" },
 	"41":  { "Name": "Z041", "Load": false, "DisplayName": "Yukko Cave" },
 	"42":  { "Name": "Z042", "Load": false, "DisplayName": "Wangun Palace" },
@@ -79,14 +79,14 @@
         "79":  { "Name": "Z079", "Load": false, "DisplayName": "Monye Dungeon" },
         "80":  { "Name": "Z080", "Load": false, "DisplayName": "Golwilda Hall" },
         "81":  { "Name": "Z074", "Load": false, "DisplayName": "Homungwan" },     "Master Map 1"
-        "82":  { "Name": "Z074", "Load": false, "DisplayName": "Chonsan Fortress" },     "Master Map 1"
+        "82":  { "Name": "Z074", "Load": false, "DisplayName": "Chonsan Fortress" },     "Master Map 2"
         "83":  { "Name": "Z083", "Load": false, "DisplayName": "Immak Dungeon" },
         "84":  { "Name": "Z084", "Load": false, "DisplayName": "Immak Dungeon" },
         "85":  { "Name": "Z085", "Load": false, "DisplayName": "Immak Dungeon" },
         "86":  { "Name": "Z086", "Load": false, "DisplayName": "Bimilda Hall" },
         "87":  { "Name": "Z087", "Load": false, "DisplayName": "Bimilda Hall" },
         "88":  { "Name": "Z088", "Load": false, "DisplayName": "Bimilda Hall" },
-        "89":  { "Name": "Z089", "Load": false, "DisplayName": "Hanchorak" },
+        "89":  { "Name": "Z089", "Load": false, "DisplayName": "Hanchorak" }, "Master Map 3"
         "90":  { "Name": "Z090", "Load": false, "DisplayName": "Owagi Tomb" },
         "91":  { "Name": "Z091", "Load": false, "DisplayName": "Sangun Island" },
         "92":  { "Name": "Z092", "Load": false, "DisplayName": "Colgu Cave" }, OLD ID
