@@ -112,7 +112,7 @@
        "112":  { "Name": "Z112", "Load": false, "DisplayName": "Heolgo Hall" },
        "113":  { "Name": "Z113", "Load": false, "DisplayName": "Heolgo Hall" },
        "114":  { "Name": "Z114", "Load": false, "DisplayName": "Heolgo Hall" },
-       "115":  { "Name": "Z115", "Load": false, "DisplayName": "Sinjay Temple" },
+       "115":  { "Name": "Z115", "Load": false, "DisplayName": "Sinjay Temple" }, Wrong spawn pont on move
        "116":  { "Name": "Z116", "Load": false, "DisplayName": "Chugun Palace" },
        "117":  { "Name": "Z117", "Load": false, "DisplayName": "Chugun Palace" },
        "118":  { "Name": "Z118", "Load": false, "DisplayName": "Chugun Palace" },
