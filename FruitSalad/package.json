@@ -20,7 +20,7 @@
     "js-yaml": "^3.3.1",
     "jshint": "^2.7.0",
     "jsonlint": "^1.6.2",
-    "mongoose": "^4.0.6",
+    "mongoose": "^5.9.4",
     "mongoose-cache": "^0.1.4",
     "netmask": "^1.0.5",
     "node-uuid": "^1.4.3",
